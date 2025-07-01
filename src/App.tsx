@@ -12,15 +12,20 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Explore } from "./pages/Explore";
 import { About } from "./pages/About";
+import { CreatorProfile } from "./pages/CreatorProfile";
+import { ForgotPassword } from "./pages/ForgotPassword";
 
 // Fan pages
 import { FanDashboard } from "./pages/fan/FanDashboard";
+import { FanSettings } from "./pages/fan/FanSettings";
 
 // Creator pages
 import { CreatorDashboard } from "./pages/creator/CreatorDashboard";
+import { CreatorSettings } from "./pages/creator/CreatorSettings";
 
 // Admin pages
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { AdminSettings } from "./pages/admin/AdminSettings";
 
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +45,8 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/about" element={<About />} />
+            <Route path="/creator/:username" element={<CreatorProfile />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Fan routes */}
             <Route
@@ -47,6 +54,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['fan']}>
                   <FanDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fan/settings"
+              element={
+                <ProtectedRoute allowedRoles={['fan']}>
+                  <FanSettings />
                 </ProtectedRoute>
               }
             />
@@ -60,6 +75,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/creator/settings"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <CreatorSettings />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Admin routes */}
             <Route
@@ -67,6 +90,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminSettings />
                 </ProtectedRoute>
               }
             />
