@@ -22,6 +22,11 @@ import { FanSettings } from "./pages/fan/FanSettings";
 // Creator pages
 import { CreatorDashboard } from "./pages/creator/CreatorDashboard";
 import { CreatorSettings } from "./pages/creator/CreatorSettings";
+import { CreatePost } from "./pages/creator/CreatePost";
+import { Analytics } from "./pages/creator/Analytics";
+import { Subscribers } from "./pages/creator/Subscribers";
+import { Messages } from "./pages/creator/Messages";
+import { Schedule } from "./pages/creator/Schedule";
 
 // Admin pages
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -80,6 +85,46 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['creator']}>
                   <CreatorSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/upload"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <CreatePost />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/analytics"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/subscribers"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <Subscribers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/messages"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <Messages />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/schedule"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <Schedule />
                 </ProtectedRoute>
               }
             />
