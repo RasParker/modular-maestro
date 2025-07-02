@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Calendar, Clock, Plus, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const SCHEDULED_POSTS = [
   {
@@ -37,6 +38,24 @@ const SCHEDULED_POSTS = [
 ];
 
 export const Schedule: React.FC = () => {
+  const { toast } = useToast();
+  const [scheduledPosts, setScheduledPosts] = useState(SCHEDULED_POSTS);
+
+  const handleEdit = (postId: string) => {
+    toast({
+      title: "Edit post",
+      description: "Opening post editor...",
+    });
+  };
+
+  const handleDelete = (postId: string) => {
+    setScheduledPosts(posts => posts.filter(post => post.id !== postId));
+    toast({
+      title: "Post deleted",
+      description: "Scheduled post has been deleted successfully.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -76,7 +95,7 @@ export const Schedule: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {SCHEDULED_POSTS.map((post) => (
+                {scheduledPosts.map((post) => (
                   <div key={post.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center">
@@ -99,10 +118,18 @@ export const Schedule: React.FC = () => {
                         <p className="text-xs text-muted-foreground">{post.scheduledTime}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEdit(post.id)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDelete(post.id)}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Users, Search, Filter } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const SUBSCRIBERS = [
   {
@@ -42,6 +43,31 @@ const SUBSCRIBERS = [
 ];
 
 export const Subscribers: React.FC = () => {
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTier, setSelectedTier] = useState('all');
+
+  const handleSearch = () => {
+    toast({
+      title: "Search function",
+      description: "Search functionality would be implemented here.",
+    });
+  };
+
+  const handleFilter = () => {
+    toast({
+      title: "Filter function",
+      description: "Filter functionality would be implemented here.",
+    });
+  };
+
+  const handleMessage = (username: string) => {
+    toast({
+      title: "Message sent",
+      description: `Opening message thread with ${username}.`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -64,11 +90,11 @@ export const Subscribers: React.FC = () => {
         </div>
 
         <div className="flex gap-4 mb-6">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleSearch}>
             <Search className="w-4 h-4 mr-2" />
             Search
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleFilter}>
             <Filter className="w-4 h-4 mr-2" />
             Filter by Tier
           </Button>
@@ -100,7 +126,11 @@ export const Subscribers: React.FC = () => {
                         {subscriber.status}
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleMessage(subscriber.username)}
+                    >
                       Message
                     </Button>
                   </div>

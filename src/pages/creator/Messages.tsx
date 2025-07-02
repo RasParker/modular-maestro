@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, MessageSquare, Send } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const MESSAGES = [
   {
@@ -34,6 +35,24 @@ const MESSAGES = [
 ];
 
 export const Messages: React.FC = () => {
+  const { toast } = useToast();
+  const [messageText, setMessageText] = useState('');
+  const [selectedMessage, setSelectedMessage] = useState(MESSAGES[0]);
+
+  const handleSendMessage = () => {
+    if (!messageText.trim()) return;
+    
+    toast({
+      title: "Message sent",
+      description: `Message sent to ${selectedMessage.from}`,
+    });
+    setMessageText('');
+  };
+
+  const handleMessageSelect = (message: typeof MESSAGES[0]) => {
+    setSelectedMessage(message);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -64,9 +83,13 @@ export const Messages: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {MESSAGES.map((message) => (
-                  <div key={message.id} className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                    message.unread ? 'border-primary/50 bg-primary/5' : 'border-border/50'
-                  }`}>
+                  <div 
+                    key={message.id} 
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      message.unread ? 'border-primary/50 bg-primary/5' : 'border-border/50'
+                    } ${selectedMessage.id === message.id ? 'ring-2 ring-primary/50' : ''}`}
+                    onClick={() => handleMessageSelect(message)}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-sm">{message.from}</span>
                       {message.unread && <Badge variant="default" className="text-xs">New</Badge>}
@@ -83,7 +106,7 @@ export const Messages: React.FC = () => {
           <div className="lg:col-span-2">
             <Card className="bg-gradient-card border-border/50 h-full">
               <CardHeader>
-                <CardTitle>Conversation with johndoe</CardTitle>
+                <CardTitle>Conversation with {selectedMessage.from}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4 min-h-[400px] max-h-[400px] overflow-y-auto">
@@ -106,9 +129,12 @@ export const Messages: React.FC = () => {
                   <input 
                     type="text" 
                     placeholder="Type your message..." 
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     className="flex-1 px-3 py-2 rounded-lg border border-border/50 bg-background text-foreground"
                   />
-                  <Button>
+                  <Button onClick={handleSendMessage} disabled={!messageText.trim()}>
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>

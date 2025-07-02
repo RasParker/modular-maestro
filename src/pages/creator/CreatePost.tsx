@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Upload, Image, Video, FileText } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export const CreatePost: React.FC = () => {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUpload = async (type: string) => {
+    setIsUploading(true);
+    try {
+      // Simulate upload process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast({
+        title: "Upload successful",
+        description: `Your ${type.toLowerCase()} post has been uploaded successfully.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload content. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -32,9 +56,13 @@ export const CreatePost: React.FC = () => {
               <CardDescription>Share photos and artwork</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
+              <Button 
+                className="w-full" 
+                onClick={() => handleUpload('Image')}
+                disabled={isUploading}
+              >
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Image
+                {isUploading ? 'Uploading...' : 'Upload Image'}
               </Button>
             </CardContent>
           </Card>
@@ -46,9 +74,13 @@ export const CreatePost: React.FC = () => {
               <CardDescription>Share videos and content</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
+              <Button 
+                className="w-full" 
+                onClick={() => handleUpload('Video')}
+                disabled={isUploading}
+              >
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Video
+                {isUploading ? 'Uploading...' : 'Upload Video'}
               </Button>
             </CardContent>
           </Card>
@@ -60,9 +92,13 @@ export const CreatePost: React.FC = () => {
               <CardDescription>Share updates and messages</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
+              <Button 
+                className="w-full" 
+                onClick={() => handleUpload('Text')}
+                disabled={isUploading}
+              >
                 <Upload className="w-4 h-4 mr-2" />
-                Create Text Post
+                {isUploading ? 'Creating...' : 'Create Text Post'}
               </Button>
             </CardContent>
           </Card>
