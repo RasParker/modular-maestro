@@ -27,6 +27,7 @@ import { Analytics } from "./pages/creator/Analytics";
 import { Subscribers } from "./pages/creator/Subscribers";
 import { Messages } from "./pages/creator/Messages";
 import { Schedule } from "./pages/creator/Schedule";
+import { EditPost } from "./pages/creator/EditPost";
 
 // Admin pages
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -125,6 +126,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['creator']}>
                   <Schedule />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/creator/edit-post/:postId"
+              element={
+                <ProtectedRoute allowedRoles={['creator']}>
+                  <EditPost />
                 </ProtectedRoute>
               }
             />

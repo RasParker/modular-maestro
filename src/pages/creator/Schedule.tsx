@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,13 +39,11 @@ const SCHEDULED_POSTS = [
 
 export const Schedule: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [scheduledPosts, setScheduledPosts] = useState(SCHEDULED_POSTS);
 
   const handleEdit = (postId: string) => {
-    toast({
-      title: "Edit post",
-      description: "Opening post editor...",
-    });
+    navigate(`/creator/edit-post/${postId}`);
   };
 
   const handleDelete = (postId: string) => {

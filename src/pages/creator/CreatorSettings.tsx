@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,8 @@ export const CreatorSettings: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   
   const [profileData, setProfileData] = useState({
     username: user?.username || '',
@@ -66,6 +68,26 @@ export const CreatorSettings: React.FC = () => {
     }
   };
 
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      toast({
+        title: "Avatar uploaded",
+        description: "Your avatar has been successfully updated.",
+      });
+    }
+  };
+
+  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      toast({
+        title: "Cover image uploaded",
+        description: "Your cover image has been successfully updated.",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -94,8 +116,26 @@ export const CreatorSettings: React.FC = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
-                  <Button variant="outline">Change Avatar</Button>
-                  <Button variant="outline">Upload Cover Image</Button>
+                  <input
+                    type="file"
+                    ref={avatarInputRef}
+                    onChange={handleAvatarUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <input
+                    type="file"
+                    ref={coverInputRef}
+                    onChange={handleCoverUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <Button variant="outline" onClick={() => avatarInputRef.current?.click()}>
+                    Change Avatar
+                  </Button>
+                  <Button variant="outline" onClick={() => coverInputRef.current?.click()}>
+                    Upload Cover Image
+                  </Button>
                 </div>
               </div>
               
