@@ -13,7 +13,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 export const FanSettings: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [isPreferencesLoading, setIsPreferencesLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -32,7 +34,7 @@ export const FanSettings: React.FC = () => {
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsProfileLoading(true);
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -53,7 +55,7 @@ export const FanSettings: React.FC = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsProfileLoading(false);
     }
   };
 
@@ -69,7 +71,7 @@ export const FanSettings: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
+    setIsPasswordLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -91,7 +93,7 @@ export const FanSettings: React.FC = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsPasswordLoading(false);
     }
   };
 
@@ -146,8 +148,8 @@ export const FanSettings: React.FC = () => {
                   </div>
                 </div>
                 
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Update Profile"}
+                <Button type="submit" disabled={isProfileLoading}>
+                  {isProfileLoading ? "Updating..." : "Update Profile"}
                 </Button>
               </form>
             </CardContent>
@@ -193,8 +195,8 @@ export const FanSettings: React.FC = () => {
                   </div>
                 </div>
                 
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Change Password"}
+                <Button type="submit" disabled={isPasswordLoading}>
+                  {isPasswordLoading ? "Updating..." : "Change Password"}
                 </Button>
               </form>
             </CardContent>
@@ -277,7 +279,29 @@ export const FanSettings: React.FC = () => {
                 </div>
               </div>
               
-              <Button>Save Preferences</Button>
+              <Button 
+                onClick={async () => {
+                  setIsPreferencesLoading(true);
+                  try {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    toast({
+                      title: "Preferences saved",
+                      description: "Your notification preferences have been updated.",
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Save failed",
+                      description: "Failed to save preferences. Please try again.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsPreferencesLoading(false);
+                  }
+                }}
+                disabled={isPreferencesLoading}
+              >
+                {isPreferencesLoading ? "Saving..." : "Save Preferences"}
+              </Button>
             </CardContent>
           </Card>
         </div>

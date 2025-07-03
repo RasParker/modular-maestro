@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, Settings, User, Crown, Shield } from 'lucide-react';
 
@@ -73,6 +74,7 @@ export const Navbar: React.FC = () => {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

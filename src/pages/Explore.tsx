@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
+import { useToast } from '@/hooks/use-toast';
 import { Search, Users, Star, Filter } from 'lucide-react';
 
 // Mock creators data
@@ -107,8 +108,16 @@ const CREATORS = [
 const CATEGORIES = ['All', 'Art', 'Fitness', 'Music', 'Tech', 'Cooking', 'Fashion'];
 
 export const Explore: React.FC = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const handleSubscribe = (creatorName: string, price: number) => {
+    toast({
+      title: "Subscription initiated",
+      description: `You've started subscribing to ${creatorName} for $${price}/month.`,
+    });
+  };
 
   const filteredCreators = CREATORS.filter(creator => {
     const matchesSearch = creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -184,7 +193,7 @@ export const Explore: React.FC = () => {
                   </Avatar>
                 </div>
                 {creator.verified && (
-                  <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground">
+                  <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground hover:bg-accent/90">
                     <Star className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
@@ -225,11 +234,23 @@ export const Explore: React.FC = () => {
                     </div>
                   </div>
                   
-                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors" asChild>
-                    <Link to={`/creator/${creator.username}`}>
-                      View Profile
-                    </Link>
-                  </Button>
+                   <div className="space-y-2">
+                     <Button 
+                       variant="outline" 
+                       className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors" 
+                       asChild
+                     >
+                       <Link to={`/creator/${creator.username}`}>
+                         View Profile
+                       </Link>
+                     </Button>
+                     <Button 
+                       className="w-full" 
+                       onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
+                     >
+                       Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
+                     </Button>
+                   </div>
                 </div>
               </CardContent>
             </Card>

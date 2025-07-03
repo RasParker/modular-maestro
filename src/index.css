@@ -6,7 +6,58 @@
 
 @layer base {
   :root {
-    /* Core brand colors */
+    /* Light theme colors */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    /* Primary brand - Deep purple for exclusivity */
+    --primary: 262 80% 50%;
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 262 90% 60%;
+
+    /* Secondary - Light gray */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    /* Muted tones */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    /* Accent - Gold for premium features */
+    --accent: 45 90% 60%;
+    --accent-foreground: 240 20% 10%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders and inputs */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 80% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom gradients for premium feel */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--accent)), hsl(45 100% 70%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(210 40% 98%));
+    
+    /* Success and warning */
+    --success: 142 76% 36%;
+    --success-foreground: 355.7 100% 97.3%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 240 20% 10%;
+  }
+
+  .dark {
+    /* Dark theme colors */
     --background: 240 20% 4%;
     --foreground: 240 5% 96%;
 
@@ -42,20 +93,10 @@
     --input: 240 10% 12%;
     --ring: 262 80% 50%;
 
-    --radius: 0.75rem;
-
     /* Custom gradients for premium feel */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-gold: linear-gradient(135deg, hsl(var(--accent)), hsl(45 100% 70%));
     --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(240 15% 8%));
-    
-    /* Glass morphism */
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     
     /* Success and warning */
     --success: 142 70% 50%;
