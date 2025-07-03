@@ -13,19 +13,31 @@ export const CreatePost: React.FC = () => {
   const handleUpload = async (type: string) => {
     setIsUploading(true);
     try {
-      // Simulate upload process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast({
-        title: "Upload successful",
-        description: `Your ${type.toLowerCase()} post has been uploaded successfully.`,
-      });
+      // Create file input and trigger click
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = type === 'Image' ? 'image/*' : type === 'Video' ? 'video/*' : '*/*';
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          // Simulate upload process
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          toast({
+            title: "Upload successful",
+            description: `Your ${type.toLowerCase()} "${file.name}" has been uploaded successfully.`,
+          });
+        }
+        setIsUploading(false);
+      };
+      
+      input.click();
     } catch (error) {
       toast({
         title: "Upload failed",
         description: "Failed to upload content. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsUploading(false);
     }
   };

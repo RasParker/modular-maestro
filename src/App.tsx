@@ -32,6 +32,16 @@ import { EditPost } from "./pages/creator/EditPost";
 // Admin pages
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { AdminSettings } from "./pages/admin/AdminSettings";
+import { ManageUsers } from "./pages/admin/ManageUsers";
+import { ReviewContent } from "./pages/admin/ReviewContent";
+import { Reports } from "./pages/admin/Reports";
+import { AdminAnalytics } from "./pages/admin/AdminAnalytics";
+
+// Fan pages (additional)
+import { ManageSubscriptions } from "./pages/fan/ManageSubscriptions";
+import { FeedPage } from "./pages/fan/FeedPage";
+import { Messages as FanMessages } from "./pages/fan/Messages";
+import { PaymentMethod } from "./pages/fan/PaymentMethod";
 
 import NotFound from "./pages/NotFound";
 
@@ -152,6 +162,72 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <ManageUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/content"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <ReviewContent />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminAnalytics />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Additional Fan routes */}
+            <Route
+              path="/fan/subscriptions"
+              element={
+                <ProtectedRoute allowedRoles={['fan']}>
+                  <ManageSubscriptions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fan/feed"
+              element={
+                <ProtectedRoute allowedRoles={['fan']}>
+                  <FeedPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fan/messages"
+              element={
+                <ProtectedRoute allowedRoles={['fan']}>
+                  <FanMessages />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fan/payment"
+              element={
+                <ProtectedRoute allowedRoles={['fan']}>
+                  <PaymentMethod />
                 </ProtectedRoute>
               }
             />
