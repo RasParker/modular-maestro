@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
+import { Login } from '@/pages/Login';
 import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorProfile } from '@/pages/CreatorProfile';
 import { FeedPage } from '@/pages/fan/FeedPage';
@@ -24,10 +25,13 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
         <AuthProvider>
           <Router>
             <Routes>
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
               <Route path="/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
@@ -44,7 +48,7 @@ function App() {
               <Route path="/creator/edit-post/:id" element={<ProtectedRoute allowedRoles={['creator']}><EditPost /></ProtectedRoute>} />
               
               {/* Default route */}
-              <Route path="/" element={<CreatorDashboard />} />
+              <Route path="/" element={<Login />} />
             </Routes>
           </Router>
           <Toaster />
