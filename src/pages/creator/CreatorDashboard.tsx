@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,7 +147,7 @@ export const CreatorDashboard: React.FC = () => {
               
               <Button asChild variant="outline" className="h-auto p-6">
                 <Link to="/creator/analytics" className="flex flex-col items-center gap-2">
-                  <BarChart className="w-8 h-8" />
+                  <BarChart3 className="w-8 h-8" />
                   <span>View Analytics</span>
                 </Link>
               </Button>
