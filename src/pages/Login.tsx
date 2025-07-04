@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as any)?.from?.pathname;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +31,17 @@ export const Login: React.FC = () => {
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
-      navigate(from, { replace: true });
+      
+      // Get the user after login to determine redirect path
+      const storedUser = localStorage.getItem('xclusive_user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const redirectPath = from || 
+          (user.role === 'admin' ? '/admin/dashboard' : 
+           user.role === 'creator' ? '/creator/dashboard' : 
+           '/fan/dashboard');
+        navigate(redirectPath, { replace: true });
+      }
     } catch (error) {
       toast({
         title: "Login failed",
