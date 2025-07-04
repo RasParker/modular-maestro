@@ -8,7 +8,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check } from 'lucide-react';
 
-// Mock creator data - in real app would fetch from API
+// Mock creator data with recent posts
 const MOCK_CREATOR = {
   id: '2',
   username: 'artisticmia',
@@ -40,6 +40,26 @@ const MOCK_CREATOR = {
       description: 'Ultimate access with personal interaction',
       features: ['Everything in Fan', 'Direct messaging', '1-on-1 feedback', 'Custom artwork requests']
     }
+  ],
+  recentPosts: [
+    {
+      id: '1',
+      title: 'New Digital Art Collection',
+      content: 'Check out my latest digital artwork featuring cyberpunk themes...',
+      mediaType: 'image',
+      tier: 'Fan',
+      createdAt: '2024-02-19T10:30:00',
+      thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop'
+    },
+    {
+      id: '2',
+      title: 'Behind the Scenes Process',
+      content: 'Here\'s how I create my digital masterpieces...',
+      mediaType: 'video',
+      tier: 'Superfan',
+      createdAt: '2024-02-18T15:20:00',
+      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop'
+    }
   ]
 };
 
@@ -58,6 +78,16 @@ export const CreatorProfile: React.FC = () => {
     }
     // Handle subscription logic
     console.log(`Subscribing to tier ${tierId}`);
+  };
+
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    return `${Math.floor(diffInHours / 24)}d ago`;
   };
 
   return (
@@ -112,20 +142,57 @@ export const CreatorProfile: React.FC = () => {
               <p className="text-muted-foreground leading-relaxed">{creator.bio}</p>
             </div>
             
-            {/* Sample Posts */}
+            {/* Recent Posts Preview */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-              <Card className="bg-gradient-card border-border/50">
-                <CardContent className="p-6">
-                  <div className="text-center py-8">
-                    <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Subscribe to view content</h3>
-                    <p className="text-muted-foreground">
-                      Subscribe to {creator.display_name} to see their exclusive posts and content.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                {creator.recentPosts.map((post) => (
+                  <Card key={post.id} className="bg-gradient-card border-border/50">
+                    <CardContent className="p-4">
+                      <div className="flex gap-4">
+                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                          <img 
+                            src={post.thumbnail} 
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h3 className="font-medium text-foreground truncate">{post.title}</h3>
+                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                {post.content}
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {post.tier}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {getTimeAgo(post.createdAt)}
+                                </span>
+                              </div>
+                            </div>
+                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                <Card className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="text-center py-4">
+                      <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Subscribe to view more content</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Subscribe to {creator.display_name} to see their exclusive posts and content.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
 

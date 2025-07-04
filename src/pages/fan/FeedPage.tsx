@@ -37,7 +37,7 @@ const MOCK_FEED = [
     title: 'Morning Workout Routine - Upper Body Blast',
     content: 'Starting the week strong with an intense upper body workout! Follow along for maximum gains. Remember to warm up properly!',
     type: 'video',
-    tier: 'Basic',
+    tier: 'Supporter',
     thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
     posted: '2024-02-19T07:00:00',
     likes: 89,
@@ -55,12 +55,30 @@ const MOCK_FEED = [
     title: 'Behind the Scenes: New Beat Production',
     content: 'Working on a new beat for my upcoming album. Here\'s a sneak peek at my creative process. What genre should I explore next?',
     type: 'audio',
-    tier: 'Producer',
+    tier: 'Superfan',
     thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
     posted: '2024-02-18T20:15:00',
     likes: 56,
     comments: 12,
     views: 423,
+    liked: false
+  },
+  {
+    id: '4',
+    creator: {
+      username: 'artisticmia',
+      display_name: 'Artistic Mia',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
+    },
+    title: 'Work in Progress Update',
+    content: 'Here\'s a sneak peek at my upcoming digital painting. Still working on the lighting effects and color balance. What do you think so far?',
+    type: 'image',
+    tier: 'Supporter',
+    thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
+    posted: '2024-02-20T14:15:00',
+    likes: 78,
+    comments: 12,
+    views: 456,
     liked: false
   }
 ];

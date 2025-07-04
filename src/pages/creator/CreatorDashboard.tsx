@@ -136,40 +136,35 @@ export const CreatorDashboard: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Quick Actions */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Manage your content and engagement</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Button size="lg" className="h-20 flex-col gap-2" asChild>
-                    <Link to="/creator/upload">
-                      <Upload className="w-6 h-6" />
-                      Create New Post
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
-                    <Link to="/creator/analytics">
-                      <BarChart3 className="w-6 h-6" />
-                      View Analytics
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
-                    <Link to="/creator/subscribers">
-                      <Users className="w-6 h-6" />
-                      Manage Subscribers
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
-                    <Link to="/creator/messages">
-                      <MessageSquare className="w-6 h-6" />
-                      Messages
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button asChild variant="premium" className="h-auto p-6">
+                <Link to="/creator/upload" className="flex flex-col items-center gap-2">
+                  <Upload className="w-8 h-8" />
+                  <span>Upload Content</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-auto p-6">
+                <Link to="/creator/analytics" className="flex flex-col items-center gap-2">
+                  <BarChart className="w-8 h-8" />
+                  <span>View Analytics</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-auto p-6">
+                <Link to="/creator/subscribers" className="flex flex-col items-center gap-2">
+                  <Users className="w-8 h-8" />
+                  <span>Manage Subscribers</span>
+                </Link>
+              </Button>
+
+              <Button asChild variant="outline" className="h-auto p-6">
+                <Link to="/creator/tiers" className="flex flex-col items-center gap-2">
+                  <DollarSign className="w-8 h-8" />
+                  <span>Manage Tiers</span>
+                </Link>
+              </Button>
+            </div>
 
             {/* Subscription Tiers Performance */}
             <Card className="bg-gradient-card border-border/50">

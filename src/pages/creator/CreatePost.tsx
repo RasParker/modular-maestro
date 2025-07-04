@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -285,7 +284,7 @@ export const CreatePost: React.FC = () => {
                         <SelectContent>
                           <SelectItem value="free">Free for all followers</SelectItem>
                           <SelectItem value="supporter">Supporter ($5/month)</SelectItem>
-                          <SelectItem value="fan">Fan ($10/month)</SelectItem>
+                          <SelectItem value="fan">Fan ($15/month)</SelectItem>
                           <SelectItem value="superfan">Superfan ($25/month)</SelectItem>
                         </SelectContent>
                       </Select>
