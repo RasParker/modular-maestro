@@ -8,6 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 import { Login } from '@/pages/Login';
+import { Explore } from '@/pages/Explore';
 import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorProfile } from '@/pages/CreatorProfile';
 import { FeedPage } from '@/pages/fan/FeedPage';
@@ -31,6 +32,9 @@ function App() {
             <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
+              
+              {/* Public Routes */}
+              <Route path="/explore" element={<Explore />} />
               
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
