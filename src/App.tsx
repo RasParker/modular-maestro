@@ -23,6 +23,17 @@ import { ManageTiers } from '@/pages/creator/ManageTiers';
 import { ManageContent } from '@/pages/creator/ManageContent';
 import { Earnings } from '@/pages/creator/Earnings';
 
+// Fan pages
+import { ManageSubscriptions } from '@/pages/fan/ManageSubscriptions';
+import { Messages } from '@/pages/fan/Messages';
+import { PaymentMethod } from '@/pages/fan/PaymentMethod';
+import { FanSettings } from '@/pages/fan/FanSettings';
+
+// Admin pages
+import { AdminDashboard } from '@/pages/admin/AdminDashboard';
+import { AdminSettings } from '@/pages/admin/AdminSettings';
+import { AdminRedirect } from '@/pages/admin/AdminRedirect';
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -41,6 +52,10 @@ function App() {
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
               <Route path="/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
+              <Route path="/fan/subscriptions" element={<ProtectedRoute allowedRoles={['fan']}><ManageSubscriptions /></ProtectedRoute>} />
+              <Route path="/fan/messages" element={<ProtectedRoute allowedRoles={['fan']}><Messages /></ProtectedRoute>} />
+              <Route path="/fan/payment" element={<ProtectedRoute allowedRoles={['fan']}><PaymentMethod /></ProtectedRoute>} />
+              <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
               <Route path="/creator/:username" element={<CreatorProfile />} />
 
               {/* Creator Routes */}
@@ -54,6 +69,11 @@ function App() {
               <Route path="/creator/settings" element={<ProtectedRoute allowedRoles={['creator']}><CreatorSettings /></ProtectedRoute>} />
               <Route path="/creator/tiers" element={<ProtectedRoute allowedRoles={['creator']}><ManageTiers /></ProtectedRoute>} />
               <Route path="/creator/edit-post/:id" element={<ProtectedRoute allowedRoles={['creator']}><EditPost /></ProtectedRoute>} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminRedirect />} />
+              <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
               
               {/* Default route */}
               <Route path="/" element={<Login />} />

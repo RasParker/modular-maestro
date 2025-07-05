@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -176,7 +177,7 @@ export const FanDashboard: React.FC = () => {
                   <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link to="/fan/feed">
+                      <Link to="/feed">
                         <Calendar className="w-4 h-4 mr-2" />
                         View My Feed
                       </Link>
@@ -209,8 +210,8 @@ export const FanDashboard: React.FC = () => {
                       <span className="text-muted-foreground">Payment method</span>
                       <span className="font-medium">•••• 4242</span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Update Payment Method
+                    <Button variant="outline" size="sm" className="w-full" asChild>
+                      <Link to="/fan/payment">Update Payment Method</Link>
                     </Button>
                   </div>
                 </CardContent>
