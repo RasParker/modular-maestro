@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 const CONTENT_DATA = [
   {
     id: '1',
-    title: 'Look what I got',
     caption: 'Check out my new traditional Ghanaian kente dress! The colors are absolutely stunning...',
     type: 'Image',
     tier: 'Basic Support',
@@ -22,11 +21,11 @@ const CONTENT_DATA = [
     views: 1234,
     likes: 89,
     comments: 12,
-    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
+    mediaPreview: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=800&h=800&fit=crop',
+    category: 'Art'
   },
   {
     id: '2',
-    title: "What's happening guys?",
     caption: 'Just finished an amazing photoshoot in Accra. The energy was incredible!',
     type: 'Image',
     tier: 'Free',
@@ -35,11 +34,11 @@ const CONTENT_DATA = [
     views: 987,
     likes: 156,
     comments: 23,
-    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
+    mediaPreview: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=800&fit=crop',
+    category: 'Fashion'
   },
   {
     id: '3',
-    title: 'Different colors, one people!',
     caption: 'Celebrating the beautiful diversity of Ghana through this vibrant corn display...',
     type: 'Image',
     tier: 'Free',
@@ -48,11 +47,11 @@ const CONTENT_DATA = [
     views: 2156,
     likes: 201,
     comments: 45,
-    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
+    mediaPreview: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=800&fit=crop',
+    category: 'Cooking'
   },
   {
     id: '4',
-    title: "It's Fridayyy! Thank God!",
     caption: 'Weekend vibes are here! Time to celebrate another successful week...',
     type: 'Image',
     tier: 'Free',
@@ -61,11 +60,11 @@ const CONTENT_DATA = [
     views: 876,
     likes: 134,
     comments: 18,
-    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
+    mediaPreview: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=800&h=800&fit=crop',
+    category: 'Fitness'
   },
   {
     id: '5',
-    title: 'Behind the Scenes Video',
     caption: 'Exclusive look at my creative process and workspace setup in Kumasi...',
     type: 'Video',
     tier: 'Premium Content',
@@ -74,11 +73,11 @@ const CONTENT_DATA = [
     views: 0,
     likes: 0,
     comments: 0,
-    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
+    mediaPreview: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=800&fit=crop',
+    category: 'Tech'
   },
   {
     id: '6',
-    title: 'Weekly Update Draft',
     caption: 'Hey everyone! This week has been amazing with so many exciting projects...',
     type: 'Text',
     tier: 'Basic Support',
@@ -87,7 +86,8 @@ const CONTENT_DATA = [
     views: 0,
     likes: 0,
     comments: 0,
-    mediaPreview: null
+    mediaPreview: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&h=800&fit=crop',
+    category: 'Music'
   }
 ];
 
@@ -139,19 +139,6 @@ export const ManageContent: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Published':
-        return 'default';
-      case 'Scheduled':
-        return 'secondary';
-      case 'Draft':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
-
   const getTierColor = (tier: string) => {
     switch (tier) {
       case 'Free':
@@ -167,17 +154,11 @@ export const ManageContent: React.FC = () => {
 
   const ContentCard = ({ item }: { item: typeof CONTENT_DATA[0] }) => (
     <div className="rounded-xl border border-border/50 bg-gradient-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
-      {/* Top Section */}
+      {/* Top Section - Only Tier Badge and Date */}
       <div className="p-4 pb-3">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-base truncate mb-1">{item.title}</h3>
-          </div>
-          <span className="text-xs text-muted-foreground flex-shrink-0">{item.date}</span>
-        </div>
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-between mb-3">
           <Badge variant={getTierColor(item.tier)} className="text-xs">{item.tier}</Badge>
-          <Badge variant={getStatusColor(item.status)} className="text-xs">{item.status}</Badge>
+          <span className="text-xs text-muted-foreground">{item.date}</span>
         </div>
       </div>
 
@@ -195,7 +176,7 @@ export const ManageContent: React.FC = () => {
               <div className="relative z-10 w-full h-full flex items-center justify-center bg-black/20">
                 <img 
                   src={item.mediaPreview} 
-                  alt={item.title}
+                  alt={item.caption}
                   className="max-w-full max-h-full object-contain"
                 />
               </div>

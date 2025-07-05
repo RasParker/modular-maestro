@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export const CreatorSettings: React.FC = () => {
@@ -19,11 +18,20 @@ export const CreatorSettings: React.FC = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
 
   const handleSave = () => {
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully.",
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    toast({
+      title: "Account deletion requested",
+      description: "Please check your email for confirmation instructions.",
+      variant: "destructive",
     });
   };
 
@@ -181,7 +189,7 @@ export const CreatorSettings: React.FC = () => {
                 <CardContent className="space-y-6">
                   <div>
                     <Label htmlFor="payoutMethod">Primary Payout Method</Label>
-                    <Select defaultValue="mtn-momo">
+                    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
@@ -195,45 +203,49 @@ export const CreatorSettings: React.FC = () => {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="momoNumber">Mobile Money Number</Label>
-                      <Input id="momoNumber" defaultValue="+233 24 123 4567" />
-                    </div>
-                    <div>
-                      <Label htmlFor="momoName">Account Name</Label>
-                      <Input id="momoName" defaultValue="Akosua Art" />
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-muted/20 space-y-3">
-                    <h4 className="font-medium text-foreground">Bank Details (Backup)</h4>
+                  {paymentMethod.includes('momo') && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="bankName">Bank Name</Label>
-                        <Select defaultValue="gcb">
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="gcb">GCB Bank</SelectItem>
-                            <SelectItem value="ecobank">Ecobank Ghana</SelectItem>
-                            <SelectItem value="absa">Absa Bank Ghana</SelectItem>
-                            <SelectItem value="stanbic">Stanbic Bank</SelectItem>
-                            <SelectItem value="fidelity">Fidelity Bank</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="momoNumber">Mobile Money Number</Label>
+                        <Input id="momoNumber" defaultValue="+233 24 123 4567" />
                       </div>
                       <div>
-                        <Label htmlFor="accountNumber">Account Number</Label>
-                        <Input id="accountNumber" defaultValue="1234567890" />
+                        <Label htmlFor="momoName">Account Name</Label>
+                        <Input id="momoName" defaultValue="Akosua Art" />
                       </div>
                     </div>
-                    <div>
-                      <Label htmlFor="accountName">Account Name</Label>
-                      <Input id="accountName" defaultValue="Akosua Art" />
+                  )}
+
+                  {paymentMethod === 'bank-transfer' && (
+                    <div className="p-4 rounded-lg bg-muted/20 space-y-3">
+                      <h4 className="font-medium text-foreground">Bank Details</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="bankName">Bank Name</Label>
+                          <Select defaultValue="gcb">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gcb">GCB Bank</SelectItem>
+                              <SelectItem value="ecobank">Ecobank Ghana</SelectItem>
+                              <SelectItem value="absa">Absa Bank Ghana</SelectItem>
+                              <SelectItem value="stanbic">Stanbic Bank</SelectItem>
+                              <SelectItem value="fidelity">Fidelity Bank</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="accountNumber">Account Number</Label>
+                          <Input id="accountNumber" defaultValue="1234567890" />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="accountName">Account Name</Label>
+                        <Input id="accountName" defaultValue="Akosua Art" />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="flex items-center justify-between">
                     <div>
@@ -261,63 +273,34 @@ export const CreatorSettings: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="w-5 h-5" />
-                    Account Security
+                    Security Settings
                   </CardTitle>
                   <CardDescription>
-                    Manage your account security and privacy settings
+                    Keep your account secure with these settings
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Change Password */}
+                  {/* Email Address */}
                   <div className="space-y-4">
+                    <h4 className="font-medium text-foreground">Email Address</h4>
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
+                      <span className="text-sm">creator4@example.com</span>
+                      <Button variant="outline" size="sm">Change Email</Button>
+                    </div>
+                  </div>
+
+                  {/* Change Password */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
                     <h4 className="font-medium text-foreground flex items-center gap-2">
                       <Key className="w-4 h-4" />
-                      Change Password
+                      Password
                     </h4>
-                    <div className="space-y-3">
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
                       <div>
-                        <Label htmlFor="currentPassword">Current Password</Label>
-                        <div className="relative">
-                          <Input 
-                            id="currentPassword" 
-                            type={showCurrentPassword ? "text" : "password"}
-                            placeholder="Enter current password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                          >
-                            {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
-                        </div>
+                        <span className="text-sm font-medium">••••••••••••</span>
+                        <p className="text-xs text-muted-foreground">Last changed 2 months ago</p>
                       </div>
-                      <div>
-                        <Label htmlFor="newPassword">New Password</Label>
-                        <div className="relative">
-                          <Input 
-                            id="newPassword" 
-                            type={showNewPassword ? "text" : "password"}
-                            placeholder="Enter new password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                          >
-                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                        <Input id="confirmPassword" type="password" placeholder="Confirm new password" />
-                      </div>
-                      <Button variant="outline" size="sm">Update Password</Button>
+                      <Button variant="outline" size="sm">Change Password</Button>
                     </div>
                   </div>
 
@@ -402,6 +385,26 @@ export const CreatorSettings: React.FC = () => {
                           <p className="text-sm text-muted-foreground">Download a copy of your account data</p>
                         </div>
                         <Button variant="outline" size="sm">Request Export</Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delete Account */}
+                  <div className="pt-4 border-t border-border/50">
+                    <div className="p-4 rounded-lg border border-destructive/50 bg-destructive/5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-destructive flex items-center gap-2">
+                            <Trash2 className="w-4 h-4" />
+                            Delete Account
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Permanently delete your account and all data
+                          </p>
+                        </div>
+                        <Button variant="destructive" onClick={handleDeleteAccount}>
+                          Delete Account
+                        </Button>
                       </div>
                     </div>
                   </div>
