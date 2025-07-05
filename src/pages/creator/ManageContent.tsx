@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +22,7 @@ const CONTENT_DATA = [
     views: 1234,
     likes: 89,
     comments: 12,
-    mediaPreview: '/placeholder.svg'
+    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
   },
   {
     id: '2',
@@ -34,7 +35,7 @@ const CONTENT_DATA = [
     views: 987,
     likes: 156,
     comments: 23,
-    mediaPreview: '/placeholder.svg'
+    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
   },
   {
     id: '3',
@@ -47,7 +48,7 @@ const CONTENT_DATA = [
     views: 2156,
     likes: 201,
     comments: 45,
-    mediaPreview: '/placeholder.svg'
+    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
   },
   {
     id: '4',
@@ -60,7 +61,7 @@ const CONTENT_DATA = [
     views: 876,
     likes: 134,
     comments: 18,
-    mediaPreview: '/placeholder.svg'
+    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
   },
   {
     id: '5',
@@ -73,7 +74,7 @@ const CONTENT_DATA = [
     views: 0,
     likes: 0,
     comments: 0,
-    mediaPreview: '/placeholder.svg'
+    mediaPreview: '/lovable-uploads/ce548b12-35d6-4c16-9548-f7e23fe2a914.png'
   },
   {
     id: '6',
@@ -165,68 +166,127 @@ export const ManageContent: React.FC = () => {
   };
 
   const ContentCard = ({ item }: { item: typeof CONTENT_DATA[0] }) => (
-    <div className="p-4 rounded-lg border border-border/50 hover:border-primary/50 transition-colors">
-      <div className="flex items-start gap-4">
-        <div className="w-20 h-20 rounded-lg bg-gradient-primary flex items-center justify-center flex-shrink-0">
-          {getTypeIcon(item.type)}
+    <div className="rounded-xl border border-border/50 bg-gradient-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
+      {/* Top Section */}
+      <div className="p-4 pb-3">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground text-base truncate mb-1">{item.title}</h3>
+          </div>
+          <span className="text-xs text-muted-foreground flex-shrink-0">{item.date}</span>
         </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-foreground truncate">{item.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {item.caption}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant={getTierColor(item.tier)}>{item.tier}</Badge>
-                <Badge variant={getStatusColor(item.status)}>{item.status}</Badge>
-                <span className="text-xs text-muted-foreground">{item.date}</span>
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant={getTierColor(item.tier)} className="text-xs">{item.tier}</Badge>
+          <Badge variant={getStatusColor(item.status)} className="text-xs">{item.status}</Badge>
+        </div>
+      </div>
+
+      {/* Middle Section - Image Container */}
+      <div className="px-4 pb-3">
+        <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
+          {item.mediaPreview ? (
+            <div className="relative w-full h-full">
+              {/* Blurred background layer */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                style={{ backgroundImage: `url(${item.mediaPreview})` }}
+              />
+              {/* Main image */}
+              <div className="relative z-10 w-full h-full flex items-center justify-center bg-black/20">
+                <img 
+                  src={item.mediaPreview} 
+                  alt={item.title}
+                  className="max-w-full max-h-full object-contain"
+                />
               </div>
-              
-              {item.status === 'Published' && (
-                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    {item.views.toLocaleString()}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Heart className="w-3 h-3" />
-                    {item.likes}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MessageSquare className="w-3 h-3" />
-                    {item.comments}
-                  </div>
+              {/* Type indicator overlay */}
+              <div className="absolute top-2 left-2 z-20">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
+                  {getTypeIcon(item.type)}
                 </div>
-              )}
+              </div>
             </div>
-            
-            <div className="flex gap-2 flex-shrink-0">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleEdit(item.id)}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              {item.status === 'Draft' && (
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  onClick={() => handlePublish(item.id)}
-                >
-                  Publish
-                </Button>
-              )}
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleDelete(item.id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+          ) : (
+            <div className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg">
+              <div className="text-center">
+                {getTypeIcon(item.type)}
+                <p className="text-xs text-muted-foreground mt-2">{item.type}</p>
+              </div>
             </div>
+          )}
+        </AspectRatio>
+      </div>
+
+      {/* Caption */}
+      <div className="px-4 pb-3">
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {item.caption}
+        </p>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="px-4 pb-4">
+        <div className="flex items-center justify-between">
+          {/* Left: Stats */}
+          <div className="flex items-center gap-4">
+            {item.status === 'Published' && (
+              <>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Eye className="w-3 h-3" />
+                  <span>{item.views.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Heart className="w-3 h-3" />
+                  <span>{item.likes}</span>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MessageSquare className="w-3 h-3" />
+                  <span>{item.comments}</span>
+                </div>
+              </>
+            )}
+            {item.status !== 'Published' && (
+              <span className="text-xs text-muted-foreground">No stats yet</span>
+            )}
+          </div>
+
+          {/* Right: Action Icons */}
+          <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-muted"
+              onClick={() => handleEdit(item.id)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            {item.status === 'Published' && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-muted"
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+            )}
+            {item.status === 'Draft' && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-success/10 text-success hover:text-success"
+                onClick={() => handlePublish(item.id)}
+              >
+                <Share className="w-4 h-4" />
+              </Button>
+            )}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-destructive/10 text-destructive hover:text-destructive"
+              onClick={() => handleDelete(item.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -237,7 +297,7 @@ export const ManageContent: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
             <Link to="/creator/dashboard">
@@ -278,72 +338,66 @@ export const ManageContent: React.FC = () => {
           </TabsList>
 
           <TabsContent value="published" className="space-y-4">
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle>Published Content</CardTitle>
-                <CardDescription>
-                  Your live content that subscribers can see
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {publishedContent.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {publishedContent.map((item) => (
                   <ContentCard key={item.id} item={item} />
                 ))}
-                {publishedContent.length === 0 && (
-                  <div className="text-center py-8">
-                    <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">No published content</h3>
-                    <p className="text-muted-foreground">Publish your first post to get started</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            ) : (
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No published content</h3>
+                  <p className="text-muted-foreground text-center mb-4">Publish your first post to get started</p>
+                  <Button asChild>
+                    <Link to="/creator/upload">Create Content</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="scheduled" className="space-y-4">
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle>Scheduled Content</CardTitle>
-                <CardDescription>
-                  Content scheduled for future publication
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {scheduledContent.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {scheduledContent.map((item) => (
                   <ContentCard key={item.id} item={item} />
                 ))}
-                {scheduledContent.length === 0 && (
-                  <div className="text-center py-8">
-                    <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">No scheduled content</h3>
-                    <p className="text-muted-foreground">Schedule posts to publish them automatically</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            ) : (
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No scheduled content</h3>
+                  <p className="text-muted-foreground text-center mb-4">Schedule posts to publish them automatically</p>
+                  <Button asChild>
+                    <Link to="/creator/upload">Create Content</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="drafts" className="space-y-4">
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle>Draft Content</CardTitle>
-                <CardDescription>
-                  Content you're still working on
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {draftContent.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {draftContent.map((item) => (
                   <ContentCard key={item.id} item={item} />
                 ))}
-                {draftContent.length === 0 && (
-                  <div className="text-center py-8">
-                    <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">No draft content</h3>
-                    <p className="text-muted-foreground">Save drafts to work on them later</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            ) : (
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No draft content</h3>
+                  <p className="text-muted-foreground text-center mb-4">Save drafts to work on them later</p>
+                  <Button asChild>
+                    <Link to="/creator/upload">Create Content</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

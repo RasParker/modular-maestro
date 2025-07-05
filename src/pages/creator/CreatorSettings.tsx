@@ -1,148 +1,29 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navbar } from '@/components/shared/Navbar';
-import { useAuth } from '@/contexts/AuthContext';
+import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Info, CreditCard, Smartphone } from 'lucide-react';
-
-const GHANAIAN_BANKS = [
-  'Access Bank Ghana',
-  'Agricultural Development Bank',
-  'Absa Bank Ghana',
-  'Cal Bank',
-  'Consolidated Bank Ghana',
-  'Ecobank Ghana',
-  'First Atlantic Bank',
-  'First National Bank Ghana',
-  'GCB Bank',
-  'Ghana Commercial Bank',
-  'Guaranty Trust Bank Ghana',
-  'National Investment Bank',
-  'Republic Bank Ghana',
-  'Societe Generale Ghana',
-  'Standard Chartered Bank Ghana',
-  'Stanbic Bank Ghana',
-  'UMB Bank',
-  'Universal Merchant Bank',
-  'Zenith Bank Ghana'
-];
-
-const MOBILE_MONEY_PROVIDERS = [
-  'MTN Mobile Money',
-  'Vodafone Cash',
-  'AirtelTigo Money'
-];
 
 export const CreatorSettings: React.FC = () => {
-  const { user, updateUser } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
-  
-  const [profileData, setProfileData] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
-    displayName: 'Amazing Creator',
-    bio: 'Digital artist creating stunning fantasy worlds and characters.',
-    website: 'https://myportfolio.com',
-    twitter: '@amazingcreator',
-    instagram: '@amazing.creator',
-  });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
-  const [contentSettings, setContentSettings] = useState({
-    autoApproveComments: true,
-    allowDirectMessages: true,
-    nsfwContent: false,
-    minimumAge: 18,
-  });
-
-  const [payoutSettings, setPayoutSettings] = useState({
-    preferredMethod: 'bank', // 'bank' or 'mobile'
-    bankName: '',
-    accountNumber: '',
-    accountHolderName: '',
-    mobileProvider: '',
-    mobileNumber: '',
-    minimumPayout: 50,
-  });
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      updateUser({ 
-        username: profileData.username,
-        email: profileData.email 
-      });
-      
-      toast({
-        title: "Profile updated",
-        description: "Your creator profile has been successfully updated.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update failed",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      toast({
-        title: "Avatar uploaded",
-        description: "Your avatar has been successfully updated.",
-      });
-    }
-  };
-
-  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      toast({
-        title: "Cover image uploaded",
-        description: "Your cover image has been successfully updated.",
-      });
-    }
-  };
-
-  const handlePayoutUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Payout settings updated",
-        description: "Your payout preferences have been successfully updated.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update failed",
-        description: "Failed to update payout settings. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSave = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your settings have been updated successfully.",
+    });
   };
 
   return (
@@ -150,373 +31,383 @@ export const CreatorSettings: React.FC = () => {
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Creator Settings</h1>
-            <p className="text-muted-foreground">Manage your creator profile and preferences</p>
+        <div className="mb-8">
+          <Button variant="outline" asChild className="mb-4">
+            <Link to="/creator/dashboard">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Link>
+          </Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Creator Settings</h1>
+              <p className="text-muted-foreground">
+                Manage your account preferences and settings
+              </p>
+            </div>
+            <Button onClick={handleSave}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
           </div>
+        </div>
 
-          {/* Profile Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your public creator profile information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src={user?.avatar} alt={user?.username} />
-                  <AvatarFallback className="text-lg">
-                    {user?.username?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <input
-                    type="file"
-                    ref={avatarInputRef}
-                    onChange={handleAvatarUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <input
-                    type="file"
-                    ref={coverInputRef}
-                    onChange={handleCoverUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <Button variant="outline" onClick={() => avatarInputRef.current?.click()}>
-                    Change Avatar
-                  </Button>
-                  <Button variant="outline" onClick={() => coverInputRef.current?.click()}>
-                    Upload Cover Image
-                  </Button>
-                </div>
-              </div>
-              
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      value={profileData.username}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="displayName">Display Name</Label>
-                    <Input
-                      id="displayName"
-                      value={profileData.displayName}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, displayName: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    placeholder="Tell your fans about yourself..."
-                    value={profileData.bio}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                    rows={4}
-                  />
-                </div>
+        <div className="space-y-6">
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="payouts">Payouts</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+            </TabsList>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={profileData.website}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                    />
+            <TabsContent value="profile" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>
+                    Update your public profile information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center">
+                      <span className="text-xl font-bold text-primary-foreground">AA</span>
+                    </div>
+                    <Button variant="outline">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Change Photo
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Contact Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                    />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input id="firstName" defaultValue="Akosua" />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input id="lastName" defaultValue="Art" />
+                    </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter Handle</Label>
-                    <Input
-                      id="twitter"
-                      placeholder="@username"
-                      value={profileData.twitter}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, twitter: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram">Instagram Handle</Label>
-                    <Input
-                      id="instagram"
-                      placeholder="@username"
-                      value={profileData.instagram}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, instagram: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Update Profile"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Content Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Content Settings</CardTitle>
-              <CardDescription>
-                Manage how your content is displayed and moderated
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto-approve Comments</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically approve comments from subscribers
-                    </p>
-                  </div>
-                  <Switch
-                    checked={contentSettings.autoApproveComments}
-                    onCheckedChange={(checked) => 
-                      setContentSettings(prev => ({ ...prev, autoApproveComments: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Allow Direct Messages</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Let subscribers send you direct messages
-                    </p>
-                  </div>
-                  <Switch
-                    checked={contentSettings.allowDirectMessages}
-                    onCheckedChange={(checked) => 
-                      setContentSettings(prev => ({ ...prev, allowDirectMessages: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>NSFW Content</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Mark your content as not safe for work
-                    </p>
-                  </div>
-                  <Switch
-                    checked={contentSettings.nsfwContent}
-                    onCheckedChange={(checked) => 
-                      setContentSettings(prev => ({ ...prev, nsfwContent: checked }))
-                    }
-                  />
-                </div>
-              </div>
-              
-              <Button>Save Content Settings</Button>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced Payout Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Payout Settings</CardTitle>
-              <CardDescription>
-                Configure how you receive payments from your subscribers
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Info Banner */}
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  
                   <div>
-                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                      Payouts are processed on the 1st of every month for the previous month's earnings.
-                    </p>
-                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                      Minimum payout amount is GHS 50.
-                    </p>
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" defaultValue="@akosua-art" />
                   </div>
-                </div>
-              </div>
+                  
+                  <div>
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea 
+                      id="bio" 
+                      defaultValue="Ghanaian artist sharing exclusive content and behind-the-scenes moments"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="location">Location</Label>
+                    <Input id="location" defaultValue="Accra, Ghana" />
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-              <form onSubmit={handlePayoutUpdate} className="space-y-6">
-                {/* Preferred Payout Method */}
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">Preferred Payout Method</Label>
-                  <RadioGroup
-                    value={payoutSettings.preferredMethod}
-                    onValueChange={(value) => 
-                      setPayoutSettings(prev => ({ ...prev, preferredMethod: value }))
-                    }
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  >
-                    <div className="flex items-center space-x-2 border border-border rounded-lg p-4">
-                      <RadioGroupItem value="bank" id="bank" />
-                      <div className="flex items-center gap-2 flex-1">
-                        <CreditCard className="w-5 h-5 text-primary" />
-                        <Label htmlFor="bank" className="flex-1 cursor-pointer">
-                          Bank Account
-                        </Label>
-                      </div>
+            <TabsContent value="content" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Content Settings</CardTitle>
+                  <CardDescription>
+                    Configure how your content is displayed and monetized
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="autoPost">Auto-post to social media</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically share new posts on your connected social accounts
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-2 border border-border rounded-lg p-4">
-                      <RadioGroupItem value="mobile" id="mobile" />
-                      <div className="flex items-center gap-2 flex-1">
-                        <Smartphone className="w-5 h-5 text-primary" />
-                        <Label htmlFor="mobile" className="flex-1 cursor-pointer">
-                          Mobile Money
-                        </Label>
-                      </div>
+                    <Switch id="autoPost" />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="watermark">Add watermark to images</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Protect your content with your username watermark
+                      </p>
                     </div>
-                  </RadioGroup>
-                </div>
+                    <Switch id="watermark" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="comments">Allow comments</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Let subscribers comment on your posts
+                      </p>
+                    </div>
+                    <Switch id="comments" defaultChecked />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="defaultTier">Default content tier</Label>
+                    <Select defaultValue="free">
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="free">Free</SelectItem>
+                        <SelectItem value="basic">Basic Support</SelectItem>
+                        <SelectItem value="premium">Premium Content</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                {/* Bank Account Information */}
-                {payoutSettings.preferredMethod === 'bank' && (
-                  <div className="space-y-4">
-                    <h4 className="font-medium">Bank Account Information</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="accountNumber">Account Number</Label>
-                        <Input
-                          id="accountNumber"
-                          placeholder="Enter account number"
-                          value={payoutSettings.accountNumber}
-                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, accountNumber: e.target.value }))}
-                        />
-                      </div>
-                      <div className="space-y-2">
+            <TabsContent value="payouts" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Payout Settings</CardTitle>
+                  <CardDescription>
+                    Configure how you receive payments from your content
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <Label htmlFor="payoutMethod">Primary Payout Method</Label>
+                    <Select defaultValue="mtn-momo">
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mtn-momo">MTN Mobile Money</SelectItem>
+                        <SelectItem value="vodafone-cash">Vodafone Cash</SelectItem>
+                        <SelectItem value="airteltigo-money">AirtelTigo Money</SelectItem>
+                        <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="paystack">Paystack</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="momoNumber">Mobile Money Number</Label>
+                      <Input id="momoNumber" defaultValue="+233 24 123 4567" />
+                    </div>
+                    <div>
+                      <Label htmlFor="momoName">Account Name</Label>
+                      <Input id="momoName" defaultValue="Akosua Art" />
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-muted/20 space-y-3">
+                    <h4 className="font-medium text-foreground">Bank Details (Backup)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
                         <Label htmlFor="bankName">Bank Name</Label>
-                        <Select
-                          value={payoutSettings.bankName}
-                          onValueChange={(value) => setPayoutSettings(prev => ({ ...prev, bankName: value }))}
-                        >
+                        <Select defaultValue="gcb">
                           <SelectTrigger>
-                            <SelectValue placeholder="Select Bank" />
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {GHANAIAN_BANKS.map((bank) => (
-                              <SelectItem key={bank} value={bank}>
-                                {bank}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="gcb">GCB Bank</SelectItem>
+                            <SelectItem value="ecobank">Ecobank Ghana</SelectItem>
+                            <SelectItem value="absa">Absa Bank Ghana</SelectItem>
+                            <SelectItem value="stanbic">Stanbic Bank</SelectItem>
+                            <SelectItem value="fidelity">Fidelity Bank</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      <div>
+                        <Label htmlFor="accountNumber">Account Number</Label>
+                        <Input id="accountNumber" defaultValue="1234567890" />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="accountHolderName">Account Holder Name</Label>
-                      <Input
-                        id="accountHolderName"
-                        placeholder="Full name as appears on account"
-                        value={payoutSettings.accountHolderName}
-                        onChange={(e) => setPayoutSettings(prev => ({ ...prev, accountHolderName: e.target.value }))}
+                    <div>
+                      <Label htmlFor="accountName">Account Name</Label>
+                      <Input id="accountName" defaultValue="Akosua Art" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="autoWithdraw">Auto-withdraw earnings</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically withdraw when balance reaches GH₵ 500
+                      </p>
+                    </div>
+                    <Switch id="autoWithdraw" />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="taxId">TIN (Tax Identification Number)</Label>
+                    <Input id="taxId" placeholder="Enter your TIN for tax reporting" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Required for earnings above GH₵ 10,000 annually
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Account Security
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your account security and privacy settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Change Password */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-foreground flex items-center gap-2">
+                      <Key className="w-4 h-4" />
+                      Change Password
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <div className="relative">
+                          <Input 
+                            id="currentPassword" 
+                            type={showCurrentPassword ? "text" : "password"}
+                            placeholder="Enter current password"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          >
+                            {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <div className="relative">
+                          <Input 
+                            id="newPassword" 
+                            type={showNewPassword ? "text" : "password"}
+                            placeholder="Enter new password"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                          >
+                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                        <Input id="confirmPassword" type="password" placeholder="Confirm new password" />
+                      </div>
+                      <Button variant="outline" size="sm">Update Password</Button>
+                    </div>
+                  </div>
+
+                  {/* Two-Factor Authentication */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-foreground flex items-center gap-2">
+                          <Smartphone className="w-4 h-4" />
+                          Two-Factor Authentication
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Add an extra layer of security to your account
+                        </p>
+                      </div>
+                      <Switch 
+                        checked={twoFactorEnabled} 
+                        onCheckedChange={setTwoFactorEnabled}
                       />
                     </div>
-                  </div>
-                )}
-
-                {/* Mobile Money Information */}
-                {payoutSettings.preferredMethod === 'mobile' && (
-                  <div className="space-y-4">
-                    <h4 className="font-medium">Mobile Money Information</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="mobileProvider">Mobile Money Provider</Label>
-                        <Select
-                          value={payoutSettings.mobileProvider}
-                          onValueChange={(value) => setPayoutSettings(prev => ({ ...prev, mobileProvider: value }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Provider" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {MOBILE_MONEY_PROVIDERS.map((provider) => (
-                              <SelectItem key={provider} value={provider}>
-                                {provider}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    {twoFactorEnabled && (
+                      <div className="p-4 rounded-lg bg-muted/20">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Scan this QR code with your authenticator app or enter the setup key manually.
+                        </p>
+                        <div className="flex items-center gap-4">
+                          <div className="w-32 h-32 bg-white rounded-lg flex items-center justify-center">
+                            <span className="text-xs text-gray-500">QR Code</span>
+                          </div>
+                          <div className="flex-1">
+                            <Label htmlFor="setupKey">Setup Key</Label>
+                            <Input id="setupKey" value="ABCD-EFGH-IJKL-MNOP" readOnly />
+                            <Button variant="outline" size="sm" className="mt-2">Copy Key</Button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="mobileNumber">Mobile Number</Label>
-                        <Input
-                          id="mobileNumber"
-                          placeholder="0XX XXX XXXX"
-                          value={payoutSettings.mobileNumber}
-                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, mobileNumber: e.target.value }))}
-                        />
+                    )}
+                  </div>
+
+                  {/* Login Activity */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <h4 className="font-medium text-foreground">Recent Login Activity</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Current Session</p>
+                          <p className="text-xs text-muted-foreground">Chrome on Windows • Accra, Ghana</p>
+                        </div>
+                        <Badge variant="outline" className="text-xs">Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Mobile App</p>
+                          <p className="text-xs text-muted-foreground">iPhone • 2 hours ago</p>
+                        </div>
+                        <Button variant="outline" size="sm">Revoke</Button>
                       </div>
                     </div>
                   </div>
-                )}
 
-                {/* Minimum Payout */}
-                <div className="space-y-2">
-                  <Label htmlFor="minimumPayout">Minimum Payout (GHS)</Label>
-                  <Input
-                    id="minimumPayout"
-                    type="number"
-                    min="50"
-                    value={payoutSettings.minimumPayout}
-                    onChange={(e) => setPayoutSettings(prev => ({ ...prev, minimumPayout: parseInt(e.target.value) }))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Minimum amount is GHS 50. Lower amounts will be held until threshold is reached.
-                  </p>
-                </div>
-                
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Save Payout Settings"}
-                </Button>
-              </form>
-
-              {/* Current Month Earnings */}
-              <div className="pt-6 border-t border-border">
-                <h4 className="font-medium mb-4">Current Month Earnings</h4>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold text-success">GHS 0.00</p>
-                    <p className="text-xs text-muted-foreground">Pending Earnings</p>
+                  {/* Privacy Settings */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <h4 className="font-medium text-foreground">Privacy Settings</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="profileVisibility">Profile Discovery</Label>
+                          <p className="text-sm text-muted-foreground">Allow your profile to appear in search results</p>
+                        </div>
+                        <Switch id="profileVisibility" defaultChecked />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="activityStatus">Show Activity Status</Label>
+                          <p className="text-sm text-muted-foreground">Let others see when you're online</p>
+                        </div>
+                        <Switch id="activityStatus" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="dataDownload">Data Export</Label>
+                          <p className="text-sm text-muted-foreground">Download a copy of your account data</p>
+                        </div>
+                        <Button variant="outline" size="sm">Request Export</Button>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">GHS 0.00</p>
-                    <p className="text-xs text-muted-foreground">Total Paid Out</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-primary">GHS 0.00</p>
-                    <p className="text-xs text-muted-foreground">Next Payout</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

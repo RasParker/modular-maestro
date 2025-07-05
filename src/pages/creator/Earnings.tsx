@@ -1,52 +1,41 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, TrendingUp, DollarSign, Users, Info, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, TrendingUp, DollarSign, Users, Calendar, Download, Eye } from 'lucide-react';
 
 const EARNINGS_DATA = {
-  totalMonthlyRevenue: 850.00,
-  totalActiveSubscribers: 3,
-  estimatedNetRevenue: 807.50,
-  currency: 'GHS'
+  totalEarnings: 15420.50,
+  thisMonth: 3280.75,
+  lastMonth: 2950.25,
+  growth: 11.2,
+  subscribers: 156,
+  pendingPayout: 1240.30,
+  nextPayout: '2025-07-15'
 };
 
-const TIER_BREAKDOWN = [
-  { 
-    name: 'Basic Support', 
-    price: 100.00, 
-    subscribers: 1, 
-    monthlyRevenue: 100.00,
-    percentage: 11.8
-  },
-  { 
-    name: 'Premium Content', 
-    price: 250.00, 
-    subscribers: 1, 
-    monthlyRevenue: 250.00,
-    percentage: 29.4
-  },
-  { 
-    name: 'VIP Access', 
-    price: 500.00, 
-    subscribers: 1, 
-    monthlyRevenue: 500.00,
-    percentage: 58.8
-  }
+const MONTHLY_DATA = [
+  { month: 'Jan 2025', earnings: 2150.30, subscribers: 128 },
+  { month: 'Feb 2025', earnings: 2680.45, subscribers: 142 },
+  { month: 'Mar 2025', earnings: 2950.25, subscribers: 150 },
+  { month: 'Apr 2025', earnings: 3280.75, subscribers: 156 },
 ];
 
-const CURRENT_MONTH_PROJECTIONS = {
-  grossRevenue: 850.00,
-  platformFee: 0.00, // 0% during MVP
-  paystackFees: 42.50, // ~5% estimated
-  netRevenue: 807.50
-};
+const TRANSACTION_HISTORY = [
+  { id: '1', date: '2025-06-28', amount: 45.50, type: 'Subscription', subscriber: 'Kwame A.', tier: 'Basic Support' },
+  { id: '2', date: '2025-06-27', amount: 120.00, type: 'Tip', subscriber: 'Ama K.', tier: 'Premium Content' },
+  { id: '3', date: '2025-06-26', amount: 25.00, type: 'Subscription', subscriber: 'Kofi M.', tier: 'Free' },
+  { id: '4', date: '2025-06-25', amount: 85.75, type: 'PPV Content', subscriber: 'Akua S.', tier: 'Premium Content' },
+];
 
 export const Earnings: React.FC = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('all-time');
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -59,207 +48,212 @@ export const Earnings: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Earnings Dashboard</h1>
-          <p className="text-muted-foreground">
-            Track your revenue and financial performance
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Earnings Dashboard</h1>
+              <p className="text-muted-foreground">
+                Track your revenue and financial performance
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all-time">All Time</SelectItem>
+                  <SelectItem value="this-year">This Year</SelectItem>
+                  <SelectItem value="this-month">This Month</SelectItem>
+                  <SelectItem value="last-month">Last Month</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Key Metrics */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-200/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Monthly Revenue</p>
-                  <p className="text-3xl font-bold text-foreground">
-                    {EARNINGS_DATA.currency} {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-success flex items-center gap-1 mt-1">
-                    <TrendingUp className="w-3 h-3" />
-                    +12% vs last month
-                  </p>
-                </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-200/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Active Subscribers</p>
-                  <p className="text-3xl font-bold text-foreground">{EARNINGS_DATA.totalActiveSubscribers}</p>
-                  <p className="text-xs text-blue-600 flex items-center gap-1 mt-1">
-                    <ArrowUpRight className="w-3 h-3" />
-                    New this month
-                  </p>
-                </div>
-                <Users className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border-cyan-200/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Est. Net Revenue*</p>
-                  <p className="text-3xl font-bold text-foreground">
-                    {EARNINGS_DATA.currency} {EARNINGS_DATA.estimatedNetRevenue.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-cyan-600 flex items-center gap-1 mt-1">
-                    <TrendingUp className="w-3 h-3" />
-                    After fees
-                  </p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-cyan-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          {/* Revenue Breakdown by Tier */}
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Revenue Breakdown by Tier</CardTitle>
-              <CardDescription>Monthly revenue from each subscription tier</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                {TIER_BREAKDOWN.map((tier) => (
-                  <div key={tier.name} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{tier.name}</Badge>
-                        <span className="text-sm text-muted-foreground">GHS {tier.price.toFixed(2)}/month</span>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">GH₵ {EARNINGS_DATA.totalEarnings.toLocaleString()}</div>
+              <div className="flex items-center text-xs text-success">
+                <TrendingUp className="w-3 h-3 mr-1" />
+                +{EARNINGS_DATA.growth}% from last month
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Month</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">GH₵ {EARNINGS_DATA.thisMonth.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">
+                +GH₵ {(EARNINGS_DATA.thisMonth - EARNINGS_DATA.lastMonth).toFixed(2)} from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Subscribers</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{EARNINGS_DATA.subscribers}</div>
+              <p className="text-xs text-muted-foreground">
+                +6 new this month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Payout</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">GH₵ {EARNINGS_DATA.pendingPayout.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">
+                Next payout: {EARNINGS_DATA.nextPayout}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="payouts">Payouts</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Monthly Performance */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Monthly Performance</CardTitle>
+                <CardDescription>Your earnings and subscriber growth over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {MONTHLY_DATA.map((data, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-foreground">{data.month}</h4>
+                        <p className="text-sm text-muted-foreground">{data.subscribers} subscribers</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {tier.subscribers} subscriber{tier.subscribers !== 1 ? 's' : ''}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          GHS {tier.monthlyRevenue.toFixed(2)}/month
-                        </p>
+                        <div className="text-lg font-semibold text-foreground">GH₵ {data.earnings.toLocaleString()}</div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Revenue Breakdown */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Revenue Breakdown</CardTitle>
+                <CardDescription>Where your earnings come from</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                    <span className="text-sm text-foreground">Subscriptions</span>
                     <div className="flex items-center gap-2">
-                      <Progress value={tier.percentage} className="flex-1 h-2" />
-                      <span className="text-xs text-muted-foreground w-12 text-right">
-                        {tier.percentage.toFixed(1)}%
-                      </span>
+                      <span className="text-sm font-medium">65%</span>
+                      <Badge variant="secondary">GH₵ 2,132.50</Badge>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-              <div className="pt-4 border-t border-border">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Total</span>
-                  <div className="text-right">
-                    <p className="font-medium">{EARNINGS_DATA.totalActiveSubscribers} subscribers</p>
-                    <p className="text-sm text-muted-foreground">
-                      GHS {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}/month
-                    </p>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                    <span className="text-sm text-foreground">Tips & Donations</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">20%</span>
+                      <Badge variant="secondary">GH₵ 656.15</Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                    <span className="text-sm text-foreground">Pay-per-view Content</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">15%</span>
+                      <Badge variant="secondary">GH₵ 492.10</Badge>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Current Month Projections */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>This Month's Projections</CardTitle>
-              <CardDescription>Estimated earnings breakdown</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm">Gross Revenue:</span>
-                  <span className="text-sm font-medium">GHS {CURRENT_MONTH_PROJECTIONS.grossRevenue.toFixed(2)}</span>
+          <TabsContent value="transactions" className="space-y-6">
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>Your latest earnings from subscribers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {TRANSACTION_HISTORY.map((transaction) => (
+                    <div key={transaction.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <h4 className="font-medium text-foreground">{transaction.subscriber}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">{transaction.type}</Badge>
+                              <Badge variant="secondary" className="text-xs">{transaction.tier}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold text-foreground">GH₵ {transaction.amount.toFixed(2)}</div>
+                        <p className="text-xs text-muted-foreground">{transaction.date}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Platform Fee:</span>
-                  <span className="text-sm font-medium text-success">
-                    GHS {CURRENT_MONTH_PROJECTIONS.platformFee.toFixed(2)} (0% during MVP)
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Paystack Fees:</span>
-                  <span className="text-sm font-medium">-GHS {CURRENT_MONTH_PROJECTIONS.paystackFees.toFixed(2)} (est.)</span>
-                </div>
-                <div className="border-t border-border pt-2">
-                  <div className="flex justify-between">
-                    <span className="font-medium">Net Revenue:</span>
-                    <span className="font-medium text-success">
-                      GHS {CURRENT_MONTH_PROJECTIONS.netRevenue.toFixed(2)}
-                    </span>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="payouts" className="space-y-6">
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Payout Information</CardTitle>
+                <CardDescription>Manage your payout preferences and history</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="p-4 rounded-lg bg-muted/20">
+                  <h4 className="font-medium text-foreground mb-2">Next Payout</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Amount: GH₵ {EARNINGS_DATA.pendingPayout.toFixed(2)}</span>
+                    <span className="text-muted-foreground">Date: {EARNINGS_DATA.nextPayout}</span>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Payment Information */}
-        <Card className="bg-gradient-card border-border/50 mb-8">
-          <CardHeader>
-            <CardTitle>Payment Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    Payment Processing:
-                  </p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                    Payments are processed monthly via Paystack. Your earnings will be transferred to 
-                    your linked bank account or mobile money wallet after deducting Paystack's transaction fees.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h4 className="font-medium mb-4">Payment Schedule:</h4>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>Payments are processed automatically by Paystack on the subscriber's billing date.</p>
-                  <p>Your earnings are transferred to your account within 2-3 business days.</p>
-                  <p>Minimum payout threshold: GHS 50</p>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium">Current Payout Method:</h4>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">Update Settings</Link>
+                
+                <div className="p-4 rounded-lg border border-border/50">
+                  <h4 className="font-medium text-foreground mb-2">Payout Method</h4>
+                  <p className="text-sm text-muted-foreground">Mobile Money (MTN) - *****1234</p>
+                  <Button variant="outline" size="sm" className="mt-2" asChild>
+                    <Link to="/creator/settings">Update Payout Method</Link>
                   </Button>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Method:</span>
-                    <span>Bank Account</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Bank:</span>
-                    <span>Access Bank Ghana</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Account:</span>
-                    <span>****1234</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
