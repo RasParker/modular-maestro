@@ -20,6 +20,8 @@ import { Schedule } from '@/pages/creator/Schedule';
 import { CreatorSettings } from '@/pages/creator/CreatorSettings';
 import { EditPost } from '@/pages/creator/EditPost';
 import { ManageTiers } from '@/pages/creator/ManageTiers';
+import { ManageContent } from '@/pages/creator/ManageContent';
+import { Earnings } from '@/pages/creator/Earnings';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,8 @@ function App() {
               {/* Creator Routes */}
               <Route path="/creator/dashboard" element={<ProtectedRoute allowedRoles={['creator']}><CreatorDashboard /></ProtectedRoute>} />
               <Route path="/creator/upload" element={<ProtectedRoute allowedRoles={['creator']}><CreatePost /></ProtectedRoute>} />
+              <Route path="/creator/manage-content" element={<ProtectedRoute allowedRoles={['creator']}><ManageContent /></ProtectedRoute>} />
+              <Route path="/creator/earnings" element={<ProtectedRoute allowedRoles={['creator']}><Earnings /></ProtectedRoute>} />
               <Route path="/creator/analytics" element={<ProtectedRoute allowedRoles={['creator']}><Analytics /></ProtectedRoute>} />
               <Route path="/creator/subscribers" element={<ProtectedRoute allowedRoles={['creator']}><Subscribers /></ProtectedRoute>} />
               <Route path="/creator/schedule" element={<ProtectedRoute allowedRoles={['creator']}><Schedule /></ProtectedRoute>} />

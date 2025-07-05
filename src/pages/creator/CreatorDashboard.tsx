@@ -12,7 +12,7 @@ import {
   Users, 
   TrendingUp, 
   Calendar, 
-  Upload, 
+  FileText, 
   MessageSquare, 
   Settings,
   BarChart3,
@@ -99,7 +99,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Monthly Earnings</p>
-                    <p className="text-2xl font-bold text-foreground">${ANALYTICS.monthlyEarnings.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-foreground">GHS {ANALYTICS.monthlyEarnings.toLocaleString()}</p>
                     <p className="text-xs text-success">+12% vs last month</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-accent" />
@@ -112,7 +112,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Earnings</p>
-                    <p className="text-2xl font-bold text-foreground">${ANALYTICS.totalEarnings.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-foreground">GHS {ANALYTICS.totalEarnings.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">All time</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-success" />
@@ -139,9 +139,9 @@ export const CreatorDashboard: React.FC = () => {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button asChild variant="premium" className="h-auto p-6">
-                <Link to="/creator/upload" className="flex flex-col items-center gap-2">
-                  <Upload className="w-8 h-8" />
-                  <span>Upload Content</span>
+                <Link to="/creator/manage-content" className="flex flex-col items-center gap-2">
+                  <FileText className="w-8 h-8" />
+                  <span>Manage Content</span>
                 </Link>
               </Button>
               
@@ -179,11 +179,11 @@ export const CreatorDashboard: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">{tier.name}</Badge>
-                        <span className="text-sm text-muted-foreground">${tier.price}/month</span>
+                        <span className="text-sm text-muted-foreground">GHS {tier.price}/month</span>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">{tier.subscribers} subscribers</p>
-                        <p className="text-xs text-muted-foreground">${tier.revenue.toLocaleString()}/month</p>
+                        <p className="text-xs text-muted-foreground">GHS {tier.revenue.toLocaleString()}/month</p>
                       </div>
                     </div>
                     <Progress 
@@ -276,7 +276,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Revenue Goal</span>
-                    <span>$4,200 / $5,000</span>
+                    <span>GHS 4,200 / 5,000</span>
                   </div>
                   <Progress value={84} className="h-2" />
                 </div>

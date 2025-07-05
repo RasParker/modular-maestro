@@ -6,10 +6,41 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Navbar } from '@/components/shared/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Info, CreditCard, Smartphone } from 'lucide-react';
+
+const GHANAIAN_BANKS = [
+  'Access Bank Ghana',
+  'Agricultural Development Bank',
+  'Absa Bank Ghana',
+  'Cal Bank',
+  'Consolidated Bank Ghana',
+  'Ecobank Ghana',
+  'First Atlantic Bank',
+  'First National Bank Ghana',
+  'GCB Bank',
+  'Ghana Commercial Bank',
+  'Guaranty Trust Bank Ghana',
+  'National Investment Bank',
+  'Republic Bank Ghana',
+  'Societe Generale Ghana',
+  'Standard Chartered Bank Ghana',
+  'Stanbic Bank Ghana',
+  'UMB Bank',
+  'Universal Merchant Bank',
+  'Zenith Bank Ghana'
+];
+
+const MOBILE_MONEY_PROVIDERS = [
+  'MTN Mobile Money',
+  'Vodafone Cash',
+  'AirtelTigo Money'
+];
 
 export const CreatorSettings: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -36,8 +67,12 @@ export const CreatorSettings: React.FC = () => {
   });
 
   const [payoutSettings, setPayoutSettings] = useState({
-    paypalEmail: 'creator@example.com',
-    bankAccount: '****1234',
+    preferredMethod: 'bank', // 'bank' or 'mobile'
+    bankName: '',
+    accountNumber: '',
+    accountHolderName: '',
+    mobileProvider: '',
+    mobileNumber: '',
     minimumPayout: 50,
   });
 
@@ -85,6 +120,28 @@ export const CreatorSettings: React.FC = () => {
         title: "Cover image uploaded",
         description: "Your cover image has been successfully updated.",
       });
+    }
+  };
+
+  const handlePayoutUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Payout settings updated",
+        description: "Your payout preferences have been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update payout settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -283,46 +340,181 @@ export const CreatorSettings: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Payout Settings */}
+          {/* Enhanced Payout Settings */}
           <Card className="bg-gradient-card border-border/50">
             <CardHeader>
               <CardTitle>Payout Settings</CardTitle>
               <CardDescription>
-                Manage your payment information and payout preferences
+                Configure how you receive payments from your subscribers
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="paypalEmail">PayPal Email</Label>
-                  <Input
-                    id="paypalEmail"
-                    type="email"
-                    value={payoutSettings.paypalEmail}
-                    onChange={(e) => setPayoutSettings(prev => ({ ...prev, paypalEmail: e.target.value }))}
-                  />
+            <CardContent className="space-y-6">
+              {/* Info Banner */}
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                      Payouts are processed on the 1st of every month for the previous month's earnings.
+                    </p>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                      Minimum payout amount is GHS 50.
+                    </p>
+                  </div>
                 </div>
+              </div>
+
+              <form onSubmit={handlePayoutUpdate} className="space-y-6">
+                {/* Preferred Payout Method */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Preferred Payout Method</Label>
+                  <RadioGroup
+                    value={payoutSettings.preferredMethod}
+                    onValueChange={(value) => 
+                      setPayoutSettings(prev => ({ ...prev, preferredMethod: value }))
+                    }
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                  >
+                    <div className="flex items-center space-x-2 border border-border rounded-lg p-4">
+                      <RadioGroupItem value="bank" id="bank" />
+                      <div className="flex items-center gap-2 flex-1">
+                        <CreditCard className="w-5 h-5 text-primary" />
+                        <Label htmlFor="bank" className="flex-1 cursor-pointer">
+                          Bank Account
+                        </Label>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 border border-border rounded-lg p-4">
+                      <RadioGroupItem value="mobile" id="mobile" />
+                      <div className="flex items-center gap-2 flex-1">
+                        <Smartphone className="w-5 h-5 text-primary" />
+                        <Label htmlFor="mobile" className="flex-1 cursor-pointer">
+                          Mobile Money
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {/* Bank Account Information */}
+                {payoutSettings.preferredMethod === 'bank' && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Bank Account Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="accountNumber">Account Number</Label>
+                        <Input
+                          id="accountNumber"
+                          placeholder="Enter account number"
+                          value={payoutSettings.accountNumber}
+                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, accountNumber: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bankName">Bank Name</Label>
+                        <Select
+                          value={payoutSettings.bankName}
+                          onValueChange={(value) => setPayoutSettings(prev => ({ ...prev, bankName: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Bank" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {GHANAIAN_BANKS.map((bank) => (
+                              <SelectItem key={bank} value={bank}>
+                                {bank}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accountHolderName">Account Holder Name</Label>
+                      <Input
+                        id="accountHolderName"
+                        placeholder="Full name as appears on account"
+                        value={payoutSettings.accountHolderName}
+                        onChange={(e) => setPayoutSettings(prev => ({ ...prev, accountHolderName: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Money Information */}
+                {payoutSettings.preferredMethod === 'mobile' && (
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Mobile Money Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="mobileProvider">Mobile Money Provider</Label>
+                        <Select
+                          value={payoutSettings.mobileProvider}
+                          onValueChange={(value) => setPayoutSettings(prev => ({ ...prev, mobileProvider: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Provider" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {MOBILE_MONEY_PROVIDERS.map((provider) => (
+                              <SelectItem key={provider} value={provider}>
+                                {provider}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mobileNumber">Mobile Number</Label>
+                        <Input
+                          id="mobileNumber"
+                          placeholder="0XX XXX XXXX"
+                          value={payoutSettings.mobileNumber}
+                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, mobileNumber: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Minimum Payout */}
                 <div className="space-y-2">
-                  <Label htmlFor="minimumPayout">Minimum Payout ($)</Label>
+                  <Label htmlFor="minimumPayout">Minimum Payout (GHS)</Label>
                   <Input
                     id="minimumPayout"
                     type="number"
-                    min="10"
+                    min="50"
                     value={payoutSettings.minimumPayout}
                     onChange={(e) => setPayoutSettings(prev => ({ ...prev, minimumPayout: parseInt(e.target.value) }))}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Minimum amount is GHS 50. Lower amounts will be held until threshold is reached.
+                  </p>
+                </div>
+                
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Updating..." : "Save Payout Settings"}
+                </Button>
+              </form>
+
+              {/* Current Month Earnings */}
+              <div className="pt-6 border-t border-border">
+                <h4 className="font-medium mb-4">Current Month Earnings</h4>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-2xl font-bold text-success">GHS 0.00</p>
+                    <p className="text-xs text-muted-foreground">Pending Earnings</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">GHS 0.00</p>
+                    <p className="text-xs text-muted-foreground">Total Paid Out</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-primary">GHS 0.00</p>
+                    <p className="text-xs text-muted-foreground">Next Payout</p>
+                  </div>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label>Bank Account</Label>
-                <div className="flex gap-2">
-                  <Input value={payoutSettings.bankAccount} disabled />
-                  <Button variant="outline">Update</Button>
-                </div>
-              </div>
-              
-              <Button>Save Payout Settings</Button>
             </CardContent>
           </Card>
         </div>
