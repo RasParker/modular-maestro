@@ -33,6 +33,10 @@ import { FanSettings } from '@/pages/fan/FanSettings';
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
 import { AdminSettings } from '@/pages/admin/AdminSettings';
 import { AdminRedirect } from '@/pages/admin/AdminRedirect';
+import { ManageUsers } from '@/pages/admin/ManageUsers';
+import { ReviewContent } from '@/pages/admin/ReviewContent';
+import { Reports } from '@/pages/admin/Reports';
+import { AdminAnalytics } from '@/pages/admin/AdminAnalytics';
 
 const queryClient = new QueryClient();
 
@@ -74,6 +78,10 @@ function App() {
               <Route path="/admin" element={<AdminRedirect />} />
               <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><ManageUsers /></ProtectedRoute>} />
+              <Route path="/admin/content" element={<ProtectedRoute allowedRoles={['admin']}><ReviewContent /></ProtectedRoute>} />
+              <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><Reports /></ProtectedRoute>} />
+              <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnalytics /></ProtectedRoute>} />
               
               {/* Default route */}
               <Route path="/" element={<Login />} />

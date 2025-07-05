@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 export const AdminSettings: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isModerationLoading, setIsModerationLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
   
   const [platformSettings, setPlatformSettings] = useState({
     siteName: 'Xclusive',
@@ -57,6 +59,50 @@ export const AdminSettings: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleModerationUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsModerationLoading(true);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Moderation settings updated",
+        description: "Content moderation settings have been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update moderation settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsModerationLoading(false);
+    }
+  };
+
+  const handleEmailUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsEmailLoading(true);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Email settings updated",
+        description: "Email configuration has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update email settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEmailLoading(false);
     }
   };
 
@@ -163,75 +209,79 @@ export const AdminSettings: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto Moderation</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically flag potentially inappropriate content
-                    </p>
-                  </div>
-                  <Switch
-                    checked={moderationSettings.autoModeration}
-                    onCheckedChange={(checked) => 
-                      setModerationSettings(prev => ({ ...prev, autoModeration: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Require Content Approval</Label>
-                    <p className="text-sm text-muted-foreground">
-                      All content must be approved before going live
-                    </p>
-                  </div>
-                  <Switch
-                    checked={moderationSettings.requireApproval}
-                    onCheckedChange={(checked) => 
-                      setModerationSettings(prev => ({ ...prev, requireApproval: checked }))
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="bannedWords">Banned Words (comma-separated)</Label>
-                  <Textarea
-                    id="bannedWords"
-                    value={moderationSettings.bannedWords}
-                    onChange={(e) => setModerationSettings(prev => ({ ...prev, bannedWords: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="maxFileSize">Max File Size (MB)</Label>
-                    <Input
-                      id="maxFileSize"
-                      type="number"
-                      min="1"
-                      max="1000"
-                      value={moderationSettings.maxFileSize}
-                      onChange={(e) => setModerationSettings(prev => ({ ...prev, maxFileSize: parseInt(e.target.value) }))}
+              <form onSubmit={handleModerationUpdate} className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Auto Moderation</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically flag potentially inappropriate content
+                      </p>
+                    </div>
+                    <Switch
+                      checked={moderationSettings.autoModeration}
+                      onCheckedChange={(checked) => 
+                        setModerationSettings(prev => ({ ...prev, autoModeration: checked }))
+                      }
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="allowedFileTypes">Allowed File Types</Label>
-                    <Input
-                      id="allowedFileTypes"
-                      value={moderationSettings.allowedFileTypes}
-                      onChange={(e) => setModerationSettings(prev => ({ ...prev, allowedFileTypes: e.target.value }))}
+                  
+                  <Separator />
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Require Content Approval</Label>
+                      <p className="text-sm text-muted-foreground">
+                        All content must be approved before going live
+                      </p>
+                    </div>
+                    <Switch
+                      checked={moderationSettings.requireApproval}
+                      onCheckedChange={(checked) => 
+                        setModerationSettings(prev => ({ ...prev, requireApproval: checked }))
+                      }
                     />
                   </div>
                 </div>
-              </div>
-              
-              <Button>Save Moderation Settings</Button>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="bannedWords">Banned Words (comma-separated)</Label>
+                    <Textarea
+                      id="bannedWords"
+                      value={moderationSettings.bannedWords}
+                      onChange={(e) => setModerationSettings(prev => ({ ...prev, bannedWords: e.target.value }))}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="maxFileSize">Max File Size (MB)</Label>
+                      <Input
+                        id="maxFileSize"
+                        type="number"
+                        min="1"
+                        max="1000"
+                        value={moderationSettings.maxFileSize}
+                        onChange={(e) => setModerationSettings(prev => ({ ...prev, maxFileSize: parseInt(e.target.value) }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="allowedFileTypes">Allowed File Types</Label>
+                      <Input
+                        id="allowedFileTypes"
+                        value={moderationSettings.allowedFileTypes}
+                        onChange={(e) => setModerationSettings(prev => ({ ...prev, allowedFileTypes: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <Button type="submit" disabled={isModerationLoading}>
+                  {isModerationLoading ? "Saving..." : "Save Moderation Settings"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 
@@ -243,47 +293,51 @@ export const AdminSettings: React.FC = () => {
                 Configure SMTP settings for platform emails
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="smtpServer">SMTP Server</Label>
-                  <Input
-                    id="smtpServer"
-                    value={emailSettings.smtpServer}
-                    onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpServer: e.target.value }))}
-                  />
+            <CardContent>
+              <form onSubmit={handleEmailUpdate} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpServer">SMTP Server</Label>
+                    <Input
+                      id="smtpServer"
+                      value={emailSettings.smtpServer}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpServer: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpPort">SMTP Port</Label>
+                    <Input
+                      id="smtpPort"
+                      type="number"
+                      value={emailSettings.smtpPort}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpPort: parseInt(e.target.value) }))}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="smtpPort">SMTP Port</Label>
-                  <Input
-                    id="smtpPort"
-                    type="number"
-                    value={emailSettings.smtpPort}
-                    onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpPort: parseInt(e.target.value) }))}
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="smtpUsername">SMTP Username</Label>
-                  <Input
-                    id="smtpUsername"
-                    value={emailSettings.smtpUsername}
-                    onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpUsername: e.target.value }))}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpUsername">SMTP Username</Label>
+                    <Input
+                      id="smtpUsername"
+                      value={emailSettings.smtpUsername}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpUsername: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fromEmail">From Email</Label>
+                    <Input
+                      id="fromEmail"
+                      value={emailSettings.fromEmail}
+                      onChange={(e) => setEmailSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fromEmail">From Email</Label>
-                  <Input
-                    id="fromEmail"
-                    value={emailSettings.fromEmail}
-                    onChange={(e) => setEmailSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
-                  />
-                </div>
-              </div>
-              
-              <Button>Save Email Settings</Button>
+                
+                <Button type="submit" disabled={isEmailLoading}>
+                  {isEmailLoading ? "Saving..." : "Save Email Settings"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
