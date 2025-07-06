@@ -114,34 +114,35 @@ export const Subscribers: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Users className="w-8 h-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Manage Subscribers
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             View and manage your subscriber base
           </p>
         </div>
 
         {/* Search and Filter Controls */}
         <div className="mb-6 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 flex gap-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 placeholder="Search by username or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                className="flex-1"
               />
-              <Button onClick={handleSearch}>
+              <Button onClick={handleSearch} className="w-full sm:w-auto">
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Select value={selectedTier} onValueChange={handleFilter}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="Filter by tier" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,7 +152,7 @@ export const Subscribers: React.FC = () => {
                 </SelectContent>
               </Select>
               
-              <Button variant="outline" onClick={resetFilters}>
+              <Button variant="outline" onClick={resetFilters} className="w-full sm:w-auto">
                 Clear Filters
               </Button>
             </div>
@@ -160,8 +161,8 @@ export const Subscribers: React.FC = () => {
 
         <Card className="bg-gradient-card border-border/50">
           <CardHeader>
-            <CardTitle>Subscriber List</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg sm:text-xl">Subscriber List</CardTitle>
+            <CardDescription className="text-sm">
               Total: {filteredSubscribers.length} subscriber(s) 
               {searchTerm && ` matching "${searchTerm}"`}
               {selectedTier !== 'all' && ` in ${selectedTier}`}
@@ -171,33 +172,44 @@ export const Subscribers: React.FC = () => {
             {filteredSubscribers.length > 0 ? (
               <div className="space-y-4">
                 {filteredSubscribers.map((subscriber) => (
-                  <div key={subscriber.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/50 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
-                        <span className="text-sm font-medium text-primary-foreground">
+                  <div key={subscriber.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg border border-border/50 hover:border-primary/50 transition-colors space-y-3 sm:space-y-0">
+                    {/* User Info Section */}
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm sm:text-base font-medium text-primary-foreground">
                           {subscriber.username.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div>
-                        <p className="font-medium text-foreground">{subscriber.username}</p>
-                        <p className="text-sm text-muted-foreground">{subscriber.email}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-foreground text-sm sm:text-base truncate">{subscriber.username}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{subscriber.email}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <Badge variant={subscriber.tier === 'Premium Content' ? 'default' : 'outline'}>
+                    
+                    {/* Details and Actions Section */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                      {/* Tier Badge */}
+                      <Badge 
+                        variant={subscriber.tier === 'Premium Content' ? 'default' : 'outline'}
+                        className="w-fit text-xs"
+                      >
                         {subscriber.tier}
                       </Badge>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Joined {subscriber.joined}</p>
+                      
+                      {/* Join Date and Status */}
+                      <div className="flex flex-col sm:text-right">
+                        <p className="text-xs sm:text-sm font-medium">Joined {subscriber.joined}</p>
                         <p className={`text-xs ${subscriber.status === 'Active' ? 'text-green-600' : 'text-yellow-600'}`}>
                           {subscriber.status}
                         </p>
                       </div>
+                      
+                      {/* Message Button */}
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => handleMessage(subscriber.username)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 w-full sm:w-auto"
                       >
                         <MessageSquare className="w-4 h-4" />
                         Message
@@ -210,7 +222,7 @@ export const Subscribers: React.FC = () => {
               <div className="text-center py-8">
                 <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No subscribers found</h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground px-4">
                   {searchTerm || selectedTier !== 'all' 
                     ? "Try adjusting your search or filter criteria"
                     : "Your subscribers will appear here once they start following you"
