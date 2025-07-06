@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, CheckCircle, XCircle, Eye, Flag } from 'lucide-react';
+import { ContentReviewCard } from '@/components/admin/ContentReviewCard';
+import { ArrowLeft, Eye, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const PENDING_CONTENT = [
@@ -78,103 +77,46 @@ export const ReviewContent: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
             <Link to="/admin/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Eye className="w-8 h-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+            <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Review Content
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Review and moderate user-submitted content
           </p>
         </div>
 
         <Card className="bg-gradient-card border-border/50">
           <CardHeader>
-            <CardTitle>Pending Content Review ({content.length})</CardTitle>
-            <CardDescription>Content awaiting moderation approval</CardDescription>
+            <CardTitle className="text-base sm:text-xl">Pending Content Review ({content.length})</CardTitle>
+            <CardDescription className="text-sm">Content awaiting moderation approval</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {content.map((item) => (
-                <div key={item.id} className="p-6 rounded-lg border border-border/50 bg-muted/10">
-                  <div className="flex gap-6">
-                    <div className="flex-shrink-0">
-                      <img 
-                        src={item.thumbnail} 
-                        alt={item.title}
-                        className="w-32 h-24 object-cover rounded-lg"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
-                          <div className="flex items-center gap-3 mt-2">
-                            <Avatar className="w-8 h-8">
-                              <AvatarImage src={item.creator.avatar} alt={item.creator.username} />
-                              <AvatarFallback>{item.creator.display_name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="text-sm font-medium">{item.creator.display_name}</p>
-                              <p className="text-xs text-muted-foreground">@{item.creator.username}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="capitalize">
-                            {item.type}
-                          </Badge>
-                          <Badge variant="outline">
-                            {item.tier}
-                          </Badge>
-                          <Badge variant={item.status === 'flagged' ? 'destructive' : 'secondary'}>
-                            {item.status === 'flagged' && <Flag className="w-3 h-3 mr-1" />}
-                            {item.status}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
-                          Submitted: {new Date(item.submitted).toLocaleString()}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleReject(item.id)}
-                          >
-                            <XCircle className="w-4 h-4 mr-1" />
-                            Reject
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(item.id)}
-                          >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Approve
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ContentReviewCard
+                  key={item.id}
+                  item={item}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
               ))}
               
               {content.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="w-24 h-24 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                <div className="text-center py-8 sm:py-12">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">All caught up!</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">All caught up!</h3>
+                  <p className="text-sm text-muted-foreground">
                     No content pending review at the moment.
                   </p>
                 </div>

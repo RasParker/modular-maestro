@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,17 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Navbar } from '@/components/shared/Navbar';
+import { DashboardHeader } from '@/components/creator/DashboardHeader';
+import { QuickActionsGrid } from '@/components/creator/QuickActionsGrid';
+import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   DollarSign, 
   Users, 
   TrendingUp, 
   Calendar, 
-  FileText, 
-  MessageSquare, 
-  Settings,
   BarChart3,
-  Crown
+  Settings
 } from 'lucide-react';
 
 // Mock analytics data
@@ -59,6 +58,25 @@ const TIER_BREAKDOWN = [
   { name: 'Superfan', price: 25, subscribers: 660, revenue: 16500 }
 ];
 
+const SCHEDULED_CONTENT = [
+  {
+    id: '1',
+    title: 'New Digital Art Collection',
+    tier: 'Superfan',
+    type: 'Image',
+    date: 'Tomorrow',
+    time: '2:00 PM'
+  },
+  {
+    id: '2',
+    title: 'Behind the Scenes Video',
+    tier: 'Fan',
+    type: 'Video',
+    date: 'Feb 20',
+    time: '6:00 PM'
+  }
+];
+
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
 
@@ -66,122 +84,88 @@ export const CreatorDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Crown className="w-8 h-8 text-accent" />
-            Creator Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.username}! Here's your creator overview
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <DashboardHeader
+          username={user?.username}
+          title="Creator Dashboard"
+          subtitle="Here's your creator overview"
+        />
 
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Key Metrics */}
-          <div className="lg:col-span-4 grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Card className="bg-gradient-card border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Subscribers</p>
-                    <p className="text-2xl font-bold text-foreground">{ANALYTICS.subscribers.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Subscribers</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{ANALYTICS.subscribers.toLocaleString()}</p>
                     <p className="text-xs text-success">+{ANALYTICS.growthRate}% this month</p>
                   </div>
-                  <Users className="h-8 w-8 text-primary" />
+                  <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-card border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Monthly Earnings</p>
-                    <p className="text-2xl font-bold text-foreground">GHS {ANALYTICS.monthlyEarnings.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Monthly Earnings</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {ANALYTICS.monthlyEarnings.toLocaleString()}</p>
                     <p className="text-xs text-success">+12% vs last month</p>
                   </div>
-                  <DollarSign className="h-8 w-8 text-accent" />
+                  <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-card border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Earnings</p>
-                    <p className="text-2xl font-bold text-foreground">GHS {ANALYTICS.totalEarnings.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Earnings</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {ANALYTICS.totalEarnings.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">All time</p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-success" />
+                  <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-card border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Engagement Rate</p>
-                    <p className="text-2xl font-bold text-foreground">{ANALYTICS.engagementRate}%</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Engagement Rate</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{ANALYTICS.engagementRate}%</p>
                     <p className="text-xs text-success">Above average</p>
                   </div>
-                  <BarChart3 className="h-8 w-8 text-primary" />
+                  <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button asChild variant="premium" className="h-auto p-6">
-                <Link to="/creator/manage-content" className="flex flex-col items-center gap-2">
-                  <FileText className="w-8 h-8" />
-                  <span>Manage Content</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant="outline" className="h-auto p-6">
-                <Link to="/creator/analytics" className="flex flex-col items-center gap-2">
-                  <BarChart3 className="w-8 h-8" />
-                  <span>View Analytics</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant="outline" className="h-auto p-6">
-                <Link to="/creator/subscribers" className="flex flex-col items-center gap-2">
-                  <Users className="w-8 h-8" />
-                  <span>Manage Subscribers</span>
-                </Link>
-              </Button>
-
-              <Button asChild variant="outline" className="h-auto p-6">
-                <Link to="/creator/tiers" className="flex flex-col items-center gap-2">
-                  <DollarSign className="w-8 h-8" />
-                  <span>Manage Tiers</span>
-                </Link>
-              </Button>
-            </div>
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+            <QuickActionsGrid />
 
             {/* Subscription Tiers Performance */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle>Subscription Tiers Performance</CardTitle>
-                <CardDescription>Revenue breakdown by tier</CardDescription>
+                <CardTitle className="text-base sm:text-xl">Subscription Tiers Performance</CardTitle>
+                <CardDescription className="text-sm">Revenue breakdown by tier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {TIER_BREAKDOWN.map((tier) => (
                   <div key={tier.name} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{tier.name}</Badge>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="text-xs">{tier.name}</Badge>
                         <span className="text-sm text-muted-foreground">GHS {tier.price}/month</span>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left sm:text-right">
                         <p className="text-sm font-medium">{tier.subscribers} subscribers</p>
                         <p className="text-xs text-muted-foreground">GHS {tier.revenue.toLocaleString()}/month</p>
                       </div>
@@ -195,59 +179,23 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Content Schedule */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Content Schedule
-                </CardTitle>
-                <CardDescription>Your upcoming posts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/50">
-                    <div>
-                      <p className="font-medium">New Digital Art Collection</p>
-                      <p className="text-sm text-muted-foreground">Superfan tier • Image</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">Tomorrow</p>
-                      <p className="text-xs text-muted-foreground">2:00 PM</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/50">
-                    <div>
-                      <p className="font-medium">Behind the Scenes Video</p>
-                      <p className="text-sm text-muted-foreground">Fan tier • Video</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">Feb 20</p>
-                      <p className="text-xs text-muted-foreground">6:00 PM</p>
-                    </div>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full mt-4" asChild>
-                  <Link to="/creator/schedule">Manage Schedule</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <ContentScheduleCard scheduledContent={SCHEDULED_CONTENT} />
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Recent Subscribers */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle className="text-lg">Recent Subscribers</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Recent Subscribers</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {RECENT_SUBSCRIBERS.map((subscriber) => (
                   <div key={subscriber.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-primary"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{subscriber.username}</p>
-                      <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-primary flex-shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{subscriber.username}</p>
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                         <Badge variant="outline" className="text-xs">{subscriber.tier}</Badge>
                         <span className="text-xs text-muted-foreground">{subscriber.joined}</span>
                       </div>
@@ -263,7 +211,7 @@ export const CreatorDashboard: React.FC = () => {
             {/* Monthly Goals */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle className="text-lg">Monthly Goals</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Monthly Goals</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -293,7 +241,7 @@ export const CreatorDashboard: React.FC = () => {
             {/* Profile Settings */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle className="text-lg">Profile</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Profile</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">

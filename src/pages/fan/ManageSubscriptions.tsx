@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Heart, CreditCard, Calendar, Pause, Play, X } from 'lucide-react';
+import { SubscriptionCard } from '@/components/fan/SubscriptionCard';
+import { ArrowLeft, Heart, CreditCard, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_SUBSCRIPTIONS = [
@@ -97,35 +96,35 @@ export const ManageSubscriptions: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
             <Link to="/fan/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Heart className="w-8 h-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+            <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Manage Subscriptions
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             View and manage all your creator subscriptions
           </p>
         </div>
 
         {/* Summary Stats */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="bg-gradient-card border-border/50">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Subscriptions</p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">
                     {subscriptions.filter(sub => sub.status === 'active').length}
                   </p>
                 </div>
-                <Heart className="h-8 w-8 text-primary" />
+                <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -156,87 +155,20 @@ export const ManageSubscriptions: React.FC = () => {
         </div>
 
         {/* Subscriptions List */}
-        <Card className="bg-gradient-card border-border/50">
-          <CardHeader>
-            <CardTitle>Your Subscriptions ({subscriptions.length})</CardTitle>
-            <CardDescription>Manage your creator subscriptions and billing</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {subscriptions.map((subscription) => (
-                <div key={subscription.id} className="p-6 rounded-lg border border-border/50 bg-muted/10">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage src={subscription.creator.avatar} alt={subscription.creator.username} />
-                        <AvatarFallback>{subscription.creator.display_name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground">{subscription.creator.display_name}</h3>
-                        <p className="text-sm text-muted-foreground">@{subscription.creator.username}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline">{subscription.creator.category}</Badge>
-                          <Badge variant="outline">{subscription.tier}</Badge>
-                          <Badge variant={subscription.status === 'active' ? 'default' : 'secondary'}>
-                            {subscription.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">${subscription.price}/month</p>
-                      <p className="text-sm text-muted-foreground">
-                        Next billing: {subscription.next_billing}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Joined: {new Date(subscription.joined).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Auto-renew:</span>
-                      <Badge variant={subscription.auto_renew ? 'default' : 'outline'}>
-                        {subscription.auto_renew ? 'Enabled' : 'Disabled'}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePauseResume(subscription.id)}
-                      >
-                        {subscription.status === 'active' ? (
-                          <>
-                            <Pause className="w-4 h-4 mr-1" />
-                            Pause
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-1" />
-                            Resume
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleCancel(subscription.id)}
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg sm:text-xl font-semibold">Your Subscriptions ({subscriptions.length})</h2>
+          </div>
+          
+          {subscriptions.map((subscription) => (
+            <SubscriptionCard
+              key={subscription.id}
+              subscription={subscription}
+              onPauseResume={handlePauseResume}
+              onCancel={handleCancel}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
