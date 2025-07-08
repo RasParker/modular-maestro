@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -296,7 +295,7 @@ export const ManageContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -432,7 +431,7 @@ export const ManageContent: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
                 <div className="flex flex-col items-center">
@@ -445,7 +444,7 @@ export const ManageContent: React.FC = () => {
                     <Edit className="w-5 h-5" />
                   </Button>
                 </div>
-                
+
                 {selectedContent.status === 'Published' && (
                   <>
                     <div className="flex flex-col items-center">
@@ -458,7 +457,7 @@ export const ManageContent: React.FC = () => {
                       </Button>
                       <span className="text-xs text-white mt-1 font-medium">{selectedContent.likes}</span>
                     </div>
-                    
+
                     <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
@@ -469,7 +468,7 @@ export const ManageContent: React.FC = () => {
                       </Button>
                       <span className="text-xs text-white mt-1 font-medium">{selectedContent.comments}</span>
                     </div>
-                    
+
                     <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
@@ -481,7 +480,7 @@ export const ManageContent: React.FC = () => {
                     </div>
                   </>
                 )}
-                
+
                 {selectedContent.status === 'Draft' && (
                   <div className="flex flex-col items-center">
                     <Button
@@ -495,7 +494,7 @@ export const ManageContent: React.FC = () => {
                     <span className="text-xs text-green-400 mt-1 font-medium">Publish</span>
                   </div>
                 )}
-                
+
                 <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
@@ -512,37 +511,12 @@ export const ManageContent: React.FC = () => {
               </div>
 
               {/* Bottom Content Overlay - Instagram Style */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 z-20">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-12 pb-6 px-6 z-20">
                 <div className="max-w-2xl">
                   {/* Caption */}
-                  <p className="text-white text-sm leading-relaxed mb-3">
+                  <p className="text-white text-sm leading-relaxed">
                     {selectedContent.caption}
                   </p>
-                  
-                  {/* Status and Stats */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs text-white/80">
-                        Status: <span className="text-white font-medium">{selectedContent.status}</span>
-                      </span>
-                      {selectedContent.status === 'Published' && (
-                        <span className="text-xs text-white/80">
-                          {selectedContent.views.toLocaleString()} views
-                        </span>
-                      )}
-                    </div>
-                    
-                    {/* Edit Action */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
-                      onClick={() => handleEdit(selectedContent.id)}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
