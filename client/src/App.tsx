@@ -22,6 +22,7 @@ import { EditPost } from '@/pages/creator/EditPost';
 import { ManageTiers } from '@/pages/creator/ManageTiers';
 import { ManageContent } from '@/pages/creator/ManageContent';
 import { Earnings } from '@/pages/creator/Earnings';
+import { Messages as CreatorMessages } from '@/pages/creator/Messages';
 
 // Fan pages
 import { ManageSubscriptions } from '@/pages/fan/ManageSubscriptions';
@@ -72,6 +73,7 @@ function App() {
               <Route path="/creator/schedule" element={<ProtectedRoute allowedRoles={['creator']}><Schedule /></ProtectedRoute>} />
               <Route path="/creator/settings" element={<ProtectedRoute allowedRoles={['creator']}><CreatorSettings /></ProtectedRoute>} />
               <Route path="/creator/tiers" element={<ProtectedRoute allowedRoles={['creator']}><ManageTiers /></ProtectedRoute>} />
+              <Route path="/creator/messages" element={<ProtectedRoute allowedRoles={['creator']}><CreatorMessages /></ProtectedRoute>} />
               <Route path="/creator/edit-post/:id" element={<ProtectedRoute allowedRoles={['creator']}><EditPost /></ProtectedRoute>} />
               
               {/* Admin Routes */}
