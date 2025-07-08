@@ -7,7 +7,8 @@ import {
   BarChart3, 
   Users, 
   DollarSign,
-  MessageSquare
+  MessageSquare,
+  TrendingUp
 } from 'lucide-react';
 
 interface QuickAction {
@@ -47,6 +48,12 @@ export const QuickActionsGrid: React.FC = () => {
       to: "/creator/messages",
       icon: <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8" />,
       label: "Messages",
+      variant: "outline"
+    },
+    {
+      to: "/creator/earnings",
+      icon: <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8" />,
+      label: "Earnings",
       variant: "outline"
     }
   ];
