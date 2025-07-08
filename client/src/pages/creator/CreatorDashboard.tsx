@@ -179,7 +179,48 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <ContentScheduleCard scheduledContent={SCHEDULED_CONTENT} />
+            {/* Scheduled Content */}
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base sm:text-lg">Scheduled Content</CardTitle>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/schedule">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      View Schedule
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {SCHEDULED_CONTENT.length > 0 ? (
+                  <div className="space-y-3">
+                    {SCHEDULED_CONTENT.map((content) => (
+                      <div key={content.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{content.title}</h4>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Badge variant="outline" className="text-xs">{content.tier}</Badge>
+                            <span>{content.date} at {content.time}</span>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {content.type}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No scheduled content</p>
+                    <Button variant="outline" size="sm" className="mt-2" asChild>
+                      <Link to="/creator/upload">Create Content</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
