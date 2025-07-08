@@ -512,10 +512,10 @@ export const ManageContent: React.FC = () => {
               </div>
 
               {/* Bottom Content Overlay - Instagram Style */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-12 pb-6 px-6 z-20">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 z-20">
                 <div className="max-w-2xl">
                   {/* Caption */}
-                  <p className="text-white text-sm leading-relaxed mb-4">
+                  <p className="text-white text-sm leading-relaxed mb-3">
                     {selectedContent.caption}
                   </p>
                   
