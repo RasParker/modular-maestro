@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const CONTENT_DATA = [
@@ -95,6 +96,8 @@ export const ManageContent: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [content, setContent] = useState(CONTENT_DATA);
+  const [selectedContent, setSelectedContent] = useState<typeof CONTENT_DATA[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const publishedContent = content.filter(item => item.status === 'Published');
   const scheduledContent = content.filter(item => item.status === 'Scheduled');
@@ -124,6 +127,16 @@ export const ManageContent: React.FC = () => {
       title: "Content published",
       description: "Your content has been published successfully.",
     });
+  };
+
+  const handleContentClick = (item: typeof CONTENT_DATA[0]) => {
+    setSelectedContent(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedContent(null);
   };
 
   const getTypeIcon = (type: string) => {
@@ -166,7 +179,10 @@ export const ManageContent: React.FC = () => {
       <div className="px-4 pb-3">
         <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
           {item.mediaPreview ? (
-            <div className="relative w-full h-full">
+            <div 
+              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => handleContentClick(item)}
+            >
               {/* Blurred background layer */}
               <div 
                 className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
@@ -188,7 +204,10 @@ export const ManageContent: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg">
+            <div 
+              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => handleContentClick(item)}
+            >
               <div className="text-center">
                 {getTypeIcon(item.type)}
                 <p className="text-xs text-muted-foreground mt-2">{item.type}</p>
@@ -382,6 +401,171 @@ export const ManageContent: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Instagram-style Content Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
+          {selectedContent && (
+            <div className="flex h-full">
+              {/* Left Side - Media */}
+              <div className="flex-1 bg-black flex items-center justify-center relative">
+                {selectedContent.mediaPreview ? (
+                  <img 
+                    src={selectedContent.mediaPreview} 
+                    alt={selectedContent.caption}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="text-center text-white">
+                      {getTypeIcon(selectedContent.type)}
+                      <p className="mt-2">{selectedContent.type} Content</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Vertical Action Icons - Instagram Style */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-10">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                    onClick={() => handleEdit(selectedContent.id)}
+                  >
+                    <Edit className="w-5 h-5" />
+                  </Button>
+                  
+                  {selectedContent.status === 'Published' && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                      >
+                        <Heart className="w-5 h-5" />
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                      >
+                        <MessageSquare className="w-5 h-5" />
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                      >
+                        <Share className="w-5 h-5" />
+                      </Button>
+                    </>
+                  )}
+                  
+                  {selectedContent.status === 'Draft' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-green-400 hover:bg-black/70 border border-green-400/50"
+                      onClick={() => handlePublish(selectedContent.id)}
+                    >
+                      <Share className="w-5 h-5" />
+                    </Button>
+                  )}
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-red-400 hover:bg-black/70 border border-red-400/50"
+                    onClick={() => {
+                      handleDelete(selectedContent.id);
+                      closeModal();
+                    }}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Right Side - Content Details */}
+              <div className="w-80 bg-background border-l border-border flex flex-col">
+                {/* Header */}
+                <div className="p-4 border-b border-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant={getTierColor(selectedContent.tier)} className="text-xs">
+                      {selectedContent.tier}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{selectedContent.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {selectedContent.type}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedContent.category}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 p-4 overflow-y-auto">
+                  <p className="text-sm text-foreground mb-4">
+                    {selectedContent.caption}
+                  </p>
+                  
+                  {/* Stats */}
+                  {selectedContent.status === 'Published' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Views</span>
+                        <span className="font-medium">{selectedContent.views.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Likes</span>
+                        <span className="font-medium">{selectedContent.likes}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Comments</span>
+                        <span className="font-medium">{selectedContent.comments}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedContent.status !== 'Published' && (
+                    <div className="text-sm text-muted-foreground">
+                      <p>Status: <span className="font-medium">{selectedContent.status}</span></p>
+                      <p className="mt-2">No engagement stats available yet</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Footer Actions */}
+                <div className="p-4 border-t border-border">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEdit(selectedContent.id)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={closeModal}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
