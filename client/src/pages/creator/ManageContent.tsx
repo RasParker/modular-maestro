@@ -176,11 +176,20 @@ export const ManageContent: React.FC = () => {
 
       {/* Middle Section - Image Container */}
       <div className="px-4 pb-3">
-        <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
+        <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
           {item.mediaPreview ? (
             <div 
-              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
+              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
               onClick={() => handleContentClick(item)}
+              onTouchStart={() => {}} // Enable touch events on iOS
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleContentClick(item);
+                }
+              }}
             >
               {/* Blurred background layer */}
               <div 
@@ -204,8 +213,17 @@ export const ManageContent: React.FC = () => {
             </div>
           ) : (
             <div 
-              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
               onClick={() => handleContentClick(item)}
+              onTouchStart={() => {}} // Enable touch events on iOS
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleContentClick(item);
+                }
+              }}
             >
               <div className="text-center">
                 {getTypeIcon(item.type)}
