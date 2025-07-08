@@ -1,58 +1,138 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock } from 'lucide-react';
-
-interface ScheduledContent {
-  id: string;
-  title: string;
-  tier: string;
-  type: string;
-  date: string;
-  time: string;
-}
+import { Button } from '@/components/ui/button';
+import { 
+  Edit3, 
+  Trash2, 
+  Calendar,
+  Clock,
+  ExternalLink
+} from 'lucide-react';
 
 interface ContentScheduleCardProps {
-  scheduledContent: ScheduledContent[];
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  type: 'Image' | 'Video' | 'Text';
+  tier: string;
+  status: 'Scheduled' | 'Draft';
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onPublish: (id: string) => void;
 }
 
-export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({ scheduledContent }) => {
+export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
+  id,
+  title,
+  description,
+  date,
+  time,
+  type,
+  tier,
+  status,
+  onEdit,
+  onDelete,
+  onPublish
+}) => {
+  const getTypeIcon = () => {
+    switch (type) {
+      case 'Image':
+        return '🖼️';
+      case 'Video':
+        return '🎥';
+      case 'Text':
+        return '📝';
+      default:
+        return '📄';
+    }
+  };
+
+  const getStatusColor = () => {
+    return status === 'Scheduled' ? 'default' : 'secondary';
+  };
+
   return (
-    <Card className="bg-gradient-card border-border/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-          <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-          Content Schedule
-        </CardTitle>
-        <CardDescription className="text-sm">Your upcoming posts</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {scheduledContent.map((content) => (
-            <div key={content.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg border border-border/50 gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm sm:text-base truncate">{content.title}</p>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  <Badge variant="outline" className="text-xs">{content.tier}</Badge>
-                  <Badge variant="outline" className="text-xs">{content.type}</Badge>
-                </div>
-              </div>
-              <div className="flex items-center justify-between sm:justify-end sm:text-right gap-2">
-                <div className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Clock className="w-3 h-3" />
-                  <span className="font-medium">{content.date}</span>
-                  <span className="text-muted-foreground">{content.time}</span>
-                </div>
-              </div>
+    <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
+      <CardContent className="p-4 space-y-4">
+        {/* Mobile-First Layout */}
+        
+        {/* Header with icon and badges */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+              {getTypeIcon()}
             </div>
-          ))}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
+                {title}
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                {description}
+              </p>
+            </div>
+          </div>
         </div>
-        <Button variant="outline" className="w-full mt-4" asChild>
-          <Link to="/creator/schedule">Manage Schedule</Link>
-        </Button>
+
+        {/* Badges Row */}
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="text-xs">
+            {type}
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            {tier}
+          </Badge>
+          <Badge variant={getStatusColor()} className="text-xs">
+            {status}
+          </Badge>
+        </div>
+
+        {/* Date/Time Info */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            <span>{date}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            <span>{time}</span>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border/30">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(id)}
+            className="flex-1 text-xs"
+          >
+            <Edit3 className="w-3 h-3 mr-1" />
+            Edit
+          </Button>
+          
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => onPublish(id)}
+            className="flex-1 text-xs bg-gradient-primary"
+          >
+            <ExternalLink className="w-3 h-3 mr-1" />
+            Publish Now
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDelete(id)}
+            className="sm:w-auto text-xs text-destructive hover:text-destructive"
+          >
+            <Trash2 className="w-3 h-3" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
