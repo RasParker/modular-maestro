@@ -8,7 +8,10 @@ import {
   Trash2, 
   Calendar,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Image,
+  Video,
+  FileText
 } from 'lucide-react';
 
 interface ContentScheduleCardProps {
@@ -41,13 +44,13 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   const getTypeIcon = () => {
     switch (type) {
       case 'Image':
-        return '🖼️';
+        return <Image className="w-4 h-4" />;
       case 'Video':
-        return '🎥';
+        return <Video className="w-4 h-4" />;
       case 'Text':
-        return '📝';
+        return <FileText className="w-4 h-4" />;
       default:
-        return '📄';
+        return <FileText className="w-4 h-4" />;
     }
   };
 
@@ -63,7 +66,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
         {/* Header with icon and badges */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground flex-shrink-0">
               {getTypeIcon()}
             </div>
             <div className="min-w-0 flex-1">
@@ -103,12 +106,12 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border/30">
+        <div className="flex gap-2 pt-2 border-t border-border/30">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit(id)}
-            className="flex-1 text-xs"
+            className="flex-1 text-xs h-8"
           >
             <Edit3 className="w-3 h-3 mr-1" />
             Edit
@@ -118,17 +121,17 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             variant="default"
             size="sm"
             onClick={() => onPublish(id)}
-            className="flex-1 text-xs bg-gradient-primary"
+            className="flex-1 text-xs h-8 bg-gradient-primary"
           >
             <ExternalLink className="w-3 h-3 mr-1" />
-            Publish Now
+            Publish
           </Button>
           
           <Button
             variant="outline"
             size="sm"
             onClick={() => onDelete(id)}
-            className="sm:w-auto text-xs text-destructive hover:text-destructive"
+            className="w-10 h-8 text-xs text-destructive hover:text-destructive p-0"
           >
             <Trash2 className="w-3 h-3" />
           </Button>

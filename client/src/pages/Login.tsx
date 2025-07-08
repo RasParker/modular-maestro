@@ -68,7 +68,7 @@ export const Login: React.FC = () => {
             <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-xl">X</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <span className="text-2xl font-bold text-foreground">
               Xclusive
             </span>
           </Link>

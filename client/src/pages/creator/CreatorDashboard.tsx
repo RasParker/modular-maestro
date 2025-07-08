@@ -187,7 +187,7 @@ export const CreatorDashboard: React.FC = () => {
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/schedule">
                       <Calendar className="w-4 h-4 mr-2" />
-                      View Schedule
+                      Manage Schedule
                     </Link>
                   </Button>
                 </div>
