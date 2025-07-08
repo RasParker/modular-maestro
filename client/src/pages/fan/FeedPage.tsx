@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
+import { CommentSection } from '@/components/fan/CommentSection';
 import { ArrowLeft, Heart, MessageSquare, Calendar, Eye, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,7 +26,36 @@ const MOCK_FEED = [
     likes: 142,
     comments: 28,
     views: 1250,
-    liked: false
+    liked: false,
+    initialComments: [
+      {
+        id: '1',
+        user: {
+          id: '2',
+          username: 'artlover123',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'Amazing work! The detail in these characters is incredible. How long did each one take?',
+        likes: 5,
+        liked: false,
+        createdAt: '2024-02-19T11:00:00',
+        replies: [
+          {
+            id: '2',
+            user: {
+              id: '1',
+              username: 'artisticmia',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'Thank you! Each character took about 6-8 hours. The armor details were the most time-consuming part.',
+            likes: 2,
+            liked: false,
+            createdAt: '2024-02-19T11:30:00',
+            replies: []
+          }
+        ]
+      }
+    ]
   },
   {
     id: '2',
@@ -43,7 +73,22 @@ const MOCK_FEED = [
     likes: 89,
     comments: 15,
     views: 892,
-    liked: true
+    liked: true,
+    initialComments: [
+      {
+        id: '3',
+        user: {
+          id: '3',
+          username: 'fitnessfan',
+          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'Great workout! Following along now. My arms are already burning! 💪',
+        likes: 8,
+        liked: true,
+        createdAt: '2024-02-19T07:30:00',
+        replies: []
+      }
+    ]
   },
   {
     id: '3',
@@ -61,7 +106,22 @@ const MOCK_FEED = [
     likes: 56,
     comments: 12,
     views: 423,
-    liked: false
+    liked: false,
+    initialComments: [
+      {
+        id: '4',
+        user: {
+          id: '4',
+          username: 'beathead',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'This sounds fire! 🔥 Have you considered exploring some drill or UK garage elements?',
+        likes: 3,
+        liked: false,
+        createdAt: '2024-02-18T21:00:00',
+        replies: []
+      }
+    ]
   },
   {
     id: '4',
@@ -79,13 +139,15 @@ const MOCK_FEED = [
     likes: 78,
     comments: 12,
     views: 456,
-    liked: false
+    liked: false,
+    initialComments: []
   }
 ];
 
 export const FeedPage: React.FC = () => {
   const { toast } = useToast();
   const [feed, setFeed] = useState(MOCK_FEED);
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
 
   const handleLike = (postId: string) => {
     setFeed(feed.map(post => 
@@ -95,6 +157,21 @@ export const FeedPage: React.FC = () => {
             liked: !post.liked,
             likes: post.liked ? post.likes - 1 : post.likes + 1
           }
+        : post
+    ));
+  };
+
+  const handleCommentClick = (postId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleCommentCountChange = (postId: string, newCount: number) => {
+    setFeed(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, comments: newCount }
         : post
     ));
   };
@@ -192,7 +269,12 @@ export const FeedPage: React.FC = () => {
                       <Heart className={`w-4 h-4 mr-1 ${post.liked ? 'fill-current' : ''}`} />
                       {post.likes}
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-muted-foreground"
+                      onClick={() => handleCommentClick(post.id)}
+                    >
                       <MessageSquare className="w-4 h-4 mr-1" />
                       {post.comments}
                     </Button>
@@ -212,6 +294,19 @@ export const FeedPage: React.FC = () => {
                   </Button>
                 </div>
               </CardContent>
+              
+              {/* Comments Section */}
+              {showComments[post.id] && (
+                <div className="border-t border-border/30">
+                  <div className="p-4">
+                    <CommentSection
+                      postId={post.id}
+                      initialComments={post.initialComments || []}
+                      onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                    />
+                  </div>
+                </div>
+              )}
             </Card>
           ))}
         </div>

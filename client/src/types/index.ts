@@ -66,11 +66,15 @@ export interface Post {
 
 export interface Comment {
   id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
+  post_id?: string;
+  user_id?: string;
   user: Pick<User, 'id' | 'username' | 'avatar'>;
+  content: string;
+  likes: number;
+  liked: boolean;
+  createdAt: string;
+  created_at?: string;
+  replies: Comment[];
 }
 
 export interface Message {
