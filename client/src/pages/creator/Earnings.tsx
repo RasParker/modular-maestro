@@ -82,9 +82,9 @@ const TransactionCard: React.FC<{ transaction: typeof TRANSACTION_HISTORY[0] }> 
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-foreground text-sm">{transaction.subscriber}</h4>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Badge variant="outline" className="text-xs">{transaction.type}</Badge>
-            <Badge variant="secondary" className="text-xs">{transaction.tier}</Badge>
+          <div className="flex gap-2 mt-2">
+            <Badge variant="outline" className="text-xs whitespace-nowrap">{transaction.type}</Badge>
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">{transaction.tier}</Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-1">{transaction.date}</p>
         </div>
