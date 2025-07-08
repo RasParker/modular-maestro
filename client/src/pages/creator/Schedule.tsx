@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navbar } from '@/components/shared/Navbar';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Plus,
   Calendar,
@@ -12,7 +13,7 @@ import {
   TrendingUp,
   ArrowLeft
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const MOCK_SCHEDULED_POSTS = [
   {
@@ -67,17 +68,29 @@ const BEST_TIMES = [
 
 export const Schedule: React.FC = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleEdit = (id: string) => {
-    console.log('Edit post:', id);
+    navigate(`/creator/edit-post/${id}`);
   };
 
   const handleDelete = (id: string) => {
-    console.log('Delete post:', id);
+    // Here you would typically show a confirmation dialog
+    // For now, we'll just show a toast notification
+    toast({
+      title: "Post deleted",
+      description: "The scheduled post has been deleted.",
+    });
   };
 
   const handlePublish = (id: string) => {
-    console.log('Publish post:', id);
+    // Here you would typically call an API to publish immediately
+    // For now, we'll just show a toast notification
+    toast({
+      title: "Post published",
+      description: "The post has been published immediately.",
+    });
   };
 
   return (
