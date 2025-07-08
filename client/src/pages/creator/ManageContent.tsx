@@ -404,28 +404,38 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden">
           {selectedContent && (
-            <div className="flex h-full">
-              {/* Left Side - Media */}
-              <div className="flex-1 bg-black flex items-center justify-center relative">
-                {selectedContent.mediaPreview ? (
-                  <img 
-                    src={selectedContent.mediaPreview} 
-                    alt={selectedContent.caption}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <div className="text-center text-white">
-                      {getTypeIcon(selectedContent.type)}
-                      <p className="mt-2">{selectedContent.type} Content</p>
-                    </div>
+            <div className="relative w-full h-full bg-black flex items-center justify-center">
+              {/* Close Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                onClick={closeModal}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+
+              {/* Main Media */}
+              {selectedContent.mediaPreview ? (
+                <img 
+                  src={selectedContent.mediaPreview} 
+                  alt={selectedContent.caption}
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <div className="text-center text-white">
+                    {getTypeIcon(selectedContent.type)}
+                    <p className="mt-2">{selectedContent.type} Content</p>
                   </div>
-                )}
-                
-                {/* Vertical Action Icons - Instagram Style */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-10">
+                </div>
+              )}
+              
+              {/* Vertical Action Icons - Instagram Style */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+                <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -434,9 +444,11 @@ export const ManageContent: React.FC = () => {
                   >
                     <Edit className="w-5 h-5" />
                   </Button>
-                  
-                  {selectedContent.status === 'Published' && (
-                    <>
+                </div>
+                
+                {selectedContent.status === 'Published' && (
+                  <>
+                    <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -444,7 +456,10 @@ export const ManageContent: React.FC = () => {
                       >
                         <Heart className="w-5 h-5" />
                       </Button>
-                      
+                      <span className="text-xs text-white mt-1 font-medium">{selectedContent.likes}</span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -452,7 +467,10 @@ export const ManageContent: React.FC = () => {
                       >
                         <MessageSquare className="w-5 h-5" />
                       </Button>
-                      
+                      <span className="text-xs text-white mt-1 font-medium">{selectedContent.comments}</span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -460,10 +478,12 @@ export const ManageContent: React.FC = () => {
                       >
                         <Share className="w-5 h-5" />
                       </Button>
-                    </>
-                  )}
-                  
-                  {selectedContent.status === 'Draft' && (
+                    </div>
+                  </>
+                )}
+                
+                {selectedContent.status === 'Draft' && (
+                  <div className="flex flex-col items-center">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -472,8 +492,11 @@ export const ManageContent: React.FC = () => {
                     >
                       <Share className="w-5 h-5" />
                     </Button>
-                  )}
-                  
+                    <span className="text-xs text-green-400 mt-1 font-medium">Publish</span>
+                  </div>
+                )}
+                
+                <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -487,77 +510,37 @@ export const ManageContent: React.FC = () => {
                   </Button>
                 </div>
               </div>
-              
-              {/* Right Side - Content Details */}
-              <div className="w-80 bg-background border-l border-border flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b border-border">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant={getTierColor(selectedContent.tier)} className="text-xs">
-                      {selectedContent.tier}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">{selectedContent.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {selectedContent.type}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {selectedContent.category}
-                    </Badge>
-                  </div>
-                </div>
-                
-                {/* Content */}
-                <div className="flex-1 p-4 overflow-y-auto">
-                  <p className="text-sm text-foreground mb-4">
+
+              {/* Bottom Content Overlay - Instagram Style */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 z-20">
+                <div className="max-w-2xl">
+                  {/* Caption */}
+                  <p className="text-white text-sm leading-relaxed mb-3">
                     {selectedContent.caption}
                   </p>
                   
-                  {/* Stats */}
-                  {selectedContent.status === 'Published' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Views</span>
-                        <span className="font-medium">{selectedContent.views.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Likes</span>
-                        <span className="font-medium">{selectedContent.likes}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Comments</span>
-                        <span className="font-medium">{selectedContent.comments}</span>
-                      </div>
+                  {/* Status and Stats */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-white/80">
+                        Status: <span className="text-white font-medium">{selectedContent.status}</span>
+                      </span>
+                      {selectedContent.status === 'Published' && (
+                        <span className="text-xs text-white/80">
+                          {selectedContent.views.toLocaleString()} views
+                        </span>
+                      )}
                     </div>
-                  )}
-                  
-                  {selectedContent.status !== 'Published' && (
-                    <div className="text-sm text-muted-foreground">
-                      <p>Status: <span className="font-medium">{selectedContent.status}</span></p>
-                      <p className="mt-2">No engagement stats available yet</p>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Footer Actions */}
-                <div className="p-4 border-t border-border">
-                  <div className="flex gap-2">
+                    
+                    {/* Edit Action */}
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1"
+                      className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70"
                       onClick={() => handleEdit(selectedContent.id)}
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={closeModal}
-                    >
-                      <X className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
