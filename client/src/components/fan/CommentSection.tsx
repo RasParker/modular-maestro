@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, MessageSquare, Send, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageSquare, Send, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -40,6 +40,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
+  const [showAllComments, setShowAllComments] = useState(false);
 
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -149,104 +151,160 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     }));
   };
 
+  const getSortedComments = () => {
+    const sorted = [...comments];
+    switch (sortBy) {
+      case 'newest':
+        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      case 'oldest':
+        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      case 'popular':
+        return sorted.sort((a, b) => b.likes - a.likes);
+      default:
+        return sorted;
+    }
+  };
+
+  const displayedComments = showAllComments ? getSortedComments() : getSortedComments().slice(0, 5);
+
   const CommentItem: React.FC<{ 
     comment: Comment; 
-    isReply?: boolean; 
-    parentId?: string 
-  }> = ({ comment, isReply = false, parentId }) => (
-    <div className={`${isReply ? 'ml-8 border-l-2 border-border/30 pl-4' : ''}`}>
-      <div className="flex gap-3 mb-3">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={comment.user.avatar} alt={comment.user.username} />
-          <AvatarFallback>{comment.user.username.charAt(0).toUpperCase()}</AvatarFallback>
-        </Avatar>
+    depth?: number; 
+    parentId?: string;
+    maxDepth?: number;
+  }> = ({ comment, depth = 0, parentId, maxDepth = 3 }) => {
+    const isNested = depth > 0;
+    const canNest = depth < maxDepth;
+    
+    return (
+      <div className={`${isNested ? 'ml-6 border-l-2 border-primary/20 pl-4 relative' : ''}`}>
+        {isNested && (
+          <div className="absolute left-0 top-4 w-6 h-0.5 bg-primary/20"></div>
+        )}
         
-        <div className="flex-1">
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-medium text-sm">{comment.user.username}</span>
-              <span className="text-xs text-muted-foreground">{getTimeAgo(comment.createdAt)}</span>
-            </div>
-            <p className="text-sm text-foreground">{comment.content}</p>
-          </div>
+        <div className="flex gap-3 mb-3">
+          <Avatar className={`${isNested ? 'h-7 w-7' : 'h-8 w-8'} flex-shrink-0`}>
+            <AvatarImage src={comment.user.avatar} alt={comment.user.username} />
+            <AvatarFallback className="text-xs">{comment.user.username.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
           
-          <div className="flex items-center gap-4 mt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`h-auto p-1 ${comment.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-              onClick={() => handleLikeComment(comment.id, isReply, parentId)}
-            >
-              <Heart className={`w-3 h-3 mr-1 ${comment.liked ? 'fill-current' : ''}`} />
-              {comment.likes > 0 && <span className="text-xs">{comment.likes}</span>}
-            </Button>
-            
-            {!isReply && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 text-muted-foreground"
-                onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-              >
-                <MessageSquare className="w-3 h-3 mr-1" />
-                <span className="text-xs">Reply</span>
-              </Button>
-            )}
-            
-            {!isReply && comment.replies.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 text-muted-foreground"
-                onClick={() => toggleReplies(comment.id)}
-              >
-                <span className="text-xs">
-                  {showReplies[comment.id] ? 'Hide' : 'Show'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
-                </span>
-              </Button>
-            )}
-          </div>
-          
-          {replyingTo === comment.id && (
-            <div className="mt-3 flex gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={user?.avatar} alt={user?.username} />
-                <AvatarFallback>{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 flex gap-2">
-                <Textarea
-                  placeholder="Write a reply..."
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  className="min-h-[60px] resize-none"
-                />
-                <Button
-                  size="sm"
-                  onClick={() => handleAddReply(comment.id)}
-                  disabled={!replyContent.trim()}
-                >
-                  <Send className="w-3 h-3" />
-                </Button>
+          <div className="flex-1 min-w-0">
+            <div className="bg-muted/50 rounded-lg p-3 hover:bg-muted/70 transition-colors">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium text-sm truncate">{comment.user.username}</span>
+                <span className="text-xs text-muted-foreground flex-shrink-0">{getTimeAgo(comment.createdAt)}</span>
+                {isNested && (
+                  <span className="text-xs text-muted-foreground opacity-60">• reply</span>
+                )}
               </div>
+              <p className="text-sm text-foreground break-words">{comment.content}</p>
             </div>
-          )}
-          
-          {!isReply && showReplies[comment.id] && comment.replies.length > 0 && (
-            <div className="mt-3 space-y-3">
-              {comment.replies.map((reply) => (
-                <CommentItem 
-                  key={reply.id} 
-                  comment={reply} 
-                  isReply={true} 
-                  parentId={comment.id}
-                />
-              ))}
+            
+            <div className="flex items-center gap-4 mt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-auto p-1 hover:bg-background/50 ${comment.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                onClick={() => handleLikeComment(comment.id, isNested, parentId)}
+              >
+                <Heart className={`w-3 h-3 mr-1 ${comment.liked ? 'fill-current' : ''}`} />
+                {comment.likes > 0 && <span className="text-xs">{comment.likes}</span>}
+              </Button>
+              
+              {canNest && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-1 text-muted-foreground hover:bg-background/50"
+                  onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                >
+                  <MessageSquare className="w-3 h-3 mr-1" />
+                  <span className="text-xs">Reply</span>
+                </Button>
+              )}
+              
+              {!isNested && comment.replies.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-1 text-muted-foreground hover:bg-background/50"
+                  onClick={() => toggleReplies(comment.id)}
+                >
+                  <span className="text-xs flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 bg-primary/40 rounded-full"></span>
+                    {showReplies[comment.id] ? 'Hide' : 'Show'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
+                  </span>
+                </Button>
+              )}
             </div>
-          )}
+            
+            {replyingTo === comment.id && (
+              <div className="mt-3 flex gap-2 animate-in slide-in-from-top-1 duration-200">
+                <Avatar className="h-6 w-6 flex-shrink-0">
+                  <AvatarImage src={user?.avatar} alt={user?.username} />
+                  <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 flex gap-2">
+                  <Textarea
+                    placeholder={`Reply to ${comment.user.username}...`}
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                    className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                        handleAddReply(comment.id);
+                      }
+                      if (e.key === 'Escape') {
+                        setReplyingTo(null);
+                        setReplyContent('');
+                      }
+                    }}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddReply(comment.id)}
+                      disabled={!replyContent.trim()}
+                      className="h-8"
+                    >
+                      <Send className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setReplyingTo(null);
+                        setReplyContent('');
+                      }}
+                      className="h-8 text-muted-foreground"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {!isNested && showReplies[comment.id] && comment.replies.length > 0 && (
+              <div className="mt-3 space-y-3 animate-in slide-in-from-top-1 duration-300">
+                {comment.replies
+                  .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                  .map((reply) => (
+                    <CommentItem 
+                      key={reply.id} 
+                      comment={reply} 
+                      depth={depth + 1}
+                      parentId={comment.id}
+                      maxDepth={maxDepth}
+                    />
+                  ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Card className="bg-gradient-card border-border/50">
@@ -263,24 +321,79 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 placeholder="Write a comment..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="min-h-[60px] resize-none"
+                className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handleAddComment();
+                  }
+                }}
               />
               <Button
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
                 size="sm"
+                className="h-[60px]"
               >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
           
+          {/* Comments Header */}
+          {comments.length > 0 && (
+            <div className="flex items-center justify-between pt-4 border-t border-border/30">
+              <span className="text-sm font-medium text-muted-foreground">
+                {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'popular')}
+                  className="text-xs bg-background border border-border/30 rounded px-2 py-1"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="popular">Most liked</option>
+                </select>
+              </div>
+            </div>
+          )}
+          
           {/* Comments List */}
           {comments.length > 0 ? (
-            <div className="space-y-4 pt-4 border-t border-border/30">
-              {comments.map((comment) => (
+            <div className="space-y-4 pt-4">
+              {displayedComments.map((comment) => (
                 <CommentItem key={comment.id} comment={comment} />
               ))}
+              
+              {comments.length > 5 && !showAllComments && (
+                <div className="text-center pt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllComments(true)}
+                    className="text-primary hover:bg-primary/10"
+                  >
+                    <ChevronDown className="w-4 h-4 mr-1" />
+                    Show {comments.length - 5} more comments
+                  </Button>
+                </div>
+              )}
+              
+              {showAllComments && comments.length > 5 && (
+                <div className="text-center pt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllComments(false)}
+                    className="text-primary hover:bg-primary/10"
+                  >
+                    <ChevronUp className="w-4 h-4 mr-1" />
+                    Show fewer comments
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">

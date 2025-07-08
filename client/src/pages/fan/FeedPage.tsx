@@ -52,6 +52,46 @@ const MOCK_FEED = [
             liked: false,
             createdAt: '2024-02-19T11:30:00',
             replies: []
+          },
+          {
+            id: '5',
+            user: {
+              id: '3',
+              username: 'digitalart_fan',
+              avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'The armor textures look so realistic! What software do you use for the detail work?',
+            likes: 1,
+            liked: false,
+            createdAt: '2024-02-19T12:15:00',
+            replies: []
+          }
+        ]
+      },
+      {
+        id: '6',
+        user: {
+          id: '4',
+          username: 'fantasy_enthusiast',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'Love the fantasy theme! The character designs remind me of classic D&D artwork. Are you planning to create a whole campaign setting?',
+        likes: 8,
+        liked: true,
+        createdAt: '2024-02-19T13:00:00',
+        replies: [
+          {
+            id: '7',
+            user: {
+              id: '1',
+              username: 'artisticmia',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'That\'s actually a great idea! I\'ve been thinking about creating a comprehensive world with these characters. Maybe I should start working on background lore and maps.',
+            likes: 4,
+            liked: false,
+            createdAt: '2024-02-19T13:30:00',
+            replies: []
           }
         ]
       }
@@ -86,6 +126,33 @@ const MOCK_FEED = [
         likes: 8,
         liked: true,
         createdAt: '2024-02-19T07:30:00',
+        replies: [
+          {
+            id: '8',
+            user: {
+              id: '2',
+              username: 'fitnessking',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'That\'s the spirit! Remember to keep proper form even when it gets tough. Results come from consistency, not just intensity.',
+            likes: 3,
+            liked: false,
+            createdAt: '2024-02-19T08:00:00',
+            replies: []
+          }
+        ]
+      },
+      {
+        id: '9',
+        user: {
+          id: '5',
+          username: 'morningworkout',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'Perfect timing! Just what I needed for my morning routine. How often do you recommend doing this specific workout?',
+        likes: 2,
+        liked: false,
+        createdAt: '2024-02-19T08:15:00',
         replies: []
       }
     ]
@@ -119,7 +186,61 @@ const MOCK_FEED = [
         likes: 3,
         liked: false,
         createdAt: '2024-02-18T21:00:00',
-        replies: []
+        replies: [
+          {
+            id: '10',
+            user: {
+              id: '3',
+              username: 'musicmaker',
+              avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'UK garage is definitely something I want to experiment with! The syncopated rhythms would work perfectly with my style.',
+            likes: 1,
+            liked: false,
+            createdAt: '2024-02-18T21:30:00',
+            replies: []
+          }
+        ]
+      },
+      {
+        id: '11',
+        user: {
+          id: '6',
+          username: 'producer_pro',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+        },
+        content: 'The layering in this beat is amazing! What DAW are you using? The mixing sounds really clean.',
+        likes: 6,
+        liked: false,
+        createdAt: '2024-02-18T22:00:00',
+        replies: [
+          {
+            id: '12',
+            user: {
+              id: '3',
+              username: 'musicmaker',
+              avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'Thanks! I\'m using Logic Pro X with some custom plugins. The secret is in the compression chain I\'ve built over the years.',
+            likes: 2,
+            liked: false,
+            createdAt: '2024-02-18T22:15:00',
+            replies: []
+          },
+          {
+            id: '13',
+            user: {
+              id: '4',
+              username: 'beathead',
+              avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'
+            },
+            content: 'Would love to hear more about your compression setup! Maybe you could do a tutorial on your production process?',
+            likes: 4,
+            liked: false,
+            createdAt: '2024-02-18T22:45:00',
+            replies: []
+          }
+        ]
       }
     ]
   },
