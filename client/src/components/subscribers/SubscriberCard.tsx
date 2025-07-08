@@ -33,7 +33,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground text-base truncate">{subscriber.username}</p>
-            <p className="text-sm text-muted-foreground truncate">{subscriber.email}</p>
+            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined}</p>
           </div>
           <Badge 
             variant={subscriber.tier === 'Premium Content' ? 'default' : 'outline'}
@@ -62,7 +62,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           className="w-full"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
-          Message {subscriber.username}
+          Send Message
         </Button>
       </div>
 
@@ -76,7 +76,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-foreground truncate">{subscriber.username}</p>
-            <p className="text-sm text-muted-foreground truncate">{subscriber.email}</p>
+            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined}</p>
           </div>
         </div>
         
@@ -100,7 +100,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
             onClick={() => onMessage(subscriber.username)}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            Message
+            Send Message
           </Button>
         </div>
       </div>
