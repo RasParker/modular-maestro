@@ -59,7 +59,7 @@ export const SubscriberFilters: React.FC<SubscriberFiltersProps> = ({
         
         <Button variant="outline" onClick={onReset} size="sm" className="shrink-0">
           <X className="w-4 h-4" />
-          <span className="hidden sm:inline ml-2">Clear</span>
+          <span className="ml-2">Clear</span>
         </Button>
       </div>
     </div>
