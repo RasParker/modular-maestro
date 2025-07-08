@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -404,13 +404,17 @@ export const ManageContent: React.FC = () => {
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selectedContent?.type} Content</DialogTitle>
+            <DialogDescription>View and manage your content</DialogDescription>
+          </DialogHeader>
           {selectedContent && (
             <div className="relative w-full h-full bg-black flex items-center justify-center">
               {/* Close Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
                 onClick={closeModal}
               >
                 <X className="w-5 h-5" />
@@ -434,17 +438,6 @@ export const ManageContent: React.FC = () => {
 
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
-                <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
-                    onClick={() => handleEdit(selectedContent.id)}
-                  >
-                    <Edit className="w-5 h-5" />
-                  </Button>
-                </div>
-
                 {selectedContent.status === 'Published' && (
                   <>
                     <div className="flex flex-col items-center">
@@ -474,8 +467,9 @@ export const ManageContent: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                        onClick={() => handleEdit(selectedContent.id)}
                       >
-                        <Share className="w-5 h-5" />
+                        <Edit className="w-5 h-5" />
                       </Button>
                     </div>
                   </>
