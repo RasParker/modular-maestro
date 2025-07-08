@@ -85,6 +85,15 @@ export const Reports: React.FC = () => {
     });
   };
 
+  const handleViewDetails = (reportId: string) => {
+    // Navigate to report details page
+    // For now, show a toast notification
+    toast({
+      title: "Report Details",
+      description: `Viewing details for report ${reportId}`,
+    });
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -186,49 +195,49 @@ export const Reports: React.FC = () => {
             <div className="space-y-4">
               {filteredReports.map((report) => (
                 <div key={report.id} className="p-6 rounded-lg border border-border/50 bg-muted/10">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-foreground">{report.reason}</h3>
-                        <Badge variant="outline" className="capitalize">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-foreground truncate">{report.reason}</h3>
+                        <Badge variant="outline" className="capitalize shrink-0">
                           {report.type}
                         </Badge>
-                        <Badge variant={getPriorityColor(report.priority) as any} className="capitalize">
+                        <Badge variant={getPriorityColor(report.priority) as any} className="capitalize shrink-0">
                           {report.priority}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">{report.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3 break-words">{report.description}</p>
                       <div className="grid md:grid-cols-2 gap-4 text-sm">
-                        <div>
+                        <div className="min-w-0">
                           <span className="text-muted-foreground">Reported by:</span>
-                          <span className="ml-2 font-medium">{report.reported_by}</span>
+                          <span className="ml-2 font-medium truncate">{report.reported_by}</span>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <span className="text-muted-foreground">Target:</span>
-                          <span className="ml-2 font-medium">{report.target}</span>
+                          <span className="ml-2 font-medium truncate">{report.target}</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Created:</span>
-                          <span className="ml-2">{new Date(report.created_at).toLocaleString()}</span>
+                          <span className="ml-2 text-xs">{new Date(report.created_at).toLocaleString()}</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Updated:</span>
-                          <span className="ml-2">{new Date(report.updated_at).toLocaleString()}</span>
+                          <span className="ml-2 text-xs">{new Date(report.updated_at).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center justify-end lg:justify-start shrink-0">
                       <Badge variant={
                         report.status === 'pending' ? 'destructive' :
                         report.status === 'under_review' ? 'secondary' : 'default'
-                      } className="flex items-center gap-1">
+                      } className="flex items-center gap-1 whitespace-nowrap">
                         {getStatusIcon(report.status)}
                         {report.status.replace('_', ' ')}
                       </Badge>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {report.status === 'pending' && (
                       <Button
                         variant="outline"
@@ -246,7 +255,11 @@ export const Reports: React.FC = () => {
                         Resolve
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(report.id)}
+                    >
                       View Details
                     </Button>
                   </div>
