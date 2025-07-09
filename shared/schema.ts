@@ -59,13 +59,12 @@ export const insertUserSchema = createInsertSchema(users).pick({
   role: true,
 });
 
-export const insertPostSchema = createInsertSchema(posts).pick({
-  creator_id: true,
-  title: true,
-  content: true,
-  media_urls: true,
-  media_type: true,
-  tier: true,
+export const insertPostSchema = createInsertSchema(posts).omit({
+  id: true,
+  likes_count: true,
+  comments_count: true,
+  created_at: true,
+  updated_at: true,
 });
 
 export const insertCommentSchema = createInsertSchema(comments).pick({
