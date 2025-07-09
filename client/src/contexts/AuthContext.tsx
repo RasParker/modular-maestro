@@ -66,37 +66,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     
-    // Mock authentication
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundUser = MOCK_USERS.find(u => u.email === email);
-    if (!foundUser) {
-      throw new Error('Invalid credentials');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
+      }
+      
+      const data = await response.json();
+      const user = {
+        ...data.user,
+        id: data.user.id.toString() // Convert to string for compatibility
+      };
+      
+      setUser(user);
+      localStorage.setItem('xclusive_user', JSON.stringify(user));
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
-    
-    setUser(foundUser);
-    localStorage.setItem('xclusive_user', JSON.stringify(foundUser));
-    setIsLoading(false);
   };
 
   const signup = async (email: string, password: string, username: string, role: 'fan' | 'creator') => {
     setIsLoading(true);
     
-    // Mock signup
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      username,
-      role,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    
-    setUser(newUser);
-    localStorage.setItem('xclusive_user', JSON.stringify(newUser));
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username, role })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Registration failed');
+      }
+      
+      const data = await response.json();
+      const user = {
+        ...data.user,
+        id: data.user.id.toString() // Convert to string for compatibility
+      };
+      
+      setUser(user);
+      localStorage.setItem('xclusive_user', JSON.stringify(user));
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = () => {

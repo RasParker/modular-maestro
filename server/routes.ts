@@ -1,16 +1,21 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertPostSchema, insertCommentSchema } from "@shared/schema";
+import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { username, password } = req.body;
-      const user = await storage.getUserByUsername(username);
+      const { email, password } = req.body;
+      const user = await storage.getUserByEmail(email);
       
-      if (!user || user.password !== password) {
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      const isValidPassword = await storage.verifyPassword(password, user.password);
+      if (!isValidPassword) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
@@ -24,9 +29,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/register", async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
-      const existingUser = await storage.getUserByUsername(validatedData.username);
       
-      if (existingUser) {
+      // Check if user already exists
+      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ error: "Email already exists" });
+      }
+      
+      const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
+      if (existingUserByUsername) {
         return res.status(400).json({ error: "Username already exists" });
       }
       
@@ -256,6 +267,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ liked });
     } catch (error) {
       res.status(500).json({ error: "Failed to check like status" });
+    }
+  });
+
+  // Subscription tier routes
+  app.get("/api/creators/:creatorId/tiers", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const tiers = await storage.getSubscriptionTiers(creatorId);
+      res.json(tiers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subscription tiers" });
+    }
+  });
+
+  app.post("/api/creators/:creatorId/tiers", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const validatedData = insertSubscriptionTierSchema.parse({
+        ...req.body,
+        creator_id: creatorId
+      });
+      
+      const tier = await storage.createSubscriptionTier(validatedData);
+      res.json(tier);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create subscription tier" });
+    }
+  });
+
+  app.put("/api/tiers/:tierId", async (req, res) => {
+    try {
+      const tierId = parseInt(req.params.tierId);
+      const tier = await storage.updateSubscriptionTier(tierId, req.body);
+      
+      if (!tier) {
+        return res.status(404).json({ error: "Tier not found" });
+      }
+      
+      res.json(tier);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update subscription tier" });
+    }
+  });
+
+  app.delete("/api/tiers/:tierId", async (req, res) => {
+    try {
+      const tierId = parseInt(req.params.tierId);
+      const deleted = await storage.deleteSubscriptionTier(tierId);
+      
+      if (!deleted) {
+        return res.status(404).json({ error: "Tier not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete subscription tier" });
+    }
+  });
+
+  // Subscription routes
+  app.get("/api/users/:userId/subscriptions", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const subscriptions = await storage.getSubscriptions(userId);
+      res.json(subscriptions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subscriptions" });
+    }
+  });
+
+  app.post("/api/subscriptions", async (req, res) => {
+    try {
+      const validatedData = insertSubscriptionSchema.parse(req.body);
+      
+      // Check if user already has active subscription to this creator
+      const existingSubscription = await storage.getUserSubscriptionToCreator(
+        validatedData.fan_id,
+        validatedData.creator_id
+      );
+      
+      if (existingSubscription) {
+        return res.status(400).json({ error: "Already subscribed to this creator" });
+      }
+      
+      const subscription = await storage.createSubscription(validatedData);
+      res.json(subscription);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create subscription" });
+    }
+  });
+
+  app.put("/api/subscriptions/:subscriptionId", async (req, res) => {
+    try {
+      const subscriptionId = parseInt(req.params.subscriptionId);
+      const subscription = await storage.updateSubscription(subscriptionId, req.body);
+      
+      if (!subscription) {
+        return res.status(404).json({ error: "Subscription not found" });
+      }
+      
+      res.json(subscription);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update subscription" });
+    }
+  });
+
+  app.delete("/api/subscriptions/:subscriptionId", async (req, res) => {
+    try {
+      const subscriptionId = parseInt(req.params.subscriptionId);
+      const cancelled = await storage.cancelSubscription(subscriptionId);
+      
+      if (!cancelled) {
+        return res.status(404).json({ error: "Subscription not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel subscription" });
+    }
+  });
+
+  // Creator subscriber routes
+  app.get("/api/creators/:creatorId/subscribers", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const subscribers = await storage.getCreatorSubscribers(creatorId);
+      res.json(subscribers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subscribers" });
     }
   });
 

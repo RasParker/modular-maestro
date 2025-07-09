@@ -1,12 +1,38 @@
-import { users, posts, comments, post_likes, comment_likes, type User, type InsertUser, type Post, type InsertPost, type Comment, type InsertComment } from "@shared/schema";
+import { 
+  users, 
+  posts, 
+  comments, 
+  post_likes, 
+  comment_likes,
+  subscription_tiers,
+  subscriptions,
+  payment_transactions,
+  creator_payouts,
+  type User, 
+  type InsertUser,
+  type Post,
+  type InsertPost,
+  type Comment,
+  type InsertComment,
+  type SubscriptionTier,
+  type InsertSubscriptionTier,
+  type Subscription,
+  type InsertSubscription,
+  type PaymentTransaction,
+  type InsertPaymentTransaction
+} from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
+  verifyPassword(password: string, hashedPassword: string): Promise<boolean>;
   
   // Post methods
   getPosts(): Promise<Post[]>;
@@ -28,6 +54,26 @@ export interface IStorage {
   likeComment(commentId: number, userId: number): Promise<boolean>;
   unlikeComment(commentId: number, userId: number): Promise<boolean>;
   isCommentLiked(commentId: number, userId: number): Promise<boolean>;
+  
+  // Subscription system methods
+  getSubscriptionTiers(creatorId: number): Promise<SubscriptionTier[]>;
+  getSubscriptionTier(id: number): Promise<SubscriptionTier | undefined>;
+  createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier>;
+  updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined>;
+  deleteSubscriptionTier(id: number): Promise<boolean>;
+  
+  getSubscriptions(userId: number): Promise<Subscription[]>;
+  getSubscription(id: number): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription | undefined>;
+  cancelSubscription(id: number): Promise<boolean>;
+  
+  getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<Subscription | undefined>;
+  getCreatorSubscribers(creatorId: number): Promise<Subscription[]>;
+  
+  // Payment methods
+  createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
+  getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]>;
 }
 
 // Database Storage Implementation
@@ -42,12 +88,43 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values({
+        ...insertUser,
+        password: hashedPassword,
+      })
       .returning();
     return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const updateData = { ...updates, updated_at: new Date() };
+    
+    // If password is being updated, hash it
+    if (updates.password) {
+      updateData.password = await bcrypt.hash(updates.password, 10);
+    }
+    
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
   }
 
   async getPosts(): Promise<Post[]> {
@@ -157,6 +234,146 @@ export class DatabaseStorage implements IStorage {
   async isCommentLiked(commentId: number, userId: number): Promise<boolean> {
     const [like] = await db.select().from(comment_likes).where(and(eq(comment_likes.comment_id, commentId), eq(comment_likes.user_id, userId)));
     return !!like;
+  }
+
+  // Subscription system methods
+  async getSubscriptionTiers(creatorId: number): Promise<SubscriptionTier[]> {
+    return await db
+      .select()
+      .from(subscription_tiers)
+      .where(and(eq(subscription_tiers.creator_id, creatorId), eq(subscription_tiers.is_active, true)))
+      .orderBy(subscription_tiers.price);
+  }
+
+  async getSubscriptionTier(id: number): Promise<SubscriptionTier | undefined> {
+    const [tier] = await db.select().from(subscription_tiers).where(eq(subscription_tiers.id, id));
+    return tier || undefined;
+  }
+
+  async createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier> {
+    const [newTier] = await db
+      .insert(subscription_tiers)
+      .values(tier)
+      .returning();
+    return newTier;
+  }
+
+  async updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined> {
+    const [tier] = await db
+      .update(subscription_tiers)
+      .set({ ...updates, updated_at: new Date() })
+      .where(eq(subscription_tiers.id, id))
+      .returning();
+    return tier || undefined;
+  }
+
+  async deleteSubscriptionTier(id: number): Promise<boolean> {
+    const result = await db.delete(subscription_tiers).where(eq(subscription_tiers.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async getSubscriptions(userId: number): Promise<Subscription[]> {
+    return await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.fan_id, userId))
+      .orderBy(desc(subscriptions.created_at));
+  }
+
+  async getSubscription(id: number): Promise<Subscription | undefined> {
+    const [subscription] = await db.select().from(subscriptions).where(eq(subscriptions.id, id));
+    return subscription || undefined;
+  }
+
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const [newSubscription] = await db
+      .insert(subscriptions)
+      .values(subscription)
+      .returning();
+    
+    // Update creator's subscriber count
+    await db
+      .update(users)
+      .set({ 
+        total_subscribers: sql`${users.total_subscribers} + 1`,
+        updated_at: new Date()
+      })
+      .where(eq(users.id, subscription.creator_id));
+    
+    return newSubscription;
+  }
+
+  async updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ ...updates, updated_at: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return subscription || undefined;
+  }
+
+  async cancelSubscription(id: number): Promise<boolean> {
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({ 
+        status: 'cancelled',
+        auto_renew: false,
+        updated_at: new Date()
+      })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    
+    if (subscription) {
+      // Update creator's subscriber count
+      await db
+        .update(users)
+        .set({ 
+          total_subscribers: sql`${users.total_subscribers} - 1`,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, subscription.creator_id));
+    }
+    
+    return !!subscription;
+  }
+
+  async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(and(
+        eq(subscriptions.fan_id, fanId),
+        eq(subscriptions.creator_id, creatorId),
+        eq(subscriptions.status, 'active')
+      ));
+    return subscription || undefined;
+  }
+
+  async getCreatorSubscribers(creatorId: number): Promise<Subscription[]> {
+    return await db
+      .select()
+      .from(subscriptions)
+      .where(and(
+        eq(subscriptions.creator_id, creatorId),
+        eq(subscriptions.status, 'active')
+      ))
+      .orderBy(desc(subscriptions.created_at));
+  }
+
+  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
+    const [newTransaction] = await db
+      .insert(payment_transactions)
+      .values(transaction)
+      .returning();
+    return newTransaction;
+  }
+
+  async getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]> {
+    return await db
+      .select()
+      .from(payment_transactions)
+      .where(eq(payment_transactions.subscription_id, subscriptionId))
+      .orderBy(desc(payment_transactions.created_at));
   }
 }
 
