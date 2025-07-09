@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CommentSection } from '@/components/fan/CommentSection';
-import { Heart, MessageSquare, Calendar, Eye, Share2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Heart, MessageSquare, Calendar, Eye, Share2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_FEED = [
@@ -266,6 +267,8 @@ export const FeedPage: React.FC = () => {
   const [feed, setFeed] = useState(MOCK_FEED);
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [expandedCaptions, setExpandedCaptions] = useState<Record<string, boolean>>({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
 
   const handleLike = (postId: string) => {
     setFeed(feed.map(post => 
@@ -299,6 +302,16 @@ export const FeedPage: React.FC = () => {
       title: "Link copied",
       description: "Post link has been copied to your clipboard.",
     });
+  };
+
+  const handleThumbnailClick = (post: any) => {
+    setSelectedContent(post);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedContent(null);
   };
 
   const toggleCaptionExpansion = (postId: string) => {
@@ -421,7 +434,18 @@ export const FeedPage: React.FC = () => {
                   })()}
                 </div>
                 
-                <div className="rounded-lg overflow-hidden">
+                <div 
+                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                  onClick={() => handleThumbnailClick(post)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleThumbnailClick(post);
+                    }
+                  }}
+                >
                   <img 
                     src={post.thumbnail} 
                     alt={`${post.creator.display_name}'s post`}
@@ -489,6 +513,105 @@ export const FeedPage: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Instagram-style Content Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selectedContent?.type} Content</DialogTitle>
+            <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
+          </DialogHeader>
+          {selectedContent && (
+            <div className="relative w-full h-full bg-black flex items-center justify-center">
+              {/* Close Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                onClick={closeModal}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+
+              {/* Main Media */}
+              <img 
+                src={selectedContent.thumbnail} 
+                alt={`${selectedContent.creator.display_name}'s post`}
+                className="max-w-full max-h-full object-contain"
+              />
+
+              {/* Vertical Action Icons - Instagram Style */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+                <div className="flex flex-col items-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 ${
+                      selectedContent.liked ? 'text-red-500' : 'text-white hover:bg-black/70'
+                    }`}
+                    onClick={() => handleLike(selectedContent.id)}
+                  >
+                    <Heart className={`w-5 h-5 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                  </Button>
+                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.likes}</span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                    onClick={() => handleCommentClick(selectedContent.id)}
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                  </Button>
+                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.comments}</span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                    onClick={() => handleShare(selectedContent.id)}
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.views}</span>
+                </div>
+              </div>
+
+              {/* Content Info Overlay - Bottom */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 z-20">
+                <div className="flex items-center gap-3 mb-3">
+                  <Avatar className="h-10 w-10 border-2 border-white/20">
+                    <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
+                    <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-white">{selectedContent.creator.display_name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-white/80">@{selectedContent.creator.username}</p>
+                      <Badge variant="outline" className="text-xs border-white/20 text-white">
+                        {selectedContent.tier}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-white/90 text-sm leading-relaxed">
+                  {selectedContent.content}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
