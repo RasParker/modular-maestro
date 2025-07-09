@@ -17,7 +17,6 @@ const MOCK_FEED = [
       display_name: 'Artistic Mia',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
     },
-    title: 'New Digital Art Collection - Fantasy Warriors',
     content: 'Just finished my latest series of fantasy warrior illustrations! This collection took me 3 weeks to complete and features 12 unique characters.',
     type: 'image',
     tier: 'Fan',
@@ -104,7 +103,6 @@ const MOCK_FEED = [
       display_name: 'Fitness King',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
     },
-    title: 'Morning Workout Routine - Upper Body Blast',
     content: 'Starting the week strong with an intense upper body workout! Follow along for maximum gains. Remember to warm up properly!',
     type: 'video',
     tier: 'Supporter',
@@ -164,7 +162,6 @@ const MOCK_FEED = [
       display_name: 'Music Maker',
       avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face'
     },
-    title: 'Behind the Scenes: New Beat Production',
     content: 'Working on a new beat for my upcoming album. Here\'s a sneak peek at my creative process. What genre should I explore next?',
     type: 'audio',
     tier: 'Superfan',
@@ -251,7 +248,6 @@ const MOCK_FEED = [
       display_name: 'Artistic Mia',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
     },
-    title: 'Work in Progress Update',
     content: 'Here\'s a sneak peek at my upcoming digital painting. Still working on the lighting effects and color balance. What do you think so far?',
     type: 'image',
     tier: 'Supporter',
@@ -361,14 +357,13 @@ export const FeedPage: React.FC = () => {
               
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{post.title}</h3>
                   <p className="text-muted-foreground">{post.content}</p>
                 </div>
                 
                 <div className="rounded-lg overflow-hidden">
                   <img 
                     src={post.thumbnail} 
-                    alt={post.title}
+                    alt={`${post.creator.display_name}'s post`}
                     className="w-full h-64 object-cover"
                   />
                 </div>
