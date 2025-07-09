@@ -129,6 +129,10 @@ export const ManageContent: React.FC = () => {
   };
 
   const handleContentClick = (item: typeof CONTENT_DATA[0]) => {
+    // Add haptic feedback for mobile devices
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
     setSelectedContent(item);
     setIsModalOpen(true);
   };
@@ -179,9 +183,27 @@ export const ManageContent: React.FC = () => {
         <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
           {item.mediaPreview ? (
             <div 
-              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-              onClick={() => handleContentClick(item)}
-              onTouchStart={() => {}} // Enable touch events on iOS
+              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none"
+              onClick={(e) => {
+                e.preventDefault();
+                handleContentClick(item);
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                // Add visual feedback for touch
+                e.currentTarget.style.opacity = '0.8';
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                // Remove visual feedback
+                e.currentTarget.style.opacity = '1';
+                handleContentClick(item);
+              }}
+              onTouchCancel={(e) => {
+                e.preventDefault();
+                // Remove visual feedback on cancel
+                e.currentTarget.style.opacity = '1';
+              }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -190,6 +212,7 @@ export const ManageContent: React.FC = () => {
                   handleContentClick(item);
                 }
               }}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               {/* Blurred background layer */}
               <div 
@@ -213,9 +236,27 @@ export const ManageContent: React.FC = () => {
             </div>
           ) : (
             <div 
-              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-              onClick={() => handleContentClick(item)}
-              onTouchStart={() => {}} // Enable touch events on iOS
+              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none"
+              onClick={(e) => {
+                e.preventDefault();
+                handleContentClick(item);
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                // Add visual feedback for touch
+                e.currentTarget.style.opacity = '0.8';
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                // Remove visual feedback
+                e.currentTarget.style.opacity = '1';
+                handleContentClick(item);
+              }}
+              onTouchCancel={(e) => {
+                e.preventDefault();
+                // Remove visual feedback on cancel
+                e.currentTarget.style.opacity = '1';
+              }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -224,6 +265,7 @@ export const ManageContent: React.FC = () => {
                   handleContentClick(item);
                 }
               }}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="text-center">
                 {getTypeIcon(item.type)}

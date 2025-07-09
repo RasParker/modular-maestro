@@ -18,7 +18,7 @@ export const posts = pgTable("posts", {
   creator_id: integer("creator_id").notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  media_urls: json("media_urls").$type<string[]>().notNull().default([]),
+  media_urls: json("media_urls").$type<string[]>().default([]),
   media_type: text("media_type").notNull().default("text"), // image, video, text
   tier: text("tier").notNull().default("public"), // public, fan, supporter, premium
   likes_count: integer("likes_count").notNull().default(0),
