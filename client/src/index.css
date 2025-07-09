@@ -14,6 +14,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Force hardware acceleration for better mobile performance */
+.touch-manipulation,
+.cursor-pointer,
+[role="button"] {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
 /* Improve tap targets for mobile */
 @media (max-width: 768px) {
   .touch-target {

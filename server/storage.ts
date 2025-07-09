@@ -66,7 +66,7 @@ export class DatabaseStorage implements IStorage {
       creator_id: insertPost.creator_id,
       title: insertPost.title,
       content: insertPost.content,
-      media_urls: insertPost.media_urls || [],
+      media_urls: (insertPost.media_urls as string[]) || [],
       media_type: insertPost.media_type || 'text',
       tier: insertPost.tier || 'public',
       likes_count: 0,

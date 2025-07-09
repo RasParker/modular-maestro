@@ -137,6 +137,12 @@ export const ManageContent: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Create a unified click handler that works for both mouse and touch
+  const handleUnifiedClick = (item: typeof CONTENT_DATA[0]) => {
+    console.log('Click/Touch triggered for:', item.id);
+    handleContentClick(item);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
@@ -182,37 +188,15 @@ export const ManageContent: React.FC = () => {
       <div className="px-4 pb-3">
         <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
           {item.mediaPreview ? (
-            <div 
-              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none"
-              onClick={(e) => {
-                e.preventDefault();
-                handleContentClick(item);
+            <button 
+              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none touch-manipulation bg-transparent border-none p-0"
+              onClick={() => handleUnifiedClick(item)}
+              style={{ 
+                WebkitTapHighlightColor: 'transparent',
+                WebkitTouchCallout: 'none',
+                WebkitUserSelect: 'none',
+                touchAction: 'manipulation'
               }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                // Add visual feedback for touch
-                e.currentTarget.style.opacity = '0.8';
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                // Remove visual feedback
-                e.currentTarget.style.opacity = '1';
-                handleContentClick(item);
-              }}
-              onTouchCancel={(e) => {
-                e.preventDefault();
-                // Remove visual feedback on cancel
-                e.currentTarget.style.opacity = '1';
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleContentClick(item);
-                }
-              }}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               {/* Blurred background layer */}
               <div 
@@ -233,45 +217,23 @@ export const ManageContent: React.FC = () => {
                   {getTypeIcon(item.type)}
                 </div>
               </div>
-            </div>
+            </button>
           ) : (
-            <div 
-              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none"
-              onClick={(e) => {
-                e.preventDefault();
-                handleContentClick(item);
+            <button 
+              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none touch-manipulation border-none p-0"
+              onClick={() => handleUnifiedClick(item)}
+              style={{ 
+                WebkitTapHighlightColor: 'transparent',
+                WebkitTouchCallout: 'none',
+                WebkitUserSelect: 'none',
+                touchAction: 'manipulation'
               }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                // Add visual feedback for touch
-                e.currentTarget.style.opacity = '0.8';
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                // Remove visual feedback
-                e.currentTarget.style.opacity = '1';
-                handleContentClick(item);
-              }}
-              onTouchCancel={(e) => {
-                e.preventDefault();
-                // Remove visual feedback on cancel
-                e.currentTarget.style.opacity = '1';
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleContentClick(item);
-                }
-              }}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="text-center">
                 {getTypeIcon(item.type)}
                 <p className="text-xs text-muted-foreground mt-2">{item.type}</p>
               </div>
-            </div>
+            </button>
           )}
         </AspectRatio>
       </div>
