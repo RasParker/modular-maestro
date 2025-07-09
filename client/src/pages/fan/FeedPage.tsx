@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CommentSection } from '@/components/fan/CommentSection';
-import { ArrowLeft, Heart, MessageSquare, Calendar, Eye, Share2 } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_FEED = [
@@ -319,18 +319,12 @@ export const FeedPage: React.FC = () => {
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <Button variant="outline" asChild className="mb-4">
-            <Link to="/fan/dashboard">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Link>
-          </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Calendar className="w-8 h-8 text-primary" />
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Your Feed
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Latest content from creators you follow
           </p>
         </div>
