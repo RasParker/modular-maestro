@@ -310,7 +310,8 @@ export const FeedPage: React.FC = () => {
 
   const truncateText = (text: string, maxLines: number = 2) => {
     const words = text.split(' ');
-    const wordsPerLine = 12; // Approximate words per line
+    // Adjust words per line based on screen size - fewer words on mobile
+    const wordsPerLine = window.innerWidth < 640 ? 8 : 12;
     const maxWords = maxLines * wordsPerLine;
     
     if (words.length <= maxWords) {
@@ -386,14 +387,18 @@ export const FeedPage: React.FC = () => {
                     
                     return (
                       <div>
-                        <p className="text-muted-foreground">
+                        <p className={`text-muted-foreground text-sm sm:text-base leading-relaxed ${
+                          !isExpanded && needsExpansion 
+                            ? 'line-clamp-2 overflow-hidden' 
+                            : ''
+                        }`}>
                           {isExpanded ? post.content : truncated}
                           {needsExpansion && !isExpanded && '...'}
                         </p>
                         {needsExpansion && (
                           <button
                             onClick={() => toggleCaptionExpansion(post.id)}
-                            className="text-sm text-primary hover:underline mt-1 font-medium"
+                            className="text-xs sm:text-sm text-primary hover:underline mt-1 font-medium block"
                           >
                             {isExpanded ? 'Read less' : 'Read more'}
                           </button>
