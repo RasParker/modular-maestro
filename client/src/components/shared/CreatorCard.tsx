@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,24 @@ interface CreatorCardProps {
 
 export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   const minPrice = Math.min(...creator.tiers.map(t => t.price));
+  const [expandedBio, setExpandedBio] = useState(false);
+
+  const truncateText = (text: string, maxLines: number = 2) => {
+    const words = text.split(' ');
+    const wordsPerLine = 8; // Fewer words per line in cards
+    const maxWords = maxLines * wordsPerLine;
+    
+    if (words.length <= maxWords) {
+      return { truncated: text, needsExpansion: false };
+    }
+    
+    return {
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
+    };
+  };
+
+  const { truncated, needsExpansion } = truncateText(creator.bio);
 
   return (
     <Card className="overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group">
@@ -61,9 +79,20 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
             <p className="text-sm text-muted-foreground">@{creator.username}</p>
           </div>
           
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {creator.bio}
-          </p>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {expandedBio ? creator.bio : truncated}
+              {needsExpansion && !expandedBio && '...'}
+            </p>
+            {needsExpansion && (
+              <button
+                onClick={() => setExpandedBio(!expandedBio)}
+                className="text-xs text-primary hover:underline mt-1 font-medium"
+              >
+                {expandedBio ? 'Read less' : 'Read more'}
+              </button>
+            )}
+          </div>
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-4 h-4" />

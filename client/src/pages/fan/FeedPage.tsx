@@ -265,6 +265,7 @@ export const FeedPage: React.FC = () => {
   const { toast } = useToast();
   const [feed, setFeed] = useState(MOCK_FEED);
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [expandedCaptions, setExpandedCaptions] = useState<Record<string, boolean>>({});
 
   const handleLike = (postId: string) => {
     setFeed(feed.map(post => 
@@ -298,6 +299,28 @@ export const FeedPage: React.FC = () => {
       title: "Link copied",
       description: "Post link has been copied to your clipboard.",
     });
+  };
+
+  const toggleCaptionExpansion = (postId: string) => {
+    setExpandedCaptions(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const truncateText = (text: string, maxLines: number = 2) => {
+    const words = text.split(' ');
+    const wordsPerLine = 12; // Approximate words per line
+    const maxWords = maxLines * wordsPerLine;
+    
+    if (words.length <= maxWords) {
+      return { truncated: text, needsExpansion: false };
+    }
+    
+    return {
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
+    };
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -357,7 +380,27 @@ export const FeedPage: React.FC = () => {
               
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-muted-foreground">{post.content}</p>
+                  {(() => {
+                    const { truncated, needsExpansion } = truncateText(post.content);
+                    const isExpanded = expandedCaptions[post.id];
+                    
+                    return (
+                      <div>
+                        <p className="text-muted-foreground">
+                          {isExpanded ? post.content : truncated}
+                          {needsExpansion && !isExpanded && '...'}
+                        </p>
+                        {needsExpansion && (
+                          <button
+                            onClick={() => toggleCaptionExpansion(post.id)}
+                            className="text-sm text-primary hover:underline mt-1 font-medium"
+                          >
+                            {isExpanded ? 'Read less' : 'Read more'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
                 
                 <div className="rounded-lg overflow-hidden">

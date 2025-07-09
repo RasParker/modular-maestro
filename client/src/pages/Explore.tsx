@@ -111,12 +111,35 @@ export const Explore: React.FC = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
 
   const handleSubscribe = (creatorName: string, price: number) => {
     toast({
-      title: "Subscription initiated",
-      description: `You've started subscribing to ${creatorName} for $${price}/month.`,
+      title: "Subscription started!",
+      description: `You've subscribed to ${creatorName} for $${price}/month.`,
     });
+  };
+
+  const toggleBioExpansion = (creatorId: string) => {
+    setExpandedBios(prev => ({
+      ...prev,
+      [creatorId]: !prev[creatorId]
+    }));
+  };
+
+  const truncateText = (text: string, maxLines: number = 2) => {
+    const words = text.split(' ');
+    const wordsPerLine = 10; // Approximate words per line in explore cards
+    const maxWords = maxLines * wordsPerLine;
+
+    if (words.length <= maxWords) {
+      return { truncated: text, needsExpansion: false };
+    }
+
+    return {
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
+    };
   };
 
   const filteredCreators = CREATORS.filter(creator => {
@@ -129,7 +152,7 @@ export const Explore: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -178,83 +201,97 @@ export const Explore: React.FC = () => {
 
         {/* Creators Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCreators.map((creator) => (
-            <Card key={creator.id} className="overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group">
-              <div className="relative">
-                <img 
-                  src={creator.cover} 
-                  alt={creator.display_name}
-                  className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute -bottom-6 left-4">
-                  <Avatar className="w-12 h-12 border-2 border-background">
-                    <AvatarImage src={creator.avatar} alt={creator.username} />
-                    <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </div>
-                {creator.verified && (
-                  <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground hover:bg-accent/90">
-                    <Star className="w-3 h-3 mr-1" />
-                    Verified
+          {filteredCreators.map((creator) => {
+            const { truncated, needsExpansion } = truncateText(creator.bio);
+            return (
+              <Card key={creator.id} className="overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group">
+                <div className="relative">
+                  <img
+                    src={creator.cover}
+                    alt={creator.display_name}
+                    className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute -bottom-6 left-4">
+                    <Avatar className="w-12 h-12 border-2 border-background">
+                      <AvatarImage src={creator.avatar} alt={creator.username} />
+                      <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  {creator.verified && (
+                    <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                      <Star className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                  <Badge className="absolute top-2 left-2 bg-primary/80 text-primary-foreground">
+                    {creator.category}
                   </Badge>
-                )}
-                <Badge className="absolute top-2 left-2 bg-primary/80 text-primary-foreground">
-                  {creator.category}
-                </Badge>
-              </div>
-              
-              <CardContent className="pt-8 pb-6">
-                <div className="space-y-3">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{creator.display_name}</h3>
-                    <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {creator.bio}
-                  </p>
-                  
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="w-4 h-4" />
-                    {creator.subscribers.toLocaleString()} subscribers
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Subscription tiers:</span>
-                      <span className="text-sm font-medium">
-                        {creator.tiers.length} option{creator.tiers.length !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">From</span>
-                      <span className="font-semibold text-accent">
-                        ${Math.min(...creator.tiers.map(t => t.price))}/month
-                      </span>
-                    </div>
-                  </div>
-                  
-                   <div className="space-y-2">
-                     <Button 
-                       variant="outline" 
-                       className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors" 
-                       asChild
-                     >
-                       <Link to={`/creator/${creator.username}`}>
-                         View Profile
-                       </Link>
-                     </Button>
-                     <Button 
-                       className="w-full" 
-                       onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
-                     >
-                       Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
-                     </Button>
-                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                <CardContent className="pt-8 pb-6">
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-semibold text-foreground">{creator.display_name}</h3>
+                      <p className="text-sm text-muted-foreground">@{creator.username}</p>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      {needsExpansion && !expandedBios[creator.id]
+                        ? truncated
+                        : creator.bio}
+                      {needsExpansion && (
+                        <Button
+                          variant="link"
+                          size="sm"
+                          onClick={() => toggleBioExpansion(creator.id)}
+                        >
+                          {expandedBios[creator.id] ? 'Read less' : 'Read more'}
+                        </Button>
+                      )}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      {creator.subscribers.toLocaleString()} subscribers
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Subscription tiers:</span>
+                        <span className="text-sm font-medium">
+                          {creator.tiers.length} option{creator.tiers.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">From</span>
+                        <span className="font-semibold text-accent">
+                          ${Math.min(...creator.tiers.map(t => t.price))}/month
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                        asChild
+                      >
+                        <Link to={`/creator/${creator.username}`}>
+                          View Profile
+                        </Link>
+                      </Button>
+                      <Button
+                        className="w-full"
+                        onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
+                      >
+                        Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
         {/* No Results */}
