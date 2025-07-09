@@ -177,7 +177,7 @@ export const FanDashboard: React.FC = () => {
                   <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link to="/feed">
+                      <Link to="/fan/feed">
                         <Calendar className="w-4 h-4 mr-2" />
                         View My Feed
                       </Link>
