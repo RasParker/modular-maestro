@@ -129,18 +129,8 @@ export const ManageContent: React.FC = () => {
   };
 
   const handleContentClick = (item: typeof CONTENT_DATA[0]) => {
-    // Add haptic feedback for mobile devices
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
-    }
     setSelectedContent(item);
     setIsModalOpen(true);
-  };
-
-  // Create a unified click handler that works for both mouse and touch
-  const handleUnifiedClick = (item: typeof CONTENT_DATA[0]) => {
-    console.log('Click/Touch triggered for:', item.id);
-    handleContentClick(item);
   };
 
   const closeModal = () => {
@@ -188,14 +178,17 @@ export const ManageContent: React.FC = () => {
       <div className="px-4 pb-3">
         <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
           {item.mediaPreview ? (
-            <button 
-              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none touch-manipulation bg-transparent border-none p-0"
-              onClick={() => handleUnifiedClick(item)}
-              style={{ 
-                WebkitTapHighlightColor: 'transparent',
-                WebkitTouchCallout: 'none',
-                WebkitUserSelect: 'none',
-                touchAction: 'manipulation'
+            <div 
+              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+              onClick={() => handleContentClick(item)}
+              onTouchStart={() => {}} // Enable touch events on iOS
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleContentClick(item);
+                }
               }}
             >
               {/* Blurred background layer */}
@@ -217,23 +210,26 @@ export const ManageContent: React.FC = () => {
                   {getTypeIcon(item.type)}
                 </div>
               </div>
-            </button>
+            </div>
           ) : (
-            <button 
-              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 select-none touch-manipulation border-none p-0"
-              onClick={() => handleUnifiedClick(item)}
-              style={{ 
-                WebkitTapHighlightColor: 'transparent',
-                WebkitTouchCallout: 'none',
-                WebkitUserSelect: 'none',
-                touchAction: 'manipulation'
+            <div 
+              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+              onClick={() => handleContentClick(item)}
+              onTouchStart={() => {}} // Enable touch events on iOS
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleContentClick(item);
+                }
               }}
             >
               <div className="text-center">
                 {getTypeIcon(item.type)}
                 <p className="text-xs text-muted-foreground mt-2">{item.type}</p>
               </div>
-            </button>
+            </div>
           )}
         </AspectRatio>
       </div>

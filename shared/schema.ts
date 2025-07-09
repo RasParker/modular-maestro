@@ -18,7 +18,7 @@ export const posts = pgTable("posts", {
   creator_id: integer("creator_id").notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  media_urls: json("media_urls").$type<string[]>().default([]),
+  media_urls: json("media_urls").$type<string[]>().notNull().default([]),
   media_type: text("media_type").notNull().default("text"), // image, video, text
   tier: text("tier").notNull().default("public"), // public, fan, supporter, premium
   likes_count: integer("likes_count").notNull().default(0),
@@ -59,12 +59,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
   role: true,
 });
 
-export const insertPostSchema = createInsertSchema(posts).omit({
-  id: true,
-  likes_count: true,
-  comments_count: true,
-  created_at: true,
-  updated_at: true,
+export const insertPostSchema = createInsertSchema(posts).pick({
+  creator_id: true,
+  title: true,
+  content: true,
+  media_urls: true,
+  media_type: true,
+  tier: true,
 });
 
 export const insertCommentSchema = createInsertSchema(comments).pick({
