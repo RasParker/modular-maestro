@@ -8,6 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 import { Login } from '@/pages/Login';
+import { Signup } from '@/pages/Signup';
 import { Explore } from '@/pages/Explore';
 import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorProfile } from '@/pages/CreatorProfile';
@@ -50,6 +51,7 @@ function App() {
             <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
               
               {/* Public Routes */}
               <Route path="/explore" element={<Explore />} />
