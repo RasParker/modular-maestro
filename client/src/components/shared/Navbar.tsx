@@ -65,6 +65,11 @@ export const Navbar: React.FC = () => {
             <Link to="/explore" className="text-foreground hover:text-primary transition-colors">
               Explore
             </Link>
+            {user && user.role === 'fan' && (
+              <Link to="/fan/feed" className="text-foreground hover:text-primary transition-colors">
+                Feed
+              </Link>
+            )}
             {user && (
               <Link to={getDashboardLink()} className="text-foreground hover:text-primary transition-colors">
                 Dashboard
