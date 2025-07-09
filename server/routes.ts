@@ -8,6 +8,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
+      
+      // Demo users for development
+      const DEMO_USERS = [
+        {
+          id: 1,
+          email: 'admin@xclusive.com',
+          username: 'admin',
+          role: 'admin',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+        {
+          id: 2,
+          email: 'creator@example.com',
+          username: 'amazingcreator',
+          role: 'creator',
+          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+        {
+          id: 3,
+          email: 'fan@example.com',
+          username: 'loyalfan',
+          role: 'fan',
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+      ];
+      
+      // Check demo users first (for development)
+      if (password === 'demo123') {
+        const demoUser = DEMO_USERS.find(u => u.email === email);
+        if (demoUser) {
+          return res.json({ user: demoUser });
+        }
+      }
+      
+      // Try database authentication
       const user = await storage.getUserByEmail(email);
       
       if (!user) {
