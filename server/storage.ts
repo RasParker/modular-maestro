@@ -1,8 +1,6 @@
-import { 
-  users, posts, comments, comment_likes, post_likes,
-  type User, type InsertUser, type Post, type InsertPost, 
-  type Comment, type InsertComment 
-} from "@shared/schema";
+import { users, posts, comments, post_likes, comment_likes, type User, type InsertUser, type Post, type InsertPost, type Comment, type InsertComment } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -32,249 +30,134 @@ export interface IStorage {
   isCommentLiked(commentId: number, userId: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private posts: Map<number, Post>;
-  private comments: Map<number, Comment>;
-  private postLikes: Map<string, boolean>; // key: `${postId}-${userId}`
-  private commentLikes: Map<string, boolean>; // key: `${commentId}-${userId}`
-  private currentUserId: number;
-  private currentPostId: number;
-  private currentCommentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.posts = new Map();
-    this.comments = new Map();
-    this.postLikes = new Map();
-    this.commentLikes = new Map();
-    this.currentUserId = 1;
-    this.currentPostId = 1;
-    this.currentCommentId = 1;
-    
-    this.seedData();
-  }
-
-  private seedData() {
-    // Seed users
-    const mockUsers = [
-      { id: 1, username: "artisticmia", email: "mia@example.com", password: "password", role: "creator", avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face", created_at: new Date(), updated_at: new Date() },
-      { id: 2, username: "fitnessking", email: "king@example.com", password: "password", role: "creator", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", created_at: new Date(), updated_at: new Date() },
-      { id: 3, username: "artlover123", email: "lover@example.com", password: "password", role: "fan", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", created_at: new Date(), updated_at: new Date() },
-      { id: 4, username: "testuser", email: "test@example.com", password: "password", role: "fan", avatar: null, created_at: new Date(), updated_at: new Date() }
-    ];
-
-    mockUsers.forEach(user => {
-      this.users.set(user.id, user);
-    });
-    this.currentUserId = 5;
-
-    // Seed posts
-    const mockPosts = [
-      { id: 1, creator_id: 1, title: "New Digital Art Collection", content: "Just finished my latest series!", media_urls: [], media_type: "image", tier: "fan", likes_count: 142, comments_count: 5, created_at: new Date(), updated_at: new Date() },
-      { id: 2, creator_id: 2, title: "Morning Workout Routine", content: "Starting the week strong!", media_urls: [], media_type: "video", tier: "supporter", likes_count: 89, comments_count: 3, created_at: new Date(), updated_at: new Date() }
-    ];
-
-    mockPosts.forEach(post => {
-      this.posts.set(post.id, post);
-    });
-    this.currentPostId = 3;
-  }
-
-  // User methods
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      avatar: null,
-      created_at: new Date(),
-      updated_at: new Date()
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
-  // Post methods
   async getPosts(): Promise<Post[]> {
-    return Array.from(this.posts.values()).sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    return await db.select().from(posts).orderBy(posts.created_at);
   }
 
   async getPost(id: number): Promise<Post | undefined> {
-    return this.posts.get(id);
+    const [post] = await db.select().from(posts).where(eq(posts.id, id));
+    return post || undefined;
   }
 
   async createPost(insertPost: InsertPost): Promise<Post> {
-    const id = this.currentPostId++;
-    const post: Post = {
-      ...insertPost,
-      id,
-      likes_count: 0,
-      comments_count: 0,
-      created_at: new Date(),
-      updated_at: new Date()
-    };
-    this.posts.set(id, post);
+    const [post] = await db
+      .insert(posts)
+      .values(insertPost)
+      .returning();
     return post;
   }
 
   async updatePost(id: number, updates: Partial<Post>): Promise<Post | undefined> {
-    const post = this.posts.get(id);
-    if (!post) return undefined;
-    
-    const updatedPost = { ...post, ...updates, updated_at: new Date() };
-    this.posts.set(id, updatedPost);
-    return updatedPost;
+    const [post] = await db
+      .update(posts)
+      .set({ ...updates, updated_at: new Date() })
+      .where(eq(posts.id, id))
+      .returning();
+    return post || undefined;
   }
 
   async deletePost(id: number): Promise<boolean> {
-    return this.posts.delete(id);
+    const result = await db.delete(posts).where(eq(posts.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
-  // Comment methods
   async getComments(postId: number): Promise<Comment[]> {
-    return Array.from(this.comments.values())
-      .filter(comment => comment.post_id === postId)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    return await db.select().from(comments).where(eq(comments.post_id, postId)).orderBy(comments.created_at);
   }
 
   async getComment(id: number): Promise<Comment | undefined> {
-    return this.comments.get(id);
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    return comment || undefined;
   }
 
   async createComment(insertComment: InsertComment): Promise<Comment> {
-    const id = this.currentCommentId++;
-    const comment: Comment = {
-      ...insertComment,
-      id,
-      likes_count: 0,
-      created_at: new Date(),
-      updated_at: new Date()
-    };
-    this.comments.set(id, comment);
-    
-    // Update post comment count
-    const post = this.posts.get(insertComment.post_id);
-    if (post) {
-      this.posts.set(insertComment.post_id, {
-        ...post,
-        comments_count: post.comments_count + 1
-      });
-    }
-    
+    const [comment] = await db
+      .insert(comments)
+      .values(insertComment)
+      .returning();
     return comment;
   }
 
   async deleteComment(id: number): Promise<boolean> {
-    const comment = this.comments.get(id);
-    if (!comment) return false;
-    
-    // Update post comment count
-    const post = this.posts.get(comment.post_id);
-    if (post) {
-      this.posts.set(comment.post_id, {
-        ...post,
-        comments_count: Math.max(0, post.comments_count - 1)
-      });
-    }
-    
-    return this.comments.delete(id);
+    const result = await db.delete(comments).where(eq(comments.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
-  // Like methods
   async likePost(postId: number, userId: number): Promise<boolean> {
-    const key = `${postId}-${userId}`;
-    if (this.postLikes.has(key)) return false;
-    
-    this.postLikes.set(key, true);
-    
-    // Update post like count
-    const post = this.posts.get(postId);
-    if (post) {
-      this.posts.set(postId, {
-        ...post,
-        likes_count: post.likes_count + 1
-      });
+    try {
+      await db.insert(post_likes).values({ post_id: postId, user_id: userId });
+      await db.update(posts).set({ likes_count: sql`${posts.likes_count} + 1` }).where(eq(posts.id, postId));
+      return true;
+    } catch {
+      return false;
     }
-    
-    return true;
   }
 
   async unlikePost(postId: number, userId: number): Promise<boolean> {
-    const key = `${postId}-${userId}`;
-    if (!this.postLikes.has(key)) return false;
-    
-    this.postLikes.delete(key);
-    
-    // Update post like count
-    const post = this.posts.get(postId);
-    if (post) {
-      this.posts.set(postId, {
-        ...post,
-        likes_count: Math.max(0, post.likes_count - 1)
-      });
+    try {
+      const result = await db.delete(post_likes).where(and(eq(post_likes.post_id, postId), eq(post_likes.user_id, userId)));
+      if ((result.rowCount || 0) > 0) {
+        await db.update(posts).set({ likes_count: sql`${posts.likes_count} - 1` }).where(eq(posts.id, postId));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    
-    return true;
   }
 
   async isPostLiked(postId: number, userId: number): Promise<boolean> {
-    const key = `${postId}-${userId}`;
-    return this.postLikes.has(key);
+    const [like] = await db.select().from(post_likes).where(and(eq(post_likes.post_id, postId), eq(post_likes.user_id, userId)));
+    return !!like;
   }
 
   async likeComment(commentId: number, userId: number): Promise<boolean> {
-    const key = `${commentId}-${userId}`;
-    if (this.commentLikes.has(key)) return false;
-    
-    this.commentLikes.set(key, true);
-    
-    // Update comment like count
-    const comment = this.comments.get(commentId);
-    if (comment) {
-      this.comments.set(commentId, {
-        ...comment,
-        likes_count: comment.likes_count + 1
-      });
+    try {
+      await db.insert(comment_likes).values({ comment_id: commentId, user_id: userId });
+      await db.update(comments).set({ likes_count: sql`${comments.likes_count} + 1` }).where(eq(comments.id, commentId));
+      return true;
+    } catch {
+      return false;
     }
-    
-    return true;
   }
 
   async unlikeComment(commentId: number, userId: number): Promise<boolean> {
-    const key = `${commentId}-${userId}`;
-    if (!this.commentLikes.has(key)) return false;
-    
-    this.commentLikes.delete(key);
-    
-    // Update comment like count
-    const comment = this.comments.get(commentId);
-    if (comment) {
-      this.comments.set(commentId, {
-        ...comment,
-        likes_count: Math.max(0, comment.likes_count - 1)
-      });
+    try {
+      const result = await db.delete(comment_likes).where(and(eq(comment_likes.comment_id, commentId), eq(comment_likes.user_id, userId)));
+      if ((result.rowCount || 0) > 0) {
+        await db.update(comments).set({ likes_count: sql`${comments.likes_count} - 1` }).where(eq(comments.id, commentId));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    
-    return true;
   }
 
   async isCommentLiked(commentId: number, userId: number): Promise<boolean> {
-    const key = `${commentId}-${userId}`;
-    return this.commentLikes.has(key);
+    const [like] = await db.select().from(comment_likes).where(and(eq(comment_likes.comment_id, commentId), eq(comment_likes.user_id, userId)));
+    return !!like;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
