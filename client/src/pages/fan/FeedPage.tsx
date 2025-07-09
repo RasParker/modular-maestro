@@ -311,7 +311,7 @@ export const FeedPage: React.FC = () => {
   const truncateText = (text: string, maxLines: number = 2) => {
     const words = text.split(' ');
     // Adjust words per line based on screen size - fewer words on mobile
-    const wordsPerLine = window.innerWidth < 640 ? 8 : 12;
+    const wordsPerLine = window.innerWidth < 640 ? 6 : 10; // Reduced to leave space for "Read more"
     const maxWords = maxLines * wordsPerLine;
     
     if (words.length <= maxWords) {
@@ -387,22 +387,35 @@ export const FeedPage: React.FC = () => {
                     
                     return (
                       <div>
-                        <p className={`text-muted-foreground text-sm sm:text-base leading-relaxed ${
-                          !isExpanded && needsExpansion 
-                            ? 'line-clamp-2 overflow-hidden' 
-                            : ''
-                        }`}>
-                          {isExpanded ? post.content : truncated}
-                          {needsExpansion && !isExpanded && '...'}
+                        <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                          {isExpanded ? post.content : (
+                            <>
+                              {truncated}
+                              {needsExpansion && !isExpanded && (
+                                <>
+                                  {'... '}
+                                  <button
+                                    onClick={() => toggleCaptionExpansion(post.id)}
+                                    className="text-xs sm:text-sm text-primary hover:underline font-medium inline"
+                                  >
+                                    Read more
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
+                          {isExpanded && needsExpansion && (
+                            <>
+                              {' '}
+                              <button
+                                onClick={() => toggleCaptionExpansion(post.id)}
+                                className="text-xs sm:text-sm text-primary hover:underline font-medium inline"
+                              >
+                                Read less
+                              </button>
+                            </>
+                          )}
                         </p>
-                        {needsExpansion && (
-                          <button
-                            onClick={() => toggleCaptionExpansion(post.id)}
-                            className="text-xs sm:text-sm text-primary hover:underline mt-1 font-medium block"
-                          >
-                            {isExpanded ? 'Read less' : 'Read more'}
-                          </button>
-                        )}
                       </div>
                     );
                   })()}
