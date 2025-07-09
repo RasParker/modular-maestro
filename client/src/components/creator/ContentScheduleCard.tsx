@@ -23,6 +23,7 @@ interface ContentScheduleCardProps {
   type: 'Image' | 'Video' | 'Text';
   tier: string;
   status: 'Scheduled' | 'Draft';
+  thumbnail?: string;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
@@ -37,6 +38,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   type,
   tier,
   status,
+  thumbnail,
   onEdit,
   onDelete,
   onPublish
@@ -63,19 +65,56 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
       <CardContent className="p-4 space-y-4">
         {/* Mobile-First Layout */}
         
-        {/* Header with icon and badges */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground flex-shrink-0">
-              {getTypeIcon()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
-                {title}
-              </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                {description}
-              </p>
+        {/* Content Preview with WhatsApp-style square container */}
+        <div className="flex items-start gap-3">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+            {thumbnail ? (
+              <div className="w-full h-full relative overflow-hidden rounded-lg">
+                {/* Background blurred image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                  style={{ backgroundImage: `url(${thumbnail})` }}
+                />
+                {/* Foreground contained image */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img 
+                    src={thumbnail} 
+                    alt={title}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                {/* Content type overlay */}
+                <div className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white">
+                  <div className="scale-75">
+                    {getTypeIcon()}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+                {getTypeIcon()}
+              </div>
+            )}
+          </div>
+          
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
+              {title}
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1">
+              {description}
+            </p>
+            
+            {/* Date/Time Info - Mobile optimized */}
+            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                <span>{date}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>{time}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -83,26 +122,11 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
         {/* Badges Row */}
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline" className="text-xs">
-            {type}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
             {tier}
           </Badge>
           <Badge variant={getStatusColor()} className="text-xs">
             {status}
           </Badge>
-        </div>
-
-        {/* Date/Time Info */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
-            <span>{date}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            <span>{time}</span>
-          </div>
         </div>
 
         {/* Action Buttons */}

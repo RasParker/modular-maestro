@@ -19,22 +19,24 @@ const MOCK_SCHEDULED_POSTS = [
   {
     id: '1',
     title: 'New Digital Art Collection',
-    description: 'Check out my latest digital artwork featuring cyberpunk themes...',
+    description: 'Check out my latest digital artwork featuring cyberpunk themes and neon landscapes...',
     date: '2024-02-20',
     time: '14:00',
     type: 'Image' as const,
     tier: 'Superfan',
-    status: 'Scheduled' as const
+    status: 'Scheduled' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop'
   },
   {
     id: '2',
     title: 'Behind the Scenes Video',
-    description: 'Take a look at my creative process and workspace setup...',
+    description: 'Take a look at my creative process and workspace setup with exclusive footage...',
     date: '2024-02-22',
     time: '18:00',
     type: 'Video' as const,
     tier: 'Fan',
-    status: 'Scheduled' as const
+    status: 'Scheduled' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop'
   },
   {
     id: '3',
@@ -44,7 +46,41 @@ const MOCK_SCHEDULED_POSTS = [
     time: '12:00',
     type: 'Text' as const,
     tier: 'Supporter',
-    status: 'Draft' as const
+    status: 'Draft' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
+  },
+  {
+    id: '4',
+    title: 'Tech Review: Latest Gadgets',
+    description: 'Comprehensive review of the newest tech gadgets and their real-world applications...',
+    date: '2024-02-27',
+    time: '16:30',
+    type: 'Video' as const,
+    tier: 'Pro',
+    status: 'Scheduled' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=300&fit=crop'
+  },
+  {
+    id: '5',
+    title: 'Recipe Collection: Healthy Meals',
+    description: 'A collection of my favorite healthy recipes with step-by-step instructions...',
+    date: '2024-02-28',
+    time: '10:00',
+    type: 'Image' as const,
+    tier: 'Chef',
+    status: 'Draft' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1556909114-b6c75d1fea83?w=300&h=300&fit=crop'
+  },
+  {
+    id: '6',
+    title: 'Fashion Trends Spring 2024',
+    description: 'Latest fashion trends and styling tips for the upcoming spring season...',
+    date: '2024-03-01',
+    time: '13:00',
+    type: 'Image' as const,
+    tier: 'Stylish',
+    status: 'Scheduled' as const,
+    thumbnail: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=300&h=300&fit=crop'
   }
 ];
 
