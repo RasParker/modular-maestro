@@ -248,78 +248,7 @@ export const CreatorProfile: React.FC = () => {
                   );
                 })}
                 
-                {/* Enhanced CTA Card */}
-                <Card className="bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 border-primary/20 relative overflow-hidden">
-                  <CardContent className="p-8 text-center relative z-10">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-50"></div>
-                    <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6">
-                        <DollarSign className="w-8 h-8 text-white" />
-                      </div>
-                      
-                      <h3 className="text-2xl font-bold mb-3 text-foreground">Join {creator.subscribers.toLocaleString()} subscribers</h3>
-                      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                        Get exclusive access to {creator.display_name}'s content, behind-the-scenes updates, and direct communication.
-                      </p>
-                      
-                      <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                        <Button 
-                          variant="premium" 
-                          size="lg"
-                          onClick={() => handleSubscribe('1')}
-                          className="min-w-48"
-                        >
-                          Start from ${Math.min(...creator.tiers.map(t => t.price))}/month
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                          Cancel anytime • Secure payment
-                        </span>
-                      </div>
-                      
-                      {/* Social Proof */}
-                      <div className="mt-6 flex items-center justify-center gap-6 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          <span>4.9/5 rating</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>98% retention rate</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
                 
-                {/* Additional Content Teasers */}
-                <Card className="bg-gradient-card border-border/50">
-                  <CardContent className="p-6">
-                    <h4 className="font-semibold mb-4 text-center">What subscribers get access to:</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 rounded-lg bg-muted/20">
-                        <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Star className="w-6 h-6 text-primary" />
-                        </div>
-                        <h5 className="font-medium mb-2">Exclusive Content</h5>
-                        <p className="text-sm text-muted-foreground">Behind-the-scenes and premium posts</p>
-                      </div>
-                      <div className="text-center p-4 rounded-lg bg-muted/20">
-                        <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Users className="w-6 h-6 text-accent" />
-                        </div>
-                        <h5 className="font-medium mb-2">Community Access</h5>
-                        <p className="text-sm text-muted-foreground">Join the private community</p>
-                      </div>
-                      <div className="text-center p-4 rounded-lg bg-muted/20">
-                        <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <DollarSign className="w-6 h-6 text-primary" />
-                        </div>
-                        <h5 className="font-medium mb-2">Direct Messages</h5>
-                        <p className="text-sm text-muted-foreground">Personal interaction with creator</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </div>
