@@ -67,9 +67,6 @@ export const Navbar: React.FC = () => {
             <Link to="/explore" className="text-foreground hover:text-primary transition-colors">
               Explore
             </Link>
-            <Link to="/creator/artisticmia" className="text-foreground hover:text-primary transition-colors">
-              Test Smart Blur
-            </Link>
             {user && user.role === 'fan' && (
               <Link to="/fan/feed" className="text-foreground hover:text-primary transition-colors">
                 Feed
@@ -132,16 +129,6 @@ export const Navbar: React.FC = () => {
                         className="text-foreground hover:text-primary"
                       >
                         Explore
-                      </Link>
-                    </Button>
-                    
-                    <Button variant="ghost" asChild className="justify-start">
-                      <Link 
-                        to="/creator/artisticmia" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-foreground hover:text-primary"
-                      >
-                        Test Smart Blur (Creator Profile)
                       </Link>
                     </Button>
                     
