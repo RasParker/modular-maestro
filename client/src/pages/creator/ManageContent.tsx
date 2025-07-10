@@ -472,24 +472,66 @@ export const ManageContent: React.FC = () => {
                 {selectedContent.status === 'Published' && (
                   <>
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white"
+                        style={{ 
+                          WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
                         <Heart className="w-7 h-7" />
                       </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
+                      <span 
+                        className="text-xs text-white font-medium" 
+                        style={{ 
+                          WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
+                        {selectedContent.likes}
+                      </span>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white"
+                        style={{ 
+                          WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
                         <MessageSquare className="w-7 h-7" />
                       </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
+                      <span 
+                        className="text-xs text-white font-medium" 
+                        style={{ 
+                          WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
+                        {selectedContent.comments}
+                      </span>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white"
+                        style={{ 
+                          WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
                         <Eye className="w-7 h-7" />
                       </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
+                      <span 
+                        className="text-xs text-white font-medium" 
+                        style={{ 
+                          WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                      >
+                        {selectedContent.views}
+                      </span>
                     </div>
                   </>
                 )}
@@ -499,10 +541,22 @@ export const ManageContent: React.FC = () => {
                     <div 
                       className="w-12 h-12 rounded-full flex items-center justify-center text-green-400 cursor-pointer hover:bg-white/10"
                       onClick={() => handlePublish(selectedContent.id)}
+                      style={{ 
+                        WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                      }}
                     >
                       <Share className="w-7 h-7" />
                     </div>
-                    <span className="text-xs text-green-400 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>Publish</span>
+                    <span 
+                      className="text-xs text-green-400 font-medium" 
+                      style={{ 
+                        WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                      }}
+                    >
+                      Publish
+                    </span>
                   </div>
                 )}
 
@@ -513,6 +567,10 @@ export const ManageContent: React.FC = () => {
                       handleDelete(selectedContent.id);
                       closeModal();
                     }}
+                    style={{ 
+                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                    }}
                   >
                     <Trash2 className="w-7 h-7" />
                   </div>
@@ -521,7 +579,13 @@ export const ManageContent: React.FC = () => {
 
               {/* Bottom Content Overlay - Instagram style with text shadows */}
               <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
-                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                <p 
+                  className="text-white text-sm leading-relaxed" 
+                  style={{ 
+                    WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                  }}
+                >
                   {expandedModalCaption ? selectedContent.caption : (
                     selectedContent.caption.length > 80 ? (
                       <>
