@@ -532,7 +532,7 @@ export const FeedPage: React.FC = () => {
                 className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
                 onClick={closeModal}
               >
-                <ArrowLeft className="w-6 h-6" />
+                <ArrowLeft className="w-7 h-7" />
               </Button>
 
               {/* Square container that fills the entire modal */}
@@ -554,7 +554,7 @@ export const FeedPage: React.FC = () => {
               </div>
 
               {/* Vertical Action Icons - Instagram Style */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
                 <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
@@ -564,7 +564,7 @@ export const FeedPage: React.FC = () => {
                     }`}
                     onClick={() => handleLike(selectedContent.id)}
                   >
-                    <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                    <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} />
                   </Button>
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
                 </div>
@@ -576,7 +576,7 @@ export const FeedPage: React.FC = () => {
                     className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
-                    <MessageSquare className="w-6 h-6" />
+                    <MessageSquare className="w-7 h-7" />
                   </Button>
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                 </div>
@@ -588,13 +588,13 @@ export const FeedPage: React.FC = () => {
                     className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleShare(selectedContent.id)}
                   >
-                    <Share2 className="w-6 h-6" />
+                    <Share2 className="w-7 h-7" />
                   </Button>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center">
-                    <Eye className="w-6 h-6 text-white" />
+                    <Eye className="w-7 h-7 text-white" />
                   </div>
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
                 </div>
