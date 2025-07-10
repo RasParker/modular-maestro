@@ -598,24 +598,28 @@ export const FeedPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Content Info Overlay - Bottom - positioned relative to the modal container */}
-              <div className="absolute bottom-4 left-4 right-16 bg-gradient-to-t from-black/60 via-black/30 to-transparent backdrop-blur-sm p-4 rounded-lg z-20">
+              {/* Content Info Overlay - Bottom - Instagram style with text shadows */}
+              <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
                 <div className="flex items-center gap-3 mb-2">
-                  <Avatar className="h-8 w-8 border-2 border-white/20">
+                  <Avatar className="h-8 w-8 shadow-lg">
                     <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
                     <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-white text-sm">{selectedContent.creator.display_name}</p>
+                    <p className="font-semibold text-white text-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                      {selectedContent.creator.display_name}
+                    </p>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-white/80">@{selectedContent.creator.username}</p>
-                      <Badge variant="outline" className="text-xs border-white/20 text-white">
+                      <p className="text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                        @{selectedContent.creator.username}
+                      </p>
+                      <Badge variant="outline" className="text-xs border-white/40 text-white bg-black/30 backdrop-blur-sm">
                         {selectedContent.tier}
                       </Badge>
                     </div>
                   </div>
                 </div>
-                <p className="text-white/90 text-sm leading-relaxed line-clamp-3">
+                <p className="text-white text-sm leading-relaxed line-clamp-3" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
                   {selectedContent.content}
                 </p>
               </div>
