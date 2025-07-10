@@ -533,8 +533,8 @@ export const FeedPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </Button>
 
-              {/* Square container that takes maximum available space */}
-              <div className="relative aspect-square w-full h-full max-w-[min(100vw-2rem,90vh-2rem)] max-h-[min(100vh-2rem,90vw-2rem)] overflow-hidden">
+              {/* Square container that adapts to available space */}
+              <div className="relative aspect-square max-w-[85vh] max-h-[85vh] w-full h-full overflow-hidden">
                 {/* Blurred background */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
