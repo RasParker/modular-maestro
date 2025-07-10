@@ -556,40 +556,34 @@ export const FeedPage: React.FC = () => {
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
                 <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`w-12 h-12 rounded-full ${
-                      selectedContent.liked ? 'text-red-500' : 'text-white hover:bg-white/10'
+                  <div 
+                    className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/10 ${
+                      selectedContent.liked ? 'text-red-500' : 'text-white'
                     }`}
                     onClick={() => handleLike(selectedContent.id)}
                   >
                     <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} />
-                  </Button>
+                  </div>
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-12 h-12 rounded-full text-white hover:bg-white/10"
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10"
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
                     <MessageSquare className="w-7 h-7" />
-                  </Button>
+                  </div>
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-12 h-12 rounded-full text-white hover:bg-white/10"
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10"
                     onClick={() => handleShare(selectedContent.id)}
                   >
                     <Share2 className="w-7 h-7" />
-                  </Button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col items-center">
