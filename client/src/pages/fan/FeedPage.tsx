@@ -599,7 +599,7 @@ export const FeedPage: React.FC = () => {
               </div>
 
               {/* Content Info Overlay - Bottom - positioned relative to the modal container */}
-              <div className="absolute bottom-4 left-4 right-16 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 rounded-lg z-20">
+              <div className="absolute bottom-4 left-4 right-16 bg-gradient-to-t from-black/60 via-black/30 to-transparent backdrop-blur-sm p-4 rounded-lg z-20">
                 <div className="flex items-center gap-3 mb-2">
                   <Avatar className="h-8 w-8 border-2 border-white/20">
                     <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
