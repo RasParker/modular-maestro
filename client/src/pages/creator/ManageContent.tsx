@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText, X } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const CONTENT_DATA = [
@@ -97,6 +97,7 @@ export const ManageContent: React.FC = () => {
   const [content, setContent] = useState(CONTENT_DATA);
   const [selectedContent, setSelectedContent] = useState<typeof CONTENT_DATA[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedModalCaption, setExpandedModalCaption] = useState(false);
 
   const publishedContent = content.filter(item => item.status === 'Published');
   const scheduledContent = content.filter(item => item.status === 'Scheduled');
@@ -136,6 +137,7 @@ export const ManageContent: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
+    setExpandedModalCaption(false);
   };
 
   const getTypeIcon = (type: string) => {
@@ -421,21 +423,21 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0">
+        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View and manage your content</DialogDescription>
           </DialogHeader>
           {selectedContent && (
             <div className="relative w-full h-full bg-black flex items-center justify-center">
-              {/* Close Button */}
+              {/* Back Arrow Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
                 onClick={closeModal}
               >
-                <X className="w-5 h-5" />
+                <ArrowLeft className="w-7 h-7" />
               </Button>
 
               {/* Square container that fills the entire modal */}
@@ -466,77 +468,81 @@ export const ManageContent: React.FC = () => {
               </div>
 
               {/* Vertical Action Icons - Instagram Style */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
                 {selectedContent.status === 'Published' && (
                   <>
                     <div className="flex flex-col items-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
-                      >
-                        <Heart className="w-5 h-5" />
-                      </Button>
-                      <span className="text-xs text-white mt-1 font-medium">{selectedContent.likes}</span>
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                        <Heart className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
-                      >
-                        <MessageSquare className="w-5 h-5" />
-                      </Button>
-                      <span className="text-xs text-white mt-1 font-medium">{selectedContent.comments}</span>
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                        <MessageSquare className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
-                        onClick={() => handleEdit(selectedContent.id)}
-                      >
-                        <Edit className="w-5 h-5" />
-                      </Button>
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                        <Eye className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
                     </div>
                   </>
                 )}
 
                 {selectedContent.status === 'Draft' && (
                   <div className="flex flex-col items-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-green-400 hover:bg-black/70 border border-green-400/50"
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-green-400 cursor-pointer hover:bg-white/10"
                       onClick={() => handlePublish(selectedContent.id)}
                     >
-                      <Share className="w-5 h-5" />
-                    </Button>
-                    <span className="text-xs text-green-400 mt-1 font-medium">Publish</span>
+                      <Share className="w-7 h-7" />
+                    </div>
+                    <span className="text-xs text-green-400 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>Publish</span>
                   </div>
                 )}
 
                 <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-red-400 hover:bg-black/70 border border-red-400/50"
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-red-400 cursor-pointer hover:bg-white/10"
                     onClick={() => {
                       handleDelete(selectedContent.id);
                       closeModal();
                     }}
                   >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
+                    <Trash2 className="w-7 h-7" />
+                  </div>
                 </div>
               </div>
 
               {/* Bottom Content Overlay - Instagram style with text shadows */}
               <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
-                <p className="text-white text-sm leading-relaxed line-clamp-3" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-                  {selectedContent.caption}
+                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                  {expandedModalCaption ? selectedContent.caption : (
+                    selectedContent.caption.length > 80 ? (
+                      <>
+                        {selectedContent.caption.substring(0, 80)}
+                        <span 
+                          className="cursor-pointer text-white/80 hover:text-white ml-1"
+                          onClick={() => setExpandedModalCaption(true)}
+                        >
+                          ...
+                        </span>
+                      </>
+                    ) : selectedContent.caption
+                  )}
+                  {expandedModalCaption && selectedContent.caption.length > 80 && (
+                    <span 
+                      className="cursor-pointer text-white/80 hover:text-white ml-2"
+                      onClick={() => setExpandedModalCaption(false)}
+                    >
+                      Show less
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
