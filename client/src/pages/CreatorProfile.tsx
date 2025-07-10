@@ -45,7 +45,7 @@ const MOCK_CREATOR = {
     {
       id: '1',
       title: 'New Digital Art Collection',
-      content: 'Check out my latest digital artwork featuring cyberpunk themes...',
+      content: 'Check out my latest digital artwork featuring cyberpunk themes and neon aesthetics. This collection took me 3 months to complete and represents a new direction in my artistic journey. I\'ve been experimenting with different lighting techniques and color palettes.',
       mediaType: 'image',
       tier: 'Fan',
       createdAt: '2024-02-19T10:30:00',
@@ -54,11 +54,47 @@ const MOCK_CREATOR = {
     {
       id: '2',
       title: 'Behind the Scenes Process',
-      content: 'Here\'s how I create my digital masterpieces...',
+      content: 'Here\'s how I create my digital masterpieces step by step. From initial sketches to final rendering, I\'ll walk you through my entire creative process. This video includes time-lapse footage of me working on the cyberpunk collection.',
       mediaType: 'video',
       tier: 'Superfan',
       createdAt: '2024-02-18T15:20:00',
       thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop'
+    },
+    {
+      id: '3',
+      title: 'Character Design Tutorial',
+      content: 'Learn my techniques for creating compelling characters that tell a story. This comprehensive tutorial covers anatomy, expression, costume design, and character development. Perfect for aspiring digital artists.',
+      mediaType: 'image',
+      tier: 'Fan',
+      createdAt: '2024-02-17T09:15:00',
+      thumbnail: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'
+    },
+    {
+      id: '4',
+      title: 'Exclusive Artwork: Dragon Queen',
+      content: 'An exclusive piece created just for my subscribers. This detailed fantasy artwork showcases advanced techniques in digital painting. Includes high-resolution downloads and process notes.',
+      mediaType: 'image',
+      tier: 'Superfan',
+      createdAt: '2024-02-16T14:45:00',
+      thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop'
+    },
+    {
+      id: '5',
+      title: 'Weekly Art Challenge Results',
+      content: 'See the amazing submissions from our community art challenge! This week\'s theme was \'Future Cities\' and the creativity was incredible. I\'ve selected the top 10 entries and provided feedback.',
+      mediaType: 'image',
+      tier: 'Supporter',
+      createdAt: '2024-02-15T11:30:00',
+      thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop'
+    },
+    {
+      id: '6',
+      title: 'Live Stream Recap: Digital Painting',
+      content: 'Missed my live stream? Here\'s the full recording where I painted a sci-fi landscape from start to finish. Includes chat interactions and real-time tips.',
+      mediaType: 'video',
+      tier: 'Fan',
+      createdAt: '2024-02-14T16:20:00',
+      thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop'
     }
   ]
 };
