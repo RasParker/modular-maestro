@@ -598,24 +598,24 @@ export const FeedPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Content Info Overlay - Bottom */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 z-20">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar className="h-10 w-10 border-2 border-white/20">
+              {/* Content Info Overlay - Bottom - positioned relative to the modal container */}
+              <div className="absolute bottom-4 left-4 right-16 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 rounded-lg z-20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-8 w-8 border-2 border-white/20">
                     <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
                     <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-white">{selectedContent.creator.display_name}</p>
+                    <p className="font-semibold text-white text-sm">{selectedContent.creator.display_name}</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-white/80">@{selectedContent.creator.username}</p>
+                      <p className="text-xs text-white/80">@{selectedContent.creator.username}</p>
                       <Badge variant="outline" className="text-xs border-white/20 text-white">
                         {selectedContent.tier}
                       </Badge>
                     </div>
                   </div>
                 </div>
-                <p className="text-white/90 text-sm leading-relaxed">
+                <p className="text-white/90 text-sm leading-relaxed line-clamp-3">
                   {selectedContent.content}
                 </p>
               </div>
