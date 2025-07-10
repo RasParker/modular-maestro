@@ -154,7 +154,35 @@ export const CreatorProfile: React.FC = () => {
               <div className="space-y-6">
                 {creator.recentPosts.map((post, index) => {
                   const tierPrice = creator.tiers.find(t => t.name === post.tier)?.price || 0;
-                  const isBlurred = index > 0; // First post partially visible, rest blurred
+                  
+                  // Smart blur strategy
+                  let blurLevel = 'none';
+                  let visibility = 100;
+                  let heightClass = 'h-auto';
+                  
+                  if (index === 0) {
+                    // First post: fully visible
+                    blurLevel = 'none';
+                    visibility = 100;
+                    heightClass = 'h-auto';
+                  } else if (index === 1) {
+                    // Second post: 70% visible
+                    blurLevel = 'light';
+                    visibility = 70;
+                    heightClass = 'h-64';
+                  } else if (index === 2) {
+                    // Third post: 50% visible
+                    blurLevel = 'medium';
+                    visibility = 50;
+                    heightClass = 'h-48';
+                  } else {
+                    // Rest: heavily blurred
+                    blurLevel = 'heavy';
+                    visibility = 30;
+                    heightClass = 'h-40';
+                  }
+                  
+                  const showBlurOverlay = index > 0;
                   
                   return (
                     <Card key={post.id} className="bg-gradient-card border-border/50 hover:border-primary/30 transition-all duration-300 overflow-hidden">
@@ -183,16 +211,21 @@ export const CreatorProfile: React.FC = () => {
                           </div>
 
                           {/* Post Content */}
-                          <div className={`relative ${isBlurred ? 'h-48' : 'h-auto'} overflow-hidden`}>
+                          <div className={`relative ${heightClass} overflow-hidden`}>
                             <div className="p-4">
                               <h3 className="font-semibold text-lg mb-3">{post.title}</h3>
                               
                               {/* Media Preview */}
-                              <div className="mb-4 rounded-lg overflow-hidden">
+                              <div className="mb-4 rounded-lg overflow-hidden relative">
                                 <img 
                                   src={post.thumbnail} 
                                   alt={post.title}
-                                  className="w-full h-48 object-cover"
+                                  className={`w-full h-48 object-cover transition-all duration-300 ${
+                                    blurLevel === 'light' ? 'blur-[1px]' :
+                                    blurLevel === 'medium' ? 'blur-[2px]' :
+                                    blurLevel === 'heavy' ? 'blur-[4px]' : ''
+                                  }`}
+                                  style={{ opacity: visibility / 100 }}
                                 />
                                 {post.mediaType === 'video' && (
                                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
@@ -203,12 +236,22 @@ export const CreatorProfile: React.FC = () => {
                                 )}
                               </div>
                               
-                              <p className="text-muted-foreground leading-relaxed">
-                                {isBlurred ? post.content.substring(0, 100) + '...' : post.content}
+                              <p className={`text-muted-foreground leading-relaxed transition-all duration-300 ${
+                                blurLevel === 'light' ? 'blur-[0.5px]' :
+                                blurLevel === 'medium' ? 'blur-[1px]' :
+                                blurLevel === 'heavy' ? 'blur-[2px]' : ''
+                              }`} style={{ opacity: visibility / 100 }}>
+                                {showBlurOverlay && index > 1 ? post.content.substring(0, 80) + '...' : 
+                                 showBlurOverlay && index === 1 ? post.content.substring(0, 150) + '...' : 
+                                 post.content}
                               </p>
                               
                               {/* Engagement Preview */}
-                              <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                              <div className={`flex items-center gap-4 mt-4 text-sm text-muted-foreground transition-all duration-300 ${
+                                blurLevel === 'light' ? 'blur-[0.5px]' :
+                                blurLevel === 'medium' ? 'blur-[1px]' :
+                                blurLevel === 'heavy' ? 'blur-[2px]' : ''
+                              }`} style={{ opacity: visibility / 100 }}>
                                 <div className="flex items-center gap-1">
                                   <Star className="w-4 h-4" />
                                   <span>{Math.floor(Math.random() * 50) + 10} likes</span>
@@ -220,14 +263,27 @@ export const CreatorProfile: React.FC = () => {
                               </div>
                             </div>
                             
-                            {/* Blur Overlay for Premium Content */}
-                            {isBlurred && (
-                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background flex items-end justify-center">
+                            {/* Progressive Blur Overlay */}
+                            {showBlurOverlay && (
+                              <div className={`absolute inset-0 transition-all duration-300 ${
+                                index === 1 ? 'bg-gradient-to-b from-transparent via-transparent to-background/60' :
+                                index === 2 ? 'bg-gradient-to-b from-transparent via-background/30 to-background/80' :
+                                'bg-gradient-to-b from-background/20 via-background/60 to-background/90'
+                              } flex items-end justify-center`}>
                                 <div className="p-6 text-center w-full">
-                                  <div className="bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-                                    <h4 className="font-semibold mb-2 text-foreground">Unlock exclusive content</h4>
+                                  <div className={`bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-border/50 transition-all duration-300 ${
+                                    index === 1 ? 'bg-background/80' :
+                                    index === 2 ? 'bg-background/90' :
+                                    'bg-background/95'
+                                  }`}>
+                                    <h4 className="font-semibold mb-2 text-foreground">
+                                      {index === 1 ? 'Preview ending...' :
+                                       index === 2 ? 'Subscribe for more' :
+                                       'Unlock exclusive content'}
+                                    </h4>
                                     <p className="text-sm text-muted-foreground mb-4">
-                                      Subscribe to {post.tier} tier to see this post and more
+                                      {index === 1 ? `Subscribe to ${post.tier} tier to read the full post` :
+                                       `Subscribe to ${post.tier} tier to see this post and more`}
                                     </p>
                                     <Button 
                                       variant="premium" 
