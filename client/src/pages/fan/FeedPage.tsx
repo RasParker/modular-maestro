@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Heart, MessageSquare, Calendar, Eye, Share2, X } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_FEED = [
@@ -267,6 +267,7 @@ export const FeedPage: React.FC = () => {
   const [feed, setFeed] = useState(MOCK_FEED);
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [expandedCaptions, setExpandedCaptions] = useState<Record<string, boolean>>({});
+  const [expandedModalCaption, setExpandedModalCaption] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
@@ -312,6 +313,7 @@ export const FeedPage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
+    setExpandedModalCaption(false);
   };
 
   const toggleCaptionExpansion = (postId: string) => {
@@ -523,14 +525,14 @@ export const FeedPage: React.FC = () => {
           </DialogHeader>
           {selectedContent && (
             <div className="relative w-full h-full bg-black flex items-center justify-center">
-              {/* Close Button */}
+              {/* Back Arrow Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
                 onClick={closeModal}
               >
-                <X className="w-5 h-5" />
+                <ArrowLeft className="w-6 h-6" />
               </Button>
 
               {/* Square container that fills the entire modal */}
@@ -562,9 +564,9 @@ export const FeedPage: React.FC = () => {
                     }`}
                     onClick={() => handleLike(selectedContent.id)}
                   >
-                    <Heart className={`w-5 h-5 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                    <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
                   </Button>
-                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
@@ -574,9 +576,9 @@ export const FeedPage: React.FC = () => {
                     className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
-                    <MessageSquare className="w-5 h-5" />
+                    <MessageSquare className="w-6 h-6" />
                   </Button>
-                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
@@ -586,15 +588,15 @@ export const FeedPage: React.FC = () => {
                     className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleShare(selectedContent.id)}
                   >
-                    <Share2 className="w-5 h-5" />
+                    <Share2 className="w-6 h-6" />
                   </Button>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center">
-                    <Eye className="w-5 h-5 text-white" />
+                    <Eye className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
                 </div>
               </div>
 
@@ -614,8 +616,28 @@ export const FeedPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <p className="text-white text-sm leading-relaxed line-clamp-2" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                  {selectedContent.content.length > 80 ? `${selectedContent.content.substring(0, 80)}...` : selectedContent.content}
+                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                  {expandedModalCaption ? selectedContent.content : (
+                    selectedContent.content.length > 80 ? (
+                      <>
+                        {selectedContent.content.substring(0, 80)}
+                        <span 
+                          className="cursor-pointer text-white/80 hover:text-white ml-1"
+                          onClick={() => setExpandedModalCaption(true)}
+                        >
+                          ...
+                        </span>
+                      </>
+                    ) : selectedContent.content
+                  )}
+                  {expandedModalCaption && selectedContent.content.length > 80 && (
+                    <span 
+                      className="cursor-pointer text-white/80 hover:text-white ml-2"
+                      onClick={() => setExpandedModalCaption(false)}
+                    >
+                      Show less
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
