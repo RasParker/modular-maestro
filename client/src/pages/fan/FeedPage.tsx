@@ -435,7 +435,7 @@ export const FeedPage: React.FC = () => {
                 </div>
                 
                 <div 
-                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
                   onClick={() => handleThumbnailClick(post)}
                   role="button"
                   tabIndex={0}
@@ -446,19 +446,10 @@ export const FeedPage: React.FC = () => {
                     }
                   }}
                 >
-                  {/* Blurred background */}
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center blur-md scale-110"
-                    style={{
-                      backgroundImage: `url(${post.thumbnail})`,
-                    }}
-                  />
-                  
-                  {/* Main image with object-contain */}
                   <img 
                     src={post.thumbnail} 
                     alt={`${post.creator.display_name}'s post`}
-                    className="relative z-10 w-full h-full object-contain"
+                    className="w-full h-64 object-cover"
                   />
                 </div>
                 
@@ -542,20 +533,23 @@ export const FeedPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </Button>
 
-              {/* Blurred background for modal */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-20"
-                style={{
-                  backgroundImage: `url(${selectedContent.thumbnail})`,
-                }}
-              />
-              
-              {/* Main Media */}
-              <img 
-                src={selectedContent.thumbnail} 
-                alt={`${selectedContent.creator.display_name}'s post`}
-                className="relative z-10 max-w-full max-h-full object-contain"
-              />
+              {/* Square container for the main content */}
+              <div className="relative aspect-square max-w-full max-h-full overflow-hidden">
+                {/* Blurred background */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center blur-md scale-110"
+                  style={{
+                    backgroundImage: `url(${selectedContent.thumbnail})`,
+                  }}
+                />
+                
+                {/* Main Media with object-contain */}
+                <img 
+                  src={selectedContent.thumbnail} 
+                  alt={`${selectedContent.creator.display_name}'s post`}
+                  className="relative z-10 w-full h-full object-contain"
+                />
+              </div>
 
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
