@@ -24,8 +24,8 @@ interface Comment {
 
 interface CommentSectionProps {
   postId: string;
-  initialComments: Comment[];
-  onCommentCountChange: (count: number) => void;
+  initialComments?: Comment[];
+  onCommentCountChange?: (count: number) => void;
 }
 
 export const CommentSection: React.FC<CommentSectionProps> = ({
@@ -35,7 +35,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [comments, setComments] = useState<Comment[]>(initialComments || []);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
@@ -72,7 +72,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
     setComments(prev => [comment, ...prev]);
     setNewComment('');
-    onCommentCountChange(comments.length + 1);
+    onCommentCountChange?.(comments.length + 1);
     
     toast({
       title: "Comment added",
@@ -105,7 +105,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     
     setReplyContent('');
     setReplyingTo(null);
-    onCommentCountChange(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
+    onCommentCountChange?.(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
     
     toast({
       title: "Reply added",
