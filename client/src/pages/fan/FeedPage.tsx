@@ -573,7 +573,7 @@ export const FeedPage: React.FC = () => {
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
                       textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
@@ -597,7 +597,7 @@ export const FeedPage: React.FC = () => {
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
                       textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
@@ -622,7 +622,7 @@ export const FeedPage: React.FC = () => {
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
                       textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
