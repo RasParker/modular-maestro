@@ -560,30 +560,62 @@ export const FeedPage: React.FC = () => {
                     className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/10 ${
                       selectedContent.liked ? 'text-red-500' : 'text-white'
                     }`}
+                    style={{ 
+                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.8)) drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                    }}
                     onClick={() => handleLike(selectedContent.id)}
                   >
                     <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} />
                   </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
+                  <span 
+                    className="text-xs text-white font-medium" 
+                    style={{ 
+                      textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,1)' 
+                    }}
+                  >
+                    {selectedContent.likes}
+                  </span>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10"
+                    style={{ 
+                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.8)) drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                    }}
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
                     <MessageSquare className="w-7 h-7" />
                   </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
+                  <span 
+                    className="text-xs text-white font-medium" 
+                    style={{ 
+                      textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,1)' 
+                    }}
+                  >
+                    {selectedContent.comments}
+                  </span>
                 </div>
 
 
 
                 <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    style={{ 
+                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.8)) drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
+                    }}
+                  >
                     <Eye className="w-7 h-7 text-white" />
                   </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
+                  <span 
+                    className="text-xs text-white font-medium" 
+                    style={{ 
+                      textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,1)' 
+                    }}
+                  >
+                    {selectedContent.views}
+                  </span>
                 </div>
               </div>
 
