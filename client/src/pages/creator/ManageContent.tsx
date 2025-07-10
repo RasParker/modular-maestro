@@ -421,7 +421,7 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View and manage your content</DialogDescription>
@@ -438,21 +438,32 @@ export const ManageContent: React.FC = () => {
                 <X className="w-5 h-5" />
               </Button>
 
-              {/* Main Media */}
-              {selectedContent.mediaPreview ? (
-                <img 
-                  src={selectedContent.mediaPreview} 
-                  alt={selectedContent.caption}
-                  className="max-w-full max-h-full object-contain"
+              {/* Square container that fills the entire modal */}
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Blurred background */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center blur-md scale-110"
+                  style={{
+                    backgroundImage: `url(${selectedContent.mediaPreview})`,
+                  }}
                 />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full">
-                  <div className="text-center text-white">
-                    {getTypeIcon(selectedContent.type)}
-                    <p className="mt-2">{selectedContent.type} Content</p>
+                
+                {/* Main Media */}
+                {selectedContent.mediaPreview ? (
+                  <img 
+                    src={selectedContent.mediaPreview} 
+                    alt={selectedContent.caption}
+                    className="relative z-10 w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="text-center text-white">
+                      {getTypeIcon(selectedContent.type)}
+                      <p className="mt-2">{selectedContent.type} Content</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
@@ -522,14 +533,11 @@ export const ManageContent: React.FC = () => {
                 </div>
               </div>
 
-              {/* Bottom Content Overlay - Instagram Style */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-12 pb-6 px-6 z-20">
-                <div className="max-w-2xl">
-                  {/* Caption */}
-                  <p className="text-white text-sm leading-relaxed">
-                    {selectedContent.caption}
-                  </p>
-                </div>
+              {/* Bottom Content Overlay - Instagram style with text shadows */}
+              <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
+                <p className="text-white text-sm leading-relaxed line-clamp-3" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                  {selectedContent.caption}
+                </p>
               </div>
             </div>
           )}
