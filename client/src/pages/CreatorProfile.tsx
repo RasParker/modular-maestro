@@ -160,7 +160,6 @@ export const CreatorProfile: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <h3 className="font-medium text-foreground truncate">{post.title}</h3>
                               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                                 {post.content}
                               </p>
@@ -173,7 +172,7 @@ export const CreatorProfile: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                            <DollarSign className="w-5 h-5 text-muted-foreground" />
                           </div>
                         </div>
                       </div>
@@ -184,7 +183,7 @@ export const CreatorProfile: React.FC = () => {
                 <Card className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
                     <div className="text-center py-4">
-                      <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <DollarSign className="w-8 h-8 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Subscribe to view more content</h3>
                       <p className="text-muted-foreground text-sm">
                         Subscribe to {creator.display_name} to see their exclusive posts and content.
