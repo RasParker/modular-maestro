@@ -557,33 +557,33 @@ export const FeedPage: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 ${
-                      selectedContent.liked ? 'text-red-500' : 'text-white hover:bg-black/70'
+                    className={`w-12 h-12 rounded-full ${
+                      selectedContent.liked ? 'text-red-500' : 'text-white hover:bg-white/10'
                     }`}
                     onClick={() => handleLike(selectedContent.id)}
                   >
                     <Heart className={`w-5 h-5 ${selectedContent.liked ? 'fill-current' : ''}`} />
                   </Button>
-                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.likes}</span>
+                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                    className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
                     <MessageSquare className="w-5 h-5" />
                   </Button>
-                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.comments}</span>
+                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                 </div>
 
                 <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 border border-white/20"
+                    className="w-12 h-12 rounded-full text-white hover:bg-white/10"
                     onClick={() => handleShare(selectedContent.id)}
                   >
                     <Share2 className="w-5 h-5" />
@@ -591,10 +591,10 @@ export const FeedPage: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center">
                     <Eye className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xs text-white mt-1 font-medium">{selectedContent.views}</span>
+                  <span className="text-xs text-white mt-1 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
                 </div>
               </div>
 
@@ -606,21 +606,16 @@ export const FeedPage: React.FC = () => {
                     <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-white text-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                    <p className="font-semibold text-white text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
                       {selectedContent.creator.display_name}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                        @{selectedContent.creator.username}
-                      </p>
-                      <Badge variant="outline" className="text-xs border-white/40 text-white bg-black/30 backdrop-blur-sm">
-                        {selectedContent.tier}
-                      </Badge>
-                    </div>
+                    <p className="text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                      @{selectedContent.creator.username}
+                    </p>
                   </div>
                 </div>
-                <p className="text-white text-sm leading-relaxed line-clamp-3" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-                  {selectedContent.content}
+                <p className="text-white text-sm leading-relaxed line-clamp-2" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                  {selectedContent.content.length > 80 ? `${selectedContent.content.substring(0, 80)}...` : selectedContent.content}
                 </p>
               </div>
             </div>
