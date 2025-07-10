@@ -516,7 +516,7 @@ export const FeedPage: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-w-[90vw] max-h-[90vh] aspect-square p-0 overflow-hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
@@ -533,8 +533,8 @@ export const FeedPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </Button>
 
-              {/* Square container that takes maximum available space */}
-              <div className="relative aspect-square w-full h-full max-w-[min(100vw-2rem,90vh)] max-h-[min(100vh-2rem,90vw)] overflow-hidden">
+              {/* Square container that fills the modal */}
+              <div className="relative w-full h-full overflow-hidden">
                 {/* Blurred background */}
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
