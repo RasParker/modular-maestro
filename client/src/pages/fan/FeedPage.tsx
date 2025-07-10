@@ -518,7 +518,7 @@ export const FeedPage: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0">
+        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
@@ -577,14 +577,7 @@ export const FeedPage: React.FC = () => {
                   <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                 </div>
 
-                <div className="flex flex-col items-center">
-                  <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10"
-                    onClick={() => handleShare(selectedContent.id)}
-                  >
-                    <Share2 className="w-7 h-7" />
-                  </div>
-                </div>
+
 
                 <div className="flex flex-col items-center">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center">
