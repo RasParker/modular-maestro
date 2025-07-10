@@ -561,20 +561,20 @@ export const FeedPage: React.FC = () => {
                       selectedContent.liked ? 'text-red-500' : 'text-white'
                     }`}
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
-                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.4)',
                     }}
                     onClick={() => handleLike(selectedContent.id)}
                   >
                     <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
                     }} />
                   </div>
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.7)',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.6)'
+                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
                     {selectedContent.likes}
@@ -585,20 +585,20 @@ export const FeedPage: React.FC = () => {
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10"
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
-                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.4)',
                     }}
                     onClick={() => handleCommentClick(selectedContent.id)}
                   >
                     <MessageSquare className="w-7 h-7" style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
                     }} />
                   </div>
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.7)',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.6)'
+                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
                     {selectedContent.comments}
@@ -611,19 +611,19 @@ export const FeedPage: React.FC = () => {
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center"
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
-                      WebkitTextStroke: '0.5px rgba(0,0,0,0.6)',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+                      WebkitTextStroke: '0.5px rgba(0,0,0,0.4)',
                     }}
                   >
                     <Eye className="w-7 h-7 text-white" style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.6))',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
                     }} />
                   </div>
                   <span 
                     className="text-xs text-white font-medium" 
                     style={{ 
-                      WebkitTextStroke: '0.3px rgba(0,0,0,0.7)',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.6)'
+                      WebkitTextStroke: '0.3px rgba(0,0,0,0.5)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.4)'
                     }}
                   >
                     {selectedContent.views}
@@ -639,15 +639,15 @@ export const FeedPage: React.FC = () => {
                     <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-white text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                    <p className="font-semibold text-white text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
                       {selectedContent.creator.display_name}
                     </p>
-                    <p className="text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                    <p className="text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
                       @{selectedContent.creator.username}
                     </p>
                   </div>
                 </div>
-                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}>
                   {expandedModalCaption ? selectedContent.content : (
                     selectedContent.content.length > 80 ? (
                       <>
