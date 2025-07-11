@@ -6,6 +6,9 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema } from "@shared/schema";
+import { db } from './db';
+import { users, posts, comments, likes, subscriptions, subscription_tiers } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -31,7 +34,7 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|gif|mp4|mov/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -47,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       // Demo users for development
       const DEMO_USERS = [
         {
@@ -77,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updated_at: '2024-01-01T00:00:00Z',
         },
       ];
-      
+
       // Check demo users first (for development)
       if (password === 'demo123') {
         const demoUser = DEMO_USERS.find(u => u.email === email);
@@ -85,19 +88,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({ user: demoUser });
         }
       }
-      
+
       // Try database authentication
       const user = await storage.getUserByEmail(email);
-      
+
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      
+
       const isValidPassword = await storage.verifyPassword(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
@@ -109,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('Registration request received:', req.body);
       const validatedData = insertUserSchema.parse(req.body);
-      
+
       // Check if user already exists
       try {
         const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
@@ -119,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.log('Email check error (user probably doesn\'t exist):', error);
       }
-      
+
       try {
         const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
         if (existingUserByUsername) {
@@ -128,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.log('Username check error (user probably doesn\'t exist):', error);
       }
-      
+
       const user = await storage.createUser(validatedData);
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
@@ -143,11 +146,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const username = req.params.username;
       const user = await storage.getUserByUsername(username);
-      
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -159,11 +162,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const user = await storage.getUser(userId);
-      
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -174,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/users/:id", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      
+
       // Check if user exists
       const user = await storage.getUser(userId);
       if (!user) {
@@ -183,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Delete user account (this would typically cascade delete related data)
       const deleted = await storage.deleteUser(userId);
-      
+
       if (!deleted) {
         return res.status(500).json({ error: "Failed to delete account" });
       }
@@ -199,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/posts", async (req, res) => {
     try {
       const posts = await storage.getPosts();
-      
+
       // Enrich posts with user information
       const postsWithUsers = await Promise.all(
         posts.map(async (post) => {
@@ -214,7 +217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         })
       );
-      
+
       res.json(postsWithUsers);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch posts" });
@@ -225,11 +228,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.id);
       const post = await storage.getPost(postId);
-      
+
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
-      
+
       const user = await storage.getUser(post.creator_id);
       const postWithUser = {
         ...post,
@@ -239,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           avatar: user.avatar
         } : null
       };
-      
+
       res.json(postWithUser);
     } catch (error) {
       console.error('Get post error:', error);
@@ -261,11 +264,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.id);
       const post = await storage.updatePost(postId, req.body);
-      
+
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
-      
+
       res.json(post);
     } catch (error) {
       console.error('Update post error:', error);
@@ -278,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.postId);
       const comments = await storage.getComments(postId);
-      
+
       // Enrich comments with user information and organize replies
       const commentsWithUsers = await Promise.all(
         comments.map(async (comment) => {
@@ -293,11 +296,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         })
       );
-      
+
       // Organize comments and replies
       const topLevelComments = commentsWithUsers.filter(c => !c.parent_id);
       const repliesMap = new Map();
-      
+
       commentsWithUsers.filter(c => c.parent_id).forEach(reply => {
         const parentId = reply.parent_id;
         if (!repliesMap.has(parentId)) {
@@ -305,12 +308,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         repliesMap.get(parentId).push(reply);
       });
-      
+
       const organizedComments = topLevelComments.map(comment => ({
         ...comment,
         replies: repliesMap.get(comment.id) || []
       }));
-      
+
       res.json(organizedComments);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch comments" });
@@ -321,16 +324,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.postId);
       console.log('Creating comment with data:', { ...req.body, post_id: postId });
-      
+
       const validatedData = insertCommentSchema.parse({
         ...req.body,
         user_id: parseInt(req.body.user_id),
         post_id: postId
       });
-      
+
       const comment = await storage.createComment(validatedData);
       const user = await storage.getUser(comment.user_id);
-      
+
       const commentWithUser = {
         ...comment,
         user: user ? {
@@ -339,7 +342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           avatar: user.avatar
         } : null
       };
-      
+
       res.json(commentWithUser);
     } catch (error) {
       console.error('Create comment error:', error);
@@ -352,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.postId);
       const { userId } = req.body;
-      
+
       const success = await storage.likePost(postId, userId);
       res.json({ success });
     } catch (error) {
@@ -364,7 +367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.postId);
       const { userId } = req.body;
-      
+
       const success = await storage.unlikePost(postId, userId);
       res.json({ success });
     } catch (error) {
@@ -376,7 +379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.postId);
       const userId = parseInt(req.params.userId);
-      
+
       const liked = await storage.isPostLiked(postId, userId);
       res.json({ liked });
     } catch (error) {
@@ -388,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const commentId = parseInt(req.params.commentId);
       const { userId } = req.body;
-      
+
       const success = await storage.likeComment(commentId, userId);
       res.json({ success });
     } catch (error) {
@@ -400,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const commentId = parseInt(req.params.commentId);
       const { userId } = req.body;
-      
+
       const success = await storage.unlikeComment(commentId, userId);
       res.json({ success });
     } catch (error) {
@@ -412,7 +415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const commentId = parseInt(req.params.commentId);
       const userId = parseInt(req.params.userId);
-      
+
       const liked = await storage.isCommentLiked(commentId, userId);
       res.json({ liked });
     } catch (error) {
@@ -438,7 +441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         creator_id: creatorId
       });
-      
+
       const tier = await storage.createSubscriptionTier(validatedData);
       res.json(tier);
     } catch (error) {
@@ -450,11 +453,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const tierId = parseInt(req.params.tierId);
       const tier = await storage.updateSubscriptionTier(tierId, req.body);
-      
+
       if (!tier) {
         return res.status(404).json({ error: "Tier not found" });
       }
-      
+
       res.json(tier);
     } catch (error) {
       res.status(500).json({ error: "Failed to update subscription tier" });
@@ -465,11 +468,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const tierId = parseInt(req.params.tierId);
       const deleted = await storage.deleteSubscriptionTier(tierId);
-      
+
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
       }
-      
+
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete subscription tier" });
@@ -490,17 +493,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/subscriptions", async (req, res) => {
     try {
       const validatedData = insertSubscriptionSchema.parse(req.body);
-      
+
       // Check if user already has active subscription to this creator
       const existingSubscription = await storage.getUserSubscriptionToCreator(
         validatedData.fan_id,
         validatedData.creator_id
       );
-      
+
       if (existingSubscription) {
         return res.status(400).json({ error: "Already subscribed to this creator" });
       }
-      
+
       const subscription = await storage.createSubscription(validatedData);
       res.json(subscription);
     } catch (error) {
@@ -512,11 +515,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const subscriptionId = parseInt(req.params.subscriptionId);
       const subscription = await storage.updateSubscription(subscriptionId, req.body);
-      
+
       if (!subscription) {
         return res.status(404).json({ error: "Subscription not found" });
       }
-      
+
       res.json(subscription);
     } catch (error) {
       res.status(500).json({ error: "Failed to update subscription" });
@@ -527,11 +530,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const subscriptionId = parseInt(req.params.subscriptionId);
       const cancelled = await storage.cancelSubscription(subscriptionId);
-      
+
       if (!cancelled) {
         return res.status(404).json({ error: "Subscription not found" });
       }
-      
+
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to cancel subscription" });
@@ -564,46 +567,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/upload/profile-photo", upload.single('profilePhoto'), async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      // Generate the URL for the uploaded file
-      const fileUrl = `/uploads/${req.file.filename}`;
-      
-      // TODO: Update user's profile photo URL in database
-      // For now, we'll just return the file URL
-      
+      const photoUrl = `/uploads/${req.file.filename}`;
+
+      // Update user's avatar in database if user is authenticated
+      if (req.session?.userId) {
+        try {
+          await db.update(users)
+            .set({ avatar: photoUrl })
+            .where(eq(users.id, req.session.userId));
+          console.log(`Updated avatar for user ${req.session.userId}: ${photoUrl}`);
+        } catch (dbError) {
+          console.error('Failed to update avatar in database:', dbError);
+          // Continue with response even if DB update fails
+        }
+      }
+
       res.json({ 
         success: true, 
-        url: fileUrl,
-        message: "Profile photo uploaded successfully" 
+        url: photoUrl,
+        message: 'Profile photo uploaded successfully' 
       });
     } catch (error) {
       console.error('Profile photo upload error:', error);
-      res.status(500).json({ error: "Failed to upload profile photo" });
+      res.status(500).json({ success: false, message: 'Upload failed' });
     }
   });
 
   app.post("/api/upload/cover-photo", upload.single('coverPhoto'), async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      // Generate the URL for the uploaded file
-      const fileUrl = `/uploads/${req.file.filename}`;
-      
-      // TODO: Update user's cover photo URL in database
-      // For now, we'll just return the file URL
-      
+      const photoUrl = `/uploads/${req.file.filename}`;
+
+      // Update user's cover image in database if user is authenticated
+      if (req.session?.userId) {
+        try {
+          await db.update(users)
+            .set({ cover_image: photoUrl })
+            .where(eq(users.id, req.session.userId));
+          console.log(`Updated cover image for user ${req.session.userId}: ${photoUrl}`);
+        } catch (dbError) {
+          console.error('Failed to update cover image in database:', dbError);
+          // Continue with response even if DB update fails
+        }
+      }
+
       res.json({ 
         success: true, 
-        url: fileUrl,
-        message: "Cover photo uploaded successfully" 
+        url: photoUrl,
+        message: 'Cover photo uploaded successfully' 
       });
     } catch (error) {
       console.error('Cover photo upload error:', error);
-      res.status(500).json({ error: "Failed to upload cover photo" });
+      res.status(500).json({ success: false, message: 'Upload failed' });
     }
   });
 
@@ -615,7 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate the URL for the uploaded file
       const fileUrl = `/uploads/${req.file.filename}`;
-      
+
       res.json({ 
         success: true, 
         url: fileUrl,
@@ -625,6 +646,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Post media upload error:', error);
       res.status(500).json({ error: "Failed to upload media" });
+    }
+  });
+
+  // Update user profile
+  app.put('/api/users/profile', async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { display_name, bio } = req.body;
+
+      const updatedUser = await db.update(users)
+        .set({ 
+          display_name: display_name || null,
+          bio: bio || null,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, req.session.userId))
+        .returning();
+
+      if (updatedUser.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json({ success: true, user: updatedUser[0] });
+    } catch (error) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+
+  // Sync profile data to database
+  app.post('/api/users/sync-profile', async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { displayName, bio, profilePhotoUrl, coverPhotoUrl } = req.body;
+
+      const updateData: any = { updated_at: new Date() };
+
+      if (displayName !== undefined) updateData.display_name = displayName;
+      if (bio !== undefined) updateData.bio = bio;
+      if (profilePhotoUrl !== undefined) updateData.avatar = profilePhotoUrl;
+      if (coverPhotoUrl !== undefined) updateData.cover_image = coverPhotoUrl;
+
+      const updatedUser = await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, req.session.userId))
+        .returning();
+
+      if (updatedUser.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json({ success: true, user: updatedUser[0] });
+    } catch (error) {
+      console.error('Profile sync error:', error);
+      res.status(500).json({ error: 'Failed to sync profile' });
     }
   });
 

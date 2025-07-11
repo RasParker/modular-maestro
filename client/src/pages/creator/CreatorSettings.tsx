@@ -179,6 +179,55 @@ export const CreatorSettings: React.FC = () => {
     }
   };
 
+  const handleSaveProfile = async () => {
+    try {
+      // Save display name and bio to localStorage
+      if (displayName.trim()) {
+        setLocalStorageItem('displayName', displayName.trim());
+      }
+
+      if (bio.trim()) {
+        setLocalStorageItem('bio', bio.trim());
+      }
+
+      // Sync to database
+      const profilePhotoUrl = getLocalStorageItem('profilePhotoUrl');
+      const coverPhotoUrl = getLocalStorageItem('coverPhotoUrl');
+
+      const response = await fetch('/api/users/sync-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          displayName: displayName.trim() || null,
+          bio: bio.trim() || null,
+          profilePhotoUrl: profilePhotoUrl || null,
+          coverPhotoUrl: coverPhotoUrl || null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to sync profile to database');
+      }
+
+      console.log('Profile synced to database successfully');
+      console.log('Dispatching localStorageChange event for displayName and bio');
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated and saved.",
+      });
+    } catch (error) {
+      console.error('Profile save error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -323,7 +372,7 @@ export const CreatorSettings: React.FC = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button onClick={handleSave} className="flex-1">
+                    <Button onClick={handleSaveProfile} className="flex-1">
                       <Save className="w-4 h-4 mr-2" />
                       Save Profile
                     </Button>
