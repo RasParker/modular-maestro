@@ -176,13 +176,13 @@ export const CreatorProfile: React.FC = () => {
       const newCoverPhotoUrl = localStorage.getItem('coverPhotoUrl');
       const newDisplayName = localStorage.getItem('displayName');
       const newBio = localStorage.getItem('bio');
-      
+
       // Only update state if the values are different
       if (newProfilePhotoUrl !== profilePhotoUrl) setProfilePhotoUrl(newProfilePhotoUrl);
       if (newCoverPhotoUrl !== coverPhotoUrl) setCoverPhotoUrl(newCoverPhotoUrl);
       if (newDisplayName !== displayName) setDisplayName(newDisplayName);
       if (newBio !== bio) setBio(newBio);
-      
+
       // Load custom tiers from localStorage
       const savedTiers = localStorage.getItem('subscriptionTiers');
       if (savedTiers) {
@@ -197,7 +197,7 @@ export const CreatorProfile: React.FC = () => {
 
     // Initial load
     updateProfileData();
-    
+
     // Listen for localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
@@ -209,7 +209,7 @@ export const CreatorProfile: React.FC = () => {
     // Listen for custom storage events (for same-tab updates)
     const handleCustomStorageChange = (e: CustomEvent) => {
       updateProfileData();
-      
+
       // Refresh posts if post-related event
       if (e.detail && e.detail.type === 'postCreated' && user && user.username === username) {
         fetchUserPosts(user.id);
@@ -218,7 +218,7 @@ export const CreatorProfile: React.FC = () => {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('localStorageChange', handleCustomStorageChange as EventListener);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
@@ -239,7 +239,7 @@ export const CreatorProfile: React.FC = () => {
   useEffect(() => {
     const fetchCreatorData = async () => {
       if (!username) return;
-      
+
       try {
         setLoading(true);
         const response = await fetch(`/api/users/username/${username}`);
@@ -347,7 +347,7 @@ export const CreatorProfile: React.FC = () => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     return `${Math.floor(diffInHours / 24)}d ago`;
@@ -508,25 +508,31 @@ export const CreatorProfile: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Creator Header */}
       <div className="relative">
         <div className="h-48 md:h-64 overflow-hidden">
-          <img 
-            src={creator.cover} 
-            alt={creator.display_name}
-            className="w-full h-full object-cover"
-          />
+          {creator.cover ? (
+            <img 
+              src={creator.cover} 
+              alt={creator.display_name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
+              <span className="text-muted-foreground">No cover photo</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
         </div>
-        
+
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
             <Avatar className="w-24 h-24 border-4 border-background">
               <AvatarImage src={creator.avatar} alt={creator.username} />
               <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{creator.display_name}</h1>
@@ -588,7 +594,7 @@ export const CreatorProfile: React.FC = () => {
               </div>
               <p className="text-muted-foreground leading-relaxed">{creator.bio}</p>
             </div>
-            
+
             {/* Recent Posts Preview */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
@@ -626,14 +632,14 @@ export const CreatorProfile: React.FC = () => {
                             </Badge>
                           </div>
                         </div>
-                        
+
                         <div className="px-4 pb-4 space-y-4">
                           <div>
                             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                               {post.content || post.title}
                             </p>
                           </div>
-                          
+
                           {post.media_urls && post.media_urls[0] && (
                             <div 
                               className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
@@ -668,7 +674,7 @@ export const CreatorProfile: React.FC = () => {
                               )}
                             </div>
                           )}
-                          
+
                           <div className="flex items-center justify-between pt-4 border-t border-border/50">
                             <div className="flex items-center gap-4">
                               <Button
@@ -694,7 +700,7 @@ export const CreatorProfile: React.FC = () => {
                                 0
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center gap-1">
                               <Button
                                 variant="ghost"
@@ -728,7 +734,7 @@ export const CreatorProfile: React.FC = () => {
                           </div>
                         </div>
                       </CardContent>
-                      
+
                       {/* Comments Section */}
                       {showComments[post.id] && (
                         <div className="border-t border-border/30">
@@ -763,7 +769,7 @@ export const CreatorProfile: React.FC = () => {
           {/* Subscription Tiers */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
-            
+
             {creator.tiers.map((tier) => (
               <Card key={tier.id} className="bg-gradient-card border-border/50">
                 <CardContent className="p-6">
@@ -775,9 +781,9 @@ export const CreatorProfile: React.FC = () => {
                         <div className="text-sm text-muted-foreground">per month</div>
                       </div>
                     </div>
-                    
+
                     <p className="text-sm text-muted-foreground">{tier.description}</p>
-                    
+
                     <ul className="space-y-2">
                       {tier.features.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2 text-sm">
@@ -786,7 +792,7 @@ export const CreatorProfile: React.FC = () => {
                         </li>
                       ))}
                     </ul>
-                    
+
                     <Button 
                       variant="premium" 
                       className="w-full"
