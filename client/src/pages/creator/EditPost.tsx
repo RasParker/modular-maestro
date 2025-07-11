@@ -30,7 +30,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export const EditPost: React.FC = () => {
-  const { postId } = useParams<{ postId: string }>();
+  const { id: postId } = useParams<{ id: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -52,12 +52,19 @@ export const EditPost: React.FC = () => {
   // Load the existing post data
   useEffect(() => {
     const fetchPost = async () => {
-      if (!postId || !user) return;
+      console.log('fetchPost called with postId:', postId, 'user:', user);
+      if (!postId || !user) {
+        console.log('Missing postId or user, returning early');
+        setIsLoading(false);
+        return;
+      }
       
       try {
+        console.log('Fetching post with ID:', postId);
         const response = await fetch(`/api/posts/${postId}`);
         if (response.ok) {
           const post = await response.json();
+          console.log('Fetched post data:', post);
           
           // Check if user owns this post
           if (post.creator_id !== parseInt(user.id)) {
@@ -94,6 +101,7 @@ export const EditPost: React.FC = () => {
         });
         navigate('/creator/dashboard');
       } finally {
+        console.log('Setting isLoading to false');
         setIsLoading(false);
       }
     };
