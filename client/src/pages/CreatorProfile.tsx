@@ -205,19 +205,31 @@ export const CreatorProfile: React.FC = () => {
         updateProfileData();
         
         // Also trigger a re-fetch of creator data to update the UI
-        if (username) {
+        if (username && user?.username === username) {
           const fetchCreatorData = async () => {
             try {
               const response = await fetch(`/api/users/username/${username}`);
               if (response.ok) {
                 const userData = await response.json();
+                const newProfilePhotoUrl = localStorage.getItem('profilePhotoUrl');
+                const newCoverPhotoUrl = localStorage.getItem('coverPhotoUrl');
+                const newDisplayName = localStorage.getItem('displayName');
+                const newBio = localStorage.getItem('bio');
+                
                 setCreator(prev => prev ? {
                   ...prev,
-                  display_name: displayName || userData.display_name || userData.username,
-                  avatar: profilePhotoUrl || userData.avatar || prev.avatar,
-                  cover: coverPhotoUrl || userData.cover_image || prev.cover,
-                  bio: bio || userData.bio || prev.bio,
+                  display_name: newDisplayName || userData.display_name || userData.username,
+                  avatar: newProfilePhotoUrl || userData.avatar || prev.avatar,
+                  cover: newCoverPhotoUrl || userData.cover_image || prev.cover,
+                  bio: newBio || userData.bio || prev.bio,
                 } : null);
+                
+                console.log('Updated creator from storage event:', {
+                  profilePhoto: newProfilePhotoUrl,
+                  coverPhoto: newCoverPhotoUrl,
+                  displayName: newDisplayName,
+                  bio: newBio
+                });
               }
             } catch (error) {
               console.error('Error re-fetching creator data:', error);
@@ -267,18 +279,21 @@ export const CreatorProfile: React.FC = () => {
         const response = await fetch(`/api/users/username/${username}`);
         if (response.ok) {
           const userData = await response.json();
-          // Create creator object with localStorage overrides taking priority
+          
+          // For own profile, prioritize localStorage values, otherwise use database values
+          const isOwnProfileCheck = user?.username === username;
+          
           const creatorData = {
             id: userData.id,
             username: userData.username,
-            display_name: displayName || userData.display_name || userData.username,
-            avatar: profilePhotoUrl || userData.avatar || `https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face`,
-            cover: coverPhotoUrl || userData.cover_image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
-            bio: bio || userData.bio || 'Welcome to my profile! I\'m excited to share my content with you.',
+            display_name: (isOwnProfileCheck && displayName) || userData.display_name || userData.username,
+            avatar: (isOwnProfileCheck && profilePhotoUrl) || userData.avatar || `https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face`,
+            cover: (isOwnProfileCheck && coverPhotoUrl) || userData.cover_image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
+            bio: (isOwnProfileCheck && bio) || userData.bio || 'Welcome to my profile! I\'m excited to share my content with you.',
             subscribers: userData.total_subscribers || 0,
             verified: userData.verified || false,
             role: userData.role,
-            tiers: customTiers.length > 0 ? customTiers : [
+            tiers: (isOwnProfileCheck && customTiers.length > 0) ? customTiers : [
               { 
                 id: '1',
                 name: 'Supporter', 
@@ -297,6 +312,11 @@ export const CreatorProfile: React.FC = () => {
             recentPosts: userPosts
           };
           setCreator(creatorData);
+          console.log('Creator data loaded:', creatorData);
+          console.log('Profile photo URL from localStorage:', profilePhotoUrl);
+          console.log('Cover photo URL from localStorage:', coverPhotoUrl);
+          console.log('Database avatar:', userData.avatar);
+          console.log('Database cover:', userData.cover_image);
         } else {
           setCreator(null);
         }
@@ -309,22 +329,9 @@ export const CreatorProfile: React.FC = () => {
     };
 
     fetchCreatorData();
-  }, [username]); // Only depend on username to prevent infinite loops
+  }, [username, user?.username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers]); // Include necessary dependencies
 
-  // Update creator data when localStorage values change
-  useEffect(() => {
-    if (creator) {
-      setCreator(prev => prev ? {
-        ...prev,
-        display_name: displayName || prev.display_name,
-        avatar: profilePhotoUrl || prev.avatar,
-        cover: coverPhotoUrl || prev.cover,
-        bio: bio || prev.bio,
-        tiers: customTiers.length > 0 ? customTiers : prev.tiers,
-        recentPosts: userPosts
-      } : null);
-    }
-  }, [displayName, bio, customTiers, userPosts, profilePhotoUrl, coverPhotoUrl]);
+  
   const isOwnProfile = user?.username === username;
 
   if (loading) {
