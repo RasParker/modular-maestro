@@ -1,51 +1,137 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Save, Upload, Image, Video } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Upload, Image, Video, Save } from 'lucide-react';
+import { Link } from 'wouter';
+import { Navbar } from '@/components/shared/Navbar';
+
+const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/quicktime"];
+
+const formSchema = z.object({
+  caption: z.string().min(1, "Caption is required").max(2000, "Caption must be less than 2000 characters"),
+  accessTier: z.enum(['free', 'supporter', 'fan', 'superfan'], {
+    required_error: "Please select an access tier",
+  }),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export const EditPost: React.FC = () => {
-  const { postId } = useParams();
-  const navigate = useNavigate();
+  const { postId } = useParams<{ postId: string }>();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [mediaFile, setMediaFile] = useState<File | null>(null);
-  const [mediaPreview, setMediaPreview] = useState<string>('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=400&h=400&fit=crop');
-  const [loadingPost, setLoadingPost] = useState(true);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [originalPost, setOriginalPost] = useState<any>(null);
 
-  const [postData, setPostData] = useState({
-    description: 'Check out my new traditional Ghanaian kente dress! The colors are absolutely stunning...',
-    tier: 'Basic Support',
-    scheduledDate: '2024-02-20',
-    scheduledTime: '14:00',
-    status: 'Published' // This should match the actual status
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      caption: '',
+      accessTier: 'free',
+    },
   });
 
-  const getStatusDescription = (status: string) => {
-    switch (status) {
-      case 'Published':
-        return 'Update your published content';
-      case 'Scheduled':
-        return 'Update your scheduled content';
-      case 'Draft':
-        return 'Update your draft content';
-      default:
-        return 'Update your content';
-    }
-  };
+  // Load the existing post data
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!postId || !user) return;
+      
+      try {
+        const response = await fetch(`/api/posts/${postId}`);
+        if (response.ok) {
+          const post = await response.json();
+          
+          // Check if user owns this post
+          if (post.creator_id !== parseInt(user.id)) {
+            toast({
+              title: "Access denied",
+              description: "You can only edit your own posts.",
+              variant: "destructive",
+            });
+            navigate('/creator/dashboard');
+            return;
+          }
+          
+          setOriginalPost(post);
+          
+          // Set form values
+          form.setValue('caption', post.content || post.title);
+          form.setValue('accessTier', post.tier === 'public' ? 'free' : post.tier);
+          
+          // Set media preview if exists
+          if (post.media_urls && post.media_urls.length > 0) {
+            const mediaUrl = post.media_urls[0].startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls[0]}`;
+            setMediaPreview(mediaUrl);
+            setMediaType(post.media_type === 'image' ? 'image' : 'video');
+          }
+        } else {
+          throw new Error('Post not found');
+        }
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load post. Please try again.",
+          variant: "destructive",
+        });
+        navigate('/creator/dashboard');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId, user, navigate, toast, form]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: "Please select a file smaller than 16MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file type
+    const isImage = ACCEPTED_IMAGE_TYPES.includes(file.type);
+    const isVideo = ACCEPTED_VIDEO_TYPES.includes(file.type);
+
+    if (!isImage && !isVideo) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a valid image (.jpg, .png, .gif) or video (.mp4, .mov) file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setMediaFile(file);
+    setMediaType(isImage ? 'image' : 'video');
+
+    // Create preview URL
     const previewUrl = URL.createObjectURL(file);
     setMediaPreview(previewUrl);
 
@@ -55,14 +141,23 @@ export const EditPost: React.FC = () => {
     });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const removeMedia = () => {
+    if (mediaPreview && mediaPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(mediaPreview);
+    }
+    setMediaFile(null);
+    setMediaPreview(null);
+    setMediaType(null);
+  };
+
+  const handleSubmit = async (data: FormData) => {
+    if (!user || !postId) return;
+
+    setIsSaving(true);
 
     try {
-      let mediaUrl = null;
-      
-      // Upload new media if a file was selected
+      // Upload new media file if it exists
+      let uploadedMediaUrls: string[] = originalPost.media_urls || [];
       if (mediaFile) {
         const formData = new FormData();
         formData.append('media', mediaFile);
@@ -72,132 +167,73 @@ export const EditPost: React.FC = () => {
           body: formData,
         });
         
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          mediaUrl = uploadResult.filename;
-        } else {
+        if (!uploadResponse.ok) {
           throw new Error('Failed to upload media');
         }
+        
+        const uploadResult = await uploadResponse.json();
+        uploadedMediaUrls = [uploadResult.filename];
       }
-      
-      // Map tier from display format back to database format
-      const tierMapping = {
-        'Free': 'public',
-        'Basic Support': 'basic',
-        'Premium Content': 'premium'
+
+      // Prepare updated post data
+      const updatedPostData = {
+        title: data.caption?.substring(0, 50) || originalPost.title,
+        content: data.caption || originalPost.content,
+        media_type: mediaType || originalPost.media_type,
+        media_urls: uploadedMediaUrls,
+        tier: data.accessTier === 'free' ? 'public' : data.accessTier,
       };
-      
-      // Update post data
-      const updateData = {
-        content: postData.description,
-        tier: tierMapping[postData.tier as keyof typeof tierMapping] || 'public',
-        status: postData.status,
-        ...(mediaUrl && { media_urls: [mediaUrl] }),
-        ...(postData.scheduledDate && { scheduled_date: postData.scheduledDate }),
-        ...(postData.scheduledTime && { scheduled_time: postData.scheduledTime })
-      };
-      
+
+      console.log('Updating post with data:', updatedPostData);
+
+      // Update the post via API
       const response = await fetch(`/api/posts/${postId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify(updatedPostData),
       });
-      
-      if (response.ok) {
-        toast({
-          title: "Post updated",
-          description: "Your post has been successfully updated.",
-        });
-        navigate('/creator/manage-content');
-      } else {
+
+      if (!response.ok) {
         throw new Error('Failed to update post');
       }
-    } catch (error) {
-      console.error('Update error:', error);
+
+      const updatedPost = await response.json();
+      console.log('Post updated successfully:', updatedPost);
+
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { type: 'postUpdated', post: updatedPost }
+      }));
+
       toast({
-        title: "Update failed",
+        title: "Post updated",
+        description: "Your post has been updated successfully.",
+      });
+
+      // Navigate back to dashboard
+      navigate('/creator/dashboard');
+    } catch (error) {
+      console.error('Error updating post:', error);
+      toast({
+        title: "Error",
         description: "Failed to update post. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleCancel = () => {
-    navigate('/creator/manage-content');
-  };
-
-  // Fetch post data when component mounts
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!postId) {
-        navigate('/creator/manage-content');
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/posts/${postId}`);
-        if (response.ok) {
-          const post = await response.json();
-          // Map tier from database format to display format
-          const tierMapping = {
-            'public': 'Free',
-            'basic': 'Basic Support',
-            'premium': 'Premium Content'
-          };
-          
-          setPostData({
-            description: post.content || '',
-            tier: tierMapping[post.tier as keyof typeof tierMapping] || 'Free',
-            scheduledDate: post.scheduled_date ? new Date(post.scheduled_date).toISOString().split('T')[0] : '',
-            scheduledTime: post.scheduled_time || '',
-            status: post.status || 'Published'
-          });
-          
-          // Set media preview if available
-          if (post.media_urls && post.media_urls.length > 0) {
-            // Check if it's already a full path or just filename
-            const mediaUrl = post.media_urls[0];
-            if (mediaUrl.startsWith('/uploads/') || mediaUrl.startsWith('http')) {
-              setMediaPreview(mediaUrl);
-            } else {
-              setMediaPreview(`/uploads/${mediaUrl}`);
-            }
-          }
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to load post data",
-            variant: "destructive",
-          });
-          navigate('/creator/manage-content');
-        }
-      } catch (error) {
-        console.error('Error fetching post:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load post data",
-          variant: "destructive",
-        });
-        navigate('/creator/manage-content');
-      } finally {
-        setLoadingPost(false);
-      }
-    };
-
-    fetchPost();
-  }, [postId, navigate, toast]);
-
-  if (loadingPost) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading post...</p>
           </div>
         </div>
       </div>
@@ -207,137 +243,165 @@ export const EditPost: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
+      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
-            <Link to="/creator/manage-content">
+            <Link to="/creator/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Content Manager
+              Back to Dashboard
             </Link>
           </Button>
           <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
           <p className="text-muted-foreground">
-            {getStatusDescription(postData.status)}
+            Update your post content and settings
           </p>
         </div>
 
-        <Card className="bg-gradient-card border-border/50">
-          <CardHeader>
-            <CardTitle>Post Details</CardTitle>
-            <CardDescription>Edit your post information and settings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="description">Caption</Label>
-                <Textarea
-                  id="description"
-                  value={postData.description}
-                  onChange={(e) => setPostData(prev => ({ ...prev, description: e.target.value }))}
-                  rows={4}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Post Content</CardTitle>
+                <CardDescription>Update your caption and media</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Caption */}
+                <FormField
+                  control={form.control}
+                  name="caption"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Caption</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="What's on your mind?"
+                          className="min-h-[120px] resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              {/* Current Media Preview */}
-              <div className="space-y-2">
-                <Label>Current Media</Label>
-                <div className="relative rounded-lg overflow-hidden bg-muted max-w-md">
-                  <img
-                    src={mediaPreview}
-                    alt="Current media"
-                    className="w-full h-64 object-cover"
-                  />
+                {/* Media Upload */}
+                <div className="space-y-4">
+                  <Label>Media (Optional)</Label>
+                  
+                  {!mediaPreview ? (
+                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                      <Input
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.gif,.mp4,.mov"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="media-upload"
+                      />
+                      <Label htmlFor="media-upload" className="cursor-pointer">
+                        <div className="flex flex-col items-center gap-4">
+                          <Upload className="w-12 h-12 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">Click to upload new media</p>
+                            <p className="text-xs text-muted-foreground">
+                              Images: JPG, PNG, GIF (max 16MB)<br/>
+                              Videos: MP4, MOV (max 16MB)
+                            </p>
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="relative rounded-lg overflow-hidden bg-muted">
+                        {mediaType === 'image' ? (
+                          <img
+                            src={mediaPreview}
+                            alt="Preview"
+                            className="w-full h-64 object-cover"
+                          />
+                        ) : (
+                          <video
+                            src={mediaPreview}
+                            className="w-full h-64 object-cover"
+                            controls
+                          />
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={removeMedia}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        {mediaType === 'image' ? <Image className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                        <span>Media preview</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Upload New Media */}
-              <div className="space-y-2">
-                <Label>Upload Image or Video</Label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.gif,.mp4,.mov"
-                    onChange={handleFileUpload}
-                    className="flex-1"
-                  />
-                  <Button type="button" variant="outline">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose File
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Leave empty to keep current media. Upload new file to replace.
-                </p>
-              </div>
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Access Settings</CardTitle>
+                <CardDescription>Choose who can see this post</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Access Tier */}
+                <FormField
+                  control={form.control}
+                  name="accessTier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Access Level</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select access level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="free">Free for all followers</SelectItem>
+                          <SelectItem value="supporter">Supporter ($5/month)</SelectItem>
+                          <SelectItem value="fan">Fan ($15/month)</SelectItem>
+                          <SelectItem value="superfan">Superfan ($25/month)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Access Level</Label>
-                  <Select value={postData.tier} onValueChange={(value) => setPostData(prev => ({ ...prev, tier: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Free">Free</SelectItem>
-                      <SelectItem value="Basic Support">Basic Support</SelectItem>
-                      <SelectItem value="Premium Content">Premium Content</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <div className="flex gap-2">
-                    <Badge variant={postData.status === 'Published' ? 'default' : postData.status === 'Scheduled' ? 'secondary' : 'outline'}>
-                      {postData.status}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              {postData.status === 'Scheduled' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="scheduledDate">Scheduled Date</Label>
-                    <Input
-                      id="scheduledDate"
-                      type="date"
-                      value={postData.scheduledDate}
-                      onChange={(e) => setPostData(prev => ({ ...prev, scheduledDate: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="scheduledTime">Scheduled Time</Label>
-                    <Input
-                      id="scheduledTime"
-                      type="time"
-                      value={postData.scheduledTime}
-                      onChange={(e) => setPostData(prev => ({ ...prev, scheduledTime: e.target.value }))}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-between pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-
-                <Button type="submit" disabled={isLoading}>
-                  <Save className="w-4 h-4 mr-2" />
-                  {isLoading ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+            <div className="flex justify-end">
+              <Button 
+                type="submit" 
+                disabled={isSaving}
+                className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );

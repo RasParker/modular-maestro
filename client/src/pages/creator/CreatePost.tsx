@@ -130,13 +130,32 @@ export const CreatePost: React.FC = () => {
         return;
       }
       
+      // Upload media file first if it exists
+      let uploadedMediaUrls: string[] = [];
+      if (mediaFile) {
+        const formData = new FormData();
+        formData.append('media', mediaFile);
+        
+        const uploadResponse = await fetch('/api/upload/post-media', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload media');
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        uploadedMediaUrls = [uploadResult.filename];
+      }
+
       // Prepare post data for API
       const postData = {
         creator_id: parseInt(user.id),
         title: data.caption?.substring(0, 50) || 'Untitled Post',
         content: data.caption || '',
         media_type: mediaType || 'text',
-        media_urls: mediaFile ? [mediaFile.name] : [],
+        media_urls: uploadedMediaUrls,
         tier: data.accessTier === 'free' ? 'public' : data.accessTier,
         scheduled_for: data.scheduledDate && action === 'schedule' ? 
           new Date(data.scheduledDate).toISOString() : null
