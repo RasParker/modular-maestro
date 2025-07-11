@@ -201,21 +201,38 @@ export const ManageContent: React.FC = () => {
               {/* Blurred background layer */}
               <div 
                 className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                style={{ backgroundImage: `url(${item.mediaPreview})` }}
+                style={{ 
+                  backgroundImage: item.type === 'Video' 
+                    ? `linear-gradient(45deg, #1a1a1a, #2d2d2d)` 
+                    : `url(${item.mediaPreview})` 
+                }}
               />
-              {/* Main image */}
+              {/* Main media content */}
               <div className="relative z-10 w-full h-full flex items-center justify-center bg-black/20">
-                <img 
-                  src={item.mediaPreview} 
-                  alt={item.caption}
-                  className="max-w-full max-h-full object-contain"
-                  onError={(e) => {
-                    // If image fails to load, replace with placeholder
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                    target.className = "max-w-full max-h-full object-contain opacity-50";
-                  }}
-                />
+                {item.type === 'Video' ? (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-blue-900/20">
+                    <div className="text-center">
+                      <div className="relative">
+                        <Video className="w-16 h-16 text-white/90 mx-auto mb-2" />
+                        <div className="absolute inset-0 bg-white/10 rounded-full blur-sm"></div>
+                      </div>
+                      <p className="text-sm text-white/80 font-medium">Video Content</p>
+                      <p className="text-xs text-white/60 mt-1">Click to preview</p>
+                    </div>
+                  </div>
+                ) : (
+                  <img 
+                    src={item.mediaPreview} 
+                    alt={item.caption}
+                    className="max-w-full max-h-full object-contain"
+                    onError={(e) => {
+                      // If image fails to load, replace with placeholder
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                      target.className = "max-w-full max-h-full object-contain opacity-50";
+                    }}
+                  />
+                )}
               </div>
               {/* Type indicator overlay */}
               <div className="absolute top-2 left-2 z-20">
@@ -463,17 +480,29 @@ export const ManageContent: React.FC = () => {
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
                   style={{
-                    backgroundImage: `url(${selectedContent.mediaPreview})`,
+                    backgroundImage: selectedContent.type === 'Video' 
+                      ? `linear-gradient(45deg, #1a1a1a, #2d2d2d)` 
+                      : `url(${selectedContent.mediaPreview})`,
                   }}
                 />
                 
                 {/* Main Media */}
                 {selectedContent.mediaPreview ? (
-                  <img 
-                    src={selectedContent.mediaPreview} 
-                    alt={selectedContent.caption}
-                    className="relative z-10 w-full h-full object-contain"
-                  />
+                  selectedContent.type === 'Video' ? (
+                    <video 
+                      src={selectedContent.mediaPreview} 
+                      className="relative z-10 w-full h-full object-contain"
+                      controls
+                      autoPlay
+                      muted
+                    />
+                  ) : (
+                    <img 
+                      src={selectedContent.mediaPreview} 
+                      alt={selectedContent.caption}
+                      className="relative z-10 w-full h-full object-contain"
+                    />
+                  )
                 ) : (
                   <div className="flex items-center justify-center w-full h-full">
                     <div className="text-center text-white">
