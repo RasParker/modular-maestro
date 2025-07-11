@@ -19,6 +19,8 @@ export const CreatorSettings: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
 
   const handleSave = () => {
     toast({
@@ -38,55 +40,78 @@ export const CreatorSettings: React.FC = () => {
   const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log('Uploading profile photo:', file.name);
-      // Create FormData to send the file
-      const formData = new FormData();
-      formData.append('profilePhoto', file);
+      try {
+        console.log('Uploading profile photo:', file.name);
+        // Create FormData to send the file
+        const formData = new FormData();
+        formData.append('profilePhoto', file);
 
-      // Upload to backend
-      const response = await fetch('/api/upload/profile-photo', {
-        method: 'POST',
-        body: formData,
-      });
+        // Upload to backend
+        const response = await fetch('/api/upload/profile-photo', {
+          method: 'POST',
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        console.log('Upload result:', result);
+
+        // Update the profile photo URL state
+        setProfilePhotoUrl(result.url);
+
+        toast({
+          title: "Profile photo updated",
+          description: "Your profile photo has been updated successfully.",
+        });
+      } catch (error) {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload profile photo. Please try again.",
+          variant: "destructive",
+        });
       }
-
-      const result = await response.json();
-      console.log('Upload result:', result);
-
-      toast({
-        title: "Profile photo updated",
-        description: "Your profile photo has been updated successfully.",
-      });
     }
   };
 
   const handleCoverPhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log('Uploading cover photo:', file.name);
-      // Create FormData to send the file
-      const formData = new FormData();
-      formData.append('coverPhoto', file);
+      try {
+        console.log('Uploading cover photo:', file.name);
+        // Create FormData to send the file
+        const formData = new FormData();
+        formData.append('coverPhoto', file);
 
-      // Upload to backend
-      const response = await fetch('/api/upload/cover-photo', {
-        method: 'POST',
-        body: formData,
-      });
+        // Upload to backend
+        const response = await fetch('/api/upload/cover-photo', {
+          method: 'POST',
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        console.log('Upload result:', result);
+        
+        // Update the cover photo URL state
+        setCoverPhotoUrl(result.url);
+
+        toast({
+          title: "Cover photo updated",
+          description: "Your cover photo has been updated successfully.",
+        });
+      } catch (error) {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload cover photo. Please try again.",
+          variant: "destructive",
+        });
       }
-
-      const result = await response.json();
-      console.log('Upload result:', result);
-      toast({
-        title: "Cover photo updated",
-        description: "Your cover photo has been updated successfully.",
-      });
     }
   };
 
@@ -138,8 +163,18 @@ export const CreatorSettings: React.FC = () => {
                   <div className="space-y-3">
                     <Label>Cover Photo</Label>
                     <div className="relative">
-                      <div className="w-full h-32 rounded-lg bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center border-2 border-dashed border-border">
-                        <span className="text-sm text-muted-foreground">Cover Photo Preview</span>
+                      <div className="w-full h-32 rounded-lg overflow-hidden border-2 border-dashed border-border">
+                        {coverPhotoUrl ? (
+                          <img 
+                            src={coverPhotoUrl} 
+                            alt="Cover photo" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
+                            <span className="text-sm text-muted-foreground">Cover Photo Preview</span>
+                          </div>
+                        )}
                       </div>
                       <input
                         type="file"
@@ -166,8 +201,18 @@ export const CreatorSettings: React.FC = () => {
                   <div className="space-y-3">
                     <Label>Profile Photo</Label>
                     <div className="flex items-center gap-6">
-                      <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center">
-                        <span className="text-xl font-bold text-primary-foreground">AA</span>
+                      <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border">
+                        {profilePhotoUrl ? (
+                          <img 
+                            src={profilePhotoUrl} 
+                            alt="Profile photo" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
+                            <span className="text-xl font-bold text-primary-foreground">AA</span>
+                          </div>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <input

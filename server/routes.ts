@@ -1,9 +1,48 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema } from "@shared/schema";
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 16 * 1024 * 1024, // 16MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|mp4|mov/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve uploaded files statically
+  app.use('/uploads', express.static(uploadsDir));
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -440,44 +479,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // File upload routes
-  app.post("/api/upload/profile-photo", async (req, res) => {
+  app.post("/api/upload/profile-photo", upload.single('profilePhoto'), async (req, res) => {
     try {
-      // In a real implementation, you would:
-      // 1. Parse multipart form data (using multer or similar)
-      // 2. Validate file type and size
-      // 3. Upload to object storage (Replit Object Storage, AWS S3, etc.)
-      // 4. Save the file URL to the user's profile in the database
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Generate the URL for the uploaded file
+      const fileUrl = `/uploads/${req.file.filename}`;
       
-      // For now, simulate successful upload
-      const mockUrl = `https://example.com/uploads/profile-${Date.now()}.jpg`;
+      // TODO: Update user's profile photo URL in database
+      // For now, we'll just return the file URL
       
       res.json({ 
         success: true, 
-        url: mockUrl,
+        url: fileUrl,
         message: "Profile photo uploaded successfully" 
       });
     } catch (error) {
+      console.error('Profile photo upload error:', error);
       res.status(500).json({ error: "Failed to upload profile photo" });
     }
   });
 
-  app.post("/api/upload/cover-photo", async (req, res) => {
+  app.post("/api/upload/cover-photo", upload.single('coverPhoto'), async (req, res) => {
     try {
-      // In a real implementation, you would:
-      // 1. Parse multipart form data (using multer or similar)
-      // 2. Validate file type and size
-      // 3. Upload to object storage (Replit Object Storage, AWS S3, etc.)
-      // 4. Save the file URL to the user's profile in the database
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Generate the URL for the uploaded file
+      const fileUrl = `/uploads/${req.file.filename}`;
       
-      // For now, simulate successful upload
-      const mockUrl = `https://example.com/uploads/cover-${Date.now()}.jpg`;
+      // TODO: Update user's cover photo URL in database
+      // For now, we'll just return the file URL
       
       res.json({ 
         success: true, 
-        url: mockUrl,
+        url: fileUrl,
         message: "Cover photo uploaded successfully" 
       });
     } catch (error) {
+      console.error('Cover photo upload error:', error);
       res.status(500).json({ error: "Failed to upload cover photo" });
     }
   });
