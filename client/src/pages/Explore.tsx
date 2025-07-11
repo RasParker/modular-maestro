@@ -124,22 +124,30 @@ export const Explore: React.FC = () => {
           console.log('Fetched real creators:', creators);
           
           // Transform real creators to match the expected format
-          const transformedCreators = creators.map((creator: any) => ({
-            id: `real_${creator.id}`,
-            username: creator.username,
-            display_name: creator.display_name || creator.username,
-            avatar: creator.avatar || `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
-            cover: creator.cover_image || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop`,
-            bio: creator.bio || 'Creator profile - join for exclusive content!',
-            category: 'General',
-            subscribers: creator.total_subscribers || 0,
-            verified: creator.verified || false,
-            tiers: [
-              { name: 'Supporter', price: 5 },
-              { name: 'Fan', price: 15 },
-              { name: 'Superfan', price: 25 }
-            ]
-          }));
+          const transformedCreators = creators.map((creator: any) => {
+            // Check localStorage for profile customizations for this specific creator
+            const profilePhotoUrl = localStorage.getItem('profilePhotoUrl');
+            const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
+            const displayName = localStorage.getItem('displayName');
+            const bio = localStorage.getItem('bio');
+            
+            return {
+              id: `real_${creator.id}`,
+              username: creator.username,
+              display_name: displayName || creator.display_name || creator.username,
+              avatar: profilePhotoUrl || creator.avatar || `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
+              cover: coverPhotoUrl || creator.cover_image || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop`,
+              bio: bio || creator.bio || 'Creator profile - join for exclusive content!',
+              category: 'General',
+              subscribers: creator.total_subscribers || 0,
+              verified: creator.verified || false,
+              tiers: [
+                { name: 'Supporter', price: 5 },
+                { name: 'Fan', price: 15 },
+                { name: 'Superfan', price: 25 }
+              ]
+            };
+          });
           
           setRealCreators(transformedCreators);
           // Combine real creators with mock creators
