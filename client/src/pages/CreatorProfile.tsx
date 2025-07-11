@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
+import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check } from 'lucide-react';
 
@@ -49,7 +50,22 @@ const MOCK_CREATOR = {
       mediaType: 'image',
       tier: 'Fan',
       createdAt: '2024-02-19T10:30:00',
-      thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop'
+      thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
+      likes: 24,
+      comments: [
+        {
+          id: '1',
+          author: 'johndoe',
+          content: 'Amazing work! Love the color palette.',
+          time: '1h ago'
+        },
+        {
+          id: '2',
+          author: 'sarahsmith',
+          content: 'This is incredible! How long did it take?',
+          time: '30m ago'
+        }
+      ]
     },
     {
       id: '2',
@@ -58,7 +74,16 @@ const MOCK_CREATOR = {
       mediaType: 'video',
       tier: 'Superfan',
       createdAt: '2024-02-18T15:20:00',
-      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop'
+      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+      likes: 18,
+      comments: [
+        {
+          id: '3',
+          author: 'mikejones',
+          content: 'Thanks for sharing your process!',
+          time: '2h ago'
+        }
+      ]
     }
   ]
 };
@@ -69,6 +94,7 @@ export const CreatorProfile: React.FC = () => {
   
   // In real app, would fetch creator data based on username
   const creator = MOCK_CREATOR;
+  const isOwnProfile = user?.username === username;
 
   const handleSubscribe = (tierId: string) => {
     if (!user) {
@@ -121,12 +147,27 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
+                {isOwnProfile && (
+                  <Badge variant="outline" className="text-xs">
+                    Your Profile
+                  </Badge>
+                )}
               </div>
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
                 {creator.subscribers.toLocaleString()} subscribers
               </div>
+              {isOwnProfile && (
+                <div className="flex items-center gap-2 mt-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings">Edit Profile</Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/upload">Create Post</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -177,6 +218,14 @@ export const CreatorProfile: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                      {isOwnProfile && (
+                        <CreatorPostActions
+                          postId={post.id}
+                          isOwnPost={true}
+                          likes={post.likes}
+                          comments={post.comments}
+                        />
+                      )}
                     </CardContent>
                   </Card>
                 ))}
