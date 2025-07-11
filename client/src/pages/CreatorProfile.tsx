@@ -147,8 +147,7 @@ export const CreatorProfile: React.FC = () => {
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [postLikes, setPostLikes] = useState<Record<string, { liked: boolean; count: number }>>({});
   const [editingPost, setEditingPost] = useState<any | null>(null);
-  const [editContent, setEditContent] = useState('');
-  const [editTitle, setEditTitle] = useState('');
+  const [editCaption, setEditCaption] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
@@ -430,8 +429,7 @@ export const CreatorProfile: React.FC = () => {
     const post = userPosts.find(p => p.id === postId);
     if (post) {
       setEditingPost(post);
-      setEditTitle(post.title);
-      setEditContent(post.content);
+      setEditCaption(post.content || post.title);
       setIsEditModalOpen(true);
     }
   };
@@ -446,8 +444,8 @@ export const CreatorProfile: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: editTitle,
-          content: editContent,
+          title: editCaption,
+          content: editCaption,
         })
       });
 
@@ -455,7 +453,7 @@ export const CreatorProfile: React.FC = () => {
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
           post.id === editingPost.id 
-            ? { ...post, title: editTitle, content: editContent }
+            ? { ...post, title: editCaption, content: editCaption }
             : post
         ));
         setIsEditModalOpen(false);
@@ -478,8 +476,7 @@ export const CreatorProfile: React.FC = () => {
   const handleCancelEdit = () => {
     setIsEditModalOpen(false);
     setEditingPost(null);
-    setEditTitle('');
-    setEditContent('');
+    setEditCaption('');
   };
 
   const handleDelete = (postId: string) => {
@@ -918,27 +915,15 @@ export const CreatorProfile: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
-              <label htmlFor="editTitle" className="block text-sm font-medium mb-2">
-                Title
-              </label>
-              <Input
-                id="editTitle"
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                placeholder="Enter post title"
-              />
-            </div>
-            <div>
-              <label htmlFor="editContent" className="block text-sm font-medium mb-2">
-                Content
+              <label htmlFor="editCaption" className="block text-sm font-medium mb-2">
+                Caption
               </label>
               <Textarea
-                id="editContent"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
+                id="editCaption"
+                value={editCaption}
+                onChange={(e) => setEditCaption(e.target.value)}
                 className="w-full min-h-[120px]"
-                placeholder="Write your post content here..."
+                placeholder="Write your post caption here..."
               />
             </div>
           </div>

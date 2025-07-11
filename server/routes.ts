@@ -314,6 +314,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validatedData = insertCommentSchema.parse({
         ...req.body,
+        user_id: parseInt(req.body.user_id),
         post_id: postId
       });
       
