@@ -838,7 +838,8 @@ export const CreatorProfile: React.FC = () => {
                     <img 
                       src={`/uploads/${selectedContent.media_urls[0]}`}
                       alt={selectedContent.title}
-                      className="relative z-10 w-full h-full object-contain"
+                      className="relative z-10 w-full h-full object-contain bg-transparent"
+                      style={{ objectFit: 'contain' }}
                     />
                   )
                 ) : (
