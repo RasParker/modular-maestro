@@ -179,7 +179,7 @@ export const CreatorProfile: React.FC = () => {
   
   // In real app, would fetch creator data based on username
   const creator = MOCK_CREATOR;
-  const isOwner = user?.username === creator.username;
+  const isOwner = user?.role === 'creator' && (user?.username === creator.username || user?.email === 'creator@example.com');
 
   const handleSubscribe = (tierId: string) => {
     if (!user) {
