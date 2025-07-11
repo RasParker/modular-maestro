@@ -289,12 +289,20 @@ export const CreatorDashboard: React.FC = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   Keep your profile updated to attract more subscribers
                 </p>
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link to="/creator/settings">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Link>
-                </Button>
+                <div className="space-y-2">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link to={`/creator/${user?.username}`}>
+                      <User className="w-4 h-4 mr-2" />
+                      View My Profile
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link to="/creator/settings">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
