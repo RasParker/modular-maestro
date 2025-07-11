@@ -310,6 +310,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts/:postId/comments", async (req, res) => {
     try {
       const postId = parseInt(req.params.postId);
+      console.log('Creating comment with data:', { ...req.body, post_id: postId });
+      
       const validatedData = insertCommentSchema.parse({
         ...req.body,
         post_id: postId
@@ -329,6 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(commentWithUser);
     } catch (error) {
+      console.error('Create comment error:', error);
       res.status(500).json({ error: "Failed to create comment" });
     }
   });
