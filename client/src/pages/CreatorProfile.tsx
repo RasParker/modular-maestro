@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
@@ -468,125 +468,130 @@ export const CreatorProfile: React.FC = () => {
               {creator.recentPosts.length > 0 ? (
                 <div className="space-y-6">
                   {creator.recentPosts.map((post) => (
-                    <Card key={post.id} className="bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          {/* Creator Info */}
-                          <Avatar className="w-12 h-12 border-2 border-background">
-                            <AvatarImage src={creator.avatar} alt={creator.username} />
-                            <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          
-                          <div className="flex-1 min-w-0">
-                            {/* Header */}
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-foreground">{creator.display_name}</h3>
-                              <span className="text-sm text-muted-foreground">@{creator.username}</span>
-                              <Badge variant={getTierColor(post.tier)} className="text-xs">
-                                {post.tier === 'public' ? 'Free' : 
-                                 post.tier === 'supporter' ? 'Supporter' :
-                                 post.tier === 'fan' ? 'Fan' :
-                                 post.tier === 'premium' ? 'Premium' :
-                                 post.tier === 'superfan' ? 'Superfan' : 'Free'}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {getTimeAgo(post.created_at || post.createdAt)}
-                              </span>
-                            </div>
-                            
-                            {/* Content */}
-                            <p className="text-sm mb-4 leading-relaxed">
-                              {post.content || post.title}
-                            </p>
-                            
-                            {/* Media */}
-                            {post.media_urls && post.media_urls[0] && (
-                              <div className="mb-4">
-                                <AspectRatio ratio={16/9} className="overflow-hidden rounded-lg">
-                                  <div 
-                                    className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity"
-                                    onClick={() => handleContentClick(post)}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        handleContentClick(post);
-                                      }
-                                    }}
-                                  >
-                                    {/* Blurred background layer */}
-                                    <div 
-                                      className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                                      style={{ backgroundImage: `url(/uploads/${post.media_urls[0]})` }}
-                                    />
-                                    {/* Main media content */}
-                                    <div className="relative z-10 w-full h-full">
-                                      {post.media_type === 'video' ? (
-                                        <video 
-                                          src={`/uploads/${post.media_urls[0]}`}
-                                          className="w-full h-full object-contain"
-                                          muted
-                                          preload="metadata"
-                                        />
-                                      ) : (
-                                        <img 
-                                          src={`/uploads/${post.media_urls[0]}`}
-                                          alt={post.title}
-                                          className="w-full h-full object-contain"
-                                          onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                            target.className = "w-full h-full object-contain opacity-50";
-                                          }}
-                                        />
-                                      )}
-                                    </div>
-                                    {/* Type indicator overlay */}
-                                    <div className="absolute top-2 left-2 z-20">
-                                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm text-white">
-                                        {getTypeIcon(post.media_type)}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </AspectRatio>
-                              </div>
-                            )}
-                            
-                            {/* Actions & Stats */}
-                            <div className="flex items-center justify-between pt-2 border-t border-border/20">
-                              {/* Left: Stats */}
-                              <div className="flex items-center gap-4">
-                                <Button variant="ghost" size="sm" className="text-muted-foreground h-8 px-2">
-                                  <Heart className="w-4 h-4 mr-1" />
-                                  {post.likes_count || post.likes || 0}
-                                </Button>
-                                <Button variant="ghost" size="sm" className="text-muted-foreground h-8 px-2">
-                                  <MessageSquare className="w-4 h-4 mr-1" />
-                                  {post.comments_count || (post.comments ? post.comments.length : 0)}
-                                </Button>
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                  <Eye className="w-4 h-4" />
-                                  <span>0</span>
+                    <Card key={post.id} className="bg-gradient-card border-border/50">
+                      <CardContent className="p-0">
+                        <div className="p-4 pb-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={creator.avatar} alt={creator.username} />
+                                <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-semibold text-foreground">{creator.display_name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
+                                  <Badge variant="outline" className="text-xs">
+                                    {post.tier === 'public' ? 'Free' : 
+                                     post.tier === 'supporter' ? 'Supporter' :
+                                     post.tier === 'fan' ? 'Fan' :
+                                     post.tier === 'premium' ? 'Premium' :
+                                     post.tier === 'superfan' ? 'Superfan' : 'Free'}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {getTimeAgo(post.created_at || post.createdAt)}
+                                  </span>
                                 </div>
                               </div>
-
-                              {/* Right: Action Icons */}
-                              <div className="flex items-center gap-1">
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
-                                  <Share className="w-4 h-4" />
-                                </Button>
-                                {isOwnProfile && (
-                                  <>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
-                                      <Edit className="w-4 h-4" />
-                                    </Button>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </>
-                                )}
+                            </div>
+                            <Badge variant="outline" className="capitalize">
+                              {post.media_type || post.mediaType}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="px-4 pb-4 space-y-4">
+                          <div>
+                            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                              {post.content || post.title}
+                            </p>
+                          </div>
+                          
+                          {post.media_urls && post.media_urls[0] && (
+                            <div 
+                              className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                              onClick={() => handleContentClick(post)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleContentClick(post);
+                                }
+                              }}
+                            >
+                              {post.media_type === 'video' ? (
+                                <video 
+                                  src={`/uploads/${post.media_urls[0]}`}
+                                  className="w-full h-64 object-cover"
+                                  muted
+                                  preload="metadata"
+                                />
+                              ) : (
+                                <img 
+                                  src={`/uploads/${post.media_urls[0]}`}
+                                  alt={post.title}
+                                  className="w-full h-64 object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full h-64 object-cover opacity-50";
+                                  }}
+                                />
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                            <div className="flex items-center gap-4">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-muted-foreground"
+                              >
+                                <Heart className="w-4 h-4 mr-1" />
+                                {post.likes_count || post.likes || 0}
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-muted-foreground"
+                              >
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                                {post.comments_count || (post.comments ? post.comments.length : 0)}
+                              </Button>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Eye className="w-4 h-4" />
+                                0
                               </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-muted-foreground h-8 w-8 p-0"
+                              >
+                                <Share2 className="w-4 h-4" />
+                              </Button>
+                              {isOwnProfile && (
+                                <>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
