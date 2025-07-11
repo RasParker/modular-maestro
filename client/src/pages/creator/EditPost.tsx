@@ -60,13 +60,55 @@ export const EditPost: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Post updated",
-        description: "Your post has been successfully updated.",
+      let mediaUrl = null;
+      
+      // Upload new media if a file was selected
+      if (mediaFile) {
+        const formData = new FormData();
+        formData.append('media', mediaFile);
+        
+        const uploadResponse = await fetch('/api/upload/post-media', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          mediaUrl = uploadResult.filename;
+        } else {
+          throw new Error('Failed to upload media');
+        }
+      }
+      
+      // Update post data
+      const updateData = {
+        content: postData.description,
+        tier: postData.tier,
+        status: postData.status,
+        ...(mediaUrl && { media_urls: [mediaUrl] }),
+        ...(postData.scheduledDate && { scheduled_date: postData.scheduledDate }),
+        ...(postData.scheduledTime && { scheduled_time: postData.scheduledTime })
+      };
+      
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
       });
-      navigate('/creator/manage-content');
+      
+      if (response.ok) {
+        toast({
+          title: "Post updated",
+          description: "Your post has been successfully updated.",
+        });
+        navigate('/creator/manage-content');
+      } else {
+        throw new Error('Failed to update post');
+      }
     } catch (error) {
+      console.error('Update error:', error);
       toast({
         title: "Update failed",
         description: "Failed to update post. Please try again.",
@@ -80,6 +122,54 @@ export const EditPost: React.FC = () => {
   const handleCancel = () => {
     navigate('/creator/manage-content');
   };
+
+  // Fetch post data when component mounts
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!postId) {
+        navigate('/creator/manage-content');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/posts/${postId}`);
+        if (response.ok) {
+          const post = await response.json();
+          setPostData({
+            description: post.content || '',
+            tier: post.tier || 'Free',
+            scheduledDate: post.scheduled_date ? new Date(post.scheduled_date).toISOString().split('T')[0] : '',
+            scheduledTime: post.scheduled_time || '',
+            status: post.status || 'Published'
+          });
+          
+          // Set media preview if available
+          if (post.media_urls && post.media_urls.length > 0) {
+            setMediaPreview(`/uploads/${post.media_urls[0]}`);
+          }
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to load post data",
+            variant: "destructive",
+          });
+          navigate('/creator/manage-content');
+        }
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load post data",
+          variant: "destructive",
+        });
+        navigate('/creator/manage-content');
+      } finally {
+        setLoadingPost(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId, navigate, toast]);
 
   if (loadingPost) {
     return (
