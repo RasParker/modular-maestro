@@ -820,7 +820,7 @@ export const CreatorProfile: React.FC = () => {
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
                   style={{
-                    backgroundImage: `url(/uploads/${selectedContent.media_urls?.[0]})`,
+                    backgroundImage: `url(${selectedContent.media_urls?.[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls?.[0]}`})`,
                   }}
                 />
                 
@@ -828,7 +828,7 @@ export const CreatorProfile: React.FC = () => {
                 {selectedContent.media_urls?.[0] ? (
                   selectedContent.media_type === 'video' ? (
                     <video 
-                      src={`/uploads/${selectedContent.media_urls[0]}`}
+                      src={selectedContent.media_urls[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls[0]}`}
                       className="relative z-10 w-full h-full object-contain"
                       controls
                       autoPlay
@@ -836,10 +836,9 @@ export const CreatorProfile: React.FC = () => {
                     />
                   ) : (
                     <img 
-                      src={`/uploads/${selectedContent.media_urls[0]}`}
+                      src={selectedContent.media_urls[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls[0]}`}
                       alt={selectedContent.title}
-                      className="relative z-10 w-full h-full object-contain bg-transparent"
-                      style={{ objectFit: 'contain' }}
+                      className="relative z-10 w-full h-full object-contain"
                     />
                   )
                 ) : (
