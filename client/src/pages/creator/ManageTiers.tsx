@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Plus, Edit, Trash2, DollarSign, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { setLocalStorageObject, getLocalStorageObject } from '@/lib/storage-utils';
 
 interface SubscriptionTier {
   id: string;
@@ -45,7 +46,7 @@ const DEFAULT_TIERS: SubscriptionTier[] = [
 export const ManageTiers: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [tiers, setTiers] = useState<SubscriptionTier[]>(DEFAULT_TIERS);
+  const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingTier, setEditingTier] = useState<SubscriptionTier | null>(null);
   const [formData, setFormData] = useState({
@@ -54,6 +55,25 @@ export const ManageTiers: React.FC = () => {
     description: '',
     features: ['']
   });
+
+  // Load tiers from localStorage on component mount
+  useEffect(() => {
+    const savedTiers = getLocalStorageObject('subscriptionTiers');
+    if (savedTiers && savedTiers.length > 0) {
+      setTiers(savedTiers);
+    } else {
+      // Use default tiers if no saved tiers exist
+      setTiers(DEFAULT_TIERS);
+      setLocalStorageObject('subscriptionTiers', DEFAULT_TIERS);
+    }
+  }, []);
+
+  // Save tiers to localStorage whenever tiers change
+  useEffect(() => {
+    if (tiers.length > 0) {
+      setLocalStorageObject('subscriptionTiers', tiers);
+    }
+  }, [tiers]);
 
   const handleCreateTier = () => {
     setIsCreating(true);

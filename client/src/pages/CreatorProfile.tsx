@@ -122,11 +122,53 @@ export const CreatorProfile: React.FC = () => {
   const { user } = useAuth();
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [bio, setBio] = useState<string | null>(null);
+  const [customTiers, setCustomTiers] = useState<any[]>([]);
+  const [profileData, setProfileData] = useState<any>(null);
 
-  // Update image URLs from localStorage when component mounts or when navigating
+  // Update profile data from localStorage when component mounts or when navigating
   useEffect(() => {
-    setProfilePhotoUrl(localStorage.getItem('profilePhotoUrl'));
-    setCoverPhotoUrl(localStorage.getItem('coverPhotoUrl'));
+    const updateProfileData = () => {
+      setProfilePhotoUrl(localStorage.getItem('profilePhotoUrl'));
+      setCoverPhotoUrl(localStorage.getItem('coverPhotoUrl'));
+      setDisplayName(localStorage.getItem('displayName'));
+      setBio(localStorage.getItem('bio'));
+      
+      // Load custom tiers from localStorage
+      const savedTiers = localStorage.getItem('subscriptionTiers');
+      if (savedTiers) {
+        try {
+          setCustomTiers(JSON.parse(savedTiers));
+        } catch (error) {
+          console.error('Error parsing saved tiers:', error);
+        }
+      }
+    };
+
+    // Initial load
+    updateProfileData();
+    
+    // Listen for localStorage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
+          e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
+        updateProfileData();
+      }
+    };
+
+    // Listen for custom storage events (for same-tab updates)
+    const handleCustomStorageChange = (e: CustomEvent) => {
+      updateProfileData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleCustomStorageChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
+    };
   }, [username]);
 
   // Create dynamic creator object
@@ -134,7 +176,10 @@ export const CreatorProfile: React.FC = () => {
   const creator = baseCreator ? {
     ...baseCreator,
     avatar: profilePhotoUrl || baseCreator.avatar,
-    cover: coverPhotoUrl || baseCreator.cover
+    cover: coverPhotoUrl || baseCreator.cover,
+    display_name: displayName || baseCreator.display_name,
+    bio: bio || baseCreator.bio,
+    tiers: customTiers.length > 0 ? customTiers : baseCreator.tiers
   } : null;
   const isOwnProfile = user?.username === username;
 

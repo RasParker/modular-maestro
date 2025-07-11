@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2, Camera, Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { setLocalStorageItem, getLocalStorageItem } from '@/lib/storage-utils';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
@@ -20,13 +21,29 @@ export const CreatorSettings: React.FC = () => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
-    localStorage.getItem('profilePhotoUrl')
+    getLocalStorageItem('profilePhotoUrl')
   );
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(
-    localStorage.getItem('coverPhotoUrl')
+    getLocalStorageItem('coverPhotoUrl')
+  );
+  const [displayName, setDisplayName] = useState<string>(
+    getLocalStorageItem('displayName') || ''
+  );
+  const [bio, setBio] = useState<string>(
+    getLocalStorageItem('bio') || ''
   );
 
   const handleSave = () => {
+    // Save display name and bio to localStorage
+    if (displayName.trim()) {
+      console.log('Saving display name:', displayName);
+      setLocalStorageItem('displayName', displayName.trim());
+    }
+    
+    if (bio.trim()) {
+      setLocalStorageItem('bio', bio.trim());
+    }
+    
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully.",
@@ -66,7 +83,7 @@ export const CreatorSettings: React.FC = () => {
         // Update the profile photo URL state
         setProfilePhotoUrl(result.url);
         // Save to localStorage so it persists across pages
-        localStorage.setItem('profilePhotoUrl', result.url);
+        setLocalStorageItem('profilePhotoUrl', result.url);
 
         toast({
           title: "Profile photo updated",
@@ -107,7 +124,7 @@ export const CreatorSettings: React.FC = () => {
         // Update the cover photo URL state
         setCoverPhotoUrl(result.url);
         // Save to localStorage so it persists across pages
-        localStorage.setItem('coverPhotoUrl', result.url);
+        setLocalStorageItem('coverPhotoUrl', result.url);
 
         toast({
           title: "Cover photo updated",
@@ -245,34 +262,32 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" defaultValue="Akosua" />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" defaultValue="Art" />
-                    </div>
-                  </div>
-
                   <div>
-                    <Label htmlFor="username">Username</Label>
-                    <Input id="username" defaultValue="@akosua-art" />
+                    <Label htmlFor="displayName">Display Name</Label>
+                    <Input 
+                      id="displayName" 
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="Enter your display name"
+                    />
                   </div>
 
                   <div>
                     <Label htmlFor="bio">Bio</Label>
                     <Textarea 
                       id="bio" 
-                      defaultValue="Ghanaian artist sharing exclusive content and behind-the-scenes moments"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder="Tell your audience about yourself..."
                       rows={3}
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" defaultValue="Accra, Ghana" />
+                  <div className="flex gap-2">
+                    <Button onClick={handleSave} className="flex-1">
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Profile
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
