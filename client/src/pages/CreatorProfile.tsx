@@ -130,10 +130,23 @@ export const CreatorProfile: React.FC = () => {
   // Update profile data from localStorage when component mounts or when navigating
   useEffect(() => {
     const updateProfileData = () => {
-      setProfilePhotoUrl(localStorage.getItem('profilePhotoUrl'));
-      setCoverPhotoUrl(localStorage.getItem('coverPhotoUrl'));
-      setDisplayName(localStorage.getItem('displayName'));
-      setBio(localStorage.getItem('bio'));
+      console.log('Updating profile data from localStorage');
+      const newProfilePhotoUrl = localStorage.getItem('profilePhotoUrl');
+      const newCoverPhotoUrl = localStorage.getItem('coverPhotoUrl');
+      const newDisplayName = localStorage.getItem('displayName');
+      const newBio = localStorage.getItem('bio');
+      
+      console.log('Current localStorage values:', {
+        profilePhotoUrl: newProfilePhotoUrl,
+        coverPhotoUrl: newCoverPhotoUrl,
+        displayName: newDisplayName,
+        bio: newBio
+      });
+      
+      setProfilePhotoUrl(newProfilePhotoUrl);
+      setCoverPhotoUrl(newCoverPhotoUrl);
+      setDisplayName(newDisplayName);
+      setBio(newBio);
       
       // Load custom tiers from localStorage
       const savedTiers = localStorage.getItem('subscriptionTiers');
@@ -151,6 +164,7 @@ export const CreatorProfile: React.FC = () => {
     
     // Listen for localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
+      console.log('Storage event received:', e.key, e.newValue);
       if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
           e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
         updateProfileData();
@@ -159,6 +173,7 @@ export const CreatorProfile: React.FC = () => {
 
     // Listen for custom storage events (for same-tab updates)
     const handleCustomStorageChange = (e: CustomEvent) => {
+      console.log('Custom storage event received:', e.detail);
       updateProfileData();
     };
 

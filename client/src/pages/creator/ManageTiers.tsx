@@ -72,6 +72,10 @@ export const ManageTiers: React.FC = () => {
   useEffect(() => {
     if (tiers.length > 0) {
       setLocalStorageObject('subscriptionTiers', tiers);
+      // Dispatch custom event to trigger reactivity
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { keys: ['subscriptionTiers'] }
+      }));
     }
   }, [tiers]);
 

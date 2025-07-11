@@ -44,6 +44,12 @@ export const CreatorSettings: React.FC = () => {
       setLocalStorageItem('bio', bio.trim());
     }
     
+    // Dispatch custom event to trigger reactivity
+    console.log('Dispatching localStorageChange event for displayName and bio');
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { keys: ['displayName', 'bio'] }
+    }));
+    
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully.",
@@ -85,6 +91,11 @@ export const CreatorSettings: React.FC = () => {
         // Save to localStorage so it persists across pages
         setLocalStorageItem('profilePhotoUrl', result.url);
 
+        // Dispatch custom event to trigger reactivity
+        window.dispatchEvent(new CustomEvent('localStorageChange', {
+          detail: { keys: ['profilePhotoUrl'] }
+        }));
+
         toast({
           title: "Profile photo updated",
           description: "Your profile photo has been updated successfully.",
@@ -125,6 +136,11 @@ export const CreatorSettings: React.FC = () => {
         setCoverPhotoUrl(result.url);
         // Save to localStorage so it persists across pages
         setLocalStorageItem('coverPhotoUrl', result.url);
+
+        // Dispatch custom event to trigger reactivity
+        window.dispatchEvent(new CustomEvent('localStorageChange', {
+          detail: { keys: ['coverPhotoUrl'] }
+        }));
 
         toast({
           title: "Cover photo updated",
