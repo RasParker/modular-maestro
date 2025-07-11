@@ -156,6 +156,19 @@ export const Navbar: React.FC = () => {
                       </Button>
                     )}
                     
+                    {user && user.role === 'creator' && (
+                      <Button variant="ghost" asChild className="justify-start">
+                        <Link 
+                          to={`/creator/${user.username}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-foreground hover:text-primary flex items-center gap-2"
+                        >
+                          <Crown className="h-4 w-4" />
+                          My Profile
+                        </Link>
+                      </Button>
+                    )}
+                    
                     {user && (
                       <Button variant="ghost" asChild className="justify-start">
                         <Link 
@@ -240,6 +253,14 @@ export const Navbar: React.FC = () => {
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
+                  {user.role === 'creator' && (
+                    <DropdownMenuItem asChild>
+                      <Link to={`/creator/${user.username}`} className="cursor-pointer">
+                        <Crown className="mr-2 h-4 w-4" />
+                        My Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to={`/${user.role}/settings`} className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
