@@ -215,18 +215,78 @@ export const CreatorProfile: React.FC = () => {
     };
   }, [username]);
 
-  // Create dynamic creator object
-  const baseCreator = username ? MOCK_CREATORS[username.toLowerCase() as keyof typeof MOCK_CREATORS] : null;
-  const creator = baseCreator ? {
-    ...baseCreator,
-    avatar: profilePhotoUrl || baseCreator.avatar,
-    cover: coverPhotoUrl || baseCreator.cover,
-    display_name: displayName || baseCreator.display_name,
-    bio: bio || baseCreator.bio,
-    tiers: customTiers.length > 0 ? customTiers : baseCreator.tiers,
-    recentPosts: userPosts.length > 0 ? userPosts : baseCreator.recentPosts
-  } : null;
+  // Fetch user data from database
+  const [creator, setCreator] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      if (!username) return;
+      
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/users/username/${username}`);
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('Fetched user data:', userData);
+          // Create creator object with database data and localStorage overrides
+          const creatorData = {
+            id: userData.id,
+            username: userData.username,
+            display_name: displayName || userData.display_name || userData.username,
+            avatar: profilePhotoUrl || userData.avatar || `https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face`,
+            cover: coverPhotoUrl || userData.cover_image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
+            bio: bio || userData.bio || 'Welcome to my profile! I\'m excited to share my content with you.',
+            subscribers: userData.total_subscribers || 0,
+            verified: userData.verified || false,
+            role: userData.role,
+            tiers: customTiers.length > 0 ? customTiers : [
+              { 
+                id: '1',
+                name: 'Supporter', 
+                price: 5,
+                description: 'Support my creative journey',
+                features: ['Access to all posts', 'Community access', 'Monthly updates']
+              },
+              { 
+                id: '2',
+                name: 'Premium', 
+                price: 15,
+                description: 'Get exclusive content and perks',
+                features: ['Everything in Supporter', 'Exclusive content', 'Behind-the-scenes access', 'Priority support']
+              }
+            ],
+            recentPosts: userPosts
+          };
+          setCreator(creatorData);
+        } else {
+          setCreator(null);
+        }
+      } catch (error) {
+        console.error('Error fetching creator data:', error);
+        setCreator(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCreatorData();
+  }, [username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers, userPosts]);
   const isOwnProfile = user?.username === username;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!creator) {
     return (
