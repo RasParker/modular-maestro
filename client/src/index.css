@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom breakpoint for extra small screens */
-@media (min-width: 475px) {
-  .xs\:inline {
-    display: inline;
-  }
-  .xs\:hidden {
-    display: none;
-  }
-}
-
 /* Line clamp utilities for text truncation */
 @layer utilities {
   .line-clamp-2 {
@@ -81,36 +71,6 @@
     --success-foreground: 355.7 100% 97.3%;
     --warning: 38 92% 50%;
     --warning-foreground: 240 20% 10%;
-
-
-/* Extra small breakpoint for responsive design */
-@media (min-width: 475px) {
-  .xs\:inline {
-    display: inline;
-  }
-}
-
-/* Line clamp utilities */
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
-
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
 
     /* Chart colors */
     --chart-1: 262 80% 50%;

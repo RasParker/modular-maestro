@@ -511,7 +511,7 @@ export const CreatorProfile: React.FC = () => {
       
       {/* Creator Header */}
       <div className="relative">
-        <div className="h-32 sm:h-48 md:h-64 overflow-hidden">
+        <div className="h-48 md:h-64 overflow-hidden">
           <img 
             src={creator.cover} 
             alt={creator.display_name}
@@ -520,93 +520,54 @@ export const CreatorProfile: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
         </div>
         
-        <div className="relative -mt-16 sm:-mt-20 px-4 sm:px-6 lg:px-8 pb-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Mobile Layout */}
-            <div className="sm:hidden flex flex-col items-center text-center space-y-3 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-              <Avatar className="w-16 h-16 border-2 border-background">
-                <AvatarImage src={creator.avatar} alt={creator.username} />
-                <AvatarFallback className="text-lg">{creator.display_name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <h1 className="text-lg font-bold text-foreground">{creator.display_name}</h1>
-                  {creator.verified && (
-                    <Badge variant="secondary" className="bg-accent text-accent-foreground text-xs px-1 py-0">
-                      <Star className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-muted-foreground text-xs">@{creator.username}</p>
-                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                  <Users className="w-3 h-3" />
-                  {creator.subscribers.toLocaleString()} subscribers
-                </div>
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="max-w-4xl mx-auto flex items-end gap-4">
+            <Avatar className="w-24 h-24 border-4 border-background">
+              <AvatarImage src={creator.avatar} alt={creator.username} />
+              <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 pb-2">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-foreground">{creator.display_name}</h1>
+                {creator.verified && (
+                  <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                    <Star className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                )}
+                {isOwnProfile && (
+                  <Badge variant="outline" className="text-xs">
+                    Your Profile
+                  </Badge>
+                )}
               </div>
-              
+              <p className="text-muted-foreground">@{creator.username}</p>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                <Users className="w-4 h-4" />
+                {creator.subscribers.toLocaleString()} subscribers
+              </div>
               {isOwnProfile && (
-                <div className="flex flex-row w-full gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs px-2 py-1" asChild>
+                <div className="flex items-center gap-2 mt-2">
+                  <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/settings">
-                      <Settings className="w-3 h-3 mr-1" />
-                      Edit
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
                     </Link>
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 text-xs px-2 py-1" asChild>
-                    <Link to="/creator/upload">
-                      Create
-                    </Link>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/upload">Create Post</Link>
                   </Button>
                 </div>
               )}
-            </div>
-            
-            {/* Desktop Layout */}
-            <div className="hidden sm:flex items-end gap-4 lg:gap-6">
-              <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-background">
-                <AvatarImage src={creator.avatar} alt={creator.username} />
-                <AvatarFallback className="text-xl sm:text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 pb-2">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">{creator.display_name}</h1>
-                  {creator.verified && (
-                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                      <Star className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-muted-foreground text-sm sm:text-base">@{creator.username}</p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                  <Users className="w-4 h-4" />
-                  {creator.subscribers.toLocaleString()} subscribers
-                </div>
-                {isOwnProfile && (
-                  <div className="flex items-center gap-2 mt-3">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/creator/settings">
-                        <Settings className="w-4 h-4 mr-2" />
-                        Edit Profile
-                      </Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/creator/upload">Create Post</Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
@@ -632,45 +593,41 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
               {(creator.recentPosts.length > 0 || userPosts.length > 0) ? (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-6">
                   {(userPosts.length > 0 ? userPosts : creator.recentPosts).map((post) => (
                     <Card key={post.id} className="bg-gradient-card border-border/50">
                       <CardContent className="p-0">
-                        {/* Post Header - Mobile Optimized */}
-                        <div className="p-3 sm:p-4 lg:p-6 pb-2">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 shrink-0">
-                              <AvatarImage src={creator.avatar} alt={creator.username} />
-                              <AvatarFallback className="text-xs sm:text-sm">{creator.display_name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-semibold text-foreground text-sm sm:text-base truncate">{creator.display_name}</p>
-                                <Badge variant="outline" className="text-xs sm:text-sm capitalize shrink-0">
-                                  {post.media_type || post.mediaType}
-                                </Badge>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground flex-wrap">
-                                <span className="truncate">@{creator.username}</span>
-                                <span>•</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {post.tier === 'public' ? 'Free' : 
-                                   post.tier === 'supporter' ? 'Supporter' :
-                                   post.tier === 'fan' ? 'Fan' :
-                                   post.tier === 'premium' ? 'Premium' :
-                                   post.tier === 'superfan' ? 'Superfan' : 'Free'}
-                                </Badge>
-                                <span>•</span>
-                                <span className="shrink-0">
-                                  {getTimeAgo(post.created_at || post.createdAt)}
-                                </span>
+                        <div className="p-4 pb-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={creator.avatar} alt={creator.username} />
+                                <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-semibold text-foreground">{creator.display_name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
+                                  <Badge variant="outline" className="text-xs">
+                                    {post.tier === 'public' ? 'Free' : 
+                                     post.tier === 'supporter' ? 'Supporter' :
+                                     post.tier === 'fan' ? 'Fan' :
+                                     post.tier === 'premium' ? 'Premium' :
+                                     post.tier === 'superfan' ? 'Superfan' : 'Free'}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {getTimeAgo(post.created_at || post.createdAt)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                            <Badge variant="outline" className="capitalize">
+                              {post.media_type || post.mediaType}
+                            </Badge>
                           </div>
                         </div>
                         
-                        {/* Post Content */}
-                        <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 space-y-3 sm:space-y-4">
+                        <div className="px-4 pb-4 space-y-4">
                           <div>
                             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                               {post.content || post.title}
@@ -693,7 +650,7 @@ export const CreatorProfile: React.FC = () => {
                               {post.media_type === 'video' ? (
                                 <video 
                                   src={`/uploads/${post.media_urls[0]}`}
-                                  className="w-full h-40 sm:h-48 lg:h-64 object-cover"
+                                  className="w-full h-64 object-cover"
                                   muted
                                   preload="metadata"
                                 />
@@ -701,45 +658,40 @@ export const CreatorProfile: React.FC = () => {
                                 <img 
                                   src={`/uploads/${post.media_urls[0]}`}
                                   alt={post.title}
-                                  className="w-full h-40 sm:h-48 lg:h-64 object-cover"
+                                  className="w-full h-64 object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                    target.className = "w-full h-40 sm:h-48 lg:h-64 object-cover opacity-50";
+                                    target.className = "w-full h-64 object-cover opacity-50";
                                   }}
                                 />
                               )}
                             </div>
                           )}
                           
-                          {/* Post Actions - Mobile Optimized */}
-                          <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                            <div className="flex items-center gap-1 sm:gap-3">
+                          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                            <div className="flex items-center gap-4">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'} text-xs sm:text-sm p-1 sm:p-2 h-8 sm:h-9`}
+                                className={`${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                 onClick={() => handleLike(post.id)}
                               >
-                                <Heart className={`w-3 h-3 sm:w-4 sm:h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                <span className="ml-1 text-xs sm:text-sm">
-                                  {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
-                                </span>
+                                <Heart className={`w-4 h-4 mr-1 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
                               </Button>
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="text-muted-foreground text-xs sm:text-sm p-1 sm:p-2 h-8 sm:h-9"
+                                className="text-muted-foreground"
                                 onClick={() => handleCommentClick(post.id)}
                               >
-                                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="ml-1 text-xs sm:text-sm">
-                                  {post.comments_count || (post.comments ? post.comments.length : 0)}
-                                </span>
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                                {post.comments_count || (post.comments ? post.comments.length : 0)}
                               </Button>
-                              <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="text-xs sm:text-sm">0</span>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Eye className="w-4 h-4" />
+                                0
                               </div>
                             </div>
                             
@@ -747,28 +699,28 @@ export const CreatorProfile: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-muted/50"
+                                className="text-muted-foreground h-8 w-8 p-0"
                                 onClick={() => handleShare(post.id)}
                               >
-                                <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <Share2 className="w-4 h-4" />
                               </Button>
                               {isOwnProfile && (
                                 <>
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="text-muted-foreground h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-muted/50"
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
                                     onClick={() => handleEdit(post.id)}
                                   >
-                                    <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <Edit className="w-4 h-4" />
                                   </Button>
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="text-muted-foreground h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600"
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
                                     onClick={() => handleDelete(post.id)}
                                   >
-                                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <Trash2 className="w-4 h-4" />
                                   </Button>
                                 </>
                               )}
@@ -780,7 +732,7 @@ export const CreatorProfile: React.FC = () => {
                       {/* Comments Section */}
                       {showComments[post.id] && (
                         <div className="border-t border-border/30">
-                          <div className="p-3 sm:p-4">
+                          <div className="p-4">
                             <CommentSection
                               postId={post.id}
                               initialComments={post.comments || []}
@@ -809,134 +761,43 @@ export const CreatorProfile: React.FC = () => {
           </div>
 
           {/* Subscription Tiers */}
-          <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-            <h2 className="text-base sm:text-lg lg:text-xl font-semibold">Subscription Tiers</h2>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Subscription Tiers</h2>
             
-            {/* Mobile: Compact Cards */}
-            <div className="sm:hidden space-y-3">
-              {creator.tiers.map((tier) => (
-                <Card key={tier.id} className="bg-gradient-card border-border/50">
-                  <CardContent className="p-3">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold">{tier.name}</h3>
-                        <div className="text-right">
-                          <div className="text-base font-bold text-accent">${tier.price}</div>
-                          <div className="text-xs text-muted-foreground">per month</div>
-                        </div>
+            {creator.tiers.map((tier) => (
+              <Card key={tier.id} className="bg-gradient-card border-border/50">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">{tier.name}</h3>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-accent">${tier.price}</div>
+                        <div className="text-sm text-muted-foreground">per month</div>
                       </div>
-                      
-                      <p className="text-xs text-muted-foreground line-clamp-2">{tier.description}</p>
-                      
-                      <div className="space-y-1">
-                        {tier.features.slice(0, 2).map((feature, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs">
-                            <Check className="w-3 h-3 text-accent shrink-0 mt-0.5" />
-                            <span className="line-clamp-1">{feature}</span>
-                          </div>
-                        ))}
-                        {tier.features.length > 2 && (
-                          <div className="text-xs text-muted-foreground">
-                            +{tier.features.length - 2} more features
-                          </div>
-                        )}
-                      </div>
-                      
-                      <Button 
-                        variant="premium" 
-                        className="w-full text-xs"
-                        size="sm"
-                        onClick={() => handleSubscribe(tier.id)}
-                      >
-                        Subscribe
-                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            
-            {/* Tablet: Horizontal scroll */}
-            <div className="hidden sm:block lg:hidden">
-              <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory">
-                {creator.tiers.map((tier) => (
-                  <Card key={tier.id} className="bg-gradient-card border-border/50 min-w-[240px] max-w-[240px] shrink-0 snap-start">
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="text-center">
-                          <h3 className="text-sm font-semibold">{tier.name}</h3>
-                          <div className="text-lg font-bold text-accent">${tier.price}</div>
-                          <div className="text-xs text-muted-foreground">per month</div>
-                        </div>
-                        
-                        <p className="text-xs text-muted-foreground text-center line-clamp-2">{tier.description}</p>
-                        
-                        <ul className="space-y-1">
-                          {tier.features.slice(0, 3).map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2 text-xs">
-                              <Check className="w-3 h-3 text-accent shrink-0 mt-0.5" />
-                              <span className="line-clamp-1">{feature}</span>
-                            </li>
-                          ))}
-                          {tier.features.length > 3 && (
-                            <li className="text-xs text-muted-foreground text-center">
-                              +{tier.features.length - 3} more
-                            </li>
-                          )}
-                        </ul>
-                        
-                        <Button 
-                          variant="premium" 
-                          className="w-full text-xs"
-                          size="sm"
-                          onClick={() => handleSubscribe(tier.id)}
-                        >
-                          Subscribe
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-            
-            {/* Desktop: Stacked layout */}
-            <div className="hidden lg:block space-y-4">
-              {creator.tiers.map((tier) => (
-                <Card key={tier.id} className="bg-gradient-card border-border/50">
-                  <CardContent className="p-4 lg:p-6">
-                    <div className="space-y-3 lg:space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-base lg:text-lg font-semibold">{tier.name}</h3>
-                        <div className="text-right">
-                          <div className="text-lg lg:text-2xl font-bold text-accent">${tier.price}</div>
-                          <div className="text-xs lg:text-sm text-muted-foreground">per month</div>
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs lg:text-sm text-muted-foreground">{tier.description}</p>
-                      
-                      <ul className="space-y-1 lg:space-y-2">
-                        {tier.features.map((feature, index) => (
-                          <li key={index} className="flex items-center gap-2 text-xs lg:text-sm">
-                            <Check className="w-3 h-3 lg:w-4 lg:h-4 text-accent shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <Button 
-                        variant="premium" 
-                        className="w-full"
-                        onClick={() => handleSubscribe(tier.id)}
-                      >
-                        Subscribe
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    
+                    <p className="text-sm text-muted-foreground">{tier.description}</p>
+                    
+                    <ul className="space-y-2">
+                      {tier.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2 text-sm">
+                          <Check className="w-4 h-4 text-accent" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Button 
+                      variant="premium" 
+                      className="w-full"
+                      onClick={() => handleSubscribe(tier.id)}
+                    >
+                      Subscribe
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
