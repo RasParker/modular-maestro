@@ -824,7 +824,7 @@ export const CreatorProfile: React.FC = () => {
                   }}
                 />
                 
-                {/* Main Media */}
+                {/* Main Media with object-contain */}
                 {selectedContent.media_urls?.[0] ? (
                   selectedContent.media_type === 'video' ? (
                     <video 
@@ -839,6 +839,7 @@ export const CreatorProfile: React.FC = () => {
                       src={selectedContent.media_urls[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls[0]}`}
                       alt={selectedContent.title}
                       className="relative z-10 w-full h-full object-contain"
+                      style={{ objectFit: 'contain' }}
                     />
                   )
                 ) : (
