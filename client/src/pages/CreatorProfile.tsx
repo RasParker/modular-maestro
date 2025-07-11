@@ -149,6 +149,8 @@ export const CreatorProfile: React.FC = () => {
   const [editingPost, setEditingPost] = useState<any | null>(null);
   const [editCaption, setEditCaption] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [creator, setCreator] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   // Function to fetch user's posts from database
@@ -260,7 +262,6 @@ export const CreatorProfile: React.FC = () => {
   }, [username]); // Remove user dependency to prevent infinite loops
 
   // Fetch user data from database
-  const [creator, setCreator] = useState(null);
 
   // Separate useEffect for fetching user posts
   useEffect(() => {
