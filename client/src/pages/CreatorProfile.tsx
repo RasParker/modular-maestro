@@ -261,10 +261,10 @@ export const CreatorProfile: React.FC = () => {
 
   // Separate useEffect for fetching user posts
   useEffect(() => {
-    if (user && user.username === username) {
-      fetchUserPosts(user.id);
+    if (creator && creator.id) {
+      fetchUserPosts(creator.id);
     }
-  }, [user?.id, username]); // Only depend on user.id and username
+  }, [creator?.id]); // Fetch posts for the profile being viewed
 
   // Fetch user data from database
   const [creator, setCreator] = useState(null);
@@ -627,9 +627,9 @@ export const CreatorProfile: React.FC = () => {
             {/* Recent Posts Preview */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-              {(creator.recentPosts.length > 0 || userPosts.length > 0) ? (
+              {userPosts.length > 0 ? (
                 <div className="space-y-6">
-                  {(userPosts.length > 0 ? userPosts : creator.recentPosts).map((post) => (
+                  {userPosts.map((post) => (
                     <Card key={post.id} className="bg-gradient-card border-border/50">
                       <CardContent className="p-0">
                         <div className="p-4 pb-2">
