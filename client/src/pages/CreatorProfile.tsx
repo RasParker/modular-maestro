@@ -520,10 +520,10 @@ export const CreatorProfile: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
         </div>
         
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
+          <div className="max-w-4xl mx-auto">
             {/* Mobile Layout */}
-            <div className="sm:hidden flex flex-col items-center text-center space-y-4">
+            <div className="sm:hidden flex flex-col items-center text-center space-y-3">
               <Avatar className="w-20 h-20 border-4 border-background">
                 <AvatarImage src={creator.avatar} alt={creator.username} />
                 <AvatarFallback className="text-xl">{creator.display_name.charAt(0)}</AvatarFallback>
@@ -531,9 +531,9 @@ export const CreatorProfile: React.FC = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground">{creator.display_name}</h1>
+                  <h1 className="text-xl font-bold text-foreground">{creator.display_name}</h1>
                   {creator.verified && (
-                    <Badge variant="secondary" className="bg-accent text-accent-foreground text-xs">
+                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
                       <Star className="w-3 h-3 mr-1" />
                       Verified
                     </Badge>
@@ -547,34 +547,30 @@ export const CreatorProfile: React.FC = () => {
               </div>
               
               {isOwnProfile && (
-                <div className="flex flex-col sm:flex-row w-full gap-2 max-w-sm">
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
+                <div className="flex flex-col w-full gap-2 max-w-xs">
+                  <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/settings">
                       <Settings className="w-4 h-4 mr-2" />
-                      <span className="hidden xs:inline">Edit Profile</span>
-                      <span className="xs:hidden">Edit</span>
+                      Edit Profile
                     </Link>
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link to="/creator/upload">
-                      <span className="hidden xs:inline">Create Post</span>
-                      <span className="xs:hidden">Create</span>
-                    </Link>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/upload">Create Post</Link>
                   </Button>
                 </div>
               )}
             </div>
             
             {/* Desktop Layout */}
-            <div className="hidden sm:flex items-end gap-4 lg:gap-6">
-              <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-background">
+            <div className="hidden sm:flex items-end gap-4">
+              <Avatar className="w-24 h-24 border-4 border-background">
                 <AvatarImage src={creator.avatar} alt={creator.username} />
-                <AvatarFallback className="text-xl sm:text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
               </Avatar>
               
               <div className="flex-1 pb-2">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">{creator.display_name}</h1>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-2xl font-bold text-foreground">{creator.display_name}</h1>
                   {creator.verified && (
                     <Badge variant="secondary" className="bg-accent text-accent-foreground">
                       <Star className="w-3 h-3 mr-1" />
@@ -582,13 +578,13 @@ export const CreatorProfile: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-                <p className="text-muted-foreground text-sm sm:text-base">@{creator.username}</p>
+                <p className="text-muted-foreground">@{creator.username}</p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Users className="w-4 h-4" />
                   {creator.subscribers.toLocaleString()} subscribers
                 </div>
                 {isOwnProfile && (
-                  <div className="flex items-center gap-2 mt-3">
+                  <div className="flex items-center gap-2 mt-2">
                     <Button variant="outline" size="sm" asChild>
                       <Link to="/creator/settings">
                         <Settings className="w-4 h-4 mr-2" />
@@ -607,7 +603,7 @@ export const CreatorProfile: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-8">
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -638,10 +634,10 @@ export const CreatorProfile: React.FC = () => {
                   {(userPosts.length > 0 ? userPosts : creator.recentPosts).map((post) => (
                     <Card key={post.id} className="bg-gradient-card border-border/50">
                       <CardContent className="p-0">
-                        <div className="p-4 sm:p-6 pb-2">
+                        <div className="p-3 sm:p-4 pb-2">
                           {/* Mobile Layout */}
                           <div className="sm:hidden">
-                            <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center gap-3 mb-3">
                               <Avatar className="h-10 w-10">
                                 <AvatarImage src={creator.avatar} alt={creator.username} />
                                 <AvatarFallback className="text-sm">{creator.display_name.charAt(0)}</AvatarFallback>
@@ -654,7 +650,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.media_type || post.mediaType}
                               </Badge>
                             </div>
-                            <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center justify-between">
                               <Badge variant="outline" className="text-xs">
                                 {post.tier === 'public' ? 'Free' : 
                                  post.tier === 'supporter' ? 'Supporter' :
@@ -776,7 +772,7 @@ export const CreatorProfile: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted/50"
+                                className="text-muted-foreground h-8 w-8 p-0"
                                 onClick={() => handleShare(post.id)}
                               >
                                 <Share2 className="w-4 h-4" />
@@ -786,7 +782,7 @@ export const CreatorProfile: React.FC = () => {
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted/50"
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
                                     onClick={() => handleEdit(post.id)}
                                   >
                                     <Edit className="w-4 h-4" />
@@ -794,7 +790,7 @@ export const CreatorProfile: React.FC = () => {
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600"
+                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
                                     onClick={() => handleDelete(post.id)}
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -838,29 +834,29 @@ export const CreatorProfile: React.FC = () => {
           </div>
 
           {/* Subscription Tiers */}
-          <div className="space-y-4 lg:space-y-6">
+          <div className="space-y-4">
             <h2 className="text-lg sm:text-xl font-semibold">Subscription Tiers</h2>
             
             {/* Mobile: Horizontal scroll */}
             <div className="sm:hidden">
-              <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory">
+              <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6">
                 {creator.tiers.map((tier) => (
-                  <Card key={tier.id} className="bg-gradient-card border-border/50 min-w-[280px] max-w-[280px] shrink-0 snap-start">
+                  <Card key={tier.id} className="bg-gradient-card border-border/50 min-w-[280px] shrink-0">
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="text-center">
-                          <h3 className="text-base font-semibold">{tier.name}</h3>
-                          <div className="text-xl font-bold text-accent">${tier.price}</div>
-                          <div className="text-xs text-muted-foreground">per month</div>
+                          <h3 className="text-lg font-semibold">{tier.name}</h3>
+                          <div className="text-2xl font-bold text-accent">${tier.price}</div>
+                          <div className="text-sm text-muted-foreground">per month</div>
                         </div>
                         
-                        <p className="text-xs text-muted-foreground text-center line-clamp-2">{tier.description}</p>
+                        <p className="text-sm text-muted-foreground text-center">{tier.description}</p>
                         
                         <ul className="space-y-2">
                           {tier.features.slice(0, 3).map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2 text-xs">
-                              <Check className="w-3 h-3 text-accent shrink-0 mt-0.5" />
-                              <span className="line-clamp-2">{feature}</span>
+                            <li key={index} className="flex items-center gap-2 text-sm">
+                              <Check className="w-4 h-4 text-accent shrink-0" />
+                              <span className="line-clamp-1">{feature}</span>
                             </li>
                           ))}
                           {tier.features.length > 3 && (

@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom breakpoint for extra small screens */
-@media (min-width: 475px) {
-  .xs\:inline {
-    display: inline;
-  }
-  .xs\:hidden {
-    display: none;
-  }
-}
-
 /* Line clamp utilities for text truncation */
 @layer utilities {
   .line-clamp-2 {
