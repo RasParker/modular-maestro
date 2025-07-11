@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
-import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2, Camera, Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export const CreatorSettings: React.FC = () => {
@@ -33,6 +33,28 @@ export const CreatorSettings: React.FC = () => {
       description: "Please check your email for confirmation instructions.",
       variant: "destructive",
     });
+  };
+
+  const handleProfilePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('Uploading profile photo:', file.name);
+      toast({
+        title: "Profile photo updated",
+        description: "Your profile photo has been updated successfully.",
+      });
+    }
+  };
+
+  const handleCoverPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('Uploading cover photo:', file.name);
+      toast({
+        title: "Cover photo updated",
+        description: "Your cover photo has been updated successfully.",
+      });
+    }
   };
 
   return (
@@ -78,15 +100,63 @@ export const CreatorSettings: React.FC = () => {
                     Update your public profile information
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center">
-                      <span className="text-xl font-bold text-primary-foreground">AA</span>
+                <CardContent className="space-y-6">
+                  {/* Cover Photo Section */}
+                  <div className="space-y-3">
+                    <Label>Cover Photo</Label>
+                    <div className="relative">
+                      <div className="w-full h-32 rounded-lg bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center border-2 border-dashed border-border">
+                        <span className="text-sm text-muted-foreground">Cover Photo Preview</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCoverPhotoUpload}
+                        className="hidden"
+                        id="cover-upload"
+                      />
+                      <label htmlFor="cover-upload">
+                        <Button variant="outline" size="sm" className="absolute bottom-2 right-2 cursor-pointer" asChild>
+                          <span>
+                            <Image className="w-4 h-4 mr-2" />
+                            Change Cover
+                          </span>
+                        </Button>
+                      </label>
                     </div>
-                    <Button variant="outline">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Change Photo
-                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Recommended size: 800x300px. Max file size: 5MB
+                    </p>
+                  </div>
+
+                  {/* Profile Photo Section */}
+                  <div className="space-y-3">
+                    <Label>Profile Photo</Label>
+                    <div className="flex items-center gap-6">
+                      <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center">
+                        <span className="text-xl font-bold text-primary-foreground">AA</span>
+                      </div>
+                      <div className="space-y-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePhotoUpload}
+                          className="hidden"
+                          id="profile-upload"
+                        />
+                        <label htmlFor="profile-upload">
+                          <Button variant="outline" className="cursor-pointer" asChild>
+                            <span>
+                              <Camera className="w-4 h-4 mr-2" />
+                              Change Photo
+                            </span>
+                          </Button>
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                          Square image recommended. Max file size: 5MB
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">

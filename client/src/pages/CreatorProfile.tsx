@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Star, Users, DollarSign, Check, Edit2, Camera, Save, X, Upload } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings } from 'lucide-react';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -124,18 +120,10 @@ const MOCK_CREATORS = {
 export const CreatorProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
-  const { toast } = useToast();
   
   // In real app, would fetch creator data based on username
   const creator = username ? MOCK_CREATORS[username.toLowerCase() as keyof typeof MOCK_CREATORS] : null;
   const isOwnProfile = user?.username === username;
-  
-  // Edit states
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [isEditingDisplayName, setIsEditingDisplayName] = useState(false);
-  const [editedBio, setEditedBio] = useState(creator?.bio || '');
-  const [editedDisplayName, setEditedDisplayName] = useState(creator?.display_name || '');
-  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
 
   if (!creator) {
     return (
@@ -159,51 +147,6 @@ export const CreatorProfile: React.FC = () => {
     }
     // Handle subscription logic
     console.log(`Subscribing to tier ${tierId}`);
-  };
-
-  const handleSaveBio = () => {
-    // In real app, make API call to update bio
-    console.log('Saving bio:', editedBio);
-    setIsEditingBio(false);
-    toast({
-      title: "Bio updated",
-      description: "Your bio has been updated successfully.",
-    });
-  };
-
-  const handleSaveDisplayName = () => {
-    // In real app, make API call to update display name
-    console.log('Saving display name:', editedDisplayName);
-    setIsEditingDisplayName(false);
-    toast({
-      title: "Display name updated", 
-      description: "Your display name has been updated successfully.",
-    });
-  };
-
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // In real app, upload to server and update avatar
-      console.log('Uploading photo:', file.name);
-      setIsPhotoDialogOpen(false);
-      toast({
-        title: "Photo uploaded",
-        description: "Your profile photo has been updated successfully.",
-      });
-    }
-  };
-
-  const handleCoverUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // In real app, upload to server and update cover
-      console.log('Uploading cover:', file.name);
-      toast({
-        title: "Cover photo updated",
-        description: "Your cover photo has been updated successfully.",
-      });
-    }
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -233,86 +176,14 @@ export const CreatorProfile: React.FC = () => {
         
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <div className="relative">
-              <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={creator.avatar} alt={creator.username} />
-                <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              {isOwnProfile && (
-                <Dialog open={isPhotoDialogOpen} onOpenChange={setIsPhotoDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      size="sm" 
-                      className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 bg-primary"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Update Profile Photo</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoUpload}
-                          className="hidden"
-                          id="avatar-upload"
-                        />
-                        <label htmlFor="avatar-upload">
-                          <Button variant="outline" className="w-full cursor-pointer" asChild>
-                            <span>
-                              <Upload className="w-4 h-4 mr-2" />
-                              Choose Photo
-                            </span>
-                          </Button>
-                        </label>
-                      </div>
-                      <p className="text-sm text-muted-foreground text-center">
-                        Upload a square image for best results (max 5MB)
-                      </p>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
+            <Avatar className="w-24 h-24 border-4 border-background">
+              <AvatarImage src={creator.avatar} alt={creator.username} />
+              <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
+            </Avatar>
             
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
-                {isEditingDisplayName ? (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={editedDisplayName}
-                      onChange={(e) => setEditedDisplayName(e.target.value)}
-                      className="text-2xl font-bold bg-background/80"
-                    />
-                    <Button size="sm" onClick={handleSaveDisplayName}>
-                      <Save className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => {
-                      setEditedDisplayName(creator.display_name);
-                      setIsEditingDisplayName(false);
-                    }}>
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold text-foreground">{editedDisplayName}</h1>
-                    {isOwnProfile && (
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => setIsEditingDisplayName(true)}
-                        className="p-1 h-auto"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                )}
+                <h1 className="text-2xl font-bold text-foreground">{creator.display_name}</h1>
                 {creator.verified && (
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     <Star className="w-3 h-3 mr-1" />
@@ -332,21 +203,12 @@ export const CreatorProfile: React.FC = () => {
               </div>
               {isOwnProfile && (
                 <div className="flex items-center gap-2 mt-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCoverUpload}
-                    className="hidden"
-                    id="cover-upload"
-                  />
-                  <label htmlFor="cover-upload">
-                    <Button variant="outline" size="sm" className="cursor-pointer" asChild>
-                      <span>
-                        <Camera className="w-4 h-4 mr-2" />
-                        Change Cover
-                      </span>
-                    </Button>
-                  </label>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/upload">Create Post</Link>
                   </Button>
@@ -365,41 +227,20 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-xl font-semibold">About</h2>
-                {isOwnProfile && !isEditingBio && (
+                {isOwnProfile && (
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    onClick={() => setIsEditingBio(true)}
+                    asChild
                     className="p-1 h-auto"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Link to="/creator/settings">
+                      <Settings className="w-4 h-4" />
+                    </Link>
                   </Button>
                 )}
               </div>
-              {isEditingBio ? (
-                <div className="space-y-3">
-                  <Textarea
-                    value={editedBio}
-                    onChange={(e) => setEditedBio(e.target.value)}
-                    className="min-h-20"
-                    placeholder="Tell your audience about yourself..."
-                  />
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={handleSaveBio}>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => {
-                      setEditedBio(creator.bio);
-                      setIsEditingBio(false);
-                    }}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground leading-relaxed">{editedBio}</p>
-              )}
+              <p className="text-muted-foreground leading-relaxed">{creator.bio}</p>
             </div>
             
             {/* Recent Posts Preview */}
