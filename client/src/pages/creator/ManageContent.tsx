@@ -449,13 +449,13 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[90vh] max-h-[90vh] w-[90vh] h-[90vh] p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-[95vh] max-h-[95vh] p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View and manage your content</DialogDescription>
           </DialogHeader>
           {selectedContent && (
-            <div className="relative w-full h-full bg-black flex items-center justify-center">
+            <div className="relative bg-black">
               {/* Back Arrow Button */}
               <Button
                 variant="ghost"
@@ -466,41 +466,43 @@ export const ManageContent: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Square container that fills the entire modal - using AspectRatio like postcard */}
-              <div className="relative w-full h-full overflow-hidden">
-                {/* Blurred background layer */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                  style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
-                />
-                {/* Main media content - Square container */}
-                <div className="relative z-10 w-full h-full">
-                  {selectedContent.mediaPreview ? (
-                    selectedContent.type === 'Video' ? (
-                      <video 
-                        src={selectedContent.mediaPreview} 
-                        className="w-full h-full object-contain"
-                        controls
-                        autoPlay
-                        muted
-                      />
-                    ) : (
-                      <img 
-                        src={selectedContent.mediaPreview} 
-                        alt={selectedContent.caption}
-                        className="w-full h-full object-contain"
-                      />
-                    )
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full">
-                      <div className="text-center text-white">
-                        {getTypeIcon(selectedContent.type)}
-                        <p className="mt-2">{selectedContent.type} Content</p>
-                      </div>
+              {/* Use AspectRatio component like the postcard */}
+              <AspectRatio ratio={1} className="overflow-hidden">
+                {selectedContent.mediaPreview ? (
+                  <div className="relative w-full h-full">
+                    {/* Blurred background layer */}
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                      style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
+                    />
+                    {/* Main media content - Square container */}
+                    <div className="relative z-10 w-full h-full">
+                      {selectedContent.type === 'Video' ? (
+                        <video 
+                          src={selectedContent.mediaPreview} 
+                          className="w-full h-full object-contain"
+                          controls
+                          autoPlay
+                          muted
+                        />
+                      ) : (
+                        <img 
+                          src={selectedContent.mediaPreview} 
+                          alt={selectedContent.caption}
+                          className="w-full h-full object-contain"
+                        />
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full bg-gradient-primary/10">
+                    <div className="text-center text-white">
+                      {getTypeIcon(selectedContent.type)}
+                      <p className="mt-2">{selectedContent.type} Content</p>
+                    </div>
+                  </div>
+                )}
+              </AspectRatio>
 
               {/* Vertical Action Icons - Instagram Style */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
