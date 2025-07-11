@@ -129,15 +129,17 @@ export const CreatorProfile: React.FC = () => {
   const [userPosts, setUserPosts] = useState<any[]>([]);
 
   // Function to fetch user's posts from database
-  const fetchUserPosts = async (userId: number) => {
+  const fetchUserPosts = async (userId: string | number) => {
     try {
       const response = await fetch('/api/posts');
       if (response.ok) {
         const allPosts = await response.json();
-        // Filter posts by current user
-        const filteredPosts = allPosts.filter((post: any) => post.creator_id === userId);
+        // Filter posts by current user (convert both to numbers for comparison)
+        const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+        const filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
         setUserPosts(filteredPosts);
         console.log('Fetched user posts:', filteredPosts);
+        console.log('User ID:', userIdNum, 'All posts:', allPosts);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error);
@@ -354,7 +356,7 @@ export const CreatorProfile: React.FC = () => {
                       <div className="flex gap-4">
                         <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                           <img 
-                            src={post.thumbnail} 
+                            src={post.thumbnail || (post.media_urls && post.media_urls[0] ? `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop` : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop')} 
                             alt={post.title}
                             className="w-full h-full object-cover"
                           />
@@ -371,7 +373,7 @@ export const CreatorProfile: React.FC = () => {
                                   {post.tier}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">
-                                  {getTimeAgo(post.createdAt)}
+                                  {getTimeAgo(post.created_at || post.createdAt)}
                                 </span>
                               </div>
                             </div>
@@ -383,8 +385,8 @@ export const CreatorProfile: React.FC = () => {
                         <CreatorPostActions
                           postId={post.id}
                           isOwnPost={true}
-                          likes={post.likes}
-                          comments={post.comments}
+                          likes={post.likes_count || post.likes || 0}
+                          comments={post.comments || []}
                         />
                       )}
                     </CardContent>
