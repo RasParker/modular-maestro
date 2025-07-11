@@ -259,16 +259,16 @@ export const CreatorProfile: React.FC = () => {
     };
   }, [username]); // Remove user dependency to prevent infinite loops
 
+  // Fetch user data from database
+  const [creator, setCreator] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   // Separate useEffect for fetching user posts
   useEffect(() => {
     if (creator && creator.id) {
       fetchUserPosts(creator.id);
     }
   }, [creator?.id]); // Fetch posts for the profile being viewed
-
-  // Fetch user data from database
-  const [creator, setCreator] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCreatorData = async () => {
