@@ -19,8 +19,12 @@ export const CreatorSettings: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
+    localStorage.getItem('profilePhotoUrl')
+  );
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(
+    localStorage.getItem('coverPhotoUrl')
+  );
 
   const handleSave = () => {
     toast({
@@ -61,6 +65,8 @@ export const CreatorSettings: React.FC = () => {
 
         // Update the profile photo URL state
         setProfilePhotoUrl(result.url);
+        // Save to localStorage so it persists across pages
+        localStorage.setItem('profilePhotoUrl', result.url);
 
         toast({
           title: "Profile photo updated",
@@ -100,6 +106,8 @@ export const CreatorSettings: React.FC = () => {
         
         // Update the cover photo URL state
         setCoverPhotoUrl(result.url);
+        // Save to localStorage so it persists across pages
+        localStorage.setItem('coverPhotoUrl', result.url);
 
         toast({
           title: "Cover photo updated",
