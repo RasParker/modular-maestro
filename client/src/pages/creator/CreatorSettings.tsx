@@ -35,10 +35,27 @@ export const CreatorSettings: React.FC = () => {
     });
   };
 
-  const handleProfilePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       console.log('Uploading profile photo:', file.name);
+      // Create FormData to send the file
+      const formData = new FormData();
+      formData.append('profilePhoto', file);
+
+      // Upload to backend
+      const response = await fetch('/api/upload/profile-photo', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      console.log('Upload result:', result);
+
       toast({
         title: "Profile photo updated",
         description: "Your profile photo has been updated successfully.",
@@ -46,10 +63,26 @@ export const CreatorSettings: React.FC = () => {
     }
   };
 
-  const handleCoverPhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverPhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       console.log('Uploading cover photo:', file.name);
+      // Create FormData to send the file
+      const formData = new FormData();
+      formData.append('coverPhoto', file);
+
+      // Upload to backend
+      const response = await fetch('/api/upload/cover-photo', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      console.log('Upload result:', result);
       toast({
         title: "Cover photo updated",
         description: "Your cover photo has been updated successfully.",
@@ -60,7 +93,7 @@ export const CreatorSettings: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -158,7 +191,7 @@ export const CreatorSettings: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
@@ -169,12 +202,12 @@ export const CreatorSettings: React.FC = () => {
                       <Input id="lastName" defaultValue="Art" />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="username">Username</Label>
                     <Input id="username" defaultValue="@akosua-art" />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="bio">Bio</Label>
                     <Textarea 
@@ -183,7 +216,7 @@ export const CreatorSettings: React.FC = () => {
                       rows={3}
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="location">Location</Label>
                     <Input id="location" defaultValue="Accra, Ghana" />
@@ -210,7 +243,7 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                     <Switch id="autoPost" />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="watermark">Add watermark to images</Label>
@@ -220,7 +253,7 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                     <Switch id="watermark" defaultChecked />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="comments">Allow comments</Label>
@@ -230,7 +263,7 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                     <Switch id="comments" defaultChecked />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="defaultTier">Default content tier</Label>
                     <Select defaultValue="free">

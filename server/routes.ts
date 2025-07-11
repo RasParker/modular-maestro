@@ -439,6 +439,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // File upload routes
+  app.post("/api/upload/profile-photo", async (req, res) => {
+    try {
+      // In a real implementation, you would:
+      // 1. Parse multipart form data (using multer or similar)
+      // 2. Validate file type and size
+      // 3. Upload to object storage (Replit Object Storage, AWS S3, etc.)
+      // 4. Save the file URL to the user's profile in the database
+      
+      // For now, simulate successful upload
+      const mockUrl = `https://example.com/uploads/profile-${Date.now()}.jpg`;
+      
+      res.json({ 
+        success: true, 
+        url: mockUrl,
+        message: "Profile photo uploaded successfully" 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to upload profile photo" });
+    }
+  });
+
+  app.post("/api/upload/cover-photo", async (req, res) => {
+    try {
+      // In a real implementation, you would:
+      // 1. Parse multipart form data (using multer or similar)
+      // 2. Validate file type and size
+      // 3. Upload to object storage (Replit Object Storage, AWS S3, etc.)
+      // 4. Save the file URL to the user's profile in the database
+      
+      // For now, simulate successful upload
+      const mockUrl = `https://example.com/uploads/cover-${Date.now()}.jpg`;
+      
+      res.json({ 
+        success: true, 
+        url: mockUrl,
+        message: "Cover photo uploaded successfully" 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to upload cover photo" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
