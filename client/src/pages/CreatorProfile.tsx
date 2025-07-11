@@ -120,10 +120,18 @@ const MOCK_CREATORS = {
 export const CreatorProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [bio, setBio] = useState<string | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
+    () => localStorage.getItem('profilePhotoUrl')
+  );
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(
+    () => localStorage.getItem('coverPhotoUrl')
+  );
+  const [displayName, setDisplayName] = useState<string | null>(
+    () => localStorage.getItem('displayName')
+  );
+  const [bio, setBio] = useState<string | null>(
+    () => localStorage.getItem('bio')
+  );
   const [customTiers, setCustomTiers] = useState<any[]>([]);
   const [profileData, setProfileData] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
@@ -229,7 +237,7 @@ export const CreatorProfile: React.FC = () => {
         if (response.ok) {
           const userData = await response.json();
           console.log('Fetched user data:', userData);
-          // Create creator object with database data and localStorage overrides
+          // Create creator object with localStorage overrides taking priority
           const creatorData = {
             id: userData.id,
             username: userData.username,
@@ -271,7 +279,7 @@ export const CreatorProfile: React.FC = () => {
     };
 
     fetchCreatorData();
-  }, [username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers, userPosts]);
+  }, [username, displayName, bio, customTiers, userPosts]);
   const isOwnProfile = user?.username === username;
 
   if (loading) {
