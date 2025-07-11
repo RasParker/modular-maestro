@@ -140,17 +140,46 @@ export const FanSettings: React.FC = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (deleteConfirmation === 'DELETE') {
-      toast({
-        title: "Account deleted",
-        description: "Your account has been permanently deleted.",
-        variant: "destructive",
-      });
-      setIsDeleteDialogOpen(false);
-      setDeleteConfirmation('');
-      // Here you would typically call your API to delete the account
-      // and then redirect to login or home page
+      try {
+        // Call the backend API to delete the account
+        const response = await fetch(`/api/users/${user?.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete account');
+        }
+
+        toast({
+          title: "Account deleted",
+          description: "Your account has been permanently deleted.",
+          variant: "destructive",
+        });
+
+        setIsDeleteDialogOpen(false);
+        setDeleteConfirmation('');
+
+        // Clear user data and logout
+        localStorage.clear();
+        
+        // Redirect to home page after a brief delay
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        toast({
+          title: "Deletion failed",
+          description: "Failed to delete account. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

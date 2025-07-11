@@ -161,6 +161,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      // Check if user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Delete user account (this would typically cascade delete related data)
+      const deleted = await storage.deleteUser(userId);
+      
+      if (!deleted) {
+        return res.status(500).json({ error: "Failed to delete account" });
+      }
+
+      res.json({ success: true, message: "Account deleted successfully" });
+    } catch (error) {
+      console.error('Delete user error:', error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
+  });
+
   // Post routes
   app.get("/api/posts", async (req, res) => {
     try {

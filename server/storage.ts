@@ -33,20 +33,21 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
   verifyPassword(password: string, hashedPassword: string): Promise<boolean>;
-  
+  deleteUser(id: number): Promise<boolean>;
+
   // Post methods
   getPosts(): Promise<Post[]>;
   getPost(id: number): Promise<Post | undefined>;
   createPost(post: InsertPost): Promise<Post>;
   updatePost(id: number, updates: Partial<Post>): Promise<Post | undefined>;
   deletePost(id: number): Promise<boolean>;
-  
+
   // Comment methods
   getComments(postId: number): Promise<Comment[]>;
   getComment(id: number): Promise<Comment | undefined>;
   createComment(comment: InsertComment): Promise<Comment>;
   deleteComment(id: number): Promise<boolean>;
-  
+
   // Like methods
   likePost(postId: number, userId: number): Promise<boolean>;
   unlikePost(postId: number, userId: number): Promise<boolean>;
@@ -54,23 +55,23 @@ export interface IStorage {
   likeComment(commentId: number, userId: number): Promise<boolean>;
   unlikeComment(commentId: number, userId: number): Promise<boolean>;
   isCommentLiked(commentId: number, userId: number): Promise<boolean>;
-  
+
   // Subscription system methods
   getSubscriptionTiers(creatorId: number): Promise<SubscriptionTier[]>;
   getSubscriptionTier(id: number): Promise<SubscriptionTier | undefined>;
   createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier>;
   updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined>;
   deleteSubscriptionTier(id: number): Promise<boolean>;
-  
+
   getSubscriptions(userId: number): Promise<Subscription[]>;
   getSubscription(id: number): Promise<Subscription | undefined>;
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription | undefined>;
   cancelSubscription(id: number): Promise<boolean>;
-  
+
   getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<Subscription | undefined>;
   getCreatorSubscribers(creatorId: number): Promise<Subscription[]>;
-  
+
   // Payment methods
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]>;
@@ -96,7 +97,7 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(insertUser.password, 10);
-    
+
     const [user] = await db
       .insert(users)
       .values({
@@ -109,12 +110,12 @@ export class DatabaseStorage implements IStorage {
 
   async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
     const updateData = { ...updates, updated_at: new Date() };
-    
+
     // If password is being updated, hash it
     if (updates.password) {
       updateData.password = await bcrypt.hash(updates.password, 10);
     }
-    
+
     const [user] = await db
       .update(users)
       .set(updateData)
@@ -125,6 +126,35 @@ export class DatabaseStorage implements IStorage {
 
   async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
     return await bcrypt.compare(password, hashedPassword);
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      // Delete user's posts first (due to foreign key constraints)
+      await db.delete(posts).where(eq(posts.creator_id, id));
+
+      // Delete user's comments
+      await db.delete(comments).where(eq(comments.user_id, id));
+
+      // Delete user's likes
+      await db.delete(post_likes).where(eq(post_likes.user_id, id));
+      await db.delete(comment_likes).where(eq(comment_likes.user_id, id));
+
+      // Delete user's subscriptions
+      await db.delete(subscriptions).where(eq(subscriptions.fan_id, id));
+      await db.delete(subscriptions).where(eq(subscriptions.creator_id, id));
+
+      // Delete user's subscription tiers
+      await db.delete(subscription_tiers).where(eq(subscription_tiers.creator_id, id));
+
+      // Finally delete the user
+      const result = await db.delete(users).where(eq(users.id, id));
+
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error('Delete user error:', error);
+      return false;
+    }
   }
 
   async getPosts(): Promise<Post[]> {
@@ -290,7 +320,7 @@ export class DatabaseStorage implements IStorage {
       .insert(subscriptions)
       .values(subscription)
       .returning();
-    
+
     // Update creator's subscriber count
     await db
       .update(users)
@@ -299,7 +329,7 @@ export class DatabaseStorage implements IStorage {
         updated_at: new Date()
       })
       .where(eq(users.id, subscription.creator_id));
-    
+
     return newSubscription;
   }
 
@@ -322,7 +352,7 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(subscriptions.id, id))
       .returning();
-    
+
     if (subscription) {
       // Update creator's subscriber count
       await db
@@ -333,7 +363,7 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(users.id, subscription.creator_id));
     }
-    
+
     return !!subscription;
   }
 

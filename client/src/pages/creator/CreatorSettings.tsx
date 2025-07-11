@@ -13,6 +13,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2, Camera, Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { setLocalStorageItem, getLocalStorageItem } from '@/lib/storage-utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
@@ -32,6 +33,7 @@ export const CreatorSettings: React.FC = () => {
   const [bio, setBio] = useState<string>(
     getLocalStorageItem('bio') || ''
   );
+  const [open, setOpen] = useState(false);
 
   const handleSave = () => {
     // Save display name and bio to localStorage
@@ -39,29 +41,50 @@ export const CreatorSettings: React.FC = () => {
       console.log('Saving display name:', displayName);
       setLocalStorageItem('displayName', displayName.trim());
     }
-    
+
     if (bio.trim()) {
       setLocalStorageItem('bio', bio.trim());
     }
-    
+
     // Dispatch custom event to trigger reactivity
     console.log('Dispatching localStorageChange event for displayName and bio');
     window.dispatchEvent(new CustomEvent('localStorageChange', {
       detail: { keys: ['displayName', 'bio'] }
     }));
-    
+
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully.",
     });
   };
 
-  const handleDeleteAccount = () => {
-    toast({
-      title: "Account deletion requested",
-      description: "Please check your email for confirmation instructions.",
-      variant: "destructive",
-    });
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Account deletion failed');
+      }
+
+      // Handle successful account deletion (e.g., redirect to logout)
+      toast({
+        title: "Account deleted",
+        description: "Your account has been successfully deleted.",
+      });
+      // Redirect to logout or another appropriate page
+      window.location.href = '/logout'; // Replace '/logout' with your actual logout route
+    } catch (error: any) {
+      toast({
+        title: "Deletion failed",
+        description: error.message || "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +154,7 @@ export const CreatorSettings: React.FC = () => {
 
         const result = await response.json();
         console.log('Upload result:', result);
-        
+
         // Update the cover photo URL state
         setCoverPhotoUrl(result.url);
         // Save to localStorage so it persists across pages
@@ -589,9 +612,24 @@ export const CreatorSettings: React.FC = () => {
                             Permanently delete your account and all data
                           </p>
                         </div>
-                        <Button variant="destructive" onClick={handleDeleteAccount}>
-                          Delete Account
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive">Delete Account</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your account
+                                and remove your data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleDeleteAccount}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>
@@ -604,3 +642,6 @@ export const CreatorSettings: React.FC = () => {
     </div>
   );
 };
+```
+
+**Final Answer:** The code has been updated to include an alert dialog for confirming account deletion and the `handleDeleteAccount` function now sends a request to the `/api/delete-account` endpoint.
