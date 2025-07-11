@@ -384,7 +384,14 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleContentClick = (post: any) => {
-    setSelectedContent(post);
+    // Transform the post data to match the content manager modal structure
+    const modalData = {
+      ...post,
+      mediaPreview: post.media_urls?.[0]?.startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls?.[0]}`,
+      type: post.media_type === 'image' ? 'Image' : post.media_type === 'video' ? 'Video' : 'Text',
+      caption: post.content || post.title
+    };
+    setSelectedContent(modalData);
     setIsModalOpen(true);
   };
 
@@ -799,7 +806,7 @@ export const CreatorProfile: React.FC = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
-            <DialogTitle>{selectedContent?.media_type} Content</DialogTitle>
+            <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content</DialogDescription>
           </DialogHeader>
           {selectedContent && (
@@ -820,15 +827,15 @@ export const CreatorProfile: React.FC = () => {
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
                   style={{
-                    backgroundImage: `url(${selectedContent.media_urls?.[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls?.[0]}`})`,
+                    backgroundImage: `url(${selectedContent.mediaPreview})`,
                   }}
                 />
                 
-                {/* Main Media with object-contain */}
-                {selectedContent.media_urls?.[0] ? (
-                  selectedContent.media_type === 'video' ? (
+                {/* Main Media */}
+                {selectedContent.mediaPreview ? (
+                  selectedContent.type === 'Video' ? (
                     <video 
-                      src={selectedContent.media_urls[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls[0]}`}
+                      src={selectedContent.mediaPreview} 
                       className="relative z-10 w-full h-full object-contain"
                       controls
                       autoPlay
@@ -836,17 +843,16 @@ export const CreatorProfile: React.FC = () => {
                     />
                   ) : (
                     <img 
-                      src={selectedContent.media_urls[0]?.startsWith('/uploads/') ? selectedContent.media_urls[0] : `/uploads/${selectedContent.media_urls[0]}`}
-                      alt={selectedContent.title}
+                      src={selectedContent.mediaPreview} 
+                      alt={selectedContent.caption}
                       className="relative z-10 w-full h-full object-contain"
-                      style={{ objectFit: 'contain' }}
                     />
                   )
                 ) : (
                   <div className="flex items-center justify-center w-full h-full">
                     <div className="text-center text-white">
-                      {getTypeIcon(selectedContent.media_type || 'text')}
-                      <p className="mt-2">{selectedContent.media_type || 'Text'} Content</p>
+                      {getTypeIcon(selectedContent.type)}
+                      <p className="mt-2">{selectedContent.type} Content</p>
                     </div>
                   </div>
                 )}
