@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -9,6 +10,14 @@ import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscrip
 import { db } from './db';
 import { users, posts, comments, likes, subscriptions, subscription_tiers } from '../shared/schema';
 import { eq } from 'drizzle-orm';
+
+// Extend Express session interface
+declare module 'express-session' {
+  interface SessionData {
+    userId?: number;
+    user?: any;
+  }
+}
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -44,6 +53,18 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure session middleware
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true in production with HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  }));
+
   // Serve uploaded files statically
   app.use('/uploads', express.static(uploadsDir));
   // Authentication routes
@@ -85,6 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (password === 'demo123') {
         const demoUser = DEMO_USERS.find(u => u.email === email);
         if (demoUser) {
+          // Set session data
+          req.session.userId = demoUser.id;
+          req.session.user = demoUser;
           return res.json({ user: demoUser });
         }
       }
@@ -102,6 +126,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { password: _, ...userWithoutPassword } = user;
+      
+      // Set session data
+      req.session.userId = user.id;
+      req.session.user = userWithoutPassword;
+      
       res.json({ user: userWithoutPassword });
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
@@ -134,6 +163,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(validatedData);
       const { password: _, ...userWithoutPassword } = user;
+      
+      // Set session data
+      req.session.userId = user.id;
+      req.session.user = userWithoutPassword;
+      
       res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error('Registration error:', error);
