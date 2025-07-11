@@ -7,7 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -135,6 +137,9 @@ export const CreatorProfile: React.FC = () => {
   const [customTiers, setCustomTiers] = useState<any[]>([]);
   const [profileData, setProfileData] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [selectedContent, setSelectedContent] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedModalCaption, setExpandedModalCaption] = useState(false);
 
   // Function to fetch user's posts from database
   const fetchUserPosts = async (userId: string | number) => {
@@ -332,6 +337,47 @@ export const CreatorProfile: React.FC = () => {
     return `${Math.floor(diffInHours / 24)}d ago`;
   };
 
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'image':
+        return <Image className="w-4 h-4" />;
+      case 'video':
+        return <Video className="w-4 h-4" />;
+      case 'text':
+        return <FileText className="w-4 h-4" />;
+      default:
+        return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case 'public':
+        return 'outline';
+      case 'supporter':
+        return 'secondary';
+      case 'fan':
+        return 'secondary';
+      case 'premium':
+        return 'default';
+      case 'superfan':
+        return 'default';
+      default:
+        return 'outline';
+    }
+  };
+
+  const handleContentClick = (post: any) => {
+    setSelectedContent(post);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedContent(null);
+    setExpandedModalCaption(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -419,69 +465,164 @@ export const CreatorProfile: React.FC = () => {
             {/* Recent Posts Preview */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-              <div className="space-y-4">
-                {creator.recentPosts.map((post) => (
-                  <Card key={post.id} className="bg-gradient-card border-border/50">
-                    <CardContent className="p-4">
-                      <div className="flex gap-4">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                          <img 
-                            src={post.thumbnail || (post.media_urls && post.media_urls[0] ? `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop` : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop')} 
-                            alt={post.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <h3 className="font-medium text-foreground truncate">{post.title}</h3>
-                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                {post.content}
-                              </p>
-                              <div className="flex items-center gap-2 mt-2">
-                                <Badge 
-                                  variant={post.tier === 'public' ? 'outline' : 'default'} 
-                                  className={`text-xs ${post.tier === 'premium' ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black' : ''}`}
-                                >
-                                  {post.tier === 'public' ? 'Free' : 
-                                   post.tier === 'supporter' ? 'Supporter' :
-                                   post.tier === 'fan' ? 'Fan' :
-                                   post.tier === 'premium' ? 'Premium' :
-                                   post.tier === 'superfan' ? 'Superfan' : 'Free'}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {getTimeAgo(post.created_at || post.createdAt)}
-                                </span>
-                              </div>
-                            </div>
-                            {post.tier !== 'public' && <DollarSign className="w-4 h-4 text-yellow-500" />}
-                          </div>
+              {creator.recentPosts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {creator.recentPosts.map((post) => (
+                    <div key={post.id} className="rounded-xl border border-border/50 bg-gradient-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
+                      {/* Top Section - Only Tier Badge and Date */}
+                      <div className="p-4 pb-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <Badge variant={getTierColor(post.tier)} className="text-xs">
+                            {post.tier === 'public' ? 'Free' : 
+                             post.tier === 'supporter' ? 'Supporter' :
+                             post.tier === 'fan' ? 'Fan' :
+                             post.tier === 'premium' ? 'Premium' :
+                             post.tier === 'superfan' ? 'Superfan' : 'Free'}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {getTimeAgo(post.created_at || post.createdAt)}
+                          </span>
                         </div>
                       </div>
-                      {isOwnProfile && (
-                        <CreatorPostActions
-                          postId={post.id}
-                          isOwnPost={true}
-                          likes={post.likes_count || post.likes || 0}
-                          comments={post.comments || []}
-                        />
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-                
+
+                      {/* Middle Section - Image Container */}
+                      <div className="px-4 pb-3">
+                        <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
+                          {post.media_urls && post.media_urls[0] ? (
+                            <div 
+                              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                              onClick={() => handleContentClick(post)}
+                              onTouchStart={() => {}} // Enable touch events on iOS
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleContentClick(post);
+                                }
+                              }}
+                            >
+                              {/* Blurred background layer */}
+                              <div 
+                                className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                                style={{ backgroundImage: `url(/uploads/${post.media_urls[0]})` }}
+                              />
+                              {/* Main media content - Square container */}
+                              <div className="relative z-10 w-full h-full">
+                                {post.media_type === 'video' ? (
+                                  <video 
+                                    src={`/uploads/${post.media_urls[0]}`}
+                                    className="w-full h-full object-contain"
+                                    muted
+                                    preload="metadata"
+                                  />
+                                ) : (
+                                  <img 
+                                    src={`/uploads/${post.media_urls[0]}`}
+                                    alt={post.title}
+                                    className="w-full h-full object-contain"
+                                    onError={(e) => {
+                                      // If image fails to load, replace with placeholder
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full h-full object-contain opacity-50";
+                                    }}
+                                  />
+                                )}
+                              </div>
+                              {/* Type indicator overlay */}
+                              <div className="absolute top-2 left-2 z-20">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
+                                  {getTypeIcon(post.media_type)}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div 
+                              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                              onClick={() => handleContentClick(post)}
+                              onTouchStart={() => {}} // Enable touch events on iOS
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleContentClick(post);
+                                }
+                              }}
+                            >
+                              <div className="text-center">
+                                {getTypeIcon(post.media_type || 'text')}
+                                <p className="text-xs text-muted-foreground mt-2">{post.media_type || 'Text'}</p>
+                              </div>
+                            </div>
+                          )}
+                        </AspectRatio>
+                      </div>
+
+                      {/* Caption */}
+                      <div className="px-4 pb-3">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {post.content || post.title}
+                        </p>
+                      </div>
+
+                      {/* Bottom Section */}
+                      <div className="px-4 pb-4">
+                        <div className="flex items-center justify-between">
+                          {/* Left: Stats */}
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Eye className="w-3 h-3" />
+                              <span>0</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Heart className="w-3 h-3" />
+                              <span>{post.likes_count || post.likes || 0}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <MessageSquare className="w-3 h-3" />
+                              <span>{post.comments_count || (post.comments ? post.comments.length : 0)}</span>
+                            </div>
+                          </div>
+
+                          {/* Right: Action Icons (only for own profile) */}
+                          {isOwnProfile && (
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-muted"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-muted"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <Card className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
                     <div className="text-center py-4">
                       <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Subscribe to view more content</h3>
+                      <h3 className="text-lg font-medium mb-2">No posts yet</h3>
                       <p className="text-muted-foreground text-sm">
-                        Subscribe to {creator.display_name} to see their exclusive posts and content.
+                        {isOwnProfile ? 'Start creating content to build your audience.' : `${creator.display_name} hasn't posted any content yet.`}
                       </p>
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              )}
             </div>
           </div>
 
@@ -526,6 +667,121 @@ export const CreatorProfile: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Instagram-style Content Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selectedContent?.media_type} Content</DialogTitle>
+            <DialogDescription>View content</DialogDescription>
+          </DialogHeader>
+          {selectedContent && (
+            <div className="relative w-full h-full bg-black flex items-center justify-center">
+              {/* Back Arrow Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
+                onClick={closeModal}
+              >
+                <ArrowLeft className="w-7 h-7" />
+              </Button>
+
+              {/* Square container that fills the entire modal */}
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Blurred background */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center blur-md scale-110"
+                  style={{
+                    backgroundImage: `url(/uploads/${selectedContent.media_urls?.[0]})`,
+                  }}
+                />
+                
+                {/* Main Media */}
+                {selectedContent.media_urls?.[0] ? (
+                  selectedContent.media_type === 'video' ? (
+                    <video 
+                      src={`/uploads/${selectedContent.media_urls[0]}`}
+                      className="relative z-10 w-full h-full object-contain"
+                      controls
+                      autoPlay
+                      muted
+                    />
+                  ) : (
+                    <img 
+                      src={`/uploads/${selectedContent.media_urls[0]}`}
+                      alt={selectedContent.title}
+                      className="relative z-10 w-full h-full object-contain"
+                    />
+                  )
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="text-center text-white">
+                      {getTypeIcon(selectedContent.media_type || 'text')}
+                      <p className="mt-2">{selectedContent.media_type || 'Text'} Content</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Vertical Action Icons - Instagram Style */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <Heart className="w-7 h-7" />
+                  </div>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                    {selectedContent.likes_count || selectedContent.likes || 0}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <MessageSquare className="w-7 h-7" />
+                  </div>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                    {selectedContent.comments_count || (selectedContent.comments ? selectedContent.comments.length : 0)}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                    <Eye className="w-7 h-7" />
+                  </div>
+                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>0</span>
+                </div>
+              </div>
+
+              {/* Bottom Content Overlay - Instagram style with text shadows */}
+              <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
+                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                  {expandedModalCaption ? (selectedContent.content || selectedContent.title) : (
+                    (selectedContent.content || selectedContent.title).length > 80 ? (
+                      <>
+                        {(selectedContent.content || selectedContent.title).substring(0, 80)}
+                        <span 
+                          className="cursor-pointer text-white/80 hover:text-white ml-1"
+                          onClick={() => setExpandedModalCaption(true)}
+                        >
+                          ...
+                        </span>
+                      </>
+                    ) : (selectedContent.content || selectedContent.title)
+                  )}
+                  {expandedModalCaption && (selectedContent.content || selectedContent.title).length > 80 && (
+                    <span 
+                      className="cursor-pointer text-white/80 hover:text-white ml-2"
+                      onClick={() => setExpandedModalCaption(false)}
+                    >
+                      Show less
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
