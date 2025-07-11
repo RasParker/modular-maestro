@@ -203,12 +203,12 @@ export const ManageContent: React.FC = () => {
                 className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
                 style={{ backgroundImage: `url(${item.mediaPreview})` }}
               />
-              {/* Main media content */}
-              <div className="relative z-10 w-full h-full flex items-center justify-center bg-black/20">
+              {/* Main media content - Square container */}
+              <div className="relative z-10 w-full h-full">
                 {item.type === 'Video' ? (
                   <video 
                     src={item.mediaPreview} 
-                    className="max-w-full max-h-full object-contain"
+                    className="w-full h-full object-contain"
                     muted
                     preload="metadata"
                   />
@@ -216,12 +216,12 @@ export const ManageContent: React.FC = () => {
                   <img 
                     src={item.mediaPreview} 
                     alt={item.caption}
-                    className="max-w-full max-h-full object-contain"
+                    className="w-full h-full object-contain"
                     onError={(e) => {
                       // If image fails to load, replace with placeholder
                       const target = e.target as HTMLImageElement;
                       target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                      target.className = "max-w-full max-h-full object-contain opacity-50";
+                      target.className = "w-full h-full object-contain opacity-50";
                     }}
                   />
                 )}
