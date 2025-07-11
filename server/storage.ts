@@ -86,13 +86,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.username, username));
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return undefined;
+    }
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || undefined;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return undefined;
+    }
   }
 
   async getCreators(): Promise<User[]> {
@@ -100,17 +110,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    // Hash the password before storing
-    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    try {
+      console.log('Creating user with data:', { ...insertUser, password: '[HIDDEN]' });
+      const hashedPassword = await bcrypt.hash(insertUser.password, 10);
 
-    const [user] = await db
-      .insert(users)
-      .values({
-        ...insertUser,
-        password: hashedPassword,
-      })
-      .returning();
-    return user;
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...insertUser,
+          password: hashedPassword,
+        })
+        .returning();
+
+      console.log('User created successfully:', { ...user, password: '[HIDDEN]' });
+      return user;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw new Error('Failed to create user account');
+    }
   }
 
   async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {

@@ -107,24 +107,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/register", async (req, res) => {
     try {
+      console.log('Registration request received:', req.body);
       const validatedData = insertUserSchema.parse(req.body);
       
       // Check if user already exists
-      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
-      if (existingUserByEmail) {
-        return res.status(400).json({ error: "Email already exists" });
+      try {
+        const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
+        if (existingUserByEmail) {
+          return res.status(400).json({ error: "Email already exists" });
+        }
+      } catch (error) {
+        console.log('Email check error (user probably doesn\'t exist):', error);
       }
       
-      const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
-      if (existingUserByUsername) {
-        return res.status(400).json({ error: "Username already exists" });
+      try {
+        const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
+        if (existingUserByUsername) {
+          return res.status(400).json({ error: "Username already exists" });
+        }
+      } catch (error) {
+        console.log('Username check error (user probably doesn\'t exist):', error);
       }
       
       const user = await storage.createUser(validatedData);
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
-      res.status(500).json({ error: "Registration failed" });
+      console.error('Registration error:', error);
+      res.status(500).json({ error: "Registration failed: " + (error instanceof Error ? error.message : 'Unknown error') });
     }
   });
 
