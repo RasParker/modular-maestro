@@ -9,83 +9,112 @@ import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check } from 'lucide-react';
 
-// Mock creator data with recent posts
-const MOCK_CREATOR = {
-  id: '2',
-  username: 'artisticmia',
-  display_name: 'Artistic Mia',
-  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
-  cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
-  bio: 'Digital artist creating stunning fantasy worlds and characters. Join me for exclusive art tutorials, behind-the-scenes content, and early access to my latest creations.',
-  subscribers: 2840,
-  verified: true,
-  tiers: [
-    { 
-      id: '1',
-      name: 'Supporter', 
-      price: 5,
-      description: 'Access to basic content and community posts',
-      features: ['Weekly art posts', 'Community access', 'Behind-the-scenes content']
-    },
-    { 
-      id: '2',
-      name: 'Fan', 
-      price: 15,
-      description: 'Everything in Supporter plus exclusive tutorials',
-      features: ['Everything in Supporter', 'Monthly tutorials', 'Process videos', 'High-res downloads']
-    },
-    { 
-      id: '3',
-      name: 'Superfan', 
-      price: 25,
-      description: 'Ultimate access with personal interaction',
-      features: ['Everything in Fan', 'Direct messaging', '1-on-1 feedback', 'Custom artwork requests']
-    }
-  ],
-  recentPosts: [
-    {
-      id: '1',
-      title: 'New Digital Art Collection',
-      content: 'Check out my latest digital artwork featuring cyberpunk themes...',
-      mediaType: 'image',
-      tier: 'Fan',
-      createdAt: '2024-02-19T10:30:00',
-      thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
-      likes: 24,
-      comments: [
-        {
-          id: '1',
-          author: 'johndoe',
-          content: 'Amazing work! Love the color palette.',
-          time: '1h ago'
-        },
-        {
-          id: '2',
-          author: 'sarahsmith',
-          content: 'This is incredible! How long did it take?',
-          time: '30m ago'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Behind the Scenes Process',
-      content: 'Here\'s how I create my digital masterpieces...',
-      mediaType: 'video',
-      tier: 'Superfan',
-      createdAt: '2024-02-18T15:20:00',
-      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
-      likes: 18,
-      comments: [
-        {
-          id: '3',
-          author: 'mikejones',
-          content: 'Thanks for sharing your process!',
-          time: '2h ago'
-        }
-      ]
-    }
-  ]
+// Mock creators database
+const MOCK_CREATORS = {
+  'artisticmia': {
+    id: '2',
+    username: 'artisticmia',
+    display_name: 'Artistic Mia',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
+    cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
+    bio: 'Digital artist creating stunning fantasy worlds and characters. Join me for exclusive art tutorials, behind-the-scenes content, and early access to my latest creations.',
+    subscribers: 2840,
+    verified: true,
+    tiers: [
+      { 
+        id: '1',
+        name: 'Supporter', 
+        price: 5,
+        description: 'Access to basic content and community posts',
+        features: ['Weekly art posts', 'Community access', 'Behind-the-scenes content']
+      },
+      { 
+        id: '2',
+        name: 'Fan', 
+        price: 15,
+        description: 'Everything in Supporter plus exclusive tutorials',
+        features: ['Everything in Supporter', 'Monthly tutorials', 'Process videos', 'High-res downloads']
+      },
+      { 
+        id: '3',
+        name: 'Superfan', 
+        price: 25,
+        description: 'Ultimate access with personal interaction',
+        features: ['Everything in Fan', 'Direct messaging', '1-on-1 feedback', 'Custom artwork requests']
+      }
+    ],
+    recentPosts: [
+      {
+        id: '1',
+        title: 'New Digital Art Collection',
+        content: 'Check out my latest digital artwork featuring cyberpunk themes...',
+        mediaType: 'image',
+        tier: 'Fan',
+        createdAt: '2024-02-19T10:30:00',
+        thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
+        likes: 24,
+        comments: [
+          {
+            id: '1',
+            author: 'johndoe',
+            content: 'Amazing work! Love the color palette.',
+            time: '1h ago'
+          },
+          {
+            id: '2',
+            author: 'sarahsmith',
+            content: 'This is incredible! How long did it take?',
+            time: '30m ago'
+          }
+        ]
+      },
+      {
+        id: '2',
+        title: 'Behind the Scenes Process',
+        content: 'Here\'s how I create my digital masterpieces...',
+        mediaType: 'video',
+        tier: 'Superfan',
+        createdAt: '2024-02-18T15:20:00',
+        thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+        likes: 18,
+        comments: [
+          {
+            id: '3',
+            author: 'mikejones',
+            content: 'Thanks for sharing your process!',
+            time: '2h ago'
+          }
+        ]
+      }
+    ]
+  },
+  'original badman': {
+    id: '3',
+    username: 'original badman',
+    display_name: 'Original Badman',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
+    bio: 'Welcome to my creative space! I\'m just getting started on this amazing platform. Stay tuned for exciting content coming your way!',
+    subscribers: 0,
+    verified: false,
+    tiers: [
+      { 
+        id: '1',
+        name: 'Supporter', 
+        price: 5,
+        description: 'Support my creative journey',
+        features: ['Access to all posts', 'Community access', 'Monthly updates']
+      },
+      { 
+        id: '2',
+        name: 'Premium', 
+        price: 15,
+        description: 'Get exclusive content and perks',
+        features: ['Everything in Supporter', 'Exclusive content', 'Behind-the-scenes access', 'Priority support']
+      }
+    ],
+    recentPosts: []
+  }
 };
 
 export const CreatorProfile: React.FC = () => {
@@ -93,8 +122,22 @@ export const CreatorProfile: React.FC = () => {
   const { user } = useAuth();
   
   // In real app, would fetch creator data based on username
-  const creator = MOCK_CREATOR;
+  const creator = username ? MOCK_CREATORS[username.toLowerCase() as keyof typeof MOCK_CREATORS] : null;
   const isOwnProfile = user?.username === username;
+
+  if (!creator) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Creator Not Found</h1>
+            <p className="text-muted-foreground">The creator profile you're looking for doesn't exist.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubscribe = (tierId: string) => {
     if (!user) {
