@@ -66,6 +66,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             replies: comment.replies || []
           }));
           setComments(formattedComments);
+          onCommentCountChange(formattedComments.length);
         }
       } catch (error) {
         console.error('Failed to fetch comments:', error);
@@ -315,7 +316,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
                     }}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
-                    style={{ direction: 'ltr', textAlign: 'left' }}
+                    style={{ 
+                      direction: 'ltr', 
+                      textAlign: 'left',
+                      unicodeBidi: 'normal',
+                      writingMode: 'horizontal-tb',
+                      textOrientation: 'mixed'
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                         handleAddReply(comment.id);
@@ -389,7 +396,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
-                style={{ direction: 'ltr', textAlign: 'left' }}
+                style={{ 
+                  direction: 'ltr', 
+                  textAlign: 'left',
+                  unicodeBidi: 'normal',
+                  writingMode: 'horizontal-tb',
+                  textOrientation: 'mixed'
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                     handleAddComment();
