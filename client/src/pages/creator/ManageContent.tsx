@@ -201,25 +201,17 @@ export const ManageContent: React.FC = () => {
               {/* Blurred background layer */}
               <div 
                 className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                style={{ 
-                  backgroundImage: item.type === 'Video' 
-                    ? `linear-gradient(45deg, #1a1a1a, #2d2d2d)` 
-                    : `url(${item.mediaPreview})` 
-                }}
+                style={{ backgroundImage: `url(${item.mediaPreview})` }}
               />
               {/* Main media content */}
               <div className="relative z-10 w-full h-full flex items-center justify-center bg-black/20">
                 {item.type === 'Video' ? (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-blue-900/20">
-                    <div className="text-center">
-                      <div className="relative">
-                        <Video className="w-16 h-16 text-white/90 mx-auto mb-2" />
-                        <div className="absolute inset-0 bg-white/10 rounded-full blur-sm"></div>
-                      </div>
-                      <p className="text-sm text-white/80 font-medium">Video Content</p>
-                      <p className="text-xs text-white/60 mt-1">Click to preview</p>
-                    </div>
-                  </div>
+                  <video 
+                    src={item.mediaPreview} 
+                    className="max-w-full max-h-full object-contain"
+                    muted
+                    preload="metadata"
+                  />
                 ) : (
                   <img 
                     src={item.mediaPreview} 
@@ -480,9 +472,7 @@ export const ManageContent: React.FC = () => {
                 <div 
                   className="absolute inset-0 bg-cover bg-center blur-md scale-110"
                   style={{
-                    backgroundImage: selectedContent.type === 'Video' 
-                      ? `linear-gradient(45deg, #1a1a1a, #2d2d2d)` 
-                      : `url(${selectedContent.mediaPreview})`,
+                    backgroundImage: `url(${selectedContent.mediaPreview})`,
                   }}
                 />
                 
