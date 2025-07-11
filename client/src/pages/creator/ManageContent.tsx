@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,95 +9,92 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-const CONTENT_DATA = [
-  {
-    id: '1',
-    caption: 'Check out my new traditional Ghanaian kente dress! The colors are absolutely stunning...',
-    type: 'Image',
-    tier: 'Basic Support',
-    status: 'Published',
-    date: 'Jun 18, 2025',
-    views: 1234,
-    likes: 89,
-    comments: 12,
-    mediaPreview: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=800&h=800&fit=crop',
-    category: 'Art'
-  },
-  {
-    id: '2',
-    caption: 'Just finished an amazing photoshoot in Accra. The energy was incredible!',
-    type: 'Image',
-    tier: 'Free',
-    status: 'Published',
-    date: 'Jun 18, 2025',
-    views: 987,
-    likes: 156,
-    comments: 23,
-    mediaPreview: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=800&fit=crop',
-    category: 'Fashion'
-  },
-  {
-    id: '3',
-    caption: 'Celebrating the beautiful diversity of Ghana through this vibrant corn display...',
-    type: 'Image',
-    tier: 'Free',
-    status: 'Published',
-    date: 'Jun 18, 2025',
-    views: 2156,
-    likes: 201,
-    comments: 45,
-    mediaPreview: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=800&fit=crop',
-    category: 'Cooking'
-  },
-  {
-    id: '4',
-    caption: 'Weekend vibes are here! Time to celebrate another successful week...',
-    type: 'Image',
-    tier: 'Free',
-    status: 'Published',
-    date: 'Jun 18, 2025',
-    views: 876,
-    likes: 134,
-    comments: 18,
-    mediaPreview: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=800&h=800&fit=crop',
-    category: 'Fitness'
-  },
-  {
-    id: '5',
-    caption: 'Exclusive look at my creative process and workspace setup in Kumasi...',
-    type: 'Video',
-    tier: 'Premium Content',
-    status: 'Scheduled',
-    date: 'Jun 20, 2025',
-    views: 0,
-    likes: 0,
-    comments: 0,
-    mediaPreview: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=800&fit=crop',
-    category: 'Tech'
-  },
-  {
-    id: '6',
-    caption: 'Hey everyone! This week has been amazing with so many exciting projects...',
-    type: 'Text',
-    tier: 'Basic Support',
-    status: 'Draft',
-    date: 'Jun 22, 2025',
-    views: 0,
-    likes: 0,
-    comments: 0,
-    mediaPreview: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&h=800&fit=crop',
-    category: 'Music'
-  }
-];
+interface ContentItem {
+  id: string;
+  caption: string;
+  type: 'Image' | 'Video' | 'Text';
+  tier: string;
+  status: 'Published' | 'Scheduled' | 'Draft';
+  date: string;
+  views: number;
+  likes: number;
+  comments: number;
+  mediaPreview: string | null;
+  category?: string;
+}
 
 export const ManageContent: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [content, setContent] = useState(CONTENT_DATA);
-  const [selectedContent, setSelectedContent] = useState<typeof CONTENT_DATA[0] | null>(null);
+  const { user } = useAuth();
+  const [content, setContent] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
+
+  // Fetch user's posts
+  useEffect(() => {
+    const fetchContent = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const allPosts = await response.json();
+          
+          // Filter posts by current user and transform to match our interface
+          const userPosts = allPosts
+            .filter((post: any) => post.creator_id === parseInt(user.id))
+            .map((post: any) => ({
+              id: post.id.toString(),
+              caption: post.content || post.title,
+              type: post.media_type === 'image' ? 'Image' as const :
+                    post.media_type === 'video' ? 'Video' as const : 'Text' as const,
+              tier: post.tier === 'public' ? 'Free' : 'Basic Support',
+              status: 'Published' as const, // Default to published for now
+              date: new Date(post.created_at).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+              }),
+              views: 0, // Will be implemented later
+              likes: post.likes_count || 0,
+              comments: post.comments_count || 0,
+              mediaPreview: post.media_urls && post.media_urls.length > 0 
+                ? `/uploads/${post.media_urls[0]}` 
+                : null,
+              category: 'General'
+            }));
+          
+          setContent(userPosts);
+          console.log('Fetched user content:', userPosts);
+        }
+      } catch (error) {
+        console.error('Error fetching content:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load your content. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContent();
+    
+    // Listen for new posts
+    const handleNewPost = () => {
+      fetchContent();
+    };
+    
+    window.addEventListener('localStorageChange', handleNewPost);
+    return () => window.removeEventListener('localStorageChange', handleNewPost);
+  }, [user, toast]);
 
   const publishedContent = content.filter(item => item.status === 'Published');
   const scheduledContent = content.filter(item => item.status === 'Scheduled');
@@ -129,7 +126,7 @@ export const ManageContent: React.FC = () => {
     });
   };
 
-  const handleContentClick = (item: typeof CONTENT_DATA[0]) => {
+  const handleContentClick = (item: ContentItem) => {
     setSelectedContent(item);
     setIsModalOpen(true);
   };
@@ -166,7 +163,7 @@ export const ManageContent: React.FC = () => {
     }
   };
 
-  const ContentCard = ({ item }: { item: typeof CONTENT_DATA[0] }) => (
+  const ContentCard = ({ item }: { item: ContentItem }) => (
     <div className="rounded-xl border border-border/50 bg-gradient-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
       {/* Top Section - Only Tier Badge and Date */}
       <div className="p-4 pb-3">
@@ -340,21 +337,26 @@ export const ManageContent: React.FC = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="published" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="published" className="flex items-center gap-2">
-              Published
-              <Badge variant="secondary">{publishedContent.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="scheduled" className="flex items-center gap-2">
-              Scheduled
-              <Badge variant="secondary">{scheduledContent.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="drafts" className="flex items-center gap-2">
-              Drafts
-              <Badge variant="secondary">{draftContent.length}</Badge>
-            </TabsTrigger>
-          </TabsList>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <Tabs defaultValue="published" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="published" className="flex items-center gap-2">
+                Published
+                <Badge variant="secondary">{publishedContent.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="scheduled" className="flex items-center gap-2">
+                Scheduled
+                <Badge variant="secondary">{scheduledContent.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="drafts" className="flex items-center gap-2">
+                Drafts
+                <Badge variant="secondary">{draftContent.length}</Badge>
+              </TabsTrigger>
+            </TabsList>
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (
@@ -419,6 +421,7 @@ export const ManageContent: React.FC = () => {
             )}
           </TabsContent>
         </Tabs>
+        )}
       </div>
 
       {/* Instagram-style Content Modal */}
