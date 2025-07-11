@@ -203,7 +203,7 @@ export const CreatorProfile: React.FC = () => {
       if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
           e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
         updateProfileData();
-        
+
         // Also trigger a re-fetch of creator data to update the UI
         if (username && user?.username === username) {
           const fetchCreatorData = async () => {
@@ -215,7 +215,7 @@ export const CreatorProfile: React.FC = () => {
                 const newCoverPhotoUrl = localStorage.getItem('coverPhotoUrl');
                 const newDisplayName = localStorage.getItem('displayName');
                 const newBio = localStorage.getItem('bio');
-                
+
                 setCreator(prev => prev ? {
                   ...prev,
                   display_name: newDisplayName || userData.display_name || userData.username,
@@ -223,7 +223,7 @@ export const CreatorProfile: React.FC = () => {
                   cover: newCoverPhotoUrl || userData.cover_image || prev.cover,
                   bio: newBio || userData.bio || prev.bio,
                 } : null);
-                
+
                 console.log('Updated creator from storage event:', {
                   profilePhoto: newProfilePhotoUrl,
                   coverPhoto: newCoverPhotoUrl,
@@ -261,7 +261,6 @@ export const CreatorProfile: React.FC = () => {
 
   // Fetch user data from database
   const [creator, setCreator] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Separate useEffect for fetching user posts
   useEffect(() => {
@@ -279,10 +278,10 @@ export const CreatorProfile: React.FC = () => {
         const response = await fetch(`/api/users/username/${username}`);
         if (response.ok) {
           const userData = await response.json();
-          
+
           // For own profile, prioritize localStorage values, otherwise use database values
           const isOwnProfileCheck = user?.username === username;
-          
+
           const creatorData = {
             id: userData.id,
             username: userData.username,
@@ -331,7 +330,7 @@ export const CreatorProfile: React.FC = () => {
     fetchCreatorData();
   }, [username, user?.username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers]); // Include necessary dependencies
 
-  
+
   const isOwnProfile = user?.username === username;
 
   if (loading) {
