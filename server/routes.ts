@@ -222,6 +222,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/posts/:id", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const post = await storage.updatePost(postId, req.body);
+      
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      console.error('Update post error:', error);
+      res.status(500).json({ error: "Failed to update post" });
+    }
+  });
+
   // Comment routes
   app.get("/api/posts/:postId/comments", async (req, res) => {
     try {

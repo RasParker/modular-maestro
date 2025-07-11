@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,7 @@ export const EditPost: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string>('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=400&h=400&fit=crop');
+  const [loadingPost, setLoadingPost] = useState(true);
 
   const [postData, setPostData] = useState({
     description: 'Check out my new traditional Ghanaian kente dress! The colors are absolutely stunning...',
@@ -81,10 +81,23 @@ export const EditPost: React.FC = () => {
     navigate('/creator/manage-content');
   };
 
+  if (loadingPost) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -206,7 +219,7 @@ export const EditPost: React.FC = () => {
                 >
                   Cancel
                 </Button>
-                
+
                 <Button type="submit" disabled={isLoading}>
                   <Save className="w-4 h-4 mr-2" />
                   {isLoading ? "Saving..." : "Save Changes"}
