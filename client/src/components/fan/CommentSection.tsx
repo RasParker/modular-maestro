@@ -39,6 +39,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContents, setReplyContents] = useState<Record<string, string>>({});
+  const [replyInputRefs, setReplyInputRefs] = useState<Record<string, React.RefObject<HTMLTextAreaElement>>>({});
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
@@ -306,9 +307,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 </Avatar>
                 <div className="flex-1 flex gap-2">
                   <Textarea
+                    key={`reply-${comment.id}`}
                     placeholder={`Reply to ${comment.user.username}...`}
                     value={replyContents[comment.id] || ''}
-                    onChange={(e) => setReplyContents(prev => ({ ...prev, [comment.id]: e.target.value }))}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
+                    }}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -319,6 +324,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         setReplyContents(prev => ({ ...prev, [comment.id]: '' }));
                       }
                     }}
+                    autoFocus
                   />
                   <div className="flex flex-col gap-1">
                     <Button
