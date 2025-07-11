@@ -1,14 +1,19 @@
+
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ArrowLeft, Save, Shield, User, Bell, CreditCard, Settings, Eye, Trash2, Camera } from 'lucide-react';
 
 export const FanSettings: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -58,6 +63,13 @@ export const FanSettings: React.FC = () => {
     autoplayVideos: true,
     showPreviews: true,
   });
+
+  const handleSave = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your settings have been updated successfully.",
+    });
+  };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,521 +136,622 @@ export const FanSettings: React.FC = () => {
     }
   };
 
+  const handleDeleteAccount = () => {
+    toast({
+      title: "Account deletion requested",
+      description: "Please check your email for confirmation instructions.",
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground">Manage your account settings and preferences</p>
+        <div className="mb-8">
+          <Button variant="outline" asChild className="mb-4">
+            <Link to="/fan/dashboard">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Link>
+          </Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Fan Settings</h1>
+              <p className="text-muted-foreground">
+                Manage your account preferences and subscription settings
+              </p>
+            </div>
+            <Button onClick={handleSave}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
           </div>
+        </div>
 
-          {/* Profile Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your personal information and profile details
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src={user?.avatar} alt={user?.username} />
-                  <AvatarFallback className="text-lg">
-                    {user?.username?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <Button variant="outline">Change Avatar</Button>
-              </div>
-              
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      value={formData.username}
-                      onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isProfileLoading}>
-                  {isProfileLoading ? "Updating..." : "Update Profile"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+              <TabsTrigger value="privacy">Privacy</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+            </TabsList>
 
-          {/* Password Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>
-                Update your password to keep your account secure
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handlePasswordChange} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={formData.currentPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={formData.newPassword}
-                      onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-                    />
+            <TabsContent value="profile" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Profile Information
+                  </CardTitle>
+                  <CardDescription>
+                    Update your personal information and profile details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <Label>Profile Photo</Label>
+                    <div className="flex items-center gap-6">
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage src={user?.avatar} alt={user?.username} />
+                        <AvatarFallback className="text-xl">
+                          {user?.username?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-2">
+                        <Button variant="outline">
+                          <Camera className="w-4 h-4 mr-2" />
+                          Change Photo
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          Square image recommended. Max file size: 5MB
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isPasswordLoading}>
-                  {isPasswordLoading ? "Updating..." : "Change Password"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  
+                  <form onSubmit={handleProfileUpdate} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          value={formData.username}
+                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button type="submit" disabled={isProfileLoading}>
+                      {isProfileLoading ? "Updating..." : "Update Profile"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
 
-          {/* Notification Preferences */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>
-                Manage how you receive notifications and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive notifications via email
-                    </p>
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Content Preferences</CardTitle>
+                  <CardDescription>
+                    Customize your content viewing experience
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Content Filtering</Label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-background"
+                        value={contentSettings.contentFiltering}
+                        onChange={(e) => setContentSettings(prev => ({ ...prev, contentFiltering: e.target.value }))}
+                      >
+                        <option value="none">No filtering</option>
+                        <option value="moderate">Moderate filtering</option>
+                        <option value="strict">Strict filtering</option>
+                      </select>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Adult Content</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow mature content in your feed
+                        </p>
+                      </div>
+                      <Switch
+                        checked={contentSettings.adultContent}
+                        onCheckedChange={(checked) => 
+                          setContentSettings(prev => ({ ...prev, adultContent: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Autoplay Videos</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Automatically play videos in your feed
+                        </p>
+                      </div>
+                      <Switch
+                        checked={contentSettings.autoplayVideos}
+                        onCheckedChange={(checked) => 
+                          setContentSettings(prev => ({ ...prev, autoplayVideos: checked }))
+                        }
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={preferences.emailNotifications}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, emailNotifications: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive push notifications in your browser
-                    </p>
-                  </div>
-                  <Switch
-                    checked={preferences.pushNotifications}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, pushNotifications: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Content Updates</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when creators you follow post new content
-                    </p>
-                  </div>
-                  <Switch
-                    checked={preferences.contentUpdates}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, contentUpdates: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Promotional Emails</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive emails about new features and promotions
-                    </p>
-                  </div>
-                  <Switch
-                    checked={preferences.promotionalEmails}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({ ...prev, promotionalEmails: checked }))
-                    }
-                  />
-                </div>
-              </div>
-              
-              <Button 
-                onClick={async () => {
-                  setIsPreferencesLoading(true);
-                  try {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    toast({
-                      title: "Preferences saved",
-                      description: "Your notification preferences have been updated.",
-                    });
-                  } catch (error) {
-                    toast({
-                      title: "Save failed",
-                      description: "Failed to save preferences. Please try again.",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setIsPreferencesLoading(false);
-                  }
-                }}
-                disabled={isPreferencesLoading}
-              >
-                {isPreferencesLoading ? "Saving..." : "Save Preferences"}
-              </Button>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Privacy Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Privacy & Visibility</CardTitle>
-              <CardDescription>
-                Control who can see your profile and activity
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Profile Visibility</Label>
-                  <select 
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={privacySettings.profileVisibility}
-                    onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
-                  >
-                    <option value="public">Public - Anyone can view</option>
-                    <option value="subscribers">Subscribers Only</option>
-                    <option value="private">Private - Hidden</option>
-                  </select>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Show in Search Results</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow others to find your profile in search
-                    </p>
+            <TabsContent value="notifications" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="w-5 h-5" />
+                    Notification Preferences
+                  </CardTitle>
+                  <CardDescription>
+                    Manage how you receive notifications and updates
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Email Notifications</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive notifications via email
+                        </p>
+                      </div>
+                      <Switch
+                        checked={preferences.emailNotifications}
+                        onCheckedChange={(checked) => 
+                          setPreferences(prev => ({ ...prev, emailNotifications: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Push Notifications</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive push notifications in your browser
+                        </p>
+                      </div>
+                      <Switch
+                        checked={preferences.pushNotifications}
+                        onCheckedChange={(checked) => 
+                          setPreferences(prev => ({ ...prev, pushNotifications: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Content Updates</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Get notified when creators you follow post new content
+                        </p>
+                      </div>
+                      <Switch
+                        checked={preferences.contentUpdates}
+                        onCheckedChange={(checked) => 
+                          setPreferences(prev => ({ ...prev, contentUpdates: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Promotional Emails</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive emails about new features and promotions
+                        </p>
+                      </div>
+                      <Switch
+                        checked={preferences.promotionalEmails}
+                        onCheckedChange={(checked) => 
+                          setPreferences(prev => ({ ...prev, promotionalEmails: checked }))
+                        }
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={privacySettings.showInSearch}
-                    onCheckedChange={(checked) => 
-                      setPrivacySettings(prev => ({ ...prev, showInSearch: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label>Who can message you</Label>
-                  <select 
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={privacySettings.allowDirectMessages}
-                    onChange={(e) => setPrivacySettings(prev => ({ ...prev, allowDirectMessages: e.target.value }))}
-                  >
-                    <option value="everyone">Everyone</option>
-                    <option value="subscribed">Creators I'm subscribed to</option>
-                    <option value="none">No one</option>
-                  </select>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Show Activity Status</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Let others see when you're online
-                    </p>
-                  </div>
-                  <Switch
-                    checked={privacySettings.showActivity}
-                    onCheckedChange={(checked) => 
-                      setPrivacySettings(prev => ({ ...prev, showActivity: checked }))
-                    }
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Subscription Management */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Subscription Preferences</CardTitle>
-              <CardDescription>
-                Manage your subscription and payment settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto-Renewal</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically renew subscriptions when they expire
-                    </p>
+            <TabsContent value="subscriptions" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Subscription Preferences
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your subscription and payment settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Auto-Renewal</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Automatically renew subscriptions when they expire
+                        </p>
+                      </div>
+                      <Switch
+                        checked={subscriptionSettings.autoRenew}
+                        onCheckedChange={(checked) => 
+                          setSubscriptionSettings(prev => ({ ...prev, autoRenew: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="spendingLimit">Monthly Spending Limit ($)</Label>
+                      <Input
+                        id="spendingLimit"
+                        type="number"
+                        value={subscriptionSettings.monthlySpendingLimit}
+                        onChange={(e) => setSubscriptionSettings(prev => ({ 
+                          ...prev, 
+                          monthlySpendingLimit: parseInt(e.target.value) || 0 
+                        }))}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Set to 0 for no limit
+                      </p>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Renewal Reminders</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Get notified before subscriptions renew
+                        </p>
+                      </div>
+                      <Switch
+                        checked={subscriptionSettings.renewalReminders}
+                        onCheckedChange={(checked) => 
+                          setSubscriptionSettings(prev => ({ ...prev, renewalReminders: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Payment Failure Notifications</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Get alerted when payments fail
+                        </p>
+                      </div>
+                      <Switch
+                        checked={subscriptionSettings.paymentFailureNotifications}
+                        onCheckedChange={(checked) => 
+                          setSubscriptionSettings(prev => ({ ...prev, paymentFailureNotifications: checked }))
+                        }
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={subscriptionSettings.autoRenew}
-                    onCheckedChange={(checked) => 
-                      setSubscriptionSettings(prev => ({ ...prev, autoRenew: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="spendingLimit">Monthly Spending Limit ($)</Label>
-                  <Input
-                    id="spendingLimit"
-                    type="number"
-                    value={subscriptionSettings.monthlySpendingLimit}
-                    onChange={(e) => setSubscriptionSettings(prev => ({ 
-                      ...prev, 
-                      monthlySpendingLimit: parseInt(e.target.value) || 0 
-                    }))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Set to 0 for no limit
-                  </p>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Renewal Reminders</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified before subscriptions renew
-                    </p>
-                  </div>
-                  <Switch
-                    checked={subscriptionSettings.renewalReminders}
-                    onCheckedChange={(checked) => 
-                      setSubscriptionSettings(prev => ({ ...prev, renewalReminders: checked }))
-                    }
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Security Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Security & Login</CardTitle>
-              <CardDescription>
-                Secure your account with additional protection
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Active Subscriptions</CardTitle>
+                  <CardDescription>
+                    Manage your current subscriptions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">CreatorName</p>
+                        <p className="text-xs text-muted-foreground">Premium Tier • $9.99/month</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">Active</Badge>
+                        <Button variant="outline" size="sm">Manage</Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">AnotherCreator</p>
+                        <p className="text-xs text-muted-foreground">Basic Tier • $4.99/month</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">Active</Badge>
+                        <Button variant="outline" size="sm">Manage</Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={securitySettings.twoFactorEnabled}
-                      onCheckedChange={(checked) => 
-                        setSecuritySettings(prev => ({ ...prev, twoFactorEnabled: checked }))
-                      }
-                    />
-                    {!securitySettings.twoFactorEnabled && (
-                      <Button variant="outline" size="sm">
-                        Setup 2FA
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="privacy" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="w-5 h-5" />
+                    Privacy & Visibility
+                  </CardTitle>
+                  <CardDescription>
+                    Control who can see your profile and activity
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Profile Visibility</Label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-background"
+                        value={privacySettings.profileVisibility}
+                        onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
+                      >
+                        <option value="public">Public - Anyone can view</option>
+                        <option value="subscribers">Subscribers Only</option>
+                        <option value="private">Private - Hidden</option>
+                      </select>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Show in Search Results</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow others to find your profile in search
+                        </p>
+                      </div>
+                      <Switch
+                        checked={privacySettings.showInSearch}
+                        onCheckedChange={(checked) => 
+                          setPrivacySettings(prev => ({ ...prev, showInSearch: checked }))
+                        }
+                      />
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-2">
+                      <Label>Who can message you</Label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-background"
+                        value={privacySettings.allowDirectMessages}
+                        onChange={(e) => setPrivacySettings(prev => ({ ...prev, allowDirectMessages: e.target.value }))}
+                      >
+                        <option value="everyone">Everyone</option>
+                        <option value="subscribed">Creators I'm subscribed to</option>
+                        <option value="none">No one</option>
+                      </select>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Show Activity Status</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Let others see when you're online
+                        </p>
+                      </div>
+                      <Switch
+                        checked={privacySettings.showActivity}
+                        onCheckedChange={(checked) => 
+                          setPrivacySettings(prev => ({ ...prev, showActivity: checked }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle>Data & Account Management</CardTitle>
+                  <CardDescription>
+                    Manage your account data and preferences
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Download Your Data</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Download a copy of your account data and activity
+                      </p>
+                      <Button variant="outline" className="w-full">
+                        Request Data Download
                       </Button>
-                    )}
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Blocked Creators</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage creators you've blocked
+                      </p>
+                      <Button variant="outline" className="w-full">
+                        Manage Blocked List
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Login Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified of new logins to your account
-                    </p>
-                  </div>
-                  <Switch
-                    checked={securitySettings.loginNotifications}
-                    onCheckedChange={(checked) => 
-                      setSecuritySettings(prev => ({ ...prev, loginNotifications: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Button variant="outline" className="w-full">
-                    View Login History
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    Revoke All Sessions
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Content Preferences */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Content Preferences</CardTitle>
-              <CardDescription>
-                Customize your content viewing experience
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Content Filtering</Label>
-                  <select 
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={contentSettings.contentFiltering}
-                    onChange={(e) => setContentSettings(prev => ({ ...prev, contentFiltering: e.target.value }))}
-                  >
-                    <option value="none">No filtering</option>
-                    <option value="moderate">Moderate filtering</option>
-                    <option value="strict">Strict filtering</option>
-                  </select>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Adult Content</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow mature content in your feed
-                    </p>
+            <TabsContent value="security" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Security Settings
+                  </CardTitle>
+                  <CardDescription>
+                    Keep your account secure with these settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Email Address */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-foreground">Email Address</h4>
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
+                      <span className="text-sm">{user?.email}</span>
+                      <Button variant="outline" size="sm">Change Email</Button>
+                    </div>
                   </div>
-                  <Switch
-                    checked={contentSettings.adultContent}
-                    onCheckedChange={(checked) => 
-                      setContentSettings(prev => ({ ...prev, adultContent: checked }))
-                    }
-                  />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Autoplay Videos</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically play videos in your feed
-                    </p>
-                  </div>
-                  <Switch
-                    checked={contentSettings.autoplayVideos}
-                    onCheckedChange={(checked) => 
-                      setContentSettings(prev => ({ ...prev, autoplayVideos: checked }))
-                    }
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Data & Account */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Data & Account Management</CardTitle>
-              <CardDescription>
-                Manage your account data and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Download Your Data</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Download a copy of your account data and activity
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Request Data Download
-                  </Button>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h4 className="font-medium">Blocked Creators</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Manage creators you've blocked
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Manage Blocked List
-                  </Button>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h4 className="font-medium text-destructive">Danger Zone</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Permanently delete your account and all data
-                  </p>
-                  <Button variant="destructive" className="w-full">
-                    Delete Account
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  {/* Change Password */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <h4 className="font-medium text-foreground">Change Password</h4>
+                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <Input
+                          id="currentPassword"
+                          type="password"
+                          value={formData.currentPassword}
+                          onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="newPassword">New Password</Label>
+                          <Input
+                            id="newPassword"
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      
+                      <Button type="submit" disabled={isPasswordLoading}>
+                        {isPasswordLoading ? "Updating..." : "Change Password"}
+                      </Button>
+                    </form>
+                  </div>
+
+                  {/* Two-Factor Authentication */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-foreground">Two-Factor Authentication</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Add an extra layer of security to your account
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={securitySettings.twoFactorEnabled}
+                          onCheckedChange={(checked) => 
+                            setSecuritySettings(prev => ({ ...prev, twoFactorEnabled: checked }))
+                          }
+                        />
+                        {!securitySettings.twoFactorEnabled && (
+                          <Button variant="outline" size="sm">
+                            Setup 2FA
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Login Activity */}
+                  <div className="space-y-4 pt-4 border-t border-border/50">
+                    <h4 className="font-medium text-foreground">Recent Login Activity</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Current Session</p>
+                          <p className="text-xs text-muted-foreground">Chrome on Windows • Accra, Ghana</p>
+                        </div>
+                        <Badge variant="outline" className="text-xs">Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Mobile App</p>
+                          <p className="text-xs text-muted-foreground">iPhone • 2 hours ago</p>
+                        </div>
+                        <Button variant="outline" size="sm">Revoke</Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Button variant="outline" className="w-full">
+                        View Full Login History
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        Revoke All Sessions
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Delete Account */}
+                  <div className="pt-4 border-t border-border/50">
+                    <div className="p-4 rounded-lg border border-destructive/50 bg-destructive/5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-destructive flex items-center gap-2">
+                            <Trash2 className="w-4 h-4" />
+                            Delete Account
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Permanently delete your account and all data
+                          </p>
+                        </div>
+                        <Button variant="destructive" onClick={handleDeleteAccount}>
+                          Delete Account
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
