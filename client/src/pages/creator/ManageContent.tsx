@@ -449,7 +449,7 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-[90vh] max-h-[90vh] w-[90vh] h-[90vh] p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View and manage your content</DialogDescription>
