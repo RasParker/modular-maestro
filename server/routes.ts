@@ -528,6 +528,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Creator routes
+  app.get("/api/creators", async (req, res) => {
+    try {
+      // Fetch all users with creator role
+      const creators = await storage.getCreators();
+      res.json(creators);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch creators" });
+    }
+  });
+
   // Creator subscriber routes
   app.get("/api/creators/:creatorId/subscribers", async (req, res) => {
     try {

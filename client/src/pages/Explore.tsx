@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -112,6 +112,48 @@ export const Explore: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
+  const [realCreators, setRealCreators] = useState<any[]>([]);
+  const [allCreators, setAllCreators] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        const response = await fetch('/api/creators');
+        if (response.ok) {
+          const creators = await response.json();
+          console.log('Fetched real creators:', creators);
+          
+          // Transform real creators to match the expected format
+          const transformedCreators = creators.map((creator: any) => ({
+            id: `real_${creator.id}`,
+            username: creator.username,
+            display_name: creator.display_name || creator.username,
+            avatar: creator.avatar || `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
+            cover: creator.cover_image || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop`,
+            bio: creator.bio || 'Creator profile - join for exclusive content!',
+            category: 'General',
+            subscribers: creator.total_subscribers || 0,
+            verified: creator.verified || false,
+            tiers: [
+              { name: 'Supporter', price: 5 },
+              { name: 'Fan', price: 15 },
+              { name: 'Superfan', price: 25 }
+            ]
+          }));
+          
+          setRealCreators(transformedCreators);
+          // Combine real creators with mock creators
+          setAllCreators([...transformedCreators, ...CREATORS]);
+        }
+      } catch (error) {
+        console.error('Error fetching creators:', error);
+        // Fallback to mock creators only
+        setAllCreators(CREATORS);
+      }
+    };
+
+    fetchCreators();
+  }, []);
 
   const handleSubscribe = (creatorName: string, price: number) => {
     toast({
@@ -142,7 +184,7 @@ export const Explore: React.FC = () => {
     };
   };
 
-  const filteredCreators = CREATORS.filter(creator => {
+  const filteredCreators = allCreators.filter(creator => {
     const matchesSearch = creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          creator.bio.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || creator.category === selectedCategory;
