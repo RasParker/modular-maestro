@@ -541,6 +541,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/upload/post-media", upload.single('media'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Generate the URL for the uploaded file
+      const fileUrl = `/uploads/${req.file.filename}`;
+      
+      res.json({ 
+        success: true, 
+        url: fileUrl,
+        filename: req.file.filename,
+        message: "Media uploaded successfully" 
+      });
+    } catch (error) {
+      console.error('Post media upload error:', error);
+      res.status(500).json({ error: "Failed to upload media" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

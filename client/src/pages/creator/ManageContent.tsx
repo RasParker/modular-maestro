@@ -65,7 +65,7 @@ export const ManageContent: React.FC = () => {
               likes: post.likes_count || 0,
               comments: post.comments_count || 0,
               mediaPreview: post.media_urls && post.media_urls.length > 0 
-                ? `/uploads/${post.media_urls[0]}` 
+                ? (post.media_urls[0].startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls[0]}`)
                 : null,
               category: 'General'
             }));
@@ -201,6 +201,12 @@ export const ManageContent: React.FC = () => {
                   src={item.mediaPreview} 
                   alt={item.caption}
                   className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    // If image fails to load, replace with placeholder
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                    target.className = "max-w-full max-h-full object-contain opacity-50";
+                  }}
                 />
               </div>
               {/* Type indicator overlay */}
