@@ -32,6 +32,33 @@ export const FanSettings: React.FC = () => {
     promotionalEmails: false,
   });
 
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: 'public',
+    showInSearch: true,
+    allowDirectMessages: 'subscribed',
+    showActivity: false,
+  });
+
+  const [subscriptionSettings, setSubscriptionSettings] = useState({
+    autoRenew: true,
+    monthlySpendingLimit: 500,
+    renewalReminders: true,
+    paymentFailureNotifications: true,
+  });
+
+  const [securitySettings, setSecuritySettings] = useState({
+    twoFactorEnabled: false,
+    loginNotifications: true,
+    suspiciousActivityAlerts: true,
+  });
+
+  const [contentSettings, setContentSettings] = useState({
+    adultContent: false,
+    contentFiltering: 'moderate',
+    autoplayVideos: true,
+    showPreviews: true,
+  });
+
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProfileLoading(true);
@@ -302,6 +329,314 @@ export const FanSettings: React.FC = () => {
               >
                 {isPreferencesLoading ? "Saving..." : "Save Preferences"}
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Privacy Settings */}
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Privacy & Visibility</CardTitle>
+              <CardDescription>
+                Control who can see your profile and activity
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Profile Visibility</Label>
+                  <select 
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={privacySettings.profileVisibility}
+                    onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
+                  >
+                    <option value="public">Public - Anyone can view</option>
+                    <option value="subscribers">Subscribers Only</option>
+                    <option value="private">Private - Hidden</option>
+                  </select>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Show in Search Results</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow others to find your profile in search
+                    </p>
+                  </div>
+                  <Switch
+                    checked={privacySettings.showInSearch}
+                    onCheckedChange={(checked) => 
+                      setPrivacySettings(prev => ({ ...prev, showInSearch: checked }))
+                    }
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <Label>Who can message you</Label>
+                  <select 
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={privacySettings.allowDirectMessages}
+                    onChange={(e) => setPrivacySettings(prev => ({ ...prev, allowDirectMessages: e.target.value }))}
+                  >
+                    <option value="everyone">Everyone</option>
+                    <option value="subscribed">Creators I'm subscribed to</option>
+                    <option value="none">No one</option>
+                  </select>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Show Activity Status</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Let others see when you're online
+                    </p>
+                  </div>
+                  <Switch
+                    checked={privacySettings.showActivity}
+                    onCheckedChange={(checked) => 
+                      setPrivacySettings(prev => ({ ...prev, showActivity: checked }))
+                    }
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Subscription Management */}
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Subscription Preferences</CardTitle>
+              <CardDescription>
+                Manage your subscription and payment settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Auto-Renewal</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically renew subscriptions when they expire
+                    </p>
+                  </div>
+                  <Switch
+                    checked={subscriptionSettings.autoRenew}
+                    onCheckedChange={(checked) => 
+                      setSubscriptionSettings(prev => ({ ...prev, autoRenew: checked }))
+                    }
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="spendingLimit">Monthly Spending Limit ($)</Label>
+                  <Input
+                    id="spendingLimit"
+                    type="number"
+                    value={subscriptionSettings.monthlySpendingLimit}
+                    onChange={(e) => setSubscriptionSettings(prev => ({ 
+                      ...prev, 
+                      monthlySpendingLimit: parseInt(e.target.value) || 0 
+                    }))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Set to 0 for no limit
+                  </p>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Renewal Reminders</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified before subscriptions renew
+                    </p>
+                  </div>
+                  <Switch
+                    checked={subscriptionSettings.renewalReminders}
+                    onCheckedChange={(checked) => 
+                      setSubscriptionSettings(prev => ({ ...prev, renewalReminders: checked }))
+                    }
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Security Settings */}
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Security & Login</CardTitle>
+              <CardDescription>
+                Secure your account with additional protection
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Two-Factor Authentication</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Add an extra layer of security to your account
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={securitySettings.twoFactorEnabled}
+                      onCheckedChange={(checked) => 
+                        setSecuritySettings(prev => ({ ...prev, twoFactorEnabled: checked }))
+                      }
+                    />
+                    {!securitySettings.twoFactorEnabled && (
+                      <Button variant="outline" size="sm">
+                        Setup 2FA
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Login Notifications</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified of new logins to your account
+                    </p>
+                  </div>
+                  <Switch
+                    checked={securitySettings.loginNotifications}
+                    onCheckedChange={(checked) => 
+                      setSecuritySettings(prev => ({ ...prev, loginNotifications: checked }))
+                    }
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full">
+                    View Login History
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    Revoke All Sessions
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Content Preferences */}
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Content Preferences</CardTitle>
+              <CardDescription>
+                Customize your content viewing experience
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Content Filtering</Label>
+                  <select 
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={contentSettings.contentFiltering}
+                    onChange={(e) => setContentSettings(prev => ({ ...prev, contentFiltering: e.target.value }))}
+                  >
+                    <option value="none">No filtering</option>
+                    <option value="moderate">Moderate filtering</option>
+                    <option value="strict">Strict filtering</option>
+                  </select>
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Adult Content</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow mature content in your feed
+                    </p>
+                  </div>
+                  <Switch
+                    checked={contentSettings.adultContent}
+                    onCheckedChange={(checked) => 
+                      setContentSettings(prev => ({ ...prev, adultContent: checked }))
+                    }
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Autoplay Videos</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically play videos in your feed
+                    </p>
+                  </div>
+                  <Switch
+                    checked={contentSettings.autoplayVideos}
+                    onCheckedChange={(checked) => 
+                      setContentSettings(prev => ({ ...prev, autoplayVideos: checked }))
+                    }
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Data & Account */}
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <CardTitle>Data & Account Management</CardTitle>
+              <CardDescription>
+                Manage your account data and preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Download Your Data</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Download a copy of your account data and activity
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    Request Data Download
+                  </Button>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <h4 className="font-medium">Blocked Creators</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Manage creators you've blocked
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    Manage Blocked List
+                  </Button>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <h4 className="font-medium text-destructive">Danger Zone</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Permanently delete your account and all data
+                  </p>
+                  <Button variant="destructive" className="w-full">
+                    Delete Account
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
