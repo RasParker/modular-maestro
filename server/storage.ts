@@ -108,22 +108,6 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
-    const updateData = { ...updates, updated_at: new Date() };
-
-    // If password is being updated, hash it
-    if (updates.password) {
-      updateData.password = await bcrypt.hash(updates.password, 10);
-    }
-
-    const [user] = await db
-      .update(users)
-      .set(updateData)
-      .where(eq(users.id, id))
-      .returning();
-    return user || undefined;
-  }
-
   async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
     return await bcrypt.compare(password, hashedPassword);
   }
@@ -155,6 +139,22 @@ export class DatabaseStorage implements IStorage {
       console.error('Delete user error:', error);
       return false;
     }
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const updateData = { ...updates, updated_at: new Date() };
+
+    // If password is being updated, hash it
+    if (updates.password) {
+      updateData.password = await bcrypt.hash(updates.password, 10);
+    }
+
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async getPosts(): Promise<Post[]> {
