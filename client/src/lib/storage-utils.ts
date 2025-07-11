@@ -7,6 +7,15 @@ export const setLocalStorageItem = (key: string, value: string) => {
   window.dispatchEvent(new CustomEvent('localStorageChange', {
     detail: { key, value }
   }));
+  
+  // Also dispatch storage event for cross-tab updates
+  window.dispatchEvent(new StorageEvent('storage', {
+    key: key,
+    newValue: value,
+    oldValue: localStorage.getItem(key),
+    storageArea: localStorage,
+    url: window.location.href
+  }));
 };
 
 export const removeLocalStorageItem = (key: string) => {

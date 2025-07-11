@@ -198,11 +198,33 @@ export const CreatorProfile: React.FC = () => {
     // Initial load
     updateProfileData();
 
-    // Listen for localStorage changes
+    // Listen for localStorage changes (cross-tab)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
           e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
         updateProfileData();
+        
+        // Also trigger a re-fetch of creator data to update the UI
+        if (username) {
+          const fetchCreatorData = async () => {
+            try {
+              const response = await fetch(`/api/users/username/${username}`);
+              if (response.ok) {
+                const userData = await response.json();
+                setCreator(prev => prev ? {
+                  ...prev,
+                  display_name: displayName || userData.display_name || userData.username,
+                  avatar: profilePhotoUrl || userData.avatar || prev.avatar,
+                  cover: coverPhotoUrl || userData.cover_image || prev.cover,
+                  bio: bio || userData.bio || prev.bio,
+                } : null);
+              }
+            } catch (error) {
+              console.error('Error re-fetching creator data:', error);
+            }
+          };
+          fetchCreatorData();
+        }
       }
     };
 
