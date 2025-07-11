@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,33 +45,33 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch comments when component mounts
-  React.useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const response = await fetch(`/api/posts/${postId}/comments`);
-        if (response.ok) {
-          const fetchedComments = await response.json();
-          const formattedComments = fetchedComments.map((comment: any) => ({
-            id: comment.id.toString(),
-            user: {
-              id: comment.user?.id.toString() || '1',
-              username: comment.user?.username || 'Anonymous',
-              avatar: comment.user?.avatar
-            },
-            content: comment.content,
-            likes: comment.likes_count || 0,
-            liked: false,
-            createdAt: comment.created_at,
-            replies: comment.replies || []
-          }));
-          setComments(formattedComments);
-          onCommentCountChange(formattedComments.length);
-        }
-      } catch (error) {
-        console.error('Failed to fetch comments:', error);
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`);
+      if (response.ok) {
+        const fetchedComments = await response.json();
+        const formattedComments = fetchedComments.map((comment: any) => ({
+          id: comment.id.toString(),
+          user: {
+            id: comment.user?.id.toString() || '1',
+            username: comment.user?.username || 'Anonymous',
+            avatar: comment.user?.avatar
+          },
+          content: comment.content,
+          likes: comment.likes_count || 0,
+          liked: false,
+          createdAt: comment.created_at,
+          replies: comment.replies || []
+        }));
+        setComments(formattedComments);
+        onCommentCountChange(formattedComments.length);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch comments:', error);
+    }
+  }, [postId, onCommentCountChange]);
 
+  React.useEffect(() => {
     fetchComments();
   }, [postId]);
 
@@ -80,7 +79,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     return `${Math.floor(diffInHours / 24)}d ago`;
@@ -120,7 +119,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         setComments(prev => [comment, ...prev]);
         setNewComment('');
         onCommentCountChange(comments.length + 1);
-        
+
         toast({
           title: "Comment added",
           description: "Your comment has been posted successfully.",
@@ -134,7 +133,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         description: "Failed to post comment. Please try again.",
       });
     }
-    
+
     toast({
       title: "Comment added",
       description: "Your comment has been posted successfully.",
@@ -164,11 +163,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         ? { ...comment, replies: [reply, ...comment.replies] }
         : comment
     ));
-    
+
     setReplyContents(prev => ({ ...prev, [parentId]: '' }));
     setReplyingTo(null);
     onCommentCountChange(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
-    
+
     toast({
       title: "Reply added",
       description: "Your reply has been posted successfully.",
@@ -237,19 +236,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   }> = ({ comment, depth = 0, parentId, maxDepth = 3 }) => {
     const isNested = depth > 0;
     const canNest = depth < maxDepth;
-    
+
     return (
       <div className={`${isNested ? 'ml-6 border-l-2 border-primary/20 pl-4 relative' : ''}`}>
         {isNested && (
           <div className="absolute left-0 top-4 w-6 h-0.5 bg-primary/20"></div>
         )}
-        
+
         <div className="flex gap-3 mb-3">
           <Avatar className={`${isNested ? 'h-7 w-7' : 'h-8 w-8'} flex-shrink-0`}>
             <AvatarImage src={comment.user.avatar} alt={comment.user.username} />
             <AvatarFallback className="text-xs">{comment.user.username.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 min-w-0">
             <div className="bg-muted/50 rounded-lg p-3 hover:bg-muted/70 transition-colors">
               <div className="flex items-center gap-2 mb-1">
@@ -261,7 +260,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               </div>
               <p className="text-sm text-foreground break-words">{comment.content}</p>
             </div>
-            
+
             <div className="flex items-center gap-4 mt-2">
               <Button
                 variant="ghost"
@@ -272,7 +271,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 <Heart className={`w-3 h-3 mr-1 ${comment.liked ? 'fill-current' : ''}`} />
                 {comment.likes > 0 && <span className="text-xs">{comment.likes}</span>}
               </Button>
-              
+
               {canNest && (
                 <Button
                   variant="ghost"
@@ -284,7 +283,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                   <span className="text-xs">Reply</span>
                 </Button>
               )}
-              
+
               {!isNested && comment.replies.length > 0 && (
                 <Button
                   variant="ghost"
@@ -299,7 +298,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 </Button>
               )}
             </div>
-            
+
             {replyingTo === comment.id && (
               <div className="mt-3 flex gap-2 animate-in slide-in-from-top-1 duration-200">
                 <Avatar className="h-6 w-6 flex-shrink-0">
@@ -358,7 +357,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 </div>
               </div>
             )}
-            
+
             {!isNested && showReplies[comment.id] && comment.replies.length > 0 && (
               <div className="mt-3 space-y-3 animate-in slide-in-from-top-1 duration-300">
                 {comment.replies
@@ -419,7 +418,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               </Button>
             </div>
           </div>
-          
+
           {/* Comments Header */}
           {comments.length > 0 && (
             <div className="flex items-center justify-between pt-4 border-t border-border/30">
@@ -440,14 +439,14 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               </div>
             </div>
           )}
-          
+
           {/* Comments List */}
           {comments.length > 0 ? (
             <div className="space-y-4 pt-4">
               {displayedComments.map((comment) => (
                 <CommentItem key={comment.id} comment={comment} />
               ))}
-              
+
               {comments.length > 5 && !showAllComments && (
                 <div className="text-center pt-4">
                   <Button
@@ -461,7 +460,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                   </Button>
                 </div>
               )}
-              
+
               {showAllComments && comments.length > 5 && (
                 <div className="text-center pt-4">
                   <Button
