@@ -138,3 +138,8 @@ Changelog:
   - ✅ Enhanced edit and delete buttons with proper functionality
   - ✅ Maintained creator-specific actions (Edit, Delete) for own posts
   - ✅ Integrated real database posts with proper data mapping
+  - ✅ Fixed comment section to fetch and store comments in database
+  - ✅ Added comprehensive edit modal with title and content fields
+  - ✅ Implemented real-time comment posting with API integration
+  - ✅ Fixed edit API call method from PATCH to PUT to match server endpoints
+  - ✅ Added proper error handling with toast notifications for all actions

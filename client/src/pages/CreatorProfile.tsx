@@ -441,7 +441,7 @@ export const CreatorProfile: React.FC = () => {
 
     try {
       const response = await fetch(`/api/posts/${editingPost.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
