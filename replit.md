@@ -143,3 +143,6 @@ Changelog:
   - ✅ Implemented real-time comment posting with API integration
   - ✅ Fixed edit API call method from PATCH to PUT to match server endpoints
   - ✅ Added proper error handling with toast notifications for all actions
+  - ✅ Fixed comment posting by converting user_id from string to number for validation
+  - ✅ Updated edit modal to use single "Caption" field matching create post template
+  - ✅ Fixed cursor focus issue in reply inputs by using individual state per comment

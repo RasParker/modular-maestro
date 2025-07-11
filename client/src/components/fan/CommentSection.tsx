@@ -38,7 +38,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
+  const [replyContents, setReplyContents] = useState<Record<string, string>>({});
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
@@ -140,6 +140,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   };
 
   const handleAddReply = (parentId: string) => {
+    const replyContent = replyContents[parentId] || '';
     if (!replyContent.trim()) return;
 
     const reply: Comment = {
@@ -162,7 +163,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         : comment
     ));
     
-    setReplyContent('');
+    setReplyContents(prev => ({ ...prev, [parentId]: '' }));
     setReplyingTo(null);
     onCommentCountChange(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
     
@@ -306,8 +307,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 <div className="flex-1 flex gap-2">
                   <Textarea
                     placeholder={`Reply to ${comment.user.username}...`}
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
+                    value={replyContents[comment.id] || ''}
+                    onChange={(e) => setReplyContents(prev => ({ ...prev, [comment.id]: e.target.value }))}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -315,7 +316,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       }
                       if (e.key === 'Escape') {
                         setReplyingTo(null);
-                        setReplyContent('');
+                        setReplyContents(prev => ({ ...prev, [comment.id]: '' }));
                       }
                     }}
                   />
@@ -323,7 +324,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                     <Button
                       size="sm"
                       onClick={() => handleAddReply(comment.id)}
-                      disabled={!replyContent.trim()}
+                      disabled={!(replyContents[comment.id] || '').trim()}
                       className="h-8"
                     >
                       <Send className="w-3 h-3" />
@@ -333,7 +334,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       variant="ghost"
                       onClick={() => {
                         setReplyingTo(null);
-                        setReplyContent('');
+                        setReplyContents(prev => ({ ...prev, [comment.id]: '' }));
                       }}
                       className="h-8 text-muted-foreground"
                     >
