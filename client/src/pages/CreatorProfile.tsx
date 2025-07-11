@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
+import { CommentSection } from '@/components/fan/CommentSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -140,6 +142,9 @@ export const CreatorProfile: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  const [postLikes, setPostLikes] = useState<Record<string, { liked: boolean; count: number }>>({});
+  const { toast } = useToast();
 
   // Function to fetch user's posts from database
   const fetchUserPosts = async (userId: string | number) => {
@@ -378,6 +383,64 @@ export const CreatorProfile: React.FC = () => {
     setExpandedModalCaption(false);
   };
 
+  // Handler functions for post interactions
+  const handleLike = (postId: string) => {
+    setPostLikes(prev => {
+      const currentLike = prev[postId] || { liked: false, count: 0 };
+      return {
+        ...prev,
+        [postId]: {
+          liked: !currentLike.liked,
+          count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
+        }
+      };
+    });
+  };
+
+  const handleCommentClick = (postId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleCommentCountChange = (postId: string, newCount: number) => {
+    setUserPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, comments_count: newCount }
+        : post
+    ));
+  };
+
+  const handleShare = (postId: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
+    toast({
+      title: "Link copied",
+      description: "Post link has been copied to your clipboard.",
+    });
+  };
+
+  const handleEdit = (postId: string) => {
+    // Navigate to edit page or open edit modal
+    toast({
+      title: "Edit feature",
+      description: "Edit functionality will be implemented soon.",
+    });
+  };
+
+  const handleDelete = (postId: string) => {
+    // Show confirmation dialog and delete post
+    const confirmDelete = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
+    if (confirmDelete) {
+      // Here you would typically make an API call to delete the post
+      setUserPosts(prev => prev.filter(post => post.id !== postId));
+      toast({
+        title: "Post deleted",
+        description: "Your post has been successfully deleted.",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -465,9 +528,9 @@ export const CreatorProfile: React.FC = () => {
             {/* Recent Posts Preview */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
-              {creator.recentPosts.length > 0 ? (
+              {(creator.recentPosts.length > 0 || userPosts.length > 0) ? (
                 <div className="space-y-6">
-                  {creator.recentPosts.map((post) => (
+                  {(userPosts.length > 0 ? userPosts : creator.recentPosts).map((post) => (
                     <Card key={post.id} className="bg-gradient-card border-border/50">
                       <CardContent className="p-0">
                         <div className="p-4 pb-2">
@@ -547,15 +610,17 @@ export const CreatorProfile: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground"
+                                className={`${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                onClick={() => handleLike(post.id)}
                               >
-                                <Heart className="w-4 h-4 mr-1" />
-                                {post.likes_count || post.likes || 0}
+                                <Heart className={`w-4 h-4 mr-1 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
                               </Button>
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-muted-foreground"
+                                onClick={() => handleCommentClick(post.id)}
                               >
                                 <MessageSquare className="w-4 h-4 mr-1" />
                                 {post.comments_count || (post.comments ? post.comments.length : 0)}
@@ -571,6 +636,7 @@ export const CreatorProfile: React.FC = () => {
                                 variant="ghost"
                                 size="sm"
                                 className="text-muted-foreground h-8 w-8 p-0"
+                                onClick={() => handleShare(post.id)}
                               >
                                 <Share2 className="w-4 h-4" />
                               </Button>
@@ -580,6 +646,7 @@ export const CreatorProfile: React.FC = () => {
                                     variant="ghost" 
                                     size="sm" 
                                     className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
+                                    onClick={() => handleEdit(post.id)}
                                   >
                                     <Edit className="w-4 h-4" />
                                   </Button>
@@ -587,6 +654,7 @@ export const CreatorProfile: React.FC = () => {
                                     variant="ghost" 
                                     size="sm" 
                                     className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
+                                    onClick={() => handleDelete(post.id)}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -596,6 +664,19 @@ export const CreatorProfile: React.FC = () => {
                           </div>
                         </div>
                       </CardContent>
+                      
+                      {/* Comments Section */}
+                      {showComments[post.id] && (
+                        <div className="border-t border-border/30">
+                          <div className="p-4">
+                            <CommentSection
+                              postId={post.id}
+                              initialComments={post.comments || []}
+                              onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </Card>
                   ))}
                 </div>
