@@ -42,6 +42,37 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch comments when component mounts
+  React.useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/posts/${postId}/comments`);
+        if (response.ok) {
+          const fetchedComments = await response.json();
+          const formattedComments = fetchedComments.map((comment: any) => ({
+            id: comment.id.toString(),
+            user: {
+              id: comment.user?.id.toString() || '1',
+              username: comment.user?.username || 'Anonymous',
+              avatar: comment.user?.avatar
+            },
+            content: comment.content,
+            likes: comment.likes_count || 0,
+            liked: false,
+            createdAt: comment.created_at,
+            replies: comment.replies || []
+          }));
+          setComments(formattedComments);
+        }
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      }
+    };
+
+    fetchComments();
+  }, [postId]);
 
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -53,26 +84,54 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     return `${Math.floor(diffInHours / 24)}d ago`;
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const comment: Comment = {
-      id: Date.now().toString(),
-      user: {
-        id: user?.id || '1',
-        username: user?.username || 'current_user',
-        avatar: user?.avatar
-      },
-      content: newComment,
-      likes: 0,
-      liked: false,
-      createdAt: new Date().toISOString(),
-      replies: []
-    };
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: newComment,
+          user_id: user?.id || 1
+        })
+      });
 
-    setComments(prev => [comment, ...prev]);
-    setNewComment('');
-    onCommentCountChange(comments.length + 1);
+      if (response.ok) {
+        const newCommentData = await response.json();
+        const comment: Comment = {
+          id: newCommentData.id.toString(),
+          user: {
+            id: newCommentData.user?.id.toString() || user?.id?.toString() || '1',
+            username: newCommentData.user?.username || user?.username || 'current_user',
+            avatar: newCommentData.user?.avatar || user?.avatar
+          },
+          content: newCommentData.content,
+          likes: 0,
+          liked: false,
+          createdAt: newCommentData.created_at,
+          replies: []
+        };
+
+        setComments(prev => [comment, ...prev]);
+        setNewComment('');
+        onCommentCountChange(comments.length + 1);
+        
+        toast({
+          title: "Comment added",
+          description: "Your comment has been posted successfully.",
+        });
+      } else {
+        throw new Error('Failed to post comment');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post comment. Please try again.",
+      });
+    }
     
     toast({
       title: "Comment added",

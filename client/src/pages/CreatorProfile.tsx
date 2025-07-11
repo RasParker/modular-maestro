@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
@@ -11,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock creators database
@@ -144,6 +146,10 @@ export const CreatorProfile: React.FC = () => {
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [postLikes, setPostLikes] = useState<Record<string, { liked: boolean; count: number }>>({});
+  const [editingPost, setEditingPost] = useState<any | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
   // Function to fetch user's posts from database
@@ -421,11 +427,59 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleEdit = (postId: string) => {
-    // Navigate to edit page or open edit modal
-    toast({
-      title: "Edit feature",
-      description: "Edit functionality will be implemented soon.",
-    });
+    const post = userPosts.find(p => p.id === postId);
+    if (post) {
+      setEditingPost(post);
+      setEditTitle(post.title);
+      setEditContent(post.content);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingPost) return;
+
+    try {
+      const response = await fetch(`/api/posts/${editingPost.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          content: editContent,
+        })
+      });
+
+      if (response.ok) {
+        const updatedPost = await response.json();
+        setUserPosts(prev => prev.map(post => 
+          post.id === editingPost.id 
+            ? { ...post, title: editTitle, content: editContent }
+            : post
+        ));
+        setIsEditModalOpen(false);
+        setEditingPost(null);
+        toast({
+          title: "Post updated",
+          description: "Your post has been successfully updated.",
+        });
+      } else {
+        throw new Error('Failed to update post');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update post. Please try again.",
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+    setEditingPost(null);
+    setEditTitle('');
+    setEditContent('');
   };
 
   const handleDelete = (postId: string) => {
@@ -850,6 +904,52 @@ export const CreatorProfile: React.FC = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Post Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Post</DialogTitle>
+            <DialogDescription>
+              Make changes to your post content below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <label htmlFor="editTitle" className="block text-sm font-medium mb-2">
+                Title
+              </label>
+              <Input
+                id="editTitle"
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Enter post title"
+              />
+            </div>
+            <div>
+              <label htmlFor="editContent" className="block text-sm font-medium mb-2">
+                Content
+              </label>
+              <Textarea
+                id="editContent"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full min-h-[120px]"
+                placeholder="Write your post content here..."
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={handleCancelEdit}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit}>
+              Save Changes
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
