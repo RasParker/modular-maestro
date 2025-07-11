@@ -304,12 +304,20 @@ export const CreatorProfile: React.FC = () => {
                     {isCreatorView ? 'Creator View' : 'Public View'}
                   </Label>
                 </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/creator/settings">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Link>
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Settings
+                    </Link>
+                  </Button>
+                </div>
               </div>
             )}
           </div>

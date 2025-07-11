@@ -77,6 +77,11 @@ export const Navbar: React.FC = () => {
                 Dashboard
               </Link>
             )}
+            {user && user.role === 'creator' && (
+              <Link to={`/creator/${user.username}`} className="text-foreground hover:text-primary transition-colors">
+                My Profile
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
