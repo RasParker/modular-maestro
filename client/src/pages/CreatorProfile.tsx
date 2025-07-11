@@ -172,18 +172,10 @@ export const CreatorProfile: React.FC = () => {
   // Update profile data from localStorage when component mounts or when navigating
   useEffect(() => {
     const updateProfileData = () => {
-      console.log('Updating profile data from localStorage');
       const newProfilePhotoUrl = localStorage.getItem('profilePhotoUrl');
       const newCoverPhotoUrl = localStorage.getItem('coverPhotoUrl');
       const newDisplayName = localStorage.getItem('displayName');
       const newBio = localStorage.getItem('bio');
-      
-      console.log('Current localStorage values:', {
-        profilePhotoUrl: newProfilePhotoUrl,
-        coverPhotoUrl: newCoverPhotoUrl,
-        displayName: newDisplayName,
-        bio: newBio
-      });
       
       // Only update state if the values are different
       if (newProfilePhotoUrl !== profilePhotoUrl) setProfilePhotoUrl(newProfilePhotoUrl);
@@ -206,14 +198,8 @@ export const CreatorProfile: React.FC = () => {
     // Initial load
     updateProfileData();
     
-    // Fetch user's posts if viewing own profile
-    if (user && user.username === username) {
-      fetchUserPosts(user.id);
-    }
-    
     // Listen for localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
-      console.log('Storage event received:', e.key, e.newValue);
       if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
           e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
         updateProfileData();
@@ -222,7 +208,6 @@ export const CreatorProfile: React.FC = () => {
 
     // Listen for custom storage events (for same-tab updates)
     const handleCustomStorageChange = (e: CustomEvent) => {
-      console.log('Custom storage event received:', e.detail);
       updateProfileData();
       
       // Refresh posts if post-related event
@@ -238,7 +223,14 @@ export const CreatorProfile: React.FC = () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
     };
-  }, [username, user]);
+  }, [username]); // Remove user dependency to prevent infinite loops
+
+  // Separate useEffect for fetching user posts
+  useEffect(() => {
+    if (user && user.username === username) {
+      fetchUserPosts(user.id);
+    }
+  }, [user?.id, username]); // Only depend on user.id and username
 
   // Fetch user data from database
   const [creator, setCreator] = useState(null);
@@ -253,7 +245,6 @@ export const CreatorProfile: React.FC = () => {
         const response = await fetch(`/api/users/username/${username}`);
         if (response.ok) {
           const userData = await response.json();
-          console.log('Fetched user data:', userData);
           // Create creator object with localStorage overrides taking priority
           const creatorData = {
             id: userData.id,
@@ -296,7 +287,22 @@ export const CreatorProfile: React.FC = () => {
     };
 
     fetchCreatorData();
-  }, [username, displayName, bio, customTiers, userPosts]);
+  }, [username]); // Only depend on username to prevent infinite loops
+
+  // Update creator data when localStorage values change
+  useEffect(() => {
+    if (creator) {
+      setCreator(prev => prev ? {
+        ...prev,
+        display_name: displayName || prev.display_name,
+        avatar: profilePhotoUrl || prev.avatar,
+        cover: coverPhotoUrl || prev.cover,
+        bio: bio || prev.bio,
+        tiers: customTiers.length > 0 ? customTiers : prev.tiers,
+        recentPosts: userPosts
+      } : null);
+    }
+  }, [displayName, bio, customTiers, userPosts, profilePhotoUrl, coverPhotoUrl]);
   const isOwnProfile = user?.username === username;
 
   if (loading) {
