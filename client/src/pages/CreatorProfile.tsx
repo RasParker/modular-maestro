@@ -170,16 +170,18 @@ export const CreatorProfile: React.FC = () => {
         bio: newBio
       });
       
-      setProfilePhotoUrl(newProfilePhotoUrl);
-      setCoverPhotoUrl(newCoverPhotoUrl);
-      setDisplayName(newDisplayName);
-      setBio(newBio);
+      // Only update state if the values are different
+      if (newProfilePhotoUrl !== profilePhotoUrl) setProfilePhotoUrl(newProfilePhotoUrl);
+      if (newCoverPhotoUrl !== coverPhotoUrl) setCoverPhotoUrl(newCoverPhotoUrl);
+      if (newDisplayName !== displayName) setDisplayName(newDisplayName);
+      if (newBio !== bio) setBio(newBio);
       
       // Load custom tiers from localStorage
       const savedTiers = localStorage.getItem('subscriptionTiers');
       if (savedTiers) {
         try {
-          setCustomTiers(JSON.parse(savedTiers));
+          const parsedTiers = JSON.parse(savedTiers);
+          setCustomTiers(parsedTiers);
         } catch (error) {
           console.error('Error parsing saved tiers:', error);
         }
@@ -221,7 +223,7 @@ export const CreatorProfile: React.FC = () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
     };
-  }, [username]);
+  }, [username, user]);
 
   // Fetch user data from database
   const [creator, setCreator] = useState(null);
