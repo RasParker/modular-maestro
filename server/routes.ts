@@ -208,6 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(postWithUser);
     } catch (error) {
+      console.error('Get post error:', error);
       res.status(500).json({ error: "Failed to fetch post" });
     }
   });

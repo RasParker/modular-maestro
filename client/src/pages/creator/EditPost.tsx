@@ -80,10 +80,17 @@ export const EditPost: React.FC = () => {
         }
       }
       
+      // Map tier from display format back to database format
+      const tierMapping = {
+        'Free': 'public',
+        'Basic Support': 'basic',
+        'Premium Content': 'premium'
+      };
+      
       // Update post data
       const updateData = {
         content: postData.description,
-        tier: postData.tier,
+        tier: tierMapping[postData.tier as keyof typeof tierMapping] || 'public',
         status: postData.status,
         ...(mediaUrl && { media_urls: [mediaUrl] }),
         ...(postData.scheduledDate && { scheduled_date: postData.scheduledDate }),
@@ -135,9 +142,16 @@ export const EditPost: React.FC = () => {
         const response = await fetch(`/api/posts/${postId}`);
         if (response.ok) {
           const post = await response.json();
+          // Map tier from database format to display format
+          const tierMapping = {
+            'public': 'Free',
+            'basic': 'Basic Support',
+            'premium': 'Premium Content'
+          };
+          
           setPostData({
             description: post.content || '',
-            tier: post.tier || 'Free',
+            tier: tierMapping[post.tier as keyof typeof tierMapping] || 'Free',
             scheduledDate: post.scheduled_date ? new Date(post.scheduled_date).toISOString().split('T')[0] : '',
             scheduledTime: post.scheduled_time || '',
             status: post.status || 'Published'
@@ -145,7 +159,13 @@ export const EditPost: React.FC = () => {
           
           // Set media preview if available
           if (post.media_urls && post.media_urls.length > 0) {
-            setMediaPreview(`/uploads/${post.media_urls[0]}`);
+            // Check if it's already a full path or just filename
+            const mediaUrl = post.media_urls[0];
+            if (mediaUrl.startsWith('/uploads/') || mediaUrl.startsWith('http')) {
+              setMediaPreview(mediaUrl);
+            } else {
+              setMediaPreview(`/uploads/${mediaUrl}`);
+            }
           }
         } else {
           toast({
