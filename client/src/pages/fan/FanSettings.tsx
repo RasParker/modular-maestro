@@ -13,6 +13,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Save, Shield, User, Bell, CreditCard, Settings, Eye, Trash2, Camera } from 'lucide-react';
 
 export const FanSettings: React.FC = () => {
@@ -63,6 +64,9 @@ export const FanSettings: React.FC = () => {
     autoplayVideos: true,
     showPreviews: true,
   });
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleSave = () => {
     toast({
@@ -137,11 +141,17 @@ export const FanSettings: React.FC = () => {
   };
 
   const handleDeleteAccount = () => {
-    toast({
-      title: "Account deletion requested",
-      description: "Please check your email for confirmation instructions.",
-      variant: "destructive",
-    });
+    if (deleteConfirmation === 'DELETE') {
+      toast({
+        title: "Account deleted",
+        description: "Your account has been permanently deleted.",
+        variant: "destructive",
+      });
+      setIsDeleteDialogOpen(false);
+      setDeleteConfirmation('');
+      // Here you would typically call your API to delete the account
+      // and then redirect to login or home page
+    }
   };
 
   return (
@@ -742,9 +752,65 @@ export const FanSettings: React.FC = () => {
                             Permanently delete your account and all data
                           </p>
                         </div>
-                        <Button variant="destructive" onClick={handleDeleteAccount}>
-                          Delete Account
-                        </Button>
+                        
+                        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                              Delete Account
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                                <Trash2 className="w-5 h-5" />
+                                Delete Account
+                              </AlertDialogTitle>
+                              <AlertDialogDescription className="space-y-3">
+                                <p>
+                                  This action cannot be undone. This will permanently delete your 
+                                  account and remove all your data from our servers.
+                                </p>
+                                <p>
+                                  This includes:
+                                </p>
+                                <ul className="list-disc list-inside text-sm space-y-1 ml-4">
+                                  <li>Your profile and settings</li>
+                                  <li>All subscription history</li>
+                                  <li>Payment methods and billing information</li>
+                                  <li>Messages and conversations</li>
+                                  <li>All account activity and preferences</li>
+                                </ul>
+                                <div className="pt-4">
+                                  <Label htmlFor="deleteConfirmation" className="text-sm font-medium">
+                                    Please type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                                  </Label>
+                                  <Input
+                                    id="deleteConfirmation"
+                                    value={deleteConfirmation}
+                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                    placeholder="Type DELETE here"
+                                    className="mt-2"
+                                  />
+                                </div>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => {
+                                setDeleteConfirmation('');
+                                setIsDeleteDialogOpen(false);
+                              }}>
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleDeleteAccount}
+                                disabled={deleteConfirmation !== 'DELETE'}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete Account
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>
