@@ -137,8 +137,7 @@ export const CreatePost: React.FC = () => {
         content: data.caption || '',
         media_type: mediaType || 'text',
         media_urls: mediaFile ? [mediaFile.name] : [],
-        is_nsfw: false,
-        tier_id: data.accessTier === 'free' ? null : 1,
+        tier: data.accessTier === 'free' ? 'public' : data.accessTier,
         scheduled_for: data.scheduledDate && action === 'schedule' ? 
           new Date(data.scheduledDate).toISOString() : null
       };

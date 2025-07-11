@@ -439,15 +439,22 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content}
                               </p>
                               <div className="flex items-center gap-2 mt-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {post.tier}
+                                <Badge 
+                                  variant={post.tier === 'public' ? 'outline' : 'default'} 
+                                  className={`text-xs ${post.tier === 'premium' ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black' : ''}`}
+                                >
+                                  {post.tier === 'public' ? 'Free' : 
+                                   post.tier === 'supporter' ? 'Supporter' :
+                                   post.tier === 'fan' ? 'Fan' :
+                                   post.tier === 'premium' ? 'Premium' :
+                                   post.tier === 'superfan' ? 'Superfan' : 'Free'}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">
                                   {getTimeAgo(post.created_at || post.createdAt)}
                                 </span>
                               </div>
                             </div>
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                            {post.tier !== 'public' && <DollarSign className="w-4 h-4 text-yellow-500" />}
                           </div>
                         </div>
                       </div>

@@ -54,7 +54,11 @@ export const ManageContent: React.FC = () => {
               caption: post.content || post.title,
               type: post.media_type === 'image' ? 'Image' as const :
                     post.media_type === 'video' ? 'Video' as const : 'Text' as const,
-              tier: post.tier === 'public' ? 'Free' : 'Basic Support',
+              tier: post.tier === 'public' ? 'Free' : 
+                    post.tier === 'supporter' ? 'Basic Support' :
+                    post.tier === 'fan' ? 'Fan Content' :
+                    post.tier === 'premium' ? 'Premium Content' :
+                    post.tier === 'superfan' ? 'Superfan Content' : 'Free',
               status: 'Published' as const, // Default to published for now
               date: new Date(post.created_at).toLocaleDateString('en-US', { 
                 month: 'short', 
@@ -156,7 +160,11 @@ export const ManageContent: React.FC = () => {
         return 'outline';
       case 'Basic Support':
         return 'secondary';
+      case 'Fan Content':
+        return 'secondary';
       case 'Premium Content':
+        return 'default';
+      case 'Superfan Content':
         return 'default';
       default:
         return 'outline';
