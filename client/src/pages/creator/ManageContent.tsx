@@ -466,41 +466,40 @@ export const ManageContent: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Square container that fills the entire modal */}
+              {/* Square container that fills the entire modal - using AspectRatio like postcard */}
               <div className="relative w-full h-full overflow-hidden">
-                {/* Blurred background */}
+                {/* Blurred background layer */}
                 <div 
-                  className="absolute inset-0 bg-cover bg-center blur-md scale-110"
-                  style={{
-                    backgroundImage: `url(${selectedContent.mediaPreview})`,
-                  }}
+                  className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                  style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
                 />
-                
-                {/* Main Media */}
-                {selectedContent.mediaPreview ? (
-                  selectedContent.type === 'Video' ? (
-                    <video 
-                      src={selectedContent.mediaPreview} 
-                      className="relative z-10 w-full h-full object-contain"
-                      controls
-                      autoPlay
-                      muted
-                    />
+                {/* Main media content - Square container */}
+                <div className="relative z-10 w-full h-full">
+                  {selectedContent.mediaPreview ? (
+                    selectedContent.type === 'Video' ? (
+                      <video 
+                        src={selectedContent.mediaPreview} 
+                        className="w-full h-full object-contain"
+                        controls
+                        autoPlay
+                        muted
+                      />
+                    ) : (
+                      <img 
+                        src={selectedContent.mediaPreview} 
+                        alt={selectedContent.caption}
+                        className="w-full h-full object-contain"
+                      />
+                    )
                   ) : (
-                    <img 
-                      src={selectedContent.mediaPreview} 
-                      alt={selectedContent.caption}
-                      className="relative z-10 w-full h-full object-contain"
-                    />
-                  )
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <div className="text-center text-white">
-                      {getTypeIcon(selectedContent.type)}
-                      <p className="mt-2">{selectedContent.type} Content</p>
+                    <div className="flex items-center justify-center w-full h-full">
+                      <div className="text-center text-white">
+                        {getTypeIcon(selectedContent.type)}
+                        <p className="mt-2">{selectedContent.type} Content</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* Vertical Action Icons - Instagram Style */}
