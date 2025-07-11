@@ -642,6 +642,3 @@ export const CreatorSettings: React.FC = () => {
     </div>
   );
 };
-```
-
-**Final Answer:** The code has been updated to include an alert dialog for confirming account deletion and the `handleDeleteAccount` function now sends a request to the `/api/delete-account` endpoint.
