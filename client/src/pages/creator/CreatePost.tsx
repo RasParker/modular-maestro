@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
@@ -40,6 +41,7 @@ type FormData = z.infer<typeof formSchema>;
 export const CreatePost: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
@@ -117,20 +119,52 @@ export const CreatePost: React.FC = () => {
     setIsUploading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
+      // Get current user ID from auth context
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to create a post.",
+          variant: "destructive",
+        });
+        navigate('/login');
+        return;
+      }
+      
+      // Prepare post data for API
       const postData = {
-        caption: data.caption,
-        mediaFile,
-        mediaType,
-        accessTier: data.accessTier,
-        scheduledDate: data.scheduledDate,
-        scheduledTime: data.scheduledTime,
-        status: action,
+        creator_id: parseInt(user.id),
+        title: data.caption?.substring(0, 50) || 'Untitled Post',
+        content: data.caption || '',
+        media_type: mediaType || 'text',
+        media_urls: mediaFile ? [mediaFile.name] : [],
+        is_nsfw: false,
+        tier_id: data.accessTier === 'free' ? null : 1,
+        scheduled_for: data.scheduledDate && action === 'schedule' ? 
+          new Date(data.scheduledDate).toISOString() : null
       };
 
       console.log('Creating post with data:', postData);
+
+      // Create the post via API
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post');
+      }
+
+      const createdPost = await response.json();
+      console.log('Post created successfully:', createdPost);
+
+      // Dispatch custom event to notify profile page
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { type: 'postCreated', post: createdPost }
+      }));
 
       toast({
         title: `Post ${action === 'publish' ? 'published' : action === 'schedule' ? 'scheduled' : 'saved as draft'}`,
@@ -144,6 +178,7 @@ export const CreatePost: React.FC = () => {
         navigate('/creator/dashboard');
       }
     } catch (error) {
+      console.error('Error creating post:', error);
       toast({
         title: "Error",
         description: `Failed to ${action} post. Please try again.`,

@@ -126,6 +126,23 @@ export const CreatorProfile: React.FC = () => {
   const [bio, setBio] = useState<string | null>(null);
   const [customTiers, setCustomTiers] = useState<any[]>([]);
   const [profileData, setProfileData] = useState<any>(null);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+
+  // Function to fetch user's posts from database
+  const fetchUserPosts = async (userId: number) => {
+    try {
+      const response = await fetch('/api/posts');
+      if (response.ok) {
+        const allPosts = await response.json();
+        // Filter posts by current user
+        const filteredPosts = allPosts.filter((post: any) => post.creator_id === userId);
+        setUserPosts(filteredPosts);
+        console.log('Fetched user posts:', filteredPosts);
+      }
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    }
+  };
 
   // Update profile data from localStorage when component mounts or when navigating
   useEffect(() => {
@@ -162,6 +179,11 @@ export const CreatorProfile: React.FC = () => {
     // Initial load
     updateProfileData();
     
+    // Fetch user's posts if viewing own profile
+    if (user && user.username === username) {
+      fetchUserPosts(user.id);
+    }
+    
     // Listen for localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
       console.log('Storage event received:', e.key, e.newValue);
@@ -175,6 +197,11 @@ export const CreatorProfile: React.FC = () => {
     const handleCustomStorageChange = (e: CustomEvent) => {
       console.log('Custom storage event received:', e.detail);
       updateProfileData();
+      
+      // Refresh posts if post-related event
+      if (e.detail && e.detail.type === 'postCreated' && user && user.username === username) {
+        fetchUserPosts(user.id);
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -194,7 +221,8 @@ export const CreatorProfile: React.FC = () => {
     cover: coverPhotoUrl || baseCreator.cover,
     display_name: displayName || baseCreator.display_name,
     bio: bio || baseCreator.bio,
-    tiers: customTiers.length > 0 ? customTiers : baseCreator.tiers
+    tiers: customTiers.length > 0 ? customTiers : baseCreator.tiers,
+    recentPosts: userPosts.length > 0 ? userPosts : baseCreator.recentPosts
   } : null;
   const isOwnProfile = user?.username === username;
 
