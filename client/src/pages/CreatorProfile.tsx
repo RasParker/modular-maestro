@@ -103,22 +103,7 @@ const MOCK_CREATORS = {
     bio: 'Welcome to my creative space! I\'m just getting started on this amazing platform. Stay tuned for exciting content coming your way!',
     subscribers: 0,
     verified: false,
-    tiers: [
-      { 
-        id: '1',
-        name: 'Supporter', 
-        price: 5,
-        description: 'Support my creative journey',
-        features: ['Access to all posts', 'Community access', 'Monthly updates']
-      },
-      { 
-        id: '2',
-        name: 'Premium', 
-        price: 15,
-        description: 'Get exclusive content and perks',
-        features: ['Everything in Supporter', 'Exclusive content', 'Behind-the-scenes access', 'Priority support']
-      }
-    ],
+    tiers: [],
     recentPosts: []
   }
 };
