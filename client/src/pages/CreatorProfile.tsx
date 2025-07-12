@@ -439,6 +439,19 @@ export const CreatorProfile: React.FC = () => {
     }
   };
 
+  const getMediaOverlayIcon = (mediaType: string) => {
+    switch (mediaType?.toLowerCase()) {
+      case 'image':
+        return <Image className="w-4 h-4 text-white" />;
+      case 'video':
+        return <Video className="w-4 h-4 text-white" />;
+      case 'text':
+        return <FileText className="w-4 h-4 text-white" />;
+      default:
+        return <FileText className="w-4 h-4 text-white" />;
+    }
+  };
+
   // Check if user has access to content based on subscription tier
   const hasAccessToTier = (postTier: string): boolean => {
     // Own profile - can see all content
@@ -713,9 +726,7 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
                               </div>
                             </div>
-                            <Badge variant="outline" className="capitalize">
-                              {post.media_type || post.mediaType}
-                            </Badge>
+
                           </div>
                         </div>
 
@@ -730,7 +741,7 @@ export const CreatorProfile: React.FC = () => {
                             <div className="rounded-lg overflow-hidden">
                               {hasAccessToTier(post.tier) ? (
                                 <div 
-                                  className="cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                                  className="relative cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
                                   onClick={() => handleContentClick(post)}
                                   role="button"
                                   tabIndex={0}
@@ -760,6 +771,12 @@ export const CreatorProfile: React.FC = () => {
                                       }}
                                     />
                                   )}
+                                  {/* Media type icon overlay */}
+                                  <div className="absolute top-2 left-2 z-20">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
+                                      {getMediaOverlayIcon(post.media_type)}
+                                    </div>
+                                  </div>
                                 </div>
                               ) : (
                                 <div className="w-full h-64 bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
