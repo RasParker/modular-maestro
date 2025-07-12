@@ -172,3 +172,8 @@ Changelog:
   - ✅ Enhanced null safety for creator profile data rendering
   - ✅ Verified full-stack application runs without errors in Replit environment
   - ✅ Completed all migration checklist items successfully
+  - ✅ Updated currency display across entire application to use Ghanaian Cedi (GHS)
+  - ✅ Modified database schema to default currency to GHS instead of USD
+  - ✅ Fixed comment reply input cursor jumping issue with isolated ReplyInput component
+  - ✅ Updated all pricing displays in UI components and admin/creator dashboards
+  - ✅ Successfully pushed database schema changes to production

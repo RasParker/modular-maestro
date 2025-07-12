@@ -61,7 +61,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           
           <div className="flex flex-col sm:text-right gap-2">
             <p className="text-lg font-bold text-foreground">
-              ${subscription.price}/month
+              GHS {subscription.price}/month
             </p>
             <p className="text-sm text-muted-foreground">
               Next: {subscription.next_billing}

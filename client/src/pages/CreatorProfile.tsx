@@ -913,7 +913,7 @@ export const CreatorProfile: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold">{tier.name}</h3>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-accent">${tier.price}</div>
+                          <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
                           <div className="text-sm text-muted-foreground">per month</div>
                         </div>
                       </div>

@@ -244,7 +244,7 @@ export const ManageTiers: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price">Monthly Price ($)</Label>
+                    <Label htmlFor="price">Monthly Price (GHS)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -321,7 +321,7 @@ export const ManageTiers: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{tier.name}</CardTitle>
-                    <Badge variant="outline">${tier.price}/mo</Badge>
+                    <Badge variant="outline">GHS {tier.price}/mo</Badge>
                   </div>
                   <CardDescription>{tier.description}</CardDescription>
                 </CardHeader>
@@ -369,13 +369,13 @@ export const ManageTiers: React.FC = () => {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">
-                    ${tiers.length > 0 ? Math.min(...tiers.map(t => t.price)) : 0}
+                    GHS {tiers.length > 0 ? Math.min(...tiers.map(t => t.price)) : 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Lowest Price</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">
-                    ${tiers.length > 0 ? Math.max(...tiers.map(t => t.price)) : 0}
+                    GHS {tiers.length > 0 ? Math.max(...tiers.map(t => t.price)) : 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Highest Price</div>
                 </div>

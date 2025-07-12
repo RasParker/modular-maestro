@@ -489,7 +489,7 @@ export const FanSettings: React.FC = () => {
                     <Separator />
                     
                     <div className="space-y-2">
-                      <Label htmlFor="spendingLimit">Monthly Spending Limit ($)</Label>
+                      <Label htmlFor="spendingLimit">Monthly Spending Limit (GHS)</Label>
                       <Input
                         id="spendingLimit"
                         type="number"
@@ -553,7 +553,7 @@ export const FanSettings: React.FC = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
                       <div>
                         <p className="text-sm font-medium text-foreground">CreatorName</p>
-                        <p className="text-xs text-muted-foreground">Premium Tier • $9.99/month</p>
+                        <p className="text-xs text-muted-foreground">Premium Tier • GHS 9.99/month</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">Active</Badge>
@@ -563,7 +563,7 @@ export const FanSettings: React.FC = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/10">
                       <div>
                         <p className="text-sm font-medium text-foreground">AnotherCreator</p>
-                        <p className="text-xs text-muted-foreground">Basic Tier • $4.99/month</p>
+                        <p className="text-xs text-muted-foreground">Basic Tier • GHS 4.99/month</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">Active</Badge>

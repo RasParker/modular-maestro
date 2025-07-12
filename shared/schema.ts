@@ -72,7 +72,7 @@ export const subscription_tiers = pgTable("subscription_tiers", {
   name: text("name").notNull(),
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  currency: text("currency").notNull().default("USD"),
+  currency: text("currency").notNull().default("GHS"),
   benefits: json("benefits").$type<string[]>().notNull().default([]),
   is_active: boolean("is_active").notNull().default(true),
   created_at: timestamp("created_at").notNull().defaultNow(),
@@ -97,7 +97,7 @@ export const payment_transactions = pgTable("payment_transactions", {
   id: serial("id").primaryKey(),
   subscription_id: integer("subscription_id").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: text("currency").notNull().default("USD"),
+  currency: text("currency").notNull().default("GHS"),
   status: text("status").notNull().default("pending"), // pending, completed, failed, refunded
   payment_method: text("payment_method"), // stripe, paypal, etc.
   transaction_id: text("transaction_id"), // external payment processor transaction ID
@@ -109,7 +109,7 @@ export const creator_payouts = pgTable("creator_payouts", {
   id: serial("id").primaryKey(),
   creator_id: integer("creator_id").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: text("currency").notNull().default("USD"),
+  currency: text("currency").notNull().default("GHS"),
   status: text("status").notNull().default("pending"), // pending, completed, failed
   period_start: timestamp("period_start").notNull(),
   period_end: timestamp("period_end").notNull(),
