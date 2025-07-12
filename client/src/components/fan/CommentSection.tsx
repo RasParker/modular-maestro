@@ -307,7 +307,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 </Avatar>
                 <div className="flex-1 flex gap-2">
                   <Textarea
-                    key={`reply-${comment.id}`}
                     placeholder={`Reply to ${comment.user.username}...`}
                     value={replyContents[comment.id] || ''}
                     onChange={(e) => {
@@ -315,13 +314,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
                     }}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
-                    style={{ 
-                      direction: 'ltr', 
-                      textAlign: 'left',
-                      unicodeBidi: 'normal',
-                      writingMode: 'horizontal-tb',
-                      textOrientation: 'mixed'
-                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                         handleAddReply(comment.id);
