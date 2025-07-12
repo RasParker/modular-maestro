@@ -135,11 +135,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { password: _, ...userWithoutPassword } = user;
-      
+
       // Set session data
       req.session.userId = user.id;
       req.session.user = userWithoutPassword;
-      
+
       res.json({ user: userWithoutPassword });
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
@@ -172,11 +172,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(validatedData);
       const { password: _, ...userWithoutPassword } = user;
-      
+
       // Set session data
       req.session.userId = user.id;
       req.session.user = userWithoutPassword;
-      
+
       res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error('Registration error:', error);
@@ -293,13 +293,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/posts", async (req, res) => {
+  // Create post
+  app.post('/api/posts', async (req: Request, res: Response) => {
     try {
-      const validatedData = insertPostSchema.parse(req.body);
-      const post = await storage.createPost(validatedData);
-      res.json(post);
+      const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
+
+      const newPost = await db.insert(posts).values({
+        creator_id,
+        title,
+        content,
+        media_type,
+        media_urls,
+        tier,
+        status: status || 'published', // Default to published if status not provided
+        scheduled_for: scheduled_for ? new Date(scheduled_for) : null,
+      }).returning();
+
+      res.json(newPost[0]);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create post" });
+      console.error('Error creating post:', error);
+      res.status(500).json({ error: 'Failed to create post' });
     }
   });
 
@@ -481,7 +494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creatorId = parseInt(req.params.creatorId);
       console.log('Creating tier for creator:', creatorId, 'with data:', req.body);
-      
+
       const validatedData = insertSubscriptionTierSchema.parse({
         ...req.body,
         creator_id: creatorId
@@ -545,7 +558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       const creatorId = parseInt(req.params.creatorId);
-      
+
       const subscription = await storage.getUserSubscriptionToCreator(userId, creatorId);
       res.json(subscription || null);
     } catch (error) {
@@ -609,13 +622,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/users", async (req, res) => {
     try {
       const allUsers = await db.select().from(users);
-      
+
       // Remove password from response
       const usersWithoutPassword = allUsers.map(user => {
         const { password: _, ...userWithoutPassword } = user;
         return userWithoutPassword;
       });
-      
+
       res.json(usersWithoutPassword);
     } catch (error) {
       console.error('Failed to fetch all users:', error);

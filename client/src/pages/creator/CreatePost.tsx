@@ -191,6 +191,7 @@ export const CreatePost: React.FC = () => {
         media_type: mediaType || 'text',
         media_urls: uploadedMediaUrls,
         tier: data.accessTier === 'free' ? 'public' : data.accessTier,
+        status: action === 'draft' ? 'draft' : action === 'schedule' ? 'scheduled' : 'published',
         scheduled_for: data.scheduledDate && action === 'schedule' ? 
           new Date(data.scheduledDate).toISOString() : null
       };

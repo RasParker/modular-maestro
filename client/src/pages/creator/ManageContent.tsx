@@ -59,7 +59,8 @@ export const ManageContent: React.FC = () => {
                     post.tier === 'fan' ? 'Fan Content' :
                     post.tier === 'premium' ? 'Premium Content' :
                     post.tier === 'superfan' ? 'Superfan Content' : 'Free',
-              status: 'Published' as const, // Default to published for now
+              status: post.status === 'draft' ? 'Draft' as const :
+                      post.status === 'scheduled' ? 'Scheduled' as const : 'Published' as const,
               date: new Date(post.created_at).toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric', 

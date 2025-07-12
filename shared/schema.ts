@@ -27,18 +27,19 @@ export const users = pgTable("users", {
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const posts = pgTable("posts", {
-  id: serial("id").primaryKey(),
-  creator_id: integer("creator_id").notNull(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
+export const posts = pgTable('posts', {
+  id: serial('id').primaryKey(),
+  creator_id: integer('creator_id').notNull(),
+  title: text('title').notNull(),
+  content: text('content'),
+  media_type: text('media_type').notNull().default('text'),
   media_urls: json("media_urls").$type<string[]>().notNull().default([]),
-  media_type: text("media_type").notNull().default("text"), // image, video, text
-  tier: text("tier").notNull().default("public"), // public, fan, supporter, premium
-  likes_count: integer("likes_count").notNull().default(0),
-  comments_count: integer("comments_count").notNull().default(0),
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  tier: text('tier').notNull().default('public'),
+  status: text('status').notNull().default('published'), // published, draft, scheduled
+  likes_count: integer('likes_count').notNull().default(0),
+  comments_count: integer('comments_count').notNull().default(0),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
 });
 
 export const comments = pgTable("comments", {
