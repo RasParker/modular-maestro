@@ -38,6 +38,16 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+interface SubscriptionTier {
+  id: number;
+  creator_id: number;
+  name: string;
+  price: number;
+  description: string;
+  benefits: string[];
+  is_active: boolean;
+}
+
 export const CreatePost: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -46,6 +56,7 @@ export const CreatePost: React.FC = () => {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -55,6 +66,29 @@ export const CreatePost: React.FC = () => {
       scheduledTime: '12:00',
     },
   });
+
+  // Fetch creator's subscription tiers
+  useEffect(() => {
+    const fetchTiers = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await fetch(`/api/creators/${user.id}/tiers`);
+        if (response.ok) {
+          const tiersData = await response.json();
+          setTiers(tiersData);
+        } else {
+          console.error('Failed to fetch tiers');
+          setTiers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching tiers:', error);
+        setTiers([]);
+      }
+    };
+
+    fetchTiers();
+  }, [user?.id]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -336,9 +370,11 @@ export const CreatePost: React.FC = () => {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="free">Free for all followers</SelectItem>
-                          <SelectItem value="supporter">Supporter ($5/month)</SelectItem>
-                          <SelectItem value="fan">Fan ($15/month)</SelectItem>
-                          <SelectItem value="superfan">Superfan ($25/month)</SelectItem>
+                          {tiers.map((tier) => (
+                            <SelectItem key={tier.id} value={tier.name.toLowerCase()}>
+                              {tier.name} (GHS {tier.price}/month)
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

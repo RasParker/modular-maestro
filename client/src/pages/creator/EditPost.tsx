@@ -22,12 +22,20 @@ const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/quicktime"];
 
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required").max(2000, "Caption must be less than 2000 characters"),
-  accessTier: z.enum(['free', 'supporter', 'fan', 'superfan'], {
-    required_error: "Please select an access tier",
-  }),
+  accessTier: z.string().min(1, "Please select an access tier"),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+interface SubscriptionTier {
+  id: number;
+  creator_id: number;
+  name: string;
+  price: number;
+  description: string;
+  benefits: string[];
+  is_active: boolean;
+}
 
 export const EditPost: React.FC = () => {
   const { id: postId } = useParams<{ id: string }>();
@@ -40,6 +48,7 @@ export const EditPost: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [originalPost, setOriginalPost] = useState<any>(null);
+  const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -49,65 +58,68 @@ export const EditPost: React.FC = () => {
     },
   });
 
-  // Load the existing post data
   useEffect(() => {
-    const fetchPost = async () => {
-      console.log('fetchPost called with postId:', postId, 'user:', user);
-      if (!postId || !user) {
-        console.log('Missing postId or user, returning early');
+    const fetchData = async () => {
+      if (!postId || !user?.id) {
         setIsLoading(false);
         return;
       }
-      
+
       try {
-        console.log('Fetching post with ID:', postId);
-        const response = await fetch(`/api/posts/${postId}`);
-        if (response.ok) {
-          const post = await response.json();
-          console.log('Fetched post data:', post);
-          
-          // Check if user owns this post
-          if (post.creator_id !== parseInt(user.id)) {
-            toast({
-              title: "Access denied",
-              description: "You can only edit your own posts.",
-              variant: "destructive",
-            });
-            navigate('/creator/dashboard');
-            return;
-          }
-          
-          setOriginalPost(post);
-          
-          // Set form values
-          form.setValue('caption', post.content || post.title);
-          form.setValue('accessTier', post.tier === 'public' ? 'free' : post.tier);
-          
+        // Fetch both post data and creator tiers
+        const [postResponse, tiersResponse] = await Promise.all([
+          fetch(`/api/posts/${postId}`),
+          fetch(`/api/creators/${user.id}/tiers`)
+        ]);
+
+        if (postResponse.ok) {
+          const postData = await postResponse.json();
+
+          // Pre-populate form with existing post data
+          form.reset({
+            caption: postData.content || '',
+            accessTier: postData.tier || 'free',
+          });
+
           // Set media preview if exists
-          if (post.media_urls && post.media_urls.length > 0) {
-            const mediaUrl = post.media_urls[0].startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls[0]}`;
+          if (postData.media_urls && postData.media_urls.length > 0) {
+            const mediaUrl = postData.media_urls[0].startsWith('/uploads/')
+              ? postData.media_urls[0]
+              : `/uploads/${postData.media_urls[0]}`;
             setMediaPreview(mediaUrl);
-            setMediaType(post.media_type === 'image' ? 'image' : 'video');
+            setMediaType(postData.media_type === 'image' ? 'image' : 'video');
           }
         } else {
-          throw new Error('Post not found');
+          toast({
+            title: "Error",
+            description: "Failed to load post data.",
+            variant: "destructive",
+          });
+          navigate('/creator/content');
+        }
+
+        if (tiersResponse.ok) {
+          const tiersData = await tiersResponse.json();
+          setTiers(tiersData);
+        } else {
+          console.error('Failed to fetch tiers');
+          setTiers([]);
         }
       } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error('Error fetching data:', error);
         toast({
           title: "Error",
-          description: "Failed to load post. Please try again.",
+          description: "Failed to load post data.",
           variant: "destructive",
         });
-        navigate('/creator/dashboard');
+        navigate('/creator/content');
       } finally {
-        console.log('Setting isLoading to false');
         setIsLoading(false);
       }
     };
 
-    fetchPost();
-  }, [postId, user, navigate, toast, form]);
+    fetchData();
+  }, [postId, user?.id, form, toast, navigate]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -169,16 +181,16 @@ export const EditPost: React.FC = () => {
       if (mediaFile) {
         const formData = new FormData();
         formData.append('media', mediaFile);
-        
+
         const uploadResponse = await fetch('/api/upload/post-media', {
           method: 'POST',
           body: formData,
         });
-        
+
         if (!uploadResponse.ok) {
           throw new Error('Failed to upload media');
         }
-        
+
         const uploadResult = await uploadResponse.json();
         uploadedMediaUrls = [uploadResult.filename];
       }
@@ -251,7 +263,7 @@ export const EditPost: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -296,7 +308,7 @@ export const EditPost: React.FC = () => {
                 {/* Media Upload */}
                 <div className="space-y-4">
                   <Label>Media (Optional)</Label>
-                  
+
                   {!mediaPreview ? (
                     <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                       <Input
@@ -312,7 +324,7 @@ export const EditPost: React.FC = () => {
                           <div>
                             <p className="text-sm font-medium">Click to upload new media</p>
                             <p className="text-xs text-muted-foreground">
-                              Images: JPG, PNG, GIF (max 16MB)<br/>
+                              Images: JPG, PNG, GIF (max 16MB)<br />
                               Videos: MP4, MOV (max 16MB)
                             </p>
                           </div>
@@ -377,9 +389,11 @@ export const EditPost: React.FC = () => {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="free">Free for all followers</SelectItem>
-                          <SelectItem value="supporter">Supporter ($5/month)</SelectItem>
-                          <SelectItem value="fan">Fan ($15/month)</SelectItem>
-                          <SelectItem value="superfan">Superfan ($25/month)</SelectItem>
+                          {tiers.map((tier) => (
+                            <SelectItem key={tier.id} value={tier.name}>
+                              {tier.name} (${tier.price}/month)
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -390,8 +404,8 @@ export const EditPost: React.FC = () => {
             </Card>
 
             <div className="flex justify-end">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSaving}
                 className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
               >
