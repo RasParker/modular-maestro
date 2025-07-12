@@ -107,7 +107,7 @@ export const FanDashboard: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monthly Spending</p>
                       <p className="text-2xl font-bold text-foreground">
-                        ${MOCK_SUBSCRIPTIONS.reduce((sum, sub) => sum + sub.price, 0)}
+                        GHS {MOCK_SUBSCRIPTIONS.reduce((sum, sub) => sum + sub.price, 0)}
                       </p>
                     </div>
                     <CreditCard className="h-8 w-8 text-accent" />
@@ -152,7 +152,7 @@ export const FanDashboard: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">{subscription.tier}</Badge>
                           <span className="text-sm text-muted-foreground">
-                            ${subscription.price}/month
+                            GHS {subscription.price}/month
                           </span>
                         </div>
                       </div>

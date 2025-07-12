@@ -94,21 +94,21 @@ export const AdminAnalytics: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Creator Subscriptions</span>
-                  <span className="text-sm text-muted-foreground">$980K (82%)</span>
+                  <span className="text-sm text-muted-foreground">GHS 980K (82%)</span>
                 </div>
                 <Progress value={82} className="h-2" />
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Platform Fees</span>
-                  <span className="text-sm text-muted-foreground">$147K (12%)</span>
+                  <span className="text-sm text-muted-foreground">GHS 147K (12%)</span>
                 </div>
                 <Progress value={12} className="h-2" />
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Premium Features</span>
-                  <span className="text-sm text-muted-foreground">$73K (6%)</span>
+                  <span className="text-sm text-muted-foreground">GHS 73K (6%)</span>
                 </div>
                 <Progress value={6} className="h-2" />
               </div>

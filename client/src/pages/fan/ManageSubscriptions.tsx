@@ -134,7 +134,7 @@ export const ManageSubscriptions: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Monthly Spending</p>
-                  <p className="text-2xl font-bold text-foreground">${totalMonthlySpend}</p>
+                  <p className="text-2xl font-bold text-foreground">GHS {totalMonthlySpend}</p>
                 </div>
                 <CreditCard className="h-8 w-8 text-accent" />
               </div>

@@ -281,7 +281,7 @@ export const PaymentMethod: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Amount due</p>
-                  <p className="font-medium">$25.00</p>
+                  <p className="font-medium">GHS 25.00</p>
                 </div>
               </div>
               

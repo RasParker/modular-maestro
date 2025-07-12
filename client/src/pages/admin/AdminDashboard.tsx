@@ -131,7 +131,7 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Platform Revenue</p>
-                    <p className="text-2xl font-bold text-foreground">${PLATFORM_STATS.platformFees.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-foreground">GHS {PLATFORM_STATS.platformFees.toLocaleString()}</p>
                     <p className="text-xs text-success">+15% vs last month</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-accent" />
@@ -255,7 +255,7 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${creator.monthly_revenue.toLocaleString()}</p>
+                      <p className="font-medium">GHS {creator.monthly_revenue.toLocaleString()}</p>
                       <div className="flex items-center gap-2">
                         <p className="text-sm text-muted-foreground">{creator.subscribers} subscribers</p>
                         <Badge variant={creator.status === 'verified' ? 'default' : 'outline'}>
