@@ -10,6 +10,7 @@ import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscrip
 import { db } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
+import paymentRoutes from './routes/payment';
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -856,6 +857,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to sync profile' });
     }
   });
+
+  // Payment routes
+  app.use('/api/payments', paymentRoutes);
 
   const httpServer = createServer(app);
   return httpServer;

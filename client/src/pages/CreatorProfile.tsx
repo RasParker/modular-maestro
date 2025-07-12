@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
+import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -138,6 +139,8 @@ export const CreatorProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [userSubscription, setUserSubscription] = useState<any>(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<any>(null);
   const { toast } = useToast();
 
   // Define isOwnProfile early to avoid initialization issues
@@ -393,8 +396,13 @@ export const CreatorProfile: React.FC = () => {
       window.location.href = `/login?redirect=/creator/${username}`;
       return;
     }
-    // Handle subscription logic
-    console.log(`Subscribing to tier ${tierId}`);
+    
+    // Find the selected tier
+    const tier = creator.tiers.find((t: any) => t.id === tierId);
+    if (tier) {
+      setSelectedTier(tier);
+      setPaymentModalOpen(true);
+    }
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -1114,6 +1122,19 @@ export const CreatorProfile: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Payment Modal */}
+      {selectedTier && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setSelectedTier(null);
+          }}
+          tier={selectedTier}
+          creatorName={creator.display_name || creator.username}
+        />
+      )}
     </div>
   );
 };

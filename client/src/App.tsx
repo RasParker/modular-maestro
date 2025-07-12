@@ -40,6 +40,9 @@ import { ReviewContent } from '@/pages/admin/ReviewContent';
 import { Reports } from '@/pages/admin/Reports';
 import { AdminAnalytics } from '@/pages/admin/AdminAnalytics';
 
+// Payment components
+import { PaymentCallback } from '@/components/payment/PaymentCallback';
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -64,6 +67,9 @@ function App() {
               <Route path="/fan/payment" element={<ProtectedRoute allowedRoles={['fan']}><PaymentMethod /></ProtectedRoute>} />
               <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
               <Route path="/creator/:username" element={<CreatorProfile />} />
+              
+              {/* Payment Routes */}
+              <Route path="/payment/callback" element={<PaymentCallback />} />
 
               {/* Creator Routes */}
               <Route path="/creator/dashboard" element={<ProtectedRoute allowedRoles={['creator']}><CreatorDashboard /></ProtectedRoute>} />
