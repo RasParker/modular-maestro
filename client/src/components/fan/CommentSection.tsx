@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -38,7 +38,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContents, setReplyContents] = useState<Record<string, string>>({});
-  const [replyInputRefs, setReplyInputRefs] = useState<Record<string, React.RefObject<HTMLTextAreaElement>>>({});
+  const replyInputRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
@@ -307,11 +307,21 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 </Avatar>
                 <div className="flex-1 flex gap-2">
                   <Textarea
+                    ref={(el) => { replyInputRefs.current[comment.id] = el; }}
                     placeholder={`Reply to ${comment.user.username}...`}
                     value={replyContents[comment.id] || ''}
                     onChange={(e) => {
                       const newValue = e.target.value;
+                      const cursorPosition = e.target.selectionStart;
                       setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
+                      
+                      // Restore cursor position after state update
+                      setTimeout(() => {
+                        const textarea = replyInputRefs.current[comment.id];
+                        if (textarea) {
+                          textarea.setSelectionRange(cursorPosition, cursorPosition);
+                        }
+                      }, 0);
                     }}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
                     onKeyDown={(e) => {
