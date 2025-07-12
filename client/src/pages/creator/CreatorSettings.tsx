@@ -34,6 +34,8 @@ export const CreatorSettings: React.FC = () => {
     getLocalStorageItem('bio') || ''
   );
   const [open, setOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleSave = () => {
     // Save display name and bio to localStorage
@@ -59,6 +61,49 @@ export const CreatorSettings: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
+    if (deleteConfirmation === 'DELETE') {
+      try {
+        // Call the backend API to delete the account
+        const response = await fetch('/api/delete-account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete account');
+        }
+
+        toast({
+          title: "Account deleted",
+          description: "Your creator account has been permanently deleted.",
+          variant: "destructive",
+        });
+
+        setIsDeleteDialogOpen(false);
+        setDeleteConfirmation('');
+
+        // Clear user data and logout
+        localStorage.clear();
+        
+        // Redirect to home page after a brief delay
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        toast({
+          title: "Deletion failed",
+          description: "Failed to delete account. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleTempDeleteAccount = async () => {
     try {
       const response = await fetch('/api/delete-account', {
         method: 'POST',
@@ -658,24 +703,66 @@ export const CreatorSettings: React.FC = () => {
                             Delete Account
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Permanently delete your account and all data
+                            Permanently delete your creator account and all data
                           </p>
                         </div>
-                        <AlertDialog>
+                        
+                        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive">Delete Account</Button>
+                            <Button variant="destructive">
+                              Delete Account
+                            </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your account
-                                and remove your data from our servers.
+                              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                                <Trash2 className="w-5 h-5" />
+                                Delete Creator Account
+                              </AlertDialogTitle>
+                              <AlertDialogDescription className="space-y-3">
+                                <p>
+                                  This action cannot be undone. This will permanently delete your 
+                                  creator account and remove all your data from our servers.
+                                </p>
+                                <p>
+                                  This includes:
+                                </p>
+                                <ul className="list-disc list-inside text-sm space-y-1 ml-4">
+                                  <li>Your creator profile and settings</li>
+                                  <li>All published content and media</li>
+                                  <li>Subscription tiers and subscriber data</li>
+                                  <li>Earnings history and payout information</li>
+                                  <li>Analytics and performance data</li>
+                                  <li>Messages and fan communications</li>
+                                </ul>
+                                <div className="pt-4">
+                                  <Label htmlFor="deleteConfirmation" className="text-sm font-medium">
+                                    Please type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                                  </Label>
+                                  <Input
+                                    id="deleteConfirmation"
+                                    value={deleteConfirmation}
+                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                    placeholder="Type DELETE here"
+                                    className="mt-2"
+                                  />
+                                </div>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={handleDeleteAccount}>Delete</AlertDialogAction>
+                              <AlertDialogCancel onClick={() => {
+                                setDeleteConfirmation('');
+                                setIsDeleteDialogOpen(false);
+                              }}>
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleDeleteAccount}
+                                disabled={deleteConfirmation !== 'DELETE'}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete Creator Account
+                              </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
