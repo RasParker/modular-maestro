@@ -312,16 +312,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                     value={replyContents[comment.id] || ''}
                     onChange={(e) => {
                       const newValue = e.target.value;
-                      const cursorPosition = e.target.selectionStart;
                       setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
-                      
-                      // Restore cursor position after state update
-                      setTimeout(() => {
-                        const textarea = replyInputRefs.current[comment.id];
-                        if (textarea) {
-                          textarea.setSelectionRange(cursorPosition, cursorPosition);
-                        }
-                      }, 0);
                     }}
                     className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
                     onKeyDown={(e) => {
