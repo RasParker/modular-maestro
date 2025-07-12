@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,56 +8,61 @@ import { Navbar } from '@/components/shared/Navbar';
 import { UserCard } from '@/components/admin/UserCard';
 import { ArrowLeft, Search, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
-const MOCK_USERS = [
-  {
-    id: '1',
-    username: 'artisticmia',
-    email: 'mia@example.com',
-    role: 'creator',
-    status: 'active',
-    joined: '2024-01-15',
-    subscribers: 2840,
-    revenue: 12500
-  },
-  {
-    id: '2',
-    username: 'fitnessking',
-    email: 'fitness@example.com',
-    role: 'creator',
-    status: 'active',
-    joined: '2024-01-10',
-    subscribers: 5120,
-    revenue: 18900
-  },
-  {
-    id: '3',
-    username: 'fan123',
-    email: 'fan@example.com',
-    role: 'fan',
-    status: 'active',
-    joined: '2024-02-01',
-    subscribers: 0,
-    revenue: 0
-  },
-  {
-    id: '4',
-    username: 'suspended_user',
-    email: 'suspended@example.com',
-    role: 'fan',
-    status: 'suspended',
-    joined: '2024-01-20',
-    subscribers: 0,
-    revenue: 0
-  }
-];
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  status: string;
+  joined: string;
+  subscribers: number;
+  revenue: number;
+}
 
 export const ManageUsers: React.FC = () => {
   const { toast } = useToast();
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/admin/users');
+      const allUsers = await response.json();
+
+      // Transform users to match the User interface
+      const transformedUsers: User[] = allUsers.map((user: any) => ({
+        id: user.id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        status: 'active', // Default to active since we don't have status in the DB yet
+        joined: new Date(user.created_at).toISOString().split('T')[0],
+        subscribers: user.total_subscribers || 0,
+        revenue: parseFloat(user.total_earnings || '0')
+      }));
+
+      setUsers(transformedUsers);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load users. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,15 +153,27 @@ export const ManageUsers: React.FC = () => {
             <CardDescription className="text-sm">Manage user accounts and permissions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {filteredUsers.map((user) => (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  onSuspendUser={handleSuspendUser}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <UserCard
+                      key={user.id}
+                      user={user}
+                      onSuspendUser={handleSuspendUser}
+                    />
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    No users found matching your criteria.
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -596,6 +596,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes - Get all users
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const allUsers = await db.select().from(users);
+      
+      // Remove password from response
+      const usersWithoutPassword = allUsers.map(user => {
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(usersWithoutPassword);
+    } catch (error) {
+      console.error('Failed to fetch all users:', error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
   // Creator routes
   app.get("/api/creators", async (req, res) => {
     try {
