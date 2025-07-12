@@ -67,6 +67,8 @@ export const FanSettings: React.FC = () => {
 
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEmailChangeDialogOpen, setIsEmailChangeDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
 
   const handleSave = () => {
     toast({
@@ -183,6 +185,39 @@ export const FanSettings: React.FC = () => {
     }
   };
 
+  const handleEmailChange = async () => {
+    if (!newEmail) {
+      toast({
+        title: "Email required",
+        description: "Please enter a new email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // API call to change email would go here
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      updateUser({ email: newEmail });
+      setFormData(prev => ({ ...prev, email: newEmail }));
+      
+      toast({
+        title: "Email updated",
+        description: "Your email address has been successfully updated.",
+      });
+      
+      setIsEmailChangeDialogOpen(false);
+      setNewEmail('');
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update email. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -195,14 +230,14 @@ export const FanSettings: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Fan Settings</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Fan Settings</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Manage your account preferences and subscription settings
               </p>
             </div>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </Button>
@@ -211,12 +246,12 @@ export const FanSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-              <TabsTrigger value="privacy">Privacy</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+              <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
+              <TabsTrigger value="subscriptions" className="text-xs sm:text-sm">Subscriptions</TabsTrigger>
+              <TabsTrigger value="privacy" className="text-xs sm:text-sm">Privacy</TabsTrigger>
+              <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -670,7 +705,9 @@ export const FanSettings: React.FC = () => {
                     <h4 className="font-medium text-foreground">Email Address</h4>
                     <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
                       <span className="text-sm">{user?.email}</span>
-                      <Button variant="outline" size="sm">Change Email</Button>
+                      <Button variant="outline" size="sm" onClick={() => setIsEmailChangeDialogOpen(true)}>
+                        Change Email
+                      </Button>
                     </div>
                   </div>
 
@@ -849,6 +886,36 @@ export const FanSettings: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Email Change Dialog */}
+      <AlertDialog open={isEmailChangeDialogOpen} onOpenChange={setIsEmailChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change Email Address</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter your new email address below. You may need to verify this email address.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="newEmail">New Email Address</Label>
+              <Input
+                id="newEmail"
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Enter new email address"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEmailChange}>
+              Update Email
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

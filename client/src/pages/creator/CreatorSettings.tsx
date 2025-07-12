@@ -240,14 +240,14 @@ export const CreatorSettings: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Creator Settings</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Creator Settings</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Manage your account preferences and settings
               </p>
             </div>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </Button>
@@ -256,11 +256,11 @@ export const CreatorSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="content">Content</TabsTrigger>
-              <TabsTrigger value="payouts">Payouts</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+              <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
+              <TabsTrigger value="content" className="text-xs sm:text-sm">Content</TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm">Payouts</TabsTrigger>
+              <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">

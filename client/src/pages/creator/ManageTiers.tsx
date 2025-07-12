@@ -158,17 +158,17 @@ export const ManageTiers: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-                <DollarSign className="w-8 h-8 text-primary" />
-                Manage Subscription Tiers
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                <span className="break-words">Manage Subscription Tiers</span>
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Create and manage your subscription tiers and pricing
               </p>
             </div>
-            <Button onClick={handleCreateTier}>
+            <Button onClick={handleCreateTier} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Create New Tier
             </Button>

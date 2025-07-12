@@ -344,14 +344,14 @@ export const ManageContent: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Content Manager</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Content Manager</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Manage and organize your content
               </p>
             </div>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link to="/creator/upload">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Content
