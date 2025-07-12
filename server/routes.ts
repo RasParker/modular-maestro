@@ -2,12 +2,13 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema } from "@shared/schema";
-import { db } from './db';
+import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
@@ -54,8 +55,16 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure session middleware
+  // Configure PostgreSQL session store
+  const PgSession = connectPgSimple(session);
+  
+  // Configure session middleware with PostgreSQL store
   app.use(session({
+    store: new PgSession({
+      pool: pool,
+      tableName: 'session',
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
