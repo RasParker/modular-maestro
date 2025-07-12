@@ -27,6 +27,69 @@ interface CommentSectionProps {
   onCommentCountChange: (count: number) => void;
 }
 
+// Separate component for reply input to avoid cursor jumping
+const ReplyInput: React.FC<{
+  commentId: string;
+  username: string;
+  onReply: (commentId: string, content: string) => void;
+  onCancel: () => void;
+  userAvatar?: string;
+  currentUserName?: string;
+}> = ({ commentId, username, onReply, onCancel, userAvatar, currentUserName }) => {
+  const [replyText, setReplyText] = useState('');
+  
+  const handleSubmit = () => {
+    if (replyText.trim()) {
+      onReply(commentId, replyText);
+      setReplyText('');
+    }
+  };
+
+  return (
+    <div className="mt-3 flex gap-2 animate-in slide-in-from-top-1 duration-200">
+      <Avatar className="h-6 w-6 flex-shrink-0">
+        <AvatarImage src={userAvatar} alt={currentUserName} />
+        <AvatarFallback className="text-xs">{currentUserName?.charAt(0).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1 flex gap-2">
+        <Textarea
+          placeholder={`Reply to ${username}...`}
+          value={replyText}
+          onChange={(e) => setReplyText(e.target.value)}
+          className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+              handleSubmit();
+            }
+            if (e.key === 'Escape') {
+              onCancel();
+            }
+          }}
+          autoFocus
+        />
+        <div className="flex flex-col gap-1">
+          <Button
+            size="sm"
+            onClick={handleSubmit}
+            disabled={!replyText.trim()}
+            className="h-8"
+          >
+            <Send className="w-3 h-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onCancel}
+            className="h-8 text-muted-foreground"
+          >
+            ✕
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const CommentSection: React.FC<CommentSectionProps> = ({
   postId,
   initialComments,
@@ -37,8 +100,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContents, setReplyContents] = useState<Record<string, string>>({});
-  const replyInputRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
@@ -140,8 +201,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     });
   };
 
-  const handleAddReply = (parentId: string) => {
-    const replyContent = replyContents[parentId] || '';
+  const handleAddReply = (parentId: string, replyContent: string) => {
     if (!replyContent.trim()) return;
 
     const reply: Comment = {
@@ -164,7 +224,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         : comment
     ));
 
-    setReplyContents(prev => ({ ...prev, [parentId]: '' }));
     setReplyingTo(null);
     onCommentCountChange(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
 
@@ -300,55 +359,14 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             </div>
 
             {replyingTo === comment.id && (
-              <div className="mt-3 flex gap-2 animate-in slide-in-from-top-1 duration-200">
-                <Avatar className="h-6 w-6 flex-shrink-0">
-                  <AvatarImage src={user?.avatar} alt={user?.username} />
-                  <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 flex gap-2">
-                  <Textarea
-                    ref={(el) => { replyInputRefs.current[comment.id] = el; }}
-                    placeholder={`Reply to ${comment.user.username}...`}
-                    value={replyContents[comment.id] || ''}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setReplyContents(prev => ({ ...prev, [comment.id]: newValue }));
-                    }}
-                    className="min-h-[60px] resize-none border-primary/20 focus:border-primary/40"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                        handleAddReply(comment.id);
-                      }
-                      if (e.key === 'Escape') {
-                        setReplyingTo(null);
-                        setReplyContents(prev => ({ ...prev, [comment.id]: '' }));
-                      }
-                    }}
-                    autoFocus
-                  />
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddReply(comment.id)}
-                      disabled={!(replyContents[comment.id] || '').trim()}
-                      className="h-8"
-                    >
-                      <Send className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setReplyingTo(null);
-                        setReplyContents(prev => ({ ...prev, [comment.id]: '' }));
-                      }}
-                      className="h-8 text-muted-foreground"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <ReplyInput
+                commentId={comment.id}
+                username={comment.user.username}
+                onReply={handleAddReply}
+                onCancel={() => setReplyingTo(null)}
+                userAvatar={user?.avatar}
+                currentUserName={user?.username}
+              />
             )}
 
             {!isNested && showReplies[comment.id] && comment.replies.length > 0 && (
