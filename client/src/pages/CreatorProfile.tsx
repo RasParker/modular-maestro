@@ -611,12 +611,12 @@ export const CreatorProfile: React.FC = () => {
           <div className="max-w-4xl mx-auto flex items-end gap-4">
             <Avatar className="w-24 h-24 border-4 border-background">
               <AvatarImage src={creator.avatar} alt={creator.username} />
-              <AvatarFallback className="text-2xl">{creator.display_name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
             </Avatar>
 
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{creator.display_name}</h1>
+                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     <Star className="w-3 h-3 mr-1" />
@@ -632,7 +632,7 @@ export const CreatorProfile: React.FC = () => {
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
-                {(creator.subscribers || 0).toLocaleString()} subscribers
+                {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
               {isOwnProfile && (
                 <div className="flex items-center gap-2 mt-2">

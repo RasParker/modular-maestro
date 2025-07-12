@@ -19,29 +19,7 @@ interface SubscriptionTier {
   features: string[];
 }
 
-const DEFAULT_TIERS: SubscriptionTier[] = [
-  {
-    id: '1',
-    name: 'Supporter',
-    price: 5,
-    description: 'Access to basic content and community posts',
-    features: ['Weekly art posts', 'Community access', 'Behind-the-scenes content']
-  },
-  {
-    id: '2',
-    name: 'Fan',
-    price: 15,
-    description: 'Everything in Supporter plus exclusive tutorials',
-    features: ['Everything in Supporter', 'Monthly tutorials', 'Process videos', 'High-res downloads']
-  },
-  {
-    id: '3',
-    name: 'Superfan',
-    price: 25,
-    description: 'Ultimate access with personal interaction',
-    features: ['Everything in Fan', 'Direct messaging', '1-on-1 feedback', 'Custom artwork requests']
-  }
-];
+// Removed DEFAULT_TIERS - new accounts should start with empty tiers
 
 export const ManageTiers: React.FC = () => {
   const { toast } = useToast();
@@ -69,13 +47,11 @@ export const ManageTiers: React.FC = () => {
 
   // Save tiers to localStorage whenever tiers change
   useEffect(() => {
-    if (tiers.length > 0) {
-      setLocalStorageObject('subscriptionTiers', tiers);
-      // Dispatch custom event to trigger reactivity
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { keys: ['subscriptionTiers'] }
-      }));
-    }
+    setLocalStorageObject('subscriptionTiers', tiers);
+    // Dispatch custom event to trigger reactivity
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { keys: ['subscriptionTiers'] }
+    }));
   }, [tiers]);
 
   const handleCreateTier = () => {
