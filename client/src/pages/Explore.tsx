@@ -124,7 +124,7 @@ export const Explore: React.FC = () => {
           console.log('Fetched real creators:', creators);
 
           // Transform real creators to match the expected format
-          const transformedCreators = creators.map((creator: any) => {
+          const transformedCreators = await Promise.all(creators.map(async (creator: any) => {
             // Check localStorage for profile customizations for this specific creator
             const profilePhotoUrl = localStorage.getItem('profilePhotoUrl');
             const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
@@ -160,7 +160,7 @@ export const Explore: React.FC = () => {
               verified: creator.verified || false,
               tiers: tiers
             };
-          });
+          }));
 
           setRealCreators(transformedCreators);
           // Combine real creators with mock creators
