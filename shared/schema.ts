@@ -222,6 +222,8 @@ export const insertSubscriptionTierSchema = createInsertSchema(subscription_tier
   price: true,
   currency: true,
   benefits: true,
+}).extend({
+  price: z.union([z.string(), z.number()]).transform((val) => val.toString()),
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
