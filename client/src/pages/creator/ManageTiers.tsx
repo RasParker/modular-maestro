@@ -37,10 +37,21 @@ export const ManageTiers: React.FC = () => {
   // Load tiers from localStorage on component mount
   useEffect(() => {
     const savedTiers = getLocalStorageObject('subscriptionTiers');
-    if (savedTiers && savedTiers.length > 0) {
-      setTiers(savedTiers);
+    // Always start with empty tiers for new accounts - clear any existing mock data
+    if (savedTiers && Array.isArray(savedTiers) && savedTiers.length > 0) {
+      // Check if these are mock tiers by looking for the specific mock tier names
+      const isMockData = savedTiers.some(tier => 
+        tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
+      );
+      
+      if (isMockData) {
+        // Clear mock data and start fresh
+        setTiers([]);
+        localStorage.removeItem('subscriptionTiers');
+      } else {
+        setTiers(savedTiers);
+      }
     } else {
-      // Start with empty tiers for new accounts
       setTiers([]);
     }
   }, []);

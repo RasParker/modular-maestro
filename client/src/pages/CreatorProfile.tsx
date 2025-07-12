@@ -180,9 +180,25 @@ export const CreatorProfile: React.FC = () => {
       if (savedTiers) {
         try {
           const parsedTiers = JSON.parse(savedTiers);
-          setCustomTiers(parsedTiers);
+          if (Array.isArray(parsedTiers)) {
+            // Check if these are mock tiers and clear them
+            const isMockData = parsedTiers.some(tier => 
+              tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
+            );
+            
+            if (isMockData) {
+              // Clear mock data and start fresh
+              localStorage.removeItem('subscriptionTiers');
+              setCustomTiers([]);
+            } else {
+              setCustomTiers(parsedTiers);
+            }
+          } else {
+            setCustomTiers([]);
+          }
         } catch (error) {
           console.error('Error parsing saved tiers:', error);
+          setCustomTiers([]);
         }
       }
     };
@@ -314,7 +330,22 @@ export const CreatorProfile: React.FC = () => {
             if (savedTiers) {
               try {
                 const parsedTiers = JSON.parse(savedTiers);
-                tiers = Array.isArray(parsedTiers) ? parsedTiers : [];
+                if (Array.isArray(parsedTiers)) {
+                  // Check if these are mock tiers and clear them
+                  const isMockData = parsedTiers.some(tier => 
+                    tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
+                  );
+                  
+                  if (isMockData) {
+                    // Clear mock data and start fresh
+                    localStorage.removeItem('subscriptionTiers');
+                    tiers = [];
+                  } else {
+                    tiers = parsedTiers;
+                  }
+                } else {
+                  tiers = [];
+                }
               } catch (error) {
                 console.error("Error parsing subscriptionTiers from localStorage", error);
                 tiers = [];
