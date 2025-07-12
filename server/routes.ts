@@ -8,7 +8,7 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema } from "@shared/schema";
 import { db } from './db';
-import { users, posts, comments, likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 
 // Extend Express session interface

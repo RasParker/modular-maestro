@@ -264,6 +264,20 @@ export const insertPaymentTransactionSchema = createInsertSchema(payment_transac
   processed_at: true,
 });
 
+export const insertReportSchema = createInsertSchema(reports).pick({
+  type: true,
+  reason: true,
+  description: true,
+  reported_by: true,
+  target_type: true,
+  target_id: true,
+  target_name: true,
+  status: true,
+  priority: true,
+  admin_notes: true,
+  resolved_by: true,
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -277,4 +291,6 @@ export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertPaymentTransaction = z.infer<typeof insertPaymentTransactionSchema>;
 export type PaymentTransaction = typeof payment_transactions.$inferSelect;
+export type InsertReport = z.infer<typeof insertReportSchema>;
+export type Report = typeof reports.$inferSelect;
 export type CreatorPayout = typeof creator_payouts.$inferSelect;
