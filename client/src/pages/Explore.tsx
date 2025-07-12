@@ -131,20 +131,21 @@ export const Explore: React.FC = () => {
             const displayName = localStorage.getItem('displayName');
             const bio = localStorage.getItem('bio');
 
-            // Load subscription tiers from localStorage - only if they exist, don't use defaults
-            const savedTiers = localStorage.getItem('subscriptionTiers');
+            // Fetch subscription tiers from API
             let tiers = [];
-            if(savedTiers){
-              try {
-                tiers = JSON.parse(savedTiers).map((tier: any) => ({
+            try {
+              const tiersResponse = await fetch(`/api/creators/${creator.id}/tiers`);
+              if (tiersResponse.ok) {
+                const tiersData = await tiersResponse.json();
+                tiers = tiersData.map((tier: any) => ({
                   id: tier.id,
                   name: tier.name,
-                  price: tier.price
+                  price: parseFloat(tier.price)
                 }));
-              } catch (error) {
-                console.error("Error parsing subscriptionTiers from localStorage", error);
-                tiers = [];
               }
+            } catch (error) {
+              console.error("Error fetching subscription tiers:", error);
+              tiers = [];
             }
 
             return {
