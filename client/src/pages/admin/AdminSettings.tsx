@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navbar } from '@/components/shared/Navbar';
 import { useToast } from '@/hooks/use-toast';
+import { Settings, Shield, Mail, Users, Save } from 'lucide-react';
 
 export const AdminSettings: React.FC = () => {
   const { toast } = useToast();
@@ -39,6 +42,13 @@ export const AdminSettings: React.FC = () => {
     smtpUsername: 'noreply@xclusive.com',
     fromEmail: 'Xclusive <noreply@xclusive.com>',
   });
+
+  const handleSave = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your settings have been updated successfully.",
+    });
+  };
 
   const handlePlatformUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,235 +121,335 @@ export const AdminSettings: React.FC = () => {
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Settings</h1>
-            <p className="text-muted-foreground">Manage platform-wide settings and configurations</p>
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Admin Settings</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Manage platform-wide settings and configurations
+              </p>
+            </div>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
           </div>
+        </div>
 
-          {/* Platform Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Platform Settings</CardTitle>
-              <CardDescription>
-                Configure basic platform information and policies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handlePlatformUpdate} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="siteName">Site Name</Label>
-                    <Input
-                      id="siteName"
-                      value={platformSettings.siteName}
-                      onChange={(e) => setPlatformSettings(prev => ({ ...prev, siteName: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="commissionRate">Commission Rate (%)</Label>
-                    <Input
-                      id="commissionRate"
-                      type="number"
-                      min="0"
-                      max="50"
-                      value={platformSettings.commissionRate}
-                      onChange={(e) => setPlatformSettings(prev => ({ ...prev, commissionRate: parseInt(e.target.value) }))}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="siteDescription">Site Description</Label>
-                  <Textarea
-                    id="siteDescription"
-                    value={platformSettings.siteDescription}
-                    onChange={(e) => setPlatformSettings(prev => ({ ...prev, siteDescription: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
+        <div className="space-y-6">
+          <Tabs defaultValue="platform" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="platform">Platform</TabsTrigger>
+              <TabsTrigger value="moderation">Content</TabsTrigger>
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+            </TabsList>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Maintenance Mode</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Temporarily disable the platform for maintenance
-                      </p>
+            <TabsContent value="platform" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Platform Settings
+                  </CardTitle>
+                  <CardDescription>
+                    Configure basic platform information and policies
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <form onSubmit={handlePlatformUpdate} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="siteName">Site Name</Label>
+                        <Input
+                          id="siteName"
+                          value={platformSettings.siteName}
+                          onChange={(e) => setPlatformSettings(prev => ({ ...prev, siteName: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="commissionRate">Commission Rate (%)</Label>
+                        <Input
+                          id="commissionRate"
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={platformSettings.commissionRate}
+                          onChange={(e) => setPlatformSettings(prev => ({ ...prev, commissionRate: parseInt(e.target.value) }))}
+                        />
+                      </div>
                     </div>
-                    <Switch
-                      checked={platformSettings.maintenanceMode}
-                      onCheckedChange={(checked) => 
-                        setPlatformSettings(prev => ({ ...prev, maintenanceMode: checked }))
-                      }
-                    />
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>New User Registration</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Allow new users to register accounts
-                      </p>
-                    </div>
-                    <Switch
-                      checked={platformSettings.newUserRegistration}
-                      onCheckedChange={(checked) => 
-                        setPlatformSettings(prev => ({ ...prev, newUserRegistration: checked }))
-                      }
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Updating..." : "Update Platform Settings"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Moderation Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Content Moderation</CardTitle>
-              <CardDescription>
-                Configure content moderation and safety settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handleModerationUpdate} className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Auto Moderation</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Automatically flag potentially inappropriate content
-                      </p>
-                    </div>
-                    <Switch
-                      checked={moderationSettings.autoModeration}
-                      onCheckedChange={(checked) => 
-                        setModerationSettings(prev => ({ ...prev, autoModeration: checked }))
-                      }
-                    />
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Require Content Approval</Label>
-                      <p className="text-sm text-muted-foreground">
-                        All content must be approved before going live
-                      </p>
-                    </div>
-                    <Switch
-                      checked={moderationSettings.requireApproval}
-                      onCheckedChange={(checked) => 
-                        setModerationSettings(prev => ({ ...prev, requireApproval: checked }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="bannedWords">Banned Words (comma-separated)</Label>
-                    <Textarea
-                      id="bannedWords"
-                      value={moderationSettings.bannedWords}
-                      onChange={(e) => setModerationSettings(prev => ({ ...prev, bannedWords: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="maxFileSize">Max File Size (MB)</Label>
+                      <Label htmlFor="siteDescription">Site Description</Label>
+                      <Textarea
+                        id="siteDescription"
+                        value={platformSettings.siteDescription}
+                        onChange={(e) => setPlatformSettings(prev => ({ ...prev, siteDescription: e.target.value }))}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label>Maintenance Mode</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Temporarily disable the platform for maintenance
+                          </p>
+                        </div>
+                        <Switch
+                          checked={platformSettings.maintenanceMode}
+                          onCheckedChange={(checked) => 
+                            setPlatformSettings(prev => ({ ...prev, maintenanceMode: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label>New User Registration</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Allow new users to register accounts
+                          </p>
+                        </div>
+                        <Switch
+                          checked={platformSettings.newUserRegistration}
+                          onCheckedChange={(checked) => 
+                            setPlatformSettings(prev => ({ ...prev, newUserRegistration: checked }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Updating..." : "Update Platform Settings"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="moderation" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Content Moderation
+                  </CardTitle>
+                  <CardDescription>
+                    Configure content moderation and safety settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <form onSubmit={handleModerationUpdate} className="space-y-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label>Auto Moderation</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Automatically flag potentially inappropriate content
+                          </p>
+                        </div>
+                        <Switch
+                          checked={moderationSettings.autoModeration}
+                          onCheckedChange={(checked) => 
+                            setModerationSettings(prev => ({ ...prev, autoModeration: checked }))
+                          }
+                        />
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label>Require Content Approval</Label>
+                          <p className="text-sm text-muted-foreground">
+                            All content must be approved before going live
+                          </p>
+                        </div>
+                        <Switch
+                          checked={moderationSettings.requireApproval}
+                          onCheckedChange={(checked) => 
+                            setModerationSettings(prev => ({ ...prev, requireApproval: checked }))
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="bannedWords">Banned Words (comma-separated)</Label>
+                        <Textarea
+                          id="bannedWords"
+                          value={moderationSettings.bannedWords}
+                          onChange={(e) => setModerationSettings(prev => ({ ...prev, bannedWords: e.target.value }))}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="maxFileSize">Max File Size (MB)</Label>
+                          <Input
+                            id="maxFileSize"
+                            type="number"
+                            min="1"
+                            max="1000"
+                            value={moderationSettings.maxFileSize}
+                            onChange={(e) => setModerationSettings(prev => ({ ...prev, maxFileSize: parseInt(e.target.value) }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="allowedFileTypes">Allowed File Types</Label>
+                          <Input
+                            id="allowedFileTypes"
+                            value={moderationSettings.allowedFileTypes}
+                            onChange={(e) => setModerationSettings(prev => ({ ...prev, allowedFileTypes: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button type="submit" disabled={isModerationLoading}>
+                      {isModerationLoading ? "Saving..." : "Save Moderation Settings"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="email" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5" />
+                    Email Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Configure SMTP settings for platform emails
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleEmailUpdate} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="smtpServer">SMTP Server</Label>
+                        <Input
+                          id="smtpServer"
+                          value={emailSettings.smtpServer}
+                          onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpServer: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="smtpPort">SMTP Port</Label>
+                        <Input
+                          id="smtpPort"
+                          type="number"
+                          value={emailSettings.smtpPort}
+                          onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpPort: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="smtpUsername">SMTP Username</Label>
+                        <Input
+                          id="smtpUsername"
+                          value={emailSettings.smtpUsername}
+                          onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpUsername: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="fromEmail">From Email</Label>
+                        <Input
+                          id="fromEmail"
+                          value={emailSettings.fromEmail}
+                          onChange={(e) => setEmailSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button type="submit" disabled={isEmailLoading}>
+                      {isEmailLoading ? "Saving..." : "Save Email Settings"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="users" className="space-y-6">
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    User Management
+                  </CardTitle>
+                  <CardDescription>
+                    Configure user-related settings and policies
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="minimumAge">Minimum Age</Label>
                       <Input
-                        id="maxFileSize"
+                        id="minimumAge"
                         type="number"
-                        min="1"
-                        max="1000"
-                        value={moderationSettings.maxFileSize}
-                        onChange={(e) => setModerationSettings(prev => ({ ...prev, maxFileSize: parseInt(e.target.value) }))}
+                        min="13"
+                        max="21"
+                        value={platformSettings.minimumAge}
+                        onChange={(e) => setPlatformSettings(prev => ({ ...prev, minimumAge: parseInt(e.target.value) }))}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Minimum age required to create an account
+                      </p>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="allowedFileTypes">Allowed File Types</Label>
-                      <Input
-                        id="allowedFileTypes"
-                        value={moderationSettings.allowedFileTypes}
-                        onChange={(e) => setModerationSettings(prev => ({ ...prev, allowedFileTypes: e.target.value }))}
-                      />
+                    
+                    <Separator />
+                    
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-foreground">User Statistics</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-lg bg-muted/20">
+                          <p className="text-sm text-muted-foreground">Total Users</p>
+                          <p className="text-2xl font-bold text-foreground">1,234</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-muted/20">
+                          <p className="text-sm text-muted-foreground">Active Creators</p>
+                          <p className="text-2xl font-bold text-foreground">456</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-muted/20">
+                          <p className="text-sm text-muted-foreground">Verified Users</p>
+                          <p className="text-2xl font-bold text-foreground">89</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-foreground">User Actions</h4>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full">
+                          Export User Data
+                        </Button>
+                        <Button variant="outline" className="w-full">
+                          Send Platform Announcement
+                        </Button>
+                        <Button variant="outline" className="w-full">
+                          Generate User Report
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <Button type="submit" disabled={isModerationLoading}>
-                  {isModerationLoading ? "Saving..." : "Save Moderation Settings"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Email Settings */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <CardTitle>Email Configuration</CardTitle>
-              <CardDescription>
-                Configure SMTP settings for platform emails
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleEmailUpdate} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="smtpServer">SMTP Server</Label>
-                    <Input
-                      id="smtpServer"
-                      value={emailSettings.smtpServer}
-                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpServer: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="smtpPort">SMTP Port</Label>
-                    <Input
-                      id="smtpPort"
-                      type="number"
-                      value={emailSettings.smtpPort}
-                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpPort: parseInt(e.target.value) }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="smtpUsername">SMTP Username</Label>
-                    <Input
-                      id="smtpUsername"
-                      value={emailSettings.smtpUsername}
-                      onChange={(e) => setEmailSettings(prev => ({ ...prev, smtpUsername: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="fromEmail">From Email</Label>
-                    <Input
-                      id="fromEmail"
-                      value={emailSettings.fromEmail}
-                      onChange={(e) => setEmailSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" disabled={isEmailLoading}>
-                  {isEmailLoading ? "Saving..." : "Save Email Settings"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
