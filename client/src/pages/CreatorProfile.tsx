@@ -185,7 +185,7 @@ export const CreatorProfile: React.FC = () => {
             const isMockData = parsedTiers.some(tier => 
               tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
             );
-            
+
             if (isMockData) {
               // Clear mock data and start fresh
               localStorage.removeItem('subscriptionTiers');
@@ -323,33 +323,16 @@ export const CreatorProfile: React.FC = () => {
           console.log('Database avatar:', userData.avatar);
           console.log('Database cover:', userData.cover_image);
 
-          // Only load tiers from localStorage for the current user's own profile
+          // Handle tiers - fetch from API
           let tiers = [];
-          if (user?.username === username) {
-            const savedTiers = localStorage.getItem('subscriptionTiers');
-            if (savedTiers) {
-              try {
-                const parsedTiers = JSON.parse(savedTiers);
-                if (Array.isArray(parsedTiers)) {
-                  // Check if these are mock tiers and clear them
-                  const isMockData = parsedTiers.some(tier => 
-                    tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
-                  );
-                  
-                  if (isMockData) {
-                    // Clear mock data and start fresh
-                    localStorage.removeItem('subscriptionTiers');
-                    tiers = [];
-                  } else {
-                    tiers = parsedTiers;
-                  }
-                } else {
-                  tiers = [];
-                }
-              } catch (error) {
-                console.error("Error parsing subscriptionTiers from localStorage", error);
-                tiers = [];
+          if (userData?.id) {
+            try {
+              const tiersResponse = await fetch(`/api/creators/${userData.id}/tiers`);
+              if (tiersResponse.ok) {
+                tiers = await tiersResponse.json();
               }
+            } catch (error) {
+              console.error('Error fetching tiers:', error);
             }
           }
 
@@ -796,7 +779,7 @@ export const CreatorProfile: React.FC = () => {
                                     <div className="mb-4 opacity-75">
                                       <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                      </svg>
+</svg>
                                     </div>
                                     <h3 className="text-lg font-medium text-foreground mb-2">
                                       {post.tier === 'supporter' ? 'Supporter' : 

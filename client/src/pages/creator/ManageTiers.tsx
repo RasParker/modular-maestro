@@ -9,21 +9,24 @@ import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Plus, Edit, Trash2, DollarSign, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { setLocalStorageObject, getLocalStorageObject } from '@/lib/storage-utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SubscriptionTier {
-  id: string;
+  id: number;
+  creator_id: number;
   name: string;
   price: number;
   description: string;
-  features: string[];
+  benefits: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
-
-// Removed DEFAULT_TIERS - new accounts should start with empty tiers
 
 export const ManageTiers: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingTier, setEditingTier] = useState<SubscriptionTier | null>(null);
@@ -31,43 +34,35 @@ export const ManageTiers: React.FC = () => {
     name: '',
     price: '',
     description: '',
-    features: ['']
+    benefits: ['']
   });
 
-  // Load tiers from localStorage on component mount
+  // Load tiers from API on component mount
   useEffect(() => {
-    const savedTiers = getLocalStorageObject('subscriptionTiers');
-    // Always start with empty tiers for new accounts - clear any existing mock data
-    if (savedTiers && Array.isArray(savedTiers) && savedTiers.length > 0) {
-      // Check if these are mock tiers by looking for the specific mock tier names
-      const isMockData = savedTiers.some(tier => 
-        tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
-      );
+    const fetchTiers = async () => {
+      if (!user?.id) return;
       
-      if (isMockData) {
-        // Clear mock data and start fresh
+      try {
+        const response = await fetch(`/api/creators/${user.id}/tiers`);
+        if (response.ok) {
+          const tiersData = await response.json();
+          setTiers(tiersData);
+        } else {
+          console.error('Failed to fetch tiers');
+          setTiers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching tiers:', error);
         setTiers([]);
-        localStorage.removeItem('subscriptionTiers');
-      } else {
-        setTiers(savedTiers);
       }
-    } else {
-      setTiers([]);
-    }
-  }, []);
+    };
 
-  // Save tiers to localStorage whenever tiers change
-  useEffect(() => {
-    setLocalStorageObject('subscriptionTiers', tiers);
-    // Dispatch custom event to trigger reactivity
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { keys: ['subscriptionTiers'] }
-    }));
-  }, [tiers]);
+    fetchTiers();
+  }, [user?.id]);
 
   const handleCreateTier = () => {
     setIsCreating(true);
-    setFormData({ name: '', price: '', description: '', features: [''] });
+    setFormData({ name: '', price: '', description: '', benefits: [''] });
   };
 
   const handleEditTier = (tier: SubscriptionTier) => {
@@ -76,12 +71,12 @@ export const ManageTiers: React.FC = () => {
       name: tier.name,
       price: tier.price.toString(),
       description: tier.description,
-      features: tier.features
+      benefits: tier.benefits
     });
   };
 
-  const handleSaveTier = () => {
-    if (!formData.name || !formData.price || !formData.description) {
+  const handleSaveTier = async () => {
+    if (!formData.name || !formData.price || !formData.description || !user?.id) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -90,59 +85,111 @@ export const ManageTiers: React.FC = () => {
       return;
     }
 
-    const tierData: SubscriptionTier = {
-      id: editingTier?.id || Date.now().toString(),
-      name: formData.name,
-      price: parseFloat(formData.price),
-      description: formData.description,
-      features: formData.features.filter(f => f.trim() !== '')
-    };
+    try {
+      const tierData = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        description: formData.description,
+        benefits: formData.benefits.filter(f => f.trim() !== '')
+      };
 
-    if (editingTier) {
-      setTiers(prev => prev.map(t => t.id === editingTier.id ? tierData : t));
+      let response;
+      if (editingTier) {
+        // Update existing tier
+        response = await fetch(`/api/tiers/${editingTier.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(tierData),
+        });
+      } else {
+        // Create new tier
+        response = await fetch(`/api/creators/${user.id}/tiers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(tierData),
+        });
+      }
+
+      if (response.ok) {
+        const savedTier = await response.json();
+        
+        if (editingTier) {
+          setTiers(prev => prev.map(t => t.id === editingTier.id ? savedTier : t));
+          toast({
+            title: "Tier updated",
+            description: "Subscription tier has been updated successfully.",
+          });
+        } else {
+          setTiers(prev => [...prev, savedTier]);
+          toast({
+            title: "Tier created",
+            description: "New subscription tier has been created successfully.",
+          });
+        }
+      } else {
+        throw new Error('Failed to save tier');
+      }
+    } catch (error) {
+      console.error('Error saving tier:', error);
       toast({
-        title: "Tier updated",
-        description: "Subscription tier has been updated successfully.",
-      });
-    } else {
-      setTiers(prev => [...prev, tierData]);
-      toast({
-        title: "Tier created",
-        description: "New subscription tier has been created successfully.",
+        title: "Error",
+        description: "Failed to save subscription tier. Please try again.",
+        variant: "destructive",
       });
     }
 
     setIsCreating(false);
     setEditingTier(null);
-    setFormData({ name: '', price: '', description: '', features: [''] });
+    setFormData({ name: '', price: '', description: '', benefits: [''] });
   };
 
-  const handleDeleteTier = (id: string) => {
-    setTiers(prev => prev.filter(t => t.id !== id));
-    toast({
-      title: "Tier deleted",
-      description: "Subscription tier has been deleted successfully.",
-    });
+  const handleDeleteTier = async (id: number) => {
+    try {
+      const response = await fetch(`/api/tiers/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTiers(prev => prev.filter(t => t.id !== id));
+        toast({
+          title: "Tier deleted",
+          description: "Subscription tier has been deleted successfully.",
+        });
+      } else {
+        throw new Error('Failed to delete tier');
+      }
+    } catch (error) {
+      console.error('Error deleting tier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete subscription tier. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleFeatureChange = (index: number, value: string) => {
+  const handleBenefitChange = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.map((f, i) => i === index ? value : f)
+      benefits: prev.benefits.map((f, i) => i === index ? value : f)
     }));
   };
 
-  const addFeature = () => {
+  const addBenefit = () => {
     setFormData(prev => ({
       ...prev,
-      features: [...prev.features, '']
+      benefits: [...prev.benefits, '']
     }));
   };
 
-  const removeFeature = (index: number) => {
+  const removeBenefit = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.filter((_, i) => i !== index)
+      benefits: prev.benefits.filter((_, i) => i !== index)
     }));
   };
 
@@ -223,28 +270,28 @@ export const ManageTiers: React.FC = () => {
 
                 <div className="space-y-4">
                   <Label>Benefits & Features</Label>
-                  {formData.features.map((feature, index) => (
+                  {formData.benefits.map((benefit, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
                         placeholder="Enter a benefit..."
-                        value={feature}
-                        onChange={(e) => handleFeatureChange(index, e.target.value)}
+                        value={benefit}
+                        onChange={(e) => handleBenefitChange(index, e.target.value)}
                       />
-                      {formData.features.length > 1 && (
+                      {formData.benefits.length > 1 && (
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => removeFeature(index)}
+                          onClick={() => removeBenefit(index)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       )}
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addFeature}>
+                  <Button type="button" variant="outline" onClick={addBenefit}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Add Feature
+                    Add Benefit
                   </Button>
                 </div>
 
@@ -257,6 +304,7 @@ export const ManageTiers: React.FC = () => {
                     onClick={() => {
                       setIsCreating(false);
                       setEditingTier(null);
+                      setFormData({ name: '', price: '', description: '', benefits: [''] });
                     }}
                   >
                     Cancel
@@ -279,10 +327,10 @@ export const ManageTiers: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-2">
-                    {tier.features.map((feature, index) => (
+                    {tier.benefits.map((benefit, index) => (
                       <li key={index} className="text-sm flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        {feature}
+                        {benefit}
                       </li>
                     ))}
                   </ul>
