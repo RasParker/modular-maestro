@@ -322,15 +322,18 @@ export const CreatorProfile: React.FC = () => {
           console.log('Database avatar:', userData.avatar);
           console.log('Database cover:', userData.cover_image);
 
-          // Load subscription tiers from localStorage - only if they exist, don't use defaults
-          const savedTiers = localStorage.getItem('subscriptionTiers');
+          // Only load tiers from localStorage for the current user's own profile
           let tiers = [];
-          if(savedTiers){
-            try {
-              tiers = JSON.parse(savedTiers);
-            } catch (error) {
-              console.error("Error parsing subscriptionTiers from localStorage", error);
-              tiers = [];
+          if (user?.username === username) {
+            const savedTiers = localStorage.getItem('subscriptionTiers');
+            if (savedTiers) {
+              try {
+                const parsedTiers = JSON.parse(savedTiers);
+                tiers = Array.isArray(parsedTiers) ? parsedTiers : [];
+              } catch (error) {
+                console.error("Error parsing subscriptionTiers from localStorage", error);
+                tiers = [];
+              }
             }
           }
 
