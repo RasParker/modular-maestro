@@ -279,7 +279,7 @@ export const CreatorProfile: React.FC = () => {
   useEffect(() => {
     const fetchUserSubscription = async () => {
       if (!user || !creator || isOwnProfile) return;
-      
+
       try {
         setSubscriptionLoading(true);
         const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
@@ -309,44 +309,39 @@ export const CreatorProfile: React.FC = () => {
         const response = await fetch(`/api/users/username/${username}`);
         if (response.ok) {
           const userData = await response.json();
+          console.log('Creator data loaded:', userData);
 
-          // For own profile, prioritize localStorage values, otherwise use database values
-          const isOwnProfileCheck = user?.username === username;
+          // Check localStorage for profile customizations
+          const profilePhotoUrl = localStorage.getItem('profilePhotoUrl');
+          const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
+          const displayName = localStorage.getItem('displayName');
+          const bio = localStorage.getItem('bio');
 
-          const creatorData = {
-            id: userData.id,
-            username: userData.username,
-            display_name: (isOwnProfileCheck && displayName) || userData.display_name || userData.username,
-            avatar: (isOwnProfileCheck && profilePhotoUrl) || userData.avatar || null,
-            cover: (isOwnProfileCheck && coverPhotoUrl) || userData.cover_image || null,
-            bio: (isOwnProfileCheck && bio) || userData.bio || null,
-            subscribers: userData.total_subscribers || 0,
-            verified: userData.verified || false,
-            role: userData.role,
-            tiers: (isOwnProfileCheck && customTiers.length > 0) ? customTiers : [
-              { 
-                id: '1',
-                name: 'Supporter', 
-                price: 5,
-                description: 'Support my creative journey',
-                features: ['Access to all posts', 'Community access', 'Monthly updates']
-              },
-              { 
-                id: '2',
-                name: 'Premium', 
-                price: 15,
-                description: 'Get exclusive content and perks',
-                features: ['Everything in Supporter', 'Exclusive content', 'Behind-the-scenes access', 'Priority support']
-              }
-            ],
-            recentPosts: userPosts
-          };
-          setCreator(creatorData);
-          console.log('Creator data loaded:', creatorData);
           console.log('Profile photo URL from localStorage:', profilePhotoUrl);
           console.log('Cover photo URL from localStorage:', coverPhotoUrl);
           console.log('Database avatar:', userData.avatar);
           console.log('Database cover:', userData.cover_image);
+
+          // Load subscription tiers from localStorage - only if they exist, don't use defaults
+          const savedTiers = localStorage.getItem('subscriptionTiers');
+          let tiers = [];
+          if(savedTiers){
+            try {
+              tiers = JSON.parse(savedTiers);
+            } catch (error) {
+              console.error("Error parsing subscriptionTiers from localStorage", error);
+              tiers = [];
+            }
+          }
+
+          setCreator({
+            ...userData,
+            display_name: displayName || userData.display_name || userData.username,
+            avatar: profilePhotoUrl || userData.avatar,
+            cover: coverPhotoUrl || userData.cover_image,
+            bio: bio || userData.bio,
+            tiers: tiers
+          });
         } else {
           setCreator(null);
         }
@@ -456,16 +451,16 @@ export const CreatorProfile: React.FC = () => {
   const hasAccessToTier = (postTier: string): boolean => {
     // Own profile - can see all content
     if (isOwnProfile) return true;
-    
+
     // Public content - everyone can see
     if (postTier === 'public') return true;
-    
+
     // If user is not logged in, no access to premium content
     if (!user) return false;
-    
+
     // If user has no subscription, no access to premium content
     if (!userSubscription) return false;
-    
+
     // Define tier hierarchy - higher tiers include lower tier content
     const tierHierarchy = {
       'supporter': 1,
@@ -473,10 +468,10 @@ export const CreatorProfile: React.FC = () => {
       'premium': 2,
       'superfan': 3
     };
-    
+
     const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
     const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 0;
-    
+
     return userTierLevel >= postTierLevel;
   };
 
