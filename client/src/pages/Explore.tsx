@@ -122,7 +122,7 @@ export const Explore: React.FC = () => {
         if (response.ok) {
           const creators = await response.json();
           console.log('Fetched real creators:', creators);
-          
+
           // Transform real creators to match the expected format
           const transformedCreators = creators.map((creator: any) => {
             // Check localStorage for profile customizations for this specific creator
@@ -130,7 +130,23 @@ export const Explore: React.FC = () => {
             const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
             const displayName = localStorage.getItem('displayName');
             const bio = localStorage.getItem('bio');
-            
+
+            // Load subscription tiers from localStorage - only if they exist, don't use defaults
+            const savedTiers = localStorage.getItem('subscriptionTiers');
+            let tiers = [];
+            if(savedTiers){
+              try {
+                tiers = JSON.parse(savedTiers).map((tier: any) => ({
+                  id: tier.id,
+                  name: tier.name,
+                  price: tier.price
+                }));
+              } catch (error) {
+                console.error("Error parsing subscriptionTiers from localStorage", error);
+                tiers = [];
+              }
+            }
+
             return {
               id: `real_${creator.id}`,
               username: creator.username,
@@ -141,14 +157,10 @@ export const Explore: React.FC = () => {
               category: 'General',
               subscribers: creator.total_subscribers || 0,
               verified: creator.verified || false,
-              tiers: [
-                { name: 'Supporter', price: 5 },
-                { name: 'Fan', price: 15 },
-                { name: 'Superfan', price: 25 }
-              ]
+              tiers: tiers
             };
           });
-          
+
           setRealCreators(transformedCreators);
           // Combine real creators with mock creators
           setAllCreators([...transformedCreators, ...CREATORS]);
