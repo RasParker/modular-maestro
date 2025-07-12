@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Navbar } from '@/components/shared/Navbar';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_FEED = [
@@ -323,10 +323,10 @@ export const FeedPage: React.FC = () => {
     }));
   };
 
-  const truncateText = (text: string, maxLines: number = 2) => {
+  const truncateText = (text: string, maxLines: number = 1) => {
     const words = text.split(' ');
     // Adjust words per line based on screen size - fewer words on mobile
-    const wordsPerLine = window.innerWidth < 640 ? 6 : 10; // Reduced to leave space for "Read more"
+    const wordsPerLine = window.innerWidth < 640 ? 8 : 12; // Single line with space for "Read more"
     const maxWords = maxLines * wordsPerLine;
     
     if (words.length <= maxWords) {
@@ -337,6 +337,19 @@ export const FeedPage: React.FC = () => {
       truncated: words.slice(0, maxWords).join(' '),
       needsExpansion: true
     };
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'image':
+        return <Image className="w-3 h-3" />;
+      case 'video':
+        return <Video className="w-3 h-3" />;
+      case 'audio':
+        return <Music className="w-3 h-3" />;
+      default:
+        return <Image className="w-3 h-3" />;
+    }
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -388,9 +401,7 @@ export const FeedPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <Badge variant="outline" className="capitalize">
-                    {post.type}
-                  </Badge>
+                  
                 </div>
               </CardHeader>
               
@@ -437,7 +448,7 @@ export const FeedPage: React.FC = () => {
                 </div>
                 
                 <div 
-                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 relative"
                   onClick={() => handleThumbnailClick(post)}
                   role="button"
                   tabIndex={0}
@@ -453,6 +464,10 @@ export const FeedPage: React.FC = () => {
                     alt={`${post.creator.display_name}'s post`}
                     className="w-full h-64 object-cover"
                   />
+                  {/* Content type overlay */}
+                  <div className="absolute top-3 right-3 w-8 h-8 bg-black/70 rounded-full flex items-center justify-center text-white">
+                    {getTypeIcon(post.type)}
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-border/50">
