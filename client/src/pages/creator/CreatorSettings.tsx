@@ -45,6 +45,7 @@ export const CreatorSettings: React.FC = () => {
     confirmPassword: '',
   });
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
 
   const handleSave = () => {
     // Save display name and bio to localStorage
@@ -131,6 +132,8 @@ export const CreatorSettings: React.FC = () => {
         description: "Your email address has been successfully updated.",
       });
       
+      // Update the displayed email
+      setCurrentEmail(newEmail);
       setIsEmailChangeDialogOpen(false);
       setNewEmail('');
     } catch (error) {
@@ -663,7 +666,7 @@ export const CreatorSettings: React.FC = () => {
                   <div className="space-y-4">
                     <h4 className="font-medium text-foreground">Email Address</h4>
                     <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
-                      <span className="text-sm">creator4@example.com</span>
+                      <span className="text-sm">{currentEmail}</span>
                       <Button variant="outline" size="sm" onClick={() => setIsEmailChangeDialogOpen(true)}>
                         Change Email
                       </Button>
@@ -794,7 +797,7 @@ export const CreatorSettings: React.FC = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="flex items-center justify-center gap-2 text-destructive">
+                              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
                                 <Trash2 className="w-5 h-5" />
                                 Delete Creator Account
                               </AlertDialogTitle>
@@ -859,7 +862,7 @@ export const CreatorSettings: React.FC = () => {
       <AlertDialog open={isEmailChangeDialogOpen} onOpenChange={setIsEmailChangeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">Change Email Address</AlertDialogTitle>
+            <AlertDialogTitle>Change Email Address</AlertDialogTitle>
             <AlertDialogDescription>
               Enter your new email address below. You may need to verify this email address.
             </AlertDialogDescription>
@@ -889,7 +892,7 @@ export const CreatorSettings: React.FC = () => {
       <AlertDialog open={isPasswordChangeDialogOpen} onOpenChange={setIsPasswordChangeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">Change Password</AlertDialogTitle>
+            <AlertDialogTitle>Change Password</AlertDialogTitle>
             <AlertDialogDescription>
               Enter your current password and choose a new secure password.
             </AlertDialogDescription>

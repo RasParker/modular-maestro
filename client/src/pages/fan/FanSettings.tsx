@@ -827,7 +827,7 @@ export const FanSettings: React.FC = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="flex items-center justify-center gap-2 text-destructive">
+                              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
                                 <Trash2 className="w-5 h-5" />
                                 Delete Account
                               </AlertDialogTitle>
@@ -891,7 +891,7 @@ export const FanSettings: React.FC = () => {
       <AlertDialog open={isEmailChangeDialogOpen} onOpenChange={setIsEmailChangeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">Change Email Address</AlertDialogTitle>
+            <AlertDialogTitle>Change Email Address</AlertDialogTitle>
             <AlertDialogDescription>
               Enter your new email address below. You may need to verify this email address.
             </AlertDialogDescription>
