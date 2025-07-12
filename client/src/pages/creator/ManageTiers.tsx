@@ -321,13 +321,13 @@ export const ManageTiers: React.FC = () => {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">
-                    ${Math.min(...tiers.map(t => t.price))}
+                    ${tiers.length > 0 ? Math.min(...tiers.map(t => t.price)) : 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Lowest Price</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">
-                    ${Math.max(...tiers.map(t => t.price))}
+                    ${tiers.length > 0 ? Math.max(...tiers.map(t => t.price)) : 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Highest Price</div>
                 </div>

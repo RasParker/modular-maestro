@@ -9,7 +9,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -654,11 +654,7 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-                {isOwnProfile && (
-                  <Badge variant="outline" className="text-xs">
-                    Your Profile
-                  </Badge>
-                )}
+
               </div>
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -926,40 +922,62 @@ export const CreatorProfile: React.FC = () => {
           <div id="subscription-tiers" className="space-y-4">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
-            {creator.tiers.map((tier) => (
-              <Card key={tier.id} className="bg-gradient-card border-border/50">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">{tier.name}</h3>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-accent">${tier.price}</div>
-                        <div className="text-sm text-muted-foreground">per month</div>
+            {creator.tiers && creator.tiers.length > 0 ? (
+              creator.tiers.map((tier) => (
+                <Card key={tier.id} className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">{tier.name}</h3>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent">${tier.price}</div>
+                          <div className="text-sm text-muted-foreground">per month</div>
+                        </div>
                       </div>
+
+                      <p className="text-sm text-muted-foreground">{tier.description}</p>
+
+                      <ul className="space-y-2">
+                        {tier.features.map((feature, index) => (
+                          <li key={index} className="flex items-center gap-2 text-sm">
+                            <Check className="w-4 h-4 text-accent" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Button 
+                        variant="premium" 
+                        className="w-full"
+                        onClick={() => handleSubscribe(tier.id)}
+                      >
+                        Subscribe
+                      </Button>
                     </div>
-
-                    <p className="text-sm text-muted-foreground">{tier.description}</p>
-
-                    <ul className="space-y-2">
-                      {tier.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm">
-                          <Check className="w-4 h-4 text-accent" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Button 
-                      variant="premium" 
-                      className="w-full"
-                      onClick={() => handleSubscribe(tier.id)}
-                    >
-                      Subscribe
-                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="p-6">
+                  <div className="text-center py-4">
+                    <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No subscription tiers</h3>
+                    <p className="text-muted-foreground text-sm">
+                      {isOwnProfile ? 'Create subscription tiers to start monetizing your content.' : `${creator?.display_name || creator?.username} hasn't created any subscription tiers yet.`}
+                    </p>
+                    {isOwnProfile && (
+                      <Button variant="outline" size="sm" asChild className="mt-4">
+                        <Link to="/creator/tiers">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Tiers
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </div>
       </div>
