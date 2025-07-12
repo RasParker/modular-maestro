@@ -340,6 +340,7 @@ export const CreatorProfile: React.FC = () => {
             avatar: profilePhotoUrl || userData.avatar,
             cover: coverPhotoUrl || userData.cover_image,
             bio: bio || userData.bio,
+            subscribers: userData.total_subscribers || 0,
             tiers: tiers
           });
         } else {
@@ -643,7 +644,7 @@ export const CreatorProfile: React.FC = () => {
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
-                {creator.subscribers.toLocaleString()} subscribers
+                {(creator.subscribers || 0).toLocaleString()} subscribers
               </div>
               {isOwnProfile && (
                 <div className="flex items-center gap-2 mt-2">
