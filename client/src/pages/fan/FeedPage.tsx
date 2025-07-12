@@ -325,8 +325,8 @@ export const FeedPage: React.FC = () => {
 
   const truncateText = (text: string, maxLines: number = 1) => {
     const words = text.split(' ');
-    // Adjust words per line based on screen size - fewer words on mobile
-    const wordsPerLine = window.innerWidth < 640 ? 8 : 12; // Single line with space for "Read more"
+    // Adjust words per line based on screen size - more words to utilize full space
+    const wordsPerLine = window.innerWidth < 640 ? 12 : 18; // Single line utilizing more space
     const maxWords = maxLines * wordsPerLine;
     
     if (words.length <= maxWords) {
