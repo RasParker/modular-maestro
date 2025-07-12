@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,63 +8,33 @@ import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, Flag, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const MOCK_REPORTS = [
-  {
-    id: '1',
-    type: 'content',
-    reason: 'Inappropriate content',
-    description: 'Contains explicit material not suitable for platform',
-    reported_by: 'user123',
-    target: 'artisticmia - Digital Art Post',
-    status: 'pending',
-    priority: 'high',
-    created_at: '2024-02-19T10:30:00',
-    updated_at: '2024-02-19T10:30:00'
-  },
-  {
-    id: '2',
-    type: 'user',
-    reason: 'Spam behavior',
-    description: 'User is sending unsolicited messages to multiple creators',
-    reported_by: 'fan456',
-    target: 'spamuser',
-    status: 'under_review',
-    priority: 'medium',
-    created_at: '2024-02-19T08:15:00',
-    updated_at: '2024-02-19T12:00:00'
-  },
-  {
-    id: '3',
-    type: 'payment',
-    reason: 'Chargeback dispute',
-    description: 'User filed chargeback after receiving content',
-    reported_by: 'system',
-    target: 'transaction_789',
-    status: 'resolved',
-    priority: 'low',
-    created_at: '2024-02-18T16:45:00',
-    updated_at: '2024-02-19T09:30:00'
-  },
-  {
-    id: '4',
-    type: 'content',
-    reason: 'Copyright violation',
-    description: 'Content appears to be copied from another creator',
-    reported_by: 'originalcreator',
-    target: 'copycat - Video Tutorial',
-    status: 'pending',
-    priority: 'high',
-    created_at: '2024-02-19T14:20:00',
-    updated_at: '2024-02-19T14:20:00'
-  }
-];
-
 export const Reports: React.FC = () => {
   const { toast } = useToast();
-  const [reports, setReports] = useState(MOCK_REPORTS);
+  const [reports, setReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const fetchReports = async () => {
+    try {
+      const response = await fetch('/api/admin/reports');
+      if (response.ok) {
+        const data = await response.json();
+        setReports(data);
+      } else {
+        console.error('Failed to fetch reports');
+      }
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredReports = reports.filter(report => {
     const matchesStatus = statusFilter === 'all' || report.status === statusFilter;
@@ -73,16 +43,36 @@ export const Reports: React.FC = () => {
     return matchesStatus && matchesType && matchesPriority;
   });
 
-  const handleUpdateStatus = (reportId: string, newStatus: string) => {
-    setReports(reports.map(report => 
-      report.id === reportId 
-        ? { ...report, status: newStatus, updated_at: new Date().toISOString() }
-        : report
-    ));
-    toast({
-      title: "Report status updated",
-      description: `Report has been marked as ${newStatus}.`,
-    });
+  const handleUpdateStatus = async (reportId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/admin/reports/${reportId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        setReports(reports.map(report => 
+          report.id === parseInt(reportId) 
+            ? { ...report, status: newStatus, updated_at: new Date().toISOString() }
+            : report
+        ));
+        toast({
+          title: "Report status updated",
+          description: `Report has been marked as ${newStatus}.`,
+        });
+      } else {
+        throw new Error('Failed to update status');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update report status.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleViewDetails = (reportId: string) => {
@@ -192,8 +182,13 @@ export const Reports: React.FC = () => {
             <CardDescription>Manage reports and violations</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {filteredReports.map((report) => (
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredReports.map((report) => (
                 <div key={report.id} className="p-6 rounded-lg border border-border/50 bg-muted/10">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
                     <div className="flex-1 min-w-0">
@@ -265,7 +260,8 @@ export const Reports: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

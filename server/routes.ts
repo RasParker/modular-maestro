@@ -6,9 +6,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema } from "@shared/schema";
+import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema } from "@shared/schema";
 import { db } from './db';
-import { users, posts, comments, likes, subscriptions, subscription_tiers } from '../shared/schema';
+import { users, posts, comments, likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 
 // Extend Express session interface
@@ -757,6 +757,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Post media upload error:', error);
       res.status(500).json({ error: "Failed to upload media" });
+    }
+  });
+
+  // Report routes
+  app.post("/api/reports", async (req, res) => {
+    try {
+      const validatedData = insertReportSchema.parse(req.body);
+      const report = await storage.createReport(validatedData);
+      res.json(report);
+    } catch (error) {
+      console.error('Create report error:', error);
+      res.status(500).json({ error: "Failed to create report" });
+    }
+  });
+
+  app.get("/api/admin/reports", async (req, res) => {
+    try {
+      const allReports = await storage.getReports();
+      res.json(allReports);
+    } catch (error) {
+      console.error('Get reports error:', error);
+      res.status(500).json({ error: "Failed to fetch reports" });
+    }
+  });
+
+  app.put("/api/admin/reports/:id/status", async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const { status, adminNotes } = req.body;
+      const resolvedBy = req.session?.userId;
+
+      const report = await storage.updateReportStatus(reportId, status, adminNotes, resolvedBy);
+      res.json(report);
+    } catch (error) {
+      console.error('Update report status error:', error);
+      res.status(500).json({ error: "Failed to update report status" });
     }
   });
 

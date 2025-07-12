@@ -119,6 +119,23 @@ export const creator_payouts = pgTable("creator_payouts", {
   created_at: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const reports = pgTable("reports", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(), // 'content', 'user', 'payment'
+  reason: text("reason").notNull(),
+  description: text("description"),
+  reported_by: integer("reported_by").notNull(),
+  target_type: text("target_type").notNull(), // 'post', 'user', 'comment'
+  target_id: integer("target_id").notNull(),
+  target_name: text("target_name"), // Human readable target name
+  status: text("status").notNull().default('pending'), // 'pending', 'under_review', 'resolved', 'dismissed'
+  priority: text("priority").notNull().default('medium'), // 'low', 'medium', 'high'
+  admin_notes: text("admin_notes"),
+  resolved_by: integer("resolved_by"),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow()
+});
+
 // Database relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),

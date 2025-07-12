@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Heart, MessageSquare, Send, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { ReportDialog } from '@/components/shared/ReportDialog';
 
 interface Comment {
   id: string;
@@ -37,7 +38,7 @@ const ReplyInput: React.FC<{
   currentUserName?: string;
 }> = ({ commentId, username, onReply, onCancel, userAvatar, currentUserName }) => {
   const [replyText, setReplyText] = useState('');
-  
+
   const handleSubmit = () => {
     if (replyText.trim()) {
       onReply(commentId, replyText);
@@ -342,6 +343,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                   <span className="text-xs">Reply</span>
                 </Button>
               )}
+               <ReportDialog contentId={comment.id} contentType="comment" />
 
               {!isNested && comment.replies.length > 0 && (
                 <Button
