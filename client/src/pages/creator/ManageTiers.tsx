@@ -62,9 +62,8 @@ export const ManageTiers: React.FC = () => {
     if (savedTiers && savedTiers.length > 0) {
       setTiers(savedTiers);
     } else {
-      // Use default tiers if no saved tiers exist
-      setTiers(DEFAULT_TIERS);
-      setLocalStorageObject('subscriptionTiers', DEFAULT_TIERS);
+      // Start with empty tiers for new accounts
+      setTiers([]);
     }
   }, []);
 
