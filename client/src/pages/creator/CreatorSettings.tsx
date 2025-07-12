@@ -36,6 +36,15 @@ export const CreatorSettings: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEmailChangeDialogOpen, setIsEmailChangeDialogOpen] = useState(false);
+  const [isPasswordChangeDialogOpen, setIsPasswordChangeDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [passwordFormData, setPasswordFormData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
   const handleSave = () => {
     // Save display name and bio to localStorage
@@ -100,6 +109,72 @@ export const CreatorSettings: React.FC = () => {
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleEmailChange = async () => {
+    if (!newEmail) {
+      toast({
+        title: "Email required",
+        description: "Please enter a new email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // API call to change email would go here
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Email updated",
+        description: "Your email address has been successfully updated.",
+      });
+      
+      setIsEmailChangeDialogOpen(false);
+      setNewEmail('');
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update email. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+      toast({
+        title: "Password mismatch",
+        description: "New passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPasswordLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Password changed",
+        description: "Your password has been successfully updated.",
+      });
+      
+      setPasswordFormData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setIsPasswordChangeDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPasswordLoading(false);
     }
   };
 
@@ -589,7 +664,9 @@ export const CreatorSettings: React.FC = () => {
                     <h4 className="font-medium text-foreground">Email Address</h4>
                     <div className="flex items-center justify-between p-4 rounded-lg bg-muted/20">
                       <span className="text-sm">creator4@example.com</span>
-                      <Button variant="outline" size="sm">Change Email</Button>
+                      <Button variant="outline" size="sm" onClick={() => setIsEmailChangeDialogOpen(true)}>
+                        Change Email
+                      </Button>
                     </div>
                   </div>
 
@@ -604,7 +681,9 @@ export const CreatorSettings: React.FC = () => {
                         <span className="text-sm font-medium">••••••••••••</span>
                         <p className="text-xs text-muted-foreground">Last changed 2 months ago</p>
                       </div>
-                      <Button variant="outline" size="sm">Change Password</Button>
+                      <Button variant="outline" size="sm" onClick={() => setIsPasswordChangeDialogOpen(true)}>
+                        Change Password
+                      </Button>
                     </div>
                   </div>
 
@@ -715,7 +794,7 @@ export const CreatorSettings: React.FC = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                              <AlertDialogTitle className="flex items-center justify-center gap-2 text-destructive">
                                 <Trash2 className="w-5 h-5" />
                                 Delete Creator Account
                               </AlertDialogTitle>
@@ -775,6 +854,95 @@ export const CreatorSettings: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Email Change Dialog */}
+      <AlertDialog open={isEmailChangeDialogOpen} onOpenChange={setIsEmailChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Change Email Address</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter your new email address below. You may need to verify this email address.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="newEmail">New Email Address</Label>
+              <Input
+                id="newEmail"
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Enter new email address"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEmailChange}>
+              Update Email
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Password Change Dialog */}
+      <AlertDialog open={isPasswordChangeDialogOpen} onOpenChange={setIsPasswordChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Change Password</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter your current password and choose a new secure password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={passwordFormData.currentPassword}
+                onChange={(e) => setPasswordFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                placeholder="Enter current password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={passwordFormData.newPassword}
+                onChange={(e) => setPasswordFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                placeholder="Enter new password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+              <Input
+                id="confirmNewPassword"
+                type="password"
+                value={passwordFormData.confirmPassword}
+                onChange={(e) => setPasswordFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Confirm new password"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setPasswordFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+              });
+              setIsPasswordChangeDialogOpen(false);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handlePasswordChange} disabled={isPasswordLoading}>
+              {isPasswordLoading ? "Updating..." : "Update Password"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
