@@ -317,9 +317,9 @@ export const CreatorProfile: React.FC = () => {
             id: userData.id,
             username: userData.username,
             display_name: (isOwnProfileCheck && displayName) || userData.display_name || userData.username,
-            avatar: (isOwnProfileCheck && profilePhotoUrl) || userData.avatar || `https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face`,
-            cover: (isOwnProfileCheck && coverPhotoUrl) || userData.cover_image || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=300&fit=crop',
-            bio: (isOwnProfileCheck && bio) || userData.bio || 'Welcome to my profile! I\'m excited to share my content with you.',
+            avatar: (isOwnProfileCheck && profilePhotoUrl) || userData.avatar || null,
+            cover: (isOwnProfileCheck && coverPhotoUrl) || userData.cover_image || null,
+            bio: (isOwnProfileCheck && bio) || userData.bio || null,
             subscribers: userData.total_subscribers || 0,
             verified: userData.verified || false,
             role: userData.role,
@@ -676,7 +676,9 @@ export const CreatorProfile: React.FC = () => {
                   </Button>
                 )}
               </div>
-              <p className="text-muted-foreground leading-relaxed">{creator.bio}</p>
+              <p className="text-muted-foreground leading-relaxed">
+                {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
+              </p>
             </div>
 
             {/* Recent Posts Preview */}
@@ -779,7 +781,7 @@ export const CreatorProfile: React.FC = () => {
                                     </p>
                                     <Button 
                                       size="sm" 
-                                      className="bg-accent hover:bg-accent/90"
+                                      className="bg-accent hover:bg-accent/90 text-black"
                                       onClick={() => {
                                         if (!user) {
                                           window.location.href = `/login?redirect=/creator/${username}`;
