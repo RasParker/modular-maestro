@@ -471,6 +471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/creators/:creatorId/tiers", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
+      console.log('Creating tier for creator:', creatorId, 'with data:', req.body);
+      
       const validatedData = insertSubscriptionTierSchema.parse({
         ...req.body,
         creator_id: creatorId
@@ -479,7 +481,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tier = await storage.createSubscriptionTier(validatedData);
       res.json(tier);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create subscription tier" });
+      console.error('Create subscription tier error:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Failed to create subscription tier" });
+      }
     }
   });
 

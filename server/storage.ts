@@ -303,11 +303,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier> {
-    const [newTier] = await db
-      .insert(subscription_tiers)
-      .values(tier)
-      .returning();
-    return newTier;
+    try {
+      console.log('Creating subscription tier with data:', tier);
+      const [newTier] = await db
+        .insert(subscription_tiers)
+        .values(tier)
+        .returning();
+      console.log('Subscription tier created successfully:', newTier);
+      return newTier;
+    } catch (error) {
+      console.error('Error creating subscription tier:', error);
+      throw new Error('Failed to create subscription tier');
+    }
   }
 
   async updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined> {
