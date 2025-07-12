@@ -151,7 +151,12 @@ export const CreatorProfile: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [creator, setCreator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [userSubscription, setUserSubscription] = useState<any>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const { toast } = useToast();
+
+  // Define isOwnProfile early to avoid initialization issues
+  const isOwnProfile = user?.username === username;
 
   // Function to fetch user's posts from database
   const fetchUserPosts = async (userId: string | number) => {
@@ -270,6 +275,31 @@ export const CreatorProfile: React.FC = () => {
     }
   }, [creator?.id]); // Fetch posts for the profile being viewed
 
+  // Fetch user's subscription to this creator
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      if (!user || !creator || isOwnProfile) return;
+      
+      try {
+        setSubscriptionLoading(true);
+        const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
+        if (response.ok) {
+          const subscriptionData = await response.json();
+          setUserSubscription(subscriptionData);
+        } else {
+          setUserSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error fetching subscription:', error);
+        setUserSubscription(null);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
+    fetchUserSubscription();
+  }, [user, creator, isOwnProfile]);
+
   useEffect(() => {
     const fetchCreatorData = async () => {
       if (!username) return;
@@ -330,9 +360,6 @@ export const CreatorProfile: React.FC = () => {
 
     fetchCreatorData();
   }, [username, user?.username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers]); // Include necessary dependencies
-
-
-  const isOwnProfile = user?.username === username;
 
   if (loading) {
     return (
@@ -410,6 +437,34 @@ export const CreatorProfile: React.FC = () => {
       default:
         return 'outline';
     }
+  };
+
+  // Check if user has access to content based on subscription tier
+  const hasAccessToTier = (postTier: string): boolean => {
+    // Own profile - can see all content
+    if (isOwnProfile) return true;
+    
+    // Public content - everyone can see
+    if (postTier === 'public') return true;
+    
+    // If user is not logged in, no access to premium content
+    if (!user) return false;
+    
+    // If user has no subscription, no access to premium content
+    if (!userSubscription) return false;
+    
+    // Define tier hierarchy - higher tiers include lower tier content
+    const tierHierarchy = {
+      'supporter': 1,
+      'fan': 2,
+      'premium': 2,
+      'superfan': 3
+    };
+    
+    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
+    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 0;
+    
+    return userTierLevel >= postTierLevel;
   };
 
   const handleContentClick = (post: any) => {
@@ -670,36 +725,74 @@ export const CreatorProfile: React.FC = () => {
                           </div>
 
                           {post.media_urls && post.media_urls[0] && (
-                            <div 
-                              className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-                              onClick={() => handleContentClick(post)}
-                              role="button"
-                              tabIndex={0}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
-                                  handleContentClick(post);
-                                }
-                              }}
-                            >
-                              {post.media_type === 'video' ? (
-                                <video 
-                                  src={`/uploads/${post.media_urls[0]}`}
-                                  className="w-full h-64 object-cover"
-                                  muted
-                                  preload="metadata"
-                                />
-                              ) : (
-                                <img 
-                                  src={`/uploads/${post.media_urls[0]}`}
-                                  alt={post.title}
-                                  className="w-full h-64 object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                    target.className = "w-full h-64 object-cover opacity-50";
+                            <div className="rounded-lg overflow-hidden">
+                              {hasAccessToTier(post.tier) ? (
+                                <div 
+                                  className="cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
+                                  onClick={() => handleContentClick(post)}
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      handleContentClick(post);
+                                    }
                                   }}
-                                />
+                                >
+                                  {post.media_type === 'video' ? (
+                                    <video 
+                                      src={`/uploads/${post.media_urls[0]}`}
+                                      className="w-full h-64 object-cover"
+                                      muted
+                                      preload="metadata"
+                                    />
+                                  ) : (
+                                    <img 
+                                      src={`/uploads/${post.media_urls[0]}`}
+                                      alt={post.title}
+                                      className="w-full h-64 object-cover"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                        target.className = "w-full h-64 object-cover opacity-50";
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="w-full h-64 bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                  <div className="text-center z-10 p-6">
+                                    <div className="mb-4 opacity-75">
+                                      <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                      </svg>
+                                    </div>
+                                    <h3 className="text-lg font-medium text-foreground mb-2">
+                                      {post.tier === 'supporter' ? 'Supporter' : 
+                                       post.tier === 'fan' ? 'Fan' : 
+                                       post.tier === 'premium' ? 'Premium' : 
+                                       post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                      Subscribe to {creator.display_name} to unlock this content
+                                    </p>
+                                    <Button 
+                                      size="sm" 
+                                      className="bg-accent hover:bg-accent/90"
+                                      onClick={() => {
+                                        if (!user) {
+                                          window.location.href = `/login?redirect=/creator/${username}`;
+                                        } else {
+                                          // Scroll to subscription tiers
+                                          document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }}
+                                    >
+                                      {!user ? 'Login to Subscribe' : 'View Subscription Plans'}
+                                    </Button>
+                                  </div>
+                                </div>
                               )}
                             </div>
                           )}
@@ -796,7 +889,7 @@ export const CreatorProfile: React.FC = () => {
           </div>
 
           {/* Subscription Tiers */}
-          <div className="space-y-4">
+          <div id="subscription-tiers" className="space-y-4">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers.map((tier) => (

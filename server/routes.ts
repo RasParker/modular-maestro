@@ -524,6 +524,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if user is subscribed to specific creator
+  app.get("/api/subscriptions/user/:userId/creator/:creatorId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const creatorId = parseInt(req.params.creatorId);
+      
+      const subscription = await storage.getUserSubscriptionToCreator(userId, creatorId);
+      res.json(subscription || null);
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      res.status(500).json({ error: "Failed to check subscription status" });
+    }
+  });
+
   app.post("/api/subscriptions", async (req, res) => {
     try {
       const validatedData = insertSubscriptionSchema.parse(req.body);
