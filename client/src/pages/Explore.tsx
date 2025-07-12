@@ -324,12 +324,18 @@ export const Explore: React.FC = () => {
                           {creator.tiers.length} option{creator.tiers.length !== 1 ? 's' : ''}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">From</span>
-                        <span className="font-semibold text-accent">
-                          ${Math.min(...creator.tiers.map(t => t.price))}/month
-                        </span>
-                      </div>
+                      {creator.tiers.length > 0 ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">From</span>
+                          <span className="font-semibold text-accent">
+                            ${Math.min(...creator.tiers.map(t => t.price))}/month
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">No tiers available</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -342,12 +348,22 @@ export const Explore: React.FC = () => {
                           View Profile
                         </Link>
                       </Button>
-                      <Button
-                        className="w-full"
-                        onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
-                      >
-                        Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
-                      </Button>
+                      {creator.tiers.length > 0 ? (
+                        <Button
+                          className="w-full"
+                          onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
+                        >
+                          Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          disabled
+                        >
+                          No subscription tiers available
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

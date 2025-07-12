@@ -177,12 +177,18 @@ export const Home: React.FC = () => {
                       {creator.subscribers.toLocaleString()} subscribers
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">From</span>
-                      <span className="font-semibold text-accent">
-                        ${creator.tiers[0].price}/month
-                      </span>
-                    </div>
+                    {creator.tiers.length > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">From</span>
+                        <span className="font-semibold text-accent">
+                          ${creator.tiers[0].price}/month
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">No tiers available</span>
+                      </div>
+                    )}
                     
                     <Button variant="outline" className="w-full" asChild>
                       <Link to={`/creator/${creator.username}`}>

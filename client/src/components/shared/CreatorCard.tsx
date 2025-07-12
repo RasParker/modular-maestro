@@ -25,7 +25,7 @@ interface CreatorCardProps {
 }
 
 export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
-  const minPrice = Math.min(...creator.tiers.map(t => t.price));
+  const minPrice = creator.tiers.length > 0 ? Math.min(...creator.tiers.map(t => t.price)) : 0;
   const [expandedBio, setExpandedBio] = useState(false);
 
   const truncateText = (text: string, maxLines: number = 2) => {
@@ -99,12 +99,18 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
             {creator.subscribers.toLocaleString()} subscribers
           </div>
           
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">From</span>
-            <span className="font-semibold text-accent">
-              ${minPrice}/month
-            </span>
-          </div>
+          {creator.tiers.length > 0 ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">From</span>
+              <span className="font-semibold text-accent">
+                ${minPrice}/month
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">No tiers available</span>
+            </div>
+          )}
           
           <Button 
             variant="outline" 
