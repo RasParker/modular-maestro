@@ -71,7 +71,7 @@ export const CreatePost: React.FC = () => {
   useEffect(() => {
     const fetchTiers = async () => {
       if (!user?.id) return;
-      
+
       try {
         const response = await fetch(`/api/creators/${user.id}/tiers`);
         if (response.ok) {
@@ -163,22 +163,22 @@ export const CreatePost: React.FC = () => {
         navigate('/login');
         return;
       }
-      
+
       // Upload media file first if it exists
       let uploadedMediaUrls: string[] = [];
       if (mediaFile) {
         const formData = new FormData();
         formData.append('media', mediaFile);
-        
+
         const uploadResponse = await fetch('/api/upload/post-media', {
           method: 'POST',
           body: formData,
         });
-        
+
         if (!uploadResponse.ok) {
           throw new Error('Failed to upload media');
         }
-        
+
         const uploadResult = await uploadResponse.json();
         uploadedMediaUrls = [uploadResult.filename];
       }
@@ -245,7 +245,7 @@ export const CreatePost: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -290,7 +290,7 @@ export const CreatePost: React.FC = () => {
                 {/* Media Upload */}
                 <div className="space-y-4">
                   <Label>Media (Optional)</Label>
-                  
+
                   {!mediaFile ? (
                     <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                       <Input

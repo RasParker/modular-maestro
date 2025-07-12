@@ -309,6 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         scheduled_for: scheduled_for ? new Date(scheduled_for) : null,
       }).returning();
 
+      console.log('Post created with status:', newPost[0].status);
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
