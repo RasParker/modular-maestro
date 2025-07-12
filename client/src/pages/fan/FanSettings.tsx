@@ -246,12 +246,12 @@ export const FanSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-              <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
-              <TabsTrigger value="subscriptions" className="text-xs sm:text-sm">Subscriptions</TabsTrigger>
-              <TabsTrigger value="privacy" className="text-xs sm:text-sm">Privacy</TabsTrigger>
-              <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="notifications">Alerts</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subs</TabsTrigger>
+              <TabsTrigger value="privacy">Privacy</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">

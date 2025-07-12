@@ -256,11 +256,11 @@ export const CreatorSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-              <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
-              <TabsTrigger value="content" className="text-xs sm:text-sm">Content</TabsTrigger>
-              <TabsTrigger value="payouts" className="text-xs sm:text-sm">Payouts</TabsTrigger>
-              <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="payouts">Payouts</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
