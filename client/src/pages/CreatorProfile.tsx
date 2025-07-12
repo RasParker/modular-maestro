@@ -921,10 +921,10 @@ export const CreatorProfile: React.FC = () => {
                       <p className="text-sm text-muted-foreground">{tier.description}</p>
 
                       <ul className="space-y-2">
-                        {tier.features.map((feature, index) => (
+                        {(tier.benefits || []).map((benefit, index) => (
                           <li key={index} className="flex items-center gap-2 text-sm">
                             <Check className="w-4 h-4 text-accent" />
-                            <span>{feature}</span>
+                            <span>{benefit}</span>
                           </li>
                         ))}
                       </ul>
