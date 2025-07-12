@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   avatar: text("avatar"),
   role: text("role").notNull().default("fan"), // fan, creator, admin
+  status: text("status").notNull().default("active"), // active, suspended
   display_name: text("display_name"),
   bio: text("bio"),
   cover_image: text("cover_image"),

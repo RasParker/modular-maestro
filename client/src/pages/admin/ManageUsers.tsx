@@ -74,22 +74,37 @@ export const ManageUsers: React.FC = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleSuspendUser = (userId: string) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'suspended' ? 'active' : 'suspended' }
-        : user
-    ));
-    toast({
-      title: "User status updated",
-      description: "User status has been successfully updated.",
-    });
+  const handleSuspendUser = async (userId: string) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      const newStatus = user?.status === 'suspended' ? 'active' : 'suspended';
+
+      const response = await fetch(`/api/admin/users/${userId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user status');
+      }
+
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId
+            ? { ...user, status: newStatus }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error('Failed to suspend/activate user:', error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">

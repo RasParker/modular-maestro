@@ -75,6 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!response.ok) {
         const error = await response.json();
+        if (error.suspended) {
+          throw new Error(error.error || 'Your account has been suspended.');
+        }
         throw new Error(error.error || 'Login failed');
       }
       

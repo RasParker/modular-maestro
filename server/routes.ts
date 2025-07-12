@@ -125,6 +125,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      // Check if user is suspended
+      if (user.status === 'suspended') {
+        return res.status(403).json({ 
+          error: "Your account has been suspended. Please contact support for assistance.",
+          suspended: true 
+        });
+      }
+
       const { password: _, ...userWithoutPassword } = user;
       
       // Set session data
@@ -611,6 +619,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Failed to fetch all users:', error);
       res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  // Admin route - Update user status (suspend/activate)
+  app.put("/api/admin/users/:id/status", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { status } = req.body;
+
+      if (!['active', 'suspended'].includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      const updatedUser = await db.update(users)
+        .set({ 
+          status: status,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userId))
+        .returning();
+
+      if (updatedUser.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = updatedUser[0];
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error('Failed to update user status:', error);
+      res.status(500).json({ error: "Failed to update user status" });
     }
   });
 
