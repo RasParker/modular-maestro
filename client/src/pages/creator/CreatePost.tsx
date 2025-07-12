@@ -466,7 +466,7 @@ export const CreatePost: React.FC = () => {
                 onClick={() => form.handleSubmit((data) => handleSubmit(data, 'draft'))()}
                 disabled={isUploading}
               >
-                Save as Draft
+                {isUploading ? 'Saving...' : 'Save as Draft'}
               </Button>
               <Button
                 type="button"

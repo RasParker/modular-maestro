@@ -298,6 +298,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
+      console.log('Creating post with status:', status);
+      
       const newPost = await db.insert(posts).values({
         creator_id,
         title,
@@ -309,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         scheduled_for: scheduled_for ? new Date(scheduled_for) : null,
       }).returning();
 
-      console.log('Post created with status:', newPost[0].status);
+      console.log('Post created successfully with final status:', newPost[0].status);
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
