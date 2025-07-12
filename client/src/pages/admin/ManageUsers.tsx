@@ -19,6 +19,7 @@ interface User {
   joined: string;
   subscribers: number;
   revenue: number;
+  avatar?: string;
 }
 
 export const ManageUsers: React.FC = () => {
@@ -48,7 +49,8 @@ export const ManageUsers: React.FC = () => {
         status: 'active', // Default to active since we don't have status in the DB yet
         joined: new Date(user.created_at).toISOString().split('T')[0],
         subscribers: user.total_subscribers || 0,
-        revenue: parseFloat(user.total_earnings || '0')
+        revenue: parseFloat(user.total_earnings || '0'),
+        avatar: user.avatar
       }));
 
       setUsers(transformedUsers);
