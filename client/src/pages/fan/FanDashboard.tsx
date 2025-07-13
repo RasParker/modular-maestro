@@ -73,7 +73,7 @@ export const FanDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="w-full">
+      <div className="w-full pt-6 pb-8">
         {/* Welcome Section */}
         <div className="content-container safe-area py-6">
           <div className="mb-8">
