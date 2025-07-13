@@ -56,6 +56,9 @@ export const CreatePost: React.FC = () => {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
   const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
 
   const form = useForm<FormData>({
@@ -150,7 +153,15 @@ export const CreatePost: React.FC = () => {
       return;
     }
 
+    // Set specific loading state based on action
     setIsUploading(true);
+    if (action === 'draft') {
+      setIsDraftSaving(true);
+    } else if (action === 'publish') {
+      setIsPublishing(true);
+    } else if (action === 'schedule') {
+      setIsScheduling(true);
+    }
 
     try {
       // Get current user ID from auth context
@@ -239,6 +250,9 @@ export const CreatePost: React.FC = () => {
       });
     } finally {
       setIsUploading(false);
+      setIsDraftSaving(false);
+      setIsPublishing(false);
+      setIsScheduling(false);
     }
   };
 
@@ -466,7 +480,7 @@ export const CreatePost: React.FC = () => {
                 onClick={() => form.handleSubmit((data) => handleSubmit(data, 'draft'))()}
                 disabled={isUploading}
               >
-                {isUploading ? 'Saving...' : 'Save as Draft'}
+                {isDraftSaving ? 'Saving...' : 'Save as Draft'}
               </Button>
               <Button
                 type="button"
@@ -474,14 +488,14 @@ export const CreatePost: React.FC = () => {
                 onClick={() => form.handleSubmit((data) => handleSubmit(data, 'schedule'))()}
                 disabled={isUploading || !form.watch('scheduledDate')}
               >
-                Schedule Post
+                {isScheduling ? 'Scheduling...' : 'Schedule Post'}
               </Button>
               <Button
                 type="button"
                 onClick={() => form.handleSubmit((data) => handleSubmit(data, 'publish'))()}
                 disabled={isUploading}
               >
-                {isUploading ? 'Publishing...' : 'Publish Now'}
+                {isPublishing ? 'Publishing...' : 'Publish Now'}
               </Button>
             </div>
           </form>
