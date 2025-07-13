@@ -281,8 +281,8 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
-    background: transparent;
-    margin-bottom: 1rem;
+    background: hsl(var(--card));
+    margin-bottom: 0;
   }
 
   .feed-card:last-child {
