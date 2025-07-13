@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Navbar } from '@/components/shared/Navbar';
+
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
@@ -365,7 +365,6 @@ export const CreatorProfile: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
@@ -379,7 +378,6 @@ export const CreatorProfile: React.FC = () => {
   if (!creator) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-foreground mb-2">Creator Not Found</h1>
@@ -610,7 +608,6 @@ export const CreatorProfile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
 
       {/* Creator Header */}
       <div className="relative">
