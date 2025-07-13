@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Navbar } from '@/components/shared/Navbar';
+
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useToast } from '@/hooks/use-toast';
 import { 
