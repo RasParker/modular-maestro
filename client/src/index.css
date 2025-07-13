@@ -355,11 +355,20 @@
     border-radius: 1rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     background: hsl(var(--background));
+    aspect-ratio: 1 !important;
+    width: min(85vh, 90vw);
+    height: min(85vh, 90vw);
     max-width: 85vh;
     max-height: 85vh;
-    aspect-ratio: 1 !important;
-    width: 85vh;
-    height: 85vh;
+  }
+
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 90vw;
+      height: 90vw;
+      max-width: 90vw;
+      max-height: 90vw;
+    }
   }
 
   /* Responsive utilities */
