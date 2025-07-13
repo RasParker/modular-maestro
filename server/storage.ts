@@ -22,7 +22,7 @@ import {
   type InsertPaymentTransaction
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -433,6 +433,134 @@ export class DatabaseStorage implements IStorage {
       .from(payment_transactions)
       .where(eq(payment_transactions.subscription_id, subscriptionId))
       .orderBy(desc(payment_transactions.created_at));
+  }
+
+  // Get creator subscription tiers
+  async getCreatorTiers(creatorId: number): Promise<SubscriptionTier[]> {
+    return db.select().from(subscription_tiers).where(eq(subscription_tiers.creator_id, creatorId));
+  }
+
+  // Get specific subscription tier
+  async getSubscriptionTier(tierId: number): Promise<SubscriptionTier | undefined> {
+    const result = await db.select().from(subscription_tiers).where(eq(subscription_tiers.id, tierId));
+    return result[0];
+  }
+
+  // Payout-related methods
+  async createCreatorPayout(data: any): Promise<any> {
+    const result = await db.insert(creator_payouts).values(data).returning();
+    return result[0];
+  }
+
+  async updateCreatorPayoutStatus(payoutId: number, status: string, transactionId?: string): Promise<void> {
+    const updateData: any = { status };
+    if (status === 'completed') {
+      updateData.processed_at = new Date();
+    }
+    if (transactionId) {
+      updateData.transaction_id = transactionId;
+    }
+    await db.update(creator_payouts).set(updateData).where(eq(creator_payouts.id, payoutId));
+  }
+
+  async getCreatorPayouts(creatorId: number, limit: number = 10): Promise<any[]> {
+    return db.select()
+      .from(creator_payouts)
+      .where(eq(creator_payouts.creator_id, creatorId))
+      .orderBy(desc(creator_payouts.created_at))
+      .limit(limit);
+  }
+
+  async getCreatorPaymentTransactions(creatorId: number, startDate: Date, endDate: Date): Promise<any[]> {
+    return db.select({
+      id: payment_transactions.id,
+      amount: payment_transactions.amount,
+      currency: payment_transactions.currency,
+      processed_at: payment_transactions.processed_at,
+      subscription_id: payment_transactions.subscription_id
+    })
+    .from(payment_transactions)
+    .innerJoin(subscriptions, eq(payment_transactions.subscription_id, subscriptions.id))
+    .where(
+      and(
+        eq(subscriptions.creator_id, creatorId),
+        eq(payment_transactions.status, 'completed'),
+        gte(payment_transactions.processed_at, startDate),
+        lte(payment_transactions.processed_at, endDate)
+      )
+    );
+  }
+
+  async getAllCreators(): Promise<any[]> {
+    return db.select().from(users).where(eq(users.role, 'creator'));
+  }
+
+  async getCreatorPayoutSettings(creatorId: number): Promise<any> {
+    // Mock implementation - in a real app, this would be stored in a separate table
+    return {
+      payout_method: 'mtn_momo',
+      phone: '+233123456789',
+      account_number: null,
+      bank_code: null
+    };
+  }
+
+  async getCreatorPayoutStats(creatorId: number): Promise<any> {
+    const payouts = await db.select()
+      .from(creator_payouts)
+      .where(eq(creator_payouts.creator_id, creatorId));
+
+    let totalPaid = 0;
+    let totalPending = 0;
+    let completedCount = 0;
+    let pendingCount = 0;
+
+    payouts.forEach(payout => {
+      const amount = parseFloat(payout.amount);
+      if (payout.status === 'completed') {
+        totalPaid += amount;
+        completedCount++;
+      } else if (payout.status === 'pending') {
+        totalPending += amount;
+        pendingCount++;
+      }
+    });
+
+    return {
+      total_paid: totalPaid,
+      total_pending: totalPending,
+      completed_count: completedCount,
+      pending_count: pendingCount,
+      last_payout: payouts.find(p => p.status === 'completed')?.processed_at || null
+    };
+  }
+
+  async getAllPayoutStats(): Promise<any> {
+    const payouts = await db.select().from(creator_payouts);
+
+    let totalPaid = 0;
+    let totalPending = 0;
+    let completedCount = 0;
+    let pendingCount = 0;
+
+    payouts.forEach(payout => {
+      const amount = parseFloat(payout.amount);
+      if (payout.status === 'completed') {
+        totalPaid += amount;
+        completedCount++;
+      } else if (payout.status === 'pending') {
+        totalPending += amount;
+        pendingCount++;
+      }
+    });
+
+    return {
+      total_paid: totalPaid,
+      total_pending: totalPending,
+      completed_count: completedCount,
+      pending_count: pendingCount,
+      total_creators: await db.select().from(users).where(eq(users.role, 'creator')).then(r => r.length)
+    };
   }
 }
 

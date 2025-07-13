@@ -115,7 +115,8 @@ export const creator_payouts = pgTable("creator_payouts", {
   status: text("status").notNull().default("pending"), // pending, completed, failed
   period_start: timestamp("period_start").notNull(),
   period_end: timestamp("period_end").notNull(),
-  payout_method: text("payout_method"), // bank_transfer, paypal, etc.
+  payout_method: text("payout_method"), // mtn_momo, vodafone_cash, bank_transfer, etc.
+  transaction_id: text("transaction_id"), // External payout provider transaction ID
   processed_at: timestamp("processed_at"),
   created_at: timestamp("created_at").notNull().defaultNow(),
 });

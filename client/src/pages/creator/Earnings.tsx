@@ -1,5 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -97,9 +99,49 @@ const TransactionCard: React.FC<{ transaction: typeof TRANSACTION_HISTORY[0] }> 
 );
 
 export const Earnings: React.FC = () => {
+  const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('all-time');
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [isPaymentInfoOpen, setIsPaymentInfoOpen] = useState(false);
+  const [payoutHistory, setPayoutHistory] = useState([]);
+  const [currentEarnings, setCurrentEarnings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchPayoutData();
+    }
+  }, [user]);
+
+  const fetchPayoutData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch current month earnings
+      const earningsResponse = await fetch(`/api/payouts/creator/${user.id}/current-earnings`);
+      if (earningsResponse.ok) {
+        const earningsData = await earningsResponse.json();
+        setCurrentEarnings(earningsData.data);
+      }
+      
+      // Fetch payout history
+      const historyResponse = await fetch(`/api/payouts/creator/${user.id}/history?limit=10`);
+      if (historyResponse.ok) {
+        const historyData = await historyResponse.json();
+        setPayoutHistory(historyData.data);
+      }
+    } catch (error) {
+      console.error('Error fetching payout data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load earnings data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -149,7 +191,7 @@ export const Earnings: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-xs sm:text-sm mb-1">Total Monthly Revenue</p>
-                  <p className="text-2xl sm:text-3xl font-bold">GHS {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}</p>
+                  <p className="text-2xl sm:text-3xl font-bold">GHS {currentEarnings?.gross_revenue?.toFixed(2) || '0.00'}</p>
                 </div>
                 <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-green-200" />
               </div>
@@ -161,7 +203,7 @@ export const Earnings: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs sm:text-sm mb-1">Total Active Subscribers</p>
-                  <p className="text-2xl sm:text-3xl font-bold">{EARNINGS_DATA.totalActiveSubscribers}</p>
+                  <p className="text-2xl sm:text-3xl font-bold">{currentEarnings?.transaction_count || 0}</p>
                 </div>
                 <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
               </div>
@@ -173,7 +215,7 @@ export const Earnings: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-cyan-100 text-xs sm:text-sm mb-1">Est. Net Revenue*</p>
-                  <p className="text-2xl sm:text-3xl font-bold">GHS {EARNINGS_DATA.estimatedNetRevenue.toFixed(2)}</p>
+                  <p className="text-2xl sm:text-3xl font-bold">GHS {currentEarnings?.net_payout?.toFixed(2) || '0.00'}</p>
                 </div>
                 <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-200" />
               </div>
@@ -317,20 +359,20 @@ export const Earnings: React.FC = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Gross Revenue:</span>
-                        <span className="font-medium">GHS {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}</span>
+                        <span className="font-medium">GHS {currentEarnings?.gross_revenue?.toFixed(2) || '0.00'}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Platform Fee:</span>
-                        <span className="font-medium">GHS {EARNINGS_DATA.platformFee.toFixed(2)} (0% during MVP)</span>
+                        <span className="text-muted-foreground">Platform Fee (5%):</span>
+                        <span className="font-medium">GHS {currentEarnings?.platform_fee?.toFixed(2) || '0.00'}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Paystack Fees:</span>
-                        <span className="font-medium">~GHS {EARNINGS_DATA.paystackFees.toFixed(2)} (est.)</span>
+                        <span className="text-muted-foreground">Paystack Fees (3.5%):</span>
+                        <span className="font-medium">GHS {currentEarnings?.paystack_fees?.toFixed(2) || '0.00'}</span>
                       </div>
                       <div className="border-t pt-2 mt-2">
                         <div className="flex justify-between font-semibold">
                           <span>Net Revenue:</span>
-                          <span>GHS {EARNINGS_DATA.estimatedNetRevenue.toFixed(2)}</span>
+                          <span>GHS {currentEarnings?.net_payout?.toFixed(2) || '0.00'}</span>
                         </div>
                       </div>
                     </div>
@@ -348,42 +390,56 @@ export const Earnings: React.FC = () => {
           </Card>
         </Collapsible>
 
-        {/* Recent Transactions */}
+        {/* Payout History */}
         <Card className="bg-gradient-card border-border/50">
           <CardHeader>
-            <CardTitle className="text-base sm:text-lg">Recent Transactions</CardTitle>
-            <CardDescription className="text-sm">Your latest earnings from subscribers</CardDescription>
+            <CardTitle className="text-base sm:text-lg">Payout History</CardTitle>
+            <CardDescription className="text-sm">Your processed payouts and pending transfers</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Desktop View */}
-            <div className="hidden sm:block space-y-4">
-              {TRANSACTION_HISTORY.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <h4 className="font-medium text-foreground">{transaction.subscriber}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">{transaction.type}</Badge>
-                          <Badge variant="secondary" className="text-xs">{transaction.tier}</Badge>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading payout history...</p>
+              </div>
+            ) : payoutHistory.length === 0 ? (
+              <div className="text-center py-8">
+                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-medium text-foreground mb-2">No Payouts Yet</h3>
+                <p className="text-sm text-muted-foreground">Your first payout will appear here once you reach the minimum threshold of GHS 10.00</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {payoutHistory.map((payout: any) => (
+                  <div key={payout.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <h4 className="font-medium text-foreground">
+                            {new Date(payout.period_start).toLocaleDateString()} - {new Date(payout.period_end).toLocaleDateString()}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              variant={payout.status === 'completed' ? 'default' : payout.status === 'pending' ? 'secondary' : 'destructive'}
+                              className="text-xs"
+                            >
+                              {payout.status}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">{payout.payout_method}</Badge>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-foreground">GHS {parseFloat(payout.amount).toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {payout.processed_at ? new Date(payout.processed_at).toLocaleDateString() : 'Pending'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-foreground">GHS {transaction.amount.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground">{transaction.date}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile View */}
-            <div className="sm:hidden space-y-4">
-              {TRANSACTION_HISTORY.map((transaction) => (
-                <TransactionCard key={transaction.id} transaction={transaction} />
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

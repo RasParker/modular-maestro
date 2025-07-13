@@ -12,6 +12,8 @@ import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
+import payoutRoutes from './routes/payout';
+import adminRoutes from './routes/admin';
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -57,7 +59,7 @@ const upload = multer({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure PostgreSQL session store
   const PgSession = connectPgSimple(session);
-  
+
   // Configure session middleware with PostgreSQL store
   app.use(session({
     store: new PgSession({
@@ -308,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
       console.log('Creating post with status:', status);
-      
+
       const newPost = await db.insert(posts).values({
         creator_id,
         title,
@@ -885,6 +887,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Payment routes
   app.use('/api/payments', paymentRoutes);
+  app.use('/api/payouts', payoutRoutes);
+  app.use('/api/admin', adminRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
