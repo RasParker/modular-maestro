@@ -542,7 +542,7 @@ export const FeedPage: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="modal-content max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden [&>button]:hidden">
+        <DialogContent className="modal-content max-w-[85vh] max-h-[85vh] p-0 overflow-hidden [&>button]:hidden" style={{ aspectRatio: '1' }}>
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
