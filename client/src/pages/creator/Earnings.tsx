@@ -19,7 +19,8 @@ import {
   Download, 
   Eye,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Plus
 } from 'lucide-react';
 
 const EARNINGS_DATA = {
@@ -32,11 +33,7 @@ const EARNINGS_DATA = {
   nextPayout: '2025-07-15'
 };
 
-const TIER_BREAKDOWN = [
-  { name: 'Basic Support', price: 10.00, subscribers: 1, monthlyRevenue: 10.00, percentage: 11.8 },
-  { name: 'Premium Content', price: 25.00, subscribers: 1, monthlyRevenue: 25.00, percentage: 29.4 },
-  { name: 'VIP Access', price: 50.00, subscribers: 1, monthlyRevenue: 50.00, percentage: 58.8 },
-];
+
 
 const TRANSACTION_HISTORY = [
   { id: '1', date: '2025-06-28', amount: 10.00, type: 'Subscription', subscriber: 'Kwame A.', tier: 'Basic Support' },
@@ -105,6 +102,8 @@ export const Earnings: React.FC = () => {
   const [isPaymentInfoOpen, setIsPaymentInfoOpen] = useState(false);
   const [payoutHistory, setPayoutHistory] = useState([]);
   const [currentEarnings, setCurrentEarnings] = useState(null);
+  const [creatorTiers, setCreatorTiers] = useState([]);
+  const [tierBreakdown, setTierBreakdown] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -130,6 +129,36 @@ export const Earnings: React.FC = () => {
       if (historyResponse.ok) {
         const historyData = await historyResponse.json();
         setPayoutHistory(historyData.data);
+      }
+
+      // Fetch creator's subscription tiers
+      const tiersResponse = await fetch(`/api/creators/${user.id}/tiers`);
+      if (tiersResponse.ok) {
+        const tiersData = await tiersResponse.json();
+        setCreatorTiers(tiersData);
+        
+        // Calculate tier breakdown with mock subscriber data for now
+        // TODO: Replace with real subscription data when available
+        const breakdown = tiersData.map((tier, index) => {
+          const mockSubscribers = Math.floor(Math.random() * 3) + 1; // 1-3 subscribers
+          const monthlyRevenue = parseFloat(tier.price) * mockSubscribers;
+          return {
+            name: tier.name,
+            price: parseFloat(tier.price),
+            subscribers: mockSubscribers,
+            monthlyRevenue: monthlyRevenue,
+            percentage: 0 // Will calculate after getting total
+          };
+        });
+        
+        // Calculate percentages
+        const totalRevenue = breakdown.reduce((sum, tier) => sum + tier.monthlyRevenue, 0);
+        const breakdownWithPercentages = breakdown.map(tier => ({
+          ...tier,
+          percentage: totalRevenue > 0 ? (tier.monthlyRevenue / totalRevenue) * 100 : 0
+        }));
+        
+        setTierBreakdown(breakdownWithPercentages);
       }
     } catch (error) {
       console.error('Error fetching payout data:', error);
@@ -257,63 +286,103 @@ export const Earnings: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {TIER_BREAKDOWN.map((tier, index) => (
-                        <tr key={index} className="border-b border-border/20">
-                          <td className="py-3 px-4 font-medium text-foreground text-sm">{tier.name}</td>
-                          <td className="py-3 px-4 text-muted-foreground text-sm">GHS {tier.price.toFixed(2)}</td>
-                          <td className="py-3 px-4">
-                            <Badge variant="outline" className="rounded-full w-6 h-6 p-0 flex items-center justify-center text-xs">
-                              {tier.subscribers}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4 font-medium text-foreground text-sm">GHS {tier.monthlyRevenue.toFixed(2)}</td>
-                          <td className="py-3 px-4">
-                            <Badge variant="secondary" className="text-xs">{tier.percentage.toFixed(1)}%</Badge>
+                      {tierBreakdown.length > 0 ? (
+                        <>
+                          {tierBreakdown.map((tier, index) => (
+                            <tr key={index} className="border-b border-border/20">
+                              <td className="py-3 px-4 font-medium text-foreground text-sm">{tier.name}</td>
+                              <td className="py-3 px-4 text-muted-foreground text-sm">GHS {tier.price.toFixed(2)}</td>
+                              <td className="py-3 px-4">
+                                <Badge variant="outline" className="rounded-full w-6 h-6 p-0 flex items-center justify-center text-xs">
+                                  {tier.subscribers}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-4 font-medium text-foreground text-sm">GHS {tier.monthlyRevenue.toFixed(2)}</td>
+                              <td className="py-3 px-4">
+                                <Badge variant="secondary" className="text-xs">{tier.percentage.toFixed(1)}%</Badge>
+                              </td>
+                            </tr>
+                          ))}
+                          <tr className="bg-muted/20">
+                            <td className="py-3 px-4 font-semibold text-foreground text-sm">Total</td>
+                            <td className="py-3 px-4 text-sm">-</td>
+                            <td className="py-3 px-4">
+                              <Badge variant="outline" className="rounded-full w-6 h-6 p-0 flex items-center justify-center text-xs bg-green-100 text-green-700">
+                                {tierBreakdown.reduce((sum, tier) => sum + tier.subscribers, 0)}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-4 font-semibold text-foreground text-sm">
+                              GHS {tierBreakdown.reduce((sum, tier) => sum + tier.monthlyRevenue, 0).toFixed(2)}
+                            </td>
+                            <td className="py-3 px-4 font-semibold text-foreground text-sm">100%</td>
+                          </tr>
+                        </>
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                            <div className="flex flex-col items-center gap-2">
+                              <DollarSign className="w-8 h-8" />
+                              <span>No subscription tiers created yet</span>
+                              <Button variant="outline" size="sm" asChild className="mt-2">
+                                <Link to="/creator/tiers">Create Tiers</Link>
+                              </Button>
+                            </div>
                           </td>
                         </tr>
-                      ))}
-                      <tr className="bg-muted/20">
-                        <td className="py-3 px-4 font-semibold text-foreground text-sm">Total</td>
-                        <td className="py-3 px-4 text-sm">-</td>
-                        <td className="py-3 px-4">
-                          <Badge variant="outline" className="rounded-full w-6 h-6 p-0 flex items-center justify-center text-xs bg-green-100 text-green-700">
-                            {EARNINGS_DATA.totalActiveSubscribers}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 font-semibold text-foreground text-sm">GHS {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}</td>
-                        <td className="py-3 px-4 font-semibold text-foreground text-sm">100%</td>
-                      </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
 
                 {/* Mobile Card View */}
                 <div className="sm:hidden space-y-4">
-                  {TIER_BREAKDOWN.map((tier, index) => (
-                    <TierCard key={index} tier={tier} />
-                  ))}
-                  
-                  {/* Total Summary Card */}
-                  <Card className="bg-muted/20 border-border/50">
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-foreground">Total Summary</h4>
-                          <Badge variant="outline" className="bg-green-100 text-green-700">100%</Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Total Subscribers</p>
-                            <p className="font-semibold">{EARNINGS_DATA.totalActiveSubscribers}</p>
+                  {tierBreakdown.length > 0 ? (
+                    <>
+                      {tierBreakdown.map((tier, index) => (
+                        <TierCard key={index} tier={tier} />
+                      ))}
+                      
+                      {/* Total Summary Card */}
+                      <Card className="bg-muted/20 border-border/50">
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-semibold text-foreground">Total Summary</h4>
+                              <Badge variant="outline" className="bg-green-100 text-green-700">100%</Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground">Total Subscribers</p>
+                                <p className="font-semibold">{tierBreakdown.reduce((sum, tier) => sum + tier.subscribers, 0)}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Total Revenue</p>
+                                <p className="font-semibold">GHS {tierBreakdown.reduce((sum, tier) => sum + tier.monthlyRevenue, 0).toFixed(2)}</p>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-muted-foreground">Total Revenue</p>
-                            <p className="font-semibold">GHS {EARNINGS_DATA.totalMonthlyRevenue.toFixed(2)}</p>
-                          </div>
+                        </CardContent>
+                      </Card>
+                    </>
+                  ) : (
+                    <Card className="bg-gradient-card border-border/50">
+                      <CardContent className="p-6">
+                        <div className="text-center py-4">
+                          <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-medium mb-2">No subscription tiers</h3>
+                          <p className="text-muted-foreground text-sm mb-4">
+                            Create subscription tiers to start tracking revenue breakdown.
+                          </p>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to="/creator/tiers">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Create Tiers
+                            </Link>
+                          </Button>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </CardContent>
             </CollapsibleContent>
