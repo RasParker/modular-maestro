@@ -98,19 +98,20 @@ export const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Shield className="w-8 h-8 text-primary" />
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.username}! Platform overview and management tools
-          </p>
-        </div>
+      <div className="w-full">
+        <div className="content-container safe-area py-6">
+          {/* Welcome Section */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <Shield className="w-8 h-8 text-primary" />
+              Admin Dashboard
+            </h1>
+            <p className="text-muted-foreground">
+              Welcome back, {user?.username}! Platform overview and management tools
+            </p>
+          </div>
 
-        <div className="grid lg:grid-cols-4 gap-6">
+          <div className="grid lg:grid-cols-4 gap-6">
           {/* Key Metrics */}
           <div className="lg:col-span-4 grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card className="bg-gradient-card border-border/50">
@@ -347,6 +348,7 @@ export const AdminDashboard: React.FC = () => {
                 </Button>
               </CardContent>
             </Card>
+          </div>
           </div>
         </div>
       </div>

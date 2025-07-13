@@ -144,6 +144,16 @@
 
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
 }
 
@@ -235,5 +245,118 @@
 
   .stats-icon {
     color: hsl(var(--primary));
+  }
+
+  /* Edge-to-edge layout utilities */
+  .edge-to-edge {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+  }
+
+  .safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .feed-card {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    margin-bottom: 1rem;
+  }
+
+  .feed-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .feed-header {
+    padding: 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--background));
+  }
+
+  .feed-content {
+    padding: 1rem;
+    background: hsl(var(--background));
+  }
+
+  .feed-media {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .feed-actions {
+    padding: 1rem;
+    background: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  /* Modern minimal buttons */
+  .minimal-button {
+    background: none;
+    border: none;
+    color: hsl(var(--muted-foreground));
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .minimal-button:hover {
+    color: hsl(var(--foreground));
+    background: hsl(var(--muted) / 0.5);
+    transform: translateY(-1px);
+  }
+
+  .minimal-button.active {
+    color: hsl(var(--primary));
+  }
+
+  .minimal-button.liked {
+    color: #ef4444;
+  }
+
+  /* Modal enhancements */
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    background: hsl(var(--background));
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+
+  /* Responsive utilities */
+  @media (max-width: 768px) {
+    .content-container {
+      padding: 0 0.5rem;
+    }
+    
+    .feed-header,
+    .feed-content,
+    .feed-actions {
+      padding: 0.75rem;
+    }
   }
 }

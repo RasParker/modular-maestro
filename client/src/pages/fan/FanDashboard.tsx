@@ -73,20 +73,23 @@ export const FanDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user?.username}!
-          </h1>
-          <p className="text-muted-foreground">
-            Here's what's happening with your favorite creators
-          </p>
+        <div className="content-container safe-area py-6">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Welcome back, {user?.username}!
+            </h1>
+            <p className="text-muted-foreground">
+              Here's what's happening with your favorite creators
+            </p>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="content-container safe-area">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
             {/* Quick Stats */}
             <div className="grid md:grid-cols-3 gap-4">
               <Card className="bg-gradient-card border-border/50">
@@ -259,6 +262,7 @@ export const FanDashboard: React.FC = () => {
                 </Button>
               </CardContent>
             </Card>
+          </div>
           </div>
         </div>
       </div>

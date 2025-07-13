@@ -85,14 +85,15 @@ export const CreatorDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <DashboardHeader
-          username={user?.username}
-          title="Creator Dashboard"
-          subtitle="Here's your creator overview"
-        />
+      <div className="w-full">
+        <div className="content-container safe-area py-6">
+          <DashboardHeader
+            username={user?.username}
+            title="Creator Dashboard"
+            subtitle="Here's your creator overview"
+          />
 
-        <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Key Metrics */}
           <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Card className="bg-gradient-card border-border/50">
@@ -305,6 +306,7 @@ export const CreatorDashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+          </div>
           </div>
         </div>
       </div>

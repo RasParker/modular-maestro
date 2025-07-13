@@ -366,47 +366,52 @@ export const FeedPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Your Feed
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Latest content from creators you follow
-          </p>
+        <div className="content-container safe-area py-6">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Your Feed
+            </h1>
+            <p className="text-muted-foreground">
+              Latest content from creators you follow
+            </p>
+          </div>
         </div>
 
         {/* Feed Content */}
-        <div className="space-y-6">
+        <div className="w-full">
           {feed.map((post) => (
-            <Card key={post.id} className="bg-gradient-card border-border/50">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                      <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-foreground">{post.creator.display_name}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">@{post.creator.username}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {post.tier}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {getTimeAgo(post.posted)}
-                        </span>
+            <div key={post.id} className="feed-card">
+              {/* Header */}
+              <div className="feed-header">
+                <div className="content-container safe-area">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                        <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-foreground">{post.creator.display_name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-muted-foreground">@{post.creator.username}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {post.tier}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {getTimeAgo(post.posted)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  
                 </div>
-              </CardHeader>
+              </div>
               
-              <CardContent className="space-y-4">
-                <div>
+              {/* Caption */}
+              <div className="feed-content">
+                <div className="content-container safe-area">
                   {(() => {
                     const { truncated, needsExpansion } = truncateText(post.content);
                     const isExpanded = expandedCaptions[post.id];
@@ -446,71 +451,71 @@ export const FeedPage: React.FC = () => {
                     );
                   })()}
                 </div>
-                
-                <div 
-                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 relative"
-                  onClick={() => handleThumbnailClick(post)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleThumbnailClick(post);
-                    }
-                  }}
-                >
-                  <img 
-                    src={post.thumbnail} 
-                    alt={`${post.creator.display_name}'s post`}
-                    className="w-full h-64 object-cover"
-                  />
-                  {/* Content type overlay */}
-                  <div className="absolute top-3 right-3 w-8 h-8 bg-black/70 rounded-full flex items-center justify-center text-white">
-                    {getTypeIcon(post.type)}
-                  </div>
+              </div>
+              
+              {/* Media */}
+              <div 
+                className="cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 relative"
+                onClick={() => handleThumbnailClick(post)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleThumbnailClick(post);
+                  }
+                }}
+              >
+                <img 
+                  src={post.thumbnail} 
+                  alt={`${post.creator.display_name}'s post`}
+                  className="feed-media"
+                />
+                {/* Content type overlay */}
+                <div className="absolute top-3 right-3 w-8 h-8 bg-black/70 rounded-full flex items-center justify-center text-white">
+                  {getTypeIcon(post.type)}
                 </div>
-                
-                <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                      onClick={() => handleLike(post.id)}
-                    >
-                      <Heart className={`w-4 h-4 mr-1 ${post.liked ? 'fill-current' : ''}`} />
-                      {post.likes}
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-muted-foreground"
-                      onClick={() => handleCommentClick(post.id)}
-                    >
-                      <MessageSquare className="w-4 h-4 mr-1" />
-                      {post.comments}
-                    </Button>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Eye className="w-4 h-4" />
-                      {post.views}
+              </div>
+              
+              {/* Actions */}
+              <div className="feed-actions">
+                <div className="content-container safe-area">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <button
+                        className={`minimal-button ${post.liked ? 'liked' : ''}`}
+                        onClick={() => handleLike(post.id)}
+                      >
+                        <Heart className={`w-4 h-4 ${post.liked ? 'fill-current' : ''}`} />
+                        {post.likes}
+                      </button>
+                      <button 
+                        className="minimal-button"
+                        onClick={() => handleCommentClick(post.id)}
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        {post.comments}
+                      </button>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Eye className="w-4 h-4" />
+                        {post.views}
+                      </div>
                     </div>
+                    
+                    <button
+                      className="minimal-button"
+                      onClick={() => handleShare(post.id)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground"
-                    onClick={() => handleShare(post.id)}
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
                 </div>
-              </CardContent>
+              </div>
               
               {/* Comments Section */}
               {showComments[post.id] && (
                 <div className="border-t border-border/30">
-                  <div className="p-4">
+                  <div className="content-container safe-area p-4">
                     <CommentSection
                       postId={post.id}
                       initialComments={post.initialComments || []}
@@ -519,21 +524,23 @@ export const FeedPage: React.FC = () => {
                   </div>
                 </div>
               )}
-            </Card>
+            </div>
           ))}
         </div>
 
         {/* Load More */}
-        <div className="text-center mt-8">
-          <Button variant="outline">
-            Load More Posts
-          </Button>
+        <div className="content-container safe-area py-8">
+          <div className="text-center">
+            <Button variant="outline">
+              Load More Posts
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="modal-content max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
@@ -541,14 +548,12 @@ export const FeedPage: React.FC = () => {
           {selectedContent && (
             <div className="relative w-full h-full bg-black flex items-center justify-center">
               {/* Back Arrow Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
+              <button
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10 flex items-center justify-center minimal-button"
                 onClick={closeModal}
               >
                 <ArrowLeft className="w-7 h-7" />
-              </Button>
+              </button>
 
               {/* Square container that fills the entire modal */}
               <div className="relative w-full h-full overflow-hidden">
