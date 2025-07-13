@@ -273,6 +273,36 @@
     margin-bottom: 1rem;
   }
 
+  /* Feed Container - Mobile first, constrained on desktop */
+  .feed-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* Desktop feed constraint */
+  @media (min-width: 768px) {
+    .feed-container {
+      max-width: 700px;
+      padding: 0 24px;
+    }
+  }
+
+  /* Media within feed container stays edge-to-edge */
+  .feed-container .feed-media {
+    margin-left: -16px;
+    margin-right: -16px;
+    width: calc(100% + 32px);
+  }
+
+  @media (min-width: 768px) {
+    .feed-container .feed-media {
+      margin-left: -24px;
+      margin-right: -24px;
+      width: calc(100% + 48px);
+    }
+  }
+
   .feed-card:last-child {
     margin-bottom: 0;
   }
