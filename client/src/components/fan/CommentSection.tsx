@@ -321,7 +321,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               <p className="text-sm text-foreground break-words">{comment.content}</p>
             </div>
 
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
               <Button
                 variant="ghost"
                 size="sm"
@@ -349,10 +349,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-auto p-1 text-muted-foreground hover:bg-background/50"
+                  className="h-auto p-1 text-muted-foreground hover:bg-background/50 flex-shrink-0"
                   onClick={() => toggleReplies(comment.id)}
                 >
-                  <span className="text-xs flex items-center gap-1">
+                  <span className="text-xs flex items-center gap-1 whitespace-nowrap">
                     <span className="inline-block w-2 h-2 bg-primary/40 rounded-full"></span>
                     {showReplies[comment.id] ? 'Hide' : 'Show'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
                   </span>
