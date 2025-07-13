@@ -279,10 +279,12 @@
 
   .feed-card {
     border: none;
-    border-radius: 0;
+    border-radius: 0.5rem;
     box-shadow: none;
     background: hsl(var(--card));
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
   }
 
   .feed-card:last-child {

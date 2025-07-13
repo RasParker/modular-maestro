@@ -382,7 +382,7 @@ export const FeedPage: React.FC = () => {
         {/* Feed Content */}
         <div className="feed-container">
           {feed.map((post) => (
-            <div key={post.id} className="feed-card bg-card border-b border-border/50">
+            <div key={post.id} className="feed-card bg-card border border-border/50">
               {/* Header */}
               <div className="feed-header">
                 <div className="content-container safe-area">
