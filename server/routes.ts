@@ -12,7 +12,7 @@ import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
-import payoutRoutes from './routes/payout';
+import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
 
 // Extend Express session interface
