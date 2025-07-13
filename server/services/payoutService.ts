@@ -98,8 +98,9 @@ export class PayoutService {
         transaction_count++;
       }
       
-      // Calculate fees
-      const platform_fee_rate = 0.05; // 5% platform fee
+      // Get platform settings for commission rate
+      const platformSettings = await storage.getPlatformSettings();
+      const platform_fee_rate = platformSettings.commission_rate; // Use dynamic commission rate
       const paystack_fee_rate = 0.035; // 3.5% Paystack fee (approximate)
       
       const platform_fee = gross_revenue * platform_fee_rate;

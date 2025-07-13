@@ -890,6 +890,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/payouts', payoutRoutes);
   app.use('/api/admin', adminRoutes);
 
+// Platform settings endpoints
+app.get('/api/admin/platform-settings', async (req, res) => {
+  try {
+    const settings = await storage.getPlatformSettings();
+    res.json({ success: true, data: settings });
+  } catch (error: any) {
+    console.error('Error fetching platform settings:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Failed to fetch platform settings' 
+    });
+  }
+});
+
+app.put('/api/admin/platform-settings', async (req, res) => {
+  try {
+    const { commission_rate, ...otherSettings } = req.body;
+
+    // Validate commission rate
+    if (commission_rate !== undefined) {
+      const rate = parseFloat(commission_rate);
+      if (isNaN(rate) || rate < 0 || rate > 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'Commission rate must be between 0 and 1 (0% to 100%)'
+        });
+      }
+    }
+
+    await storage.updatePlatformSettings({
+      commission_rate: commission_rate ? parseFloat(commission_rate) : 0.05,
+      ...otherSettings
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'Platform settings updated successfully' 
+    });
+  } catch (error: any) {
+    console.error('Error updating platform settings:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Failed to update platform settings' 
+    });
+  }
+});
+
   const httpServer = createServer(app);
   return httpServer;
 }

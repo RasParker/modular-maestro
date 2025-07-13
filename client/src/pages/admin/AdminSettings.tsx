@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +17,7 @@ export const AdminSettings: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModerationLoading, setIsModerationLoading] = useState(false);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
-  
+
   const [platformSettings, setPlatformSettings] = useState({
     siteName: 'Xclusive',
     siteDescription: 'Premium content monetization platform',
@@ -55,16 +54,34 @@ export const AdminSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Settings updated",
-        description: "Platform settings have been successfully updated.",
+      const response = await fetch('/api/admin/platform-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          commission_rate: platformSettings.commissionRate / 100, // Convert percentage to decimal
+          site_name: platformSettings.siteName,
+          site_description: platformSettings.siteDescription,
+          maintenance_mode: platformSettings.maintenanceMode,
+          new_user_registration: platformSettings.newUserRegistration
+        }),
       });
-    } catch (error) {
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Settings Updated",
+          description: "Platform settings have been saved successfully.",
+        });
+      } else {
+        throw new Error(data.message || 'Failed to update settings');
+      }
+    } catch (error: any) {
       toast({
-        title: "Update failed",
-        description: "Failed to update settings. Please try again.",
+        title: "Error",
+        description: error.message || "Failed to update platform settings.",
         variant: "destructive",
       });
     } finally {
@@ -78,7 +95,7 @@ export const AdminSettings: React.FC = () => {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Moderation settings updated",
         description: "Content moderation settings have been successfully updated.",
@@ -100,7 +117,7 @@ export const AdminSettings: React.FC = () => {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Email settings updated",
         description: "Email configuration has been successfully updated.",
@@ -119,7 +136,7 @@ export const AdminSettings: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -179,7 +196,7 @@ export const AdminSettings: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="siteDescription">Site Description</Label>
                       <Textarea
@@ -205,9 +222,9 @@ export const AdminSettings: React.FC = () => {
                           }
                         />
                       </div>
-                      
+
                       <Separator />
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                           <Label>New User Registration</Label>
@@ -223,7 +240,7 @@ export const AdminSettings: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Updating..." : "Update Platform Settings"}
                     </Button>
@@ -260,9 +277,9 @@ export const AdminSettings: React.FC = () => {
                           }
                         />
                       </div>
-                      
+
                       <Separator />
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                           <Label>Require Content Approval</Label>
@@ -312,7 +329,7 @@ export const AdminSettings: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Button type="submit" disabled={isModerationLoading}>
                       {isModerationLoading ? "Saving..." : "Save Moderation Settings"}
                     </Button>
@@ -372,7 +389,7 @@ export const AdminSettings: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <Button type="submit" disabled={isEmailLoading}>
                       {isEmailLoading ? "Saving..." : "Save Email Settings"}
                     </Button>
@@ -408,9 +425,9 @@ export const AdminSettings: React.FC = () => {
                         Minimum age required to create an account
                       </p>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-3">
                       <h4 className="font-medium text-foreground">User Statistics</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -428,9 +445,9 @@ export const AdminSettings: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-3">
                       <h4 className="font-medium text-foreground">User Actions</h4>
                       <div className="space-y-2">

@@ -76,6 +76,10 @@ export interface IStorage {
   // Payment methods
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]>;
+
+  // Platform settings methods
+  getPlatformSettings(): Promise<any>;
+  updatePlatformSettings(settings: any): Promise<void>;
 }
 
 // Database Storage Implementation
@@ -464,8 +468,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCreatorPayouts(creatorId: number, limit: number = 10): Promise<any[]> {
-    return db.select()
-      .from(creator_payouts)
+    return await db.select().from(creator_payouts)
       .where(eq(creator_payouts.creator_id, creatorId))
       .orderBy(desc(creator_payouts.created_at))
       .limit(limit);
@@ -561,6 +564,62 @@ export class DatabaseStorage implements IStorage {
       pending_count: pendingCount,
       total_creators: await db.select().from(users).where(eq(users.role, 'creator')).then(r => r.length)
     };
+  }
+
+  // Platform settings methods
+  async getPlatformSettings(): Promise<any> {
+    // For now, we'll store platform settings in a simple key-value approach
+    // In production, you might want a dedicated platform_settings table
+    try {
+      const result = await db.execute(sql`
+        SELECT value FROM platform_settings WHERE key = 'commission_rate'
+      `);
+
+      const commissionRate = result.rows[0]?.value || '0.05'; // Default 5%
+
+      return {
+        commission_rate: parseFloat(commissionRate),
+        site_name: 'Xclusive',
+        site_description: 'Premium content monetization platform',
+        maintenance_mode: false,
+        new_user_registration: true
+      };
+    } catch (error) {
+      console.error('Error getting platform settings:', error);
+      // If table doesn't exist or other error, return defaults
+      return {
+        commission_rate: 0.05,
+        site_name: 'Xclusive',
+        site_description: 'Premium content monetization platform',
+        maintenance_mode: false,
+        new_user_registration: true
+      };
+    }
+  }
+
+  async updatePlatformSettings(settings: any): Promise<void> {
+    try {
+      // Create table if it doesn't exist
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS platform_settings (
+          key VARCHAR(255) PRIMARY KEY,
+          value TEXT,
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+
+      // Update commission rate
+      await db.execute(sql`
+        INSERT INTO platform_settings (key, value, updated_at)
+        VALUES ('commission_rate', ${settings.commission_rate.toString()}, NOW())
+        ON CONFLICT (key) DO UPDATE SET 
+          value = EXCLUDED.value,
+          updated_at = EXCLUDED.updated_at
+      `);
+    } catch (error) {
+      console.error('Error updating platform settings:', error);
+      throw error;
+    }
   }
 }
 
