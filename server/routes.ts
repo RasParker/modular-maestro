@@ -7,7 +7,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema } from "@shared/schema";
+import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
 import { eq } from 'drizzle-orm';
@@ -882,6 +882,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Profile sync error:', error);
       res.status(500).json({ error: 'Failed to sync profile' });
+    }
+  });
+
+  // Creator payout settings endpoints
+  app.get('/api/creators/:id/payout-settings', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.id);
+      
+      // Ensure user can only access their own settings or if they're admin
+      if (!req.session?.userId || (req.session.userId !== creatorId && req.session.user?.role !== 'admin')) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      const settings = await storage.getCreatorPayoutSettings(creatorId);
+      res.json({ success: true, data: settings });
+    } catch (error) {
+      console.error('Error fetching payout settings:', error);
+      res.status(500).json({ error: 'Failed to fetch payout settings' });
+    }
+  });
+
+  app.post('/api/creators/:id/payout-settings', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.id);
+      
+      // Ensure user can only update their own settings
+      if (!req.session?.userId || req.session.userId !== creatorId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      const validatedData = insertCreatorPayoutSettingsSchema.parse({
+        ...req.body,
+        creator_id: creatorId
+      });
+
+      const settings = await storage.saveCreatorPayoutSettings(validatedData);
+      res.json({ success: true, data: settings });
+    } catch (error) {
+      console.error('Error saving payout settings:', error);
+      res.status(500).json({ error: 'Failed to save payout settings' });
+    }
+  });
+
+  app.put('/api/creators/:id/payout-settings', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.id);
+      
+      // Ensure user can only update their own settings
+      if (!req.session?.userId || req.session.userId !== creatorId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      const settings = await storage.updateCreatorPayoutSettings(creatorId, req.body);
+      if (!settings) {
+        return res.status(404).json({ error: 'Settings not found' });
+      }
+      
+      res.json({ success: true, data: settings });
+    } catch (error) {
+      console.error('Error updating payout settings:', error);
+      res.status(500).json({ error: 'Failed to update payout settings' });
     }
   });
 

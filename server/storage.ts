@@ -8,6 +8,7 @@ import {
   subscriptions,
   payment_transactions,
   creator_payouts,
+  creator_payout_settings,
   type User, 
   type InsertUser,
   type Post,
@@ -19,7 +20,9 @@ import {
   type Subscription,
   type InsertSubscription,
   type PaymentTransaction,
-  type InsertPaymentTransaction
+  type InsertPaymentTransaction,
+  type CreatorPayoutSettings,
+  type InsertCreatorPayoutSettings
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
@@ -76,6 +79,11 @@ export interface IStorage {
   // Payment methods
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]>;
+
+  // Creator payout settings methods
+  getCreatorPayoutSettings(creatorId: number): Promise<CreatorPayoutSettings | undefined>;
+  saveCreatorPayoutSettings(settings: InsertCreatorPayoutSettings): Promise<CreatorPayoutSettings>;
+  updateCreatorPayoutSettings(creatorId: number, updates: Partial<CreatorPayoutSettings>): Promise<CreatorPayoutSettings | undefined>;
 
   // Platform settings methods
   getPlatformSettings(): Promise<any>;
@@ -498,14 +506,38 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).where(eq(users.role, 'creator'));
   }
 
-  async getCreatorPayoutSettings(creatorId: number): Promise<any> {
-    // Mock implementation - in a real app, this would be stored in a separate table
-    return {
-      payout_method: 'mtn_momo',
-      phone: '+233123456789',
-      account_number: null,
-      bank_code: null
-    };
+  async getCreatorPayoutSettings(creatorId: number): Promise<CreatorPayoutSettings | undefined> {
+    const [settings] = await db.select().from(creator_payout_settings)
+      .where(eq(creator_payout_settings.creator_id, creatorId));
+    return settings || undefined;
+  }
+
+  async saveCreatorPayoutSettings(settings: InsertCreatorPayoutSettings): Promise<CreatorPayoutSettings> {
+    const [existingSetting] = await db.select().from(creator_payout_settings)
+      .where(eq(creator_payout_settings.creator_id, settings.creator_id));
+
+    if (existingSetting) {
+      // Update existing settings
+      const [updated] = await db.update(creator_payout_settings)
+        .set({ ...settings, updated_at: new Date() })
+        .where(eq(creator_payout_settings.creator_id, settings.creator_id))
+        .returning();
+      return updated;
+    } else {
+      // Create new settings
+      const [created] = await db.insert(creator_payout_settings)
+        .values(settings)
+        .returning();
+      return created;
+    }
+  }
+
+  async updateCreatorPayoutSettings(creatorId: number, updates: Partial<CreatorPayoutSettings>): Promise<CreatorPayoutSettings | undefined> {
+    const [updated] = await db.update(creator_payout_settings)
+      .set({ ...updates, updated_at: new Date() })
+      .where(eq(creator_payout_settings.creator_id, creatorId))
+      .returning();
+    return updated || undefined;
   }
 
   async getCreatorPayoutStats(creatorId: number): Promise<any> {

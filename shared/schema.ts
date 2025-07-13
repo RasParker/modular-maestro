@@ -121,6 +121,25 @@ export const creator_payouts = pgTable("creator_payouts", {
   created_at: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const creator_payout_settings = pgTable("creator_payout_settings", {
+  id: serial("id").primaryKey(),
+  creator_id: integer("creator_id").notNull().unique(),
+  payout_method: text("payout_method").notNull(), // mtn_momo, vodafone_cash, bank_transfer, etc.
+  // Mobile Money fields
+  momo_provider: text("momo_provider"), // mtn, vodafone, airteltigo
+  momo_phone: text("momo_phone"),
+  momo_name: text("momo_name"),
+  // Bank Transfer fields
+  bank_name: text("bank_name"),
+  account_number: text("account_number"),
+  account_name: text("account_name"),
+  // Other settings
+  auto_withdraw_enabled: boolean("auto_withdraw_enabled").notNull().default(false),
+  auto_withdraw_threshold: decimal("auto_withdraw_threshold", { precision: 10, scale: 2 }).default("500.00"),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const reports = pgTable("reports", {
   id: serial("id").primaryKey(),
   type: text("type").notNull(), // 'content', 'user', 'payment'
@@ -139,13 +158,14 @@ export const reports = pgTable("reports", {
 });
 
 // Database relations
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   posts: many(posts),
   comments: many(comments),
   subscriptions: many(subscriptions),
   subscription_tiers: many(subscription_tiers),
   payment_transactions: many(payment_transactions),
   creator_payouts: many(creator_payouts),
+  payout_settings: one(creator_payout_settings),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -203,6 +223,13 @@ export const paymentTransactionsRelations = relations(payment_transactions, ({ o
 export const creatorPayoutsRelations = relations(creator_payouts, ({ one }) => ({
   creator: one(users, {
     fields: [creator_payouts.creator_id],
+    references: [users.id],
+  }),
+}));
+
+export const creatorPayoutSettingsRelations = relations(creator_payout_settings, ({ one }) => ({
+  creator: one(users, {
+    fields: [creator_payout_settings.creator_id],
     references: [users.id],
   }),
 }));
@@ -280,6 +307,19 @@ export const insertReportSchema = createInsertSchema(reports).pick({
   resolved_by: true,
 });
 
+export const insertCreatorPayoutSettingsSchema = createInsertSchema(creator_payout_settings).pick({
+  creator_id: true,
+  payout_method: true,
+  momo_provider: true,
+  momo_phone: true,
+  momo_name: true,
+  bank_name: true,
+  account_number: true,
+  account_name: true,
+  auto_withdraw_enabled: true,
+  auto_withdraw_threshold: true,
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -296,3 +336,5 @@ export type PaymentTransaction = typeof payment_transactions.$inferSelect;
 export type InsertReport = z.infer<typeof insertReportSchema>;
 export type Report = typeof reports.$inferSelect;
 export type CreatorPayout = typeof creator_payouts.$inferSelect;
+export type InsertCreatorPayoutSettings = z.infer<typeof insertCreatorPayoutSettingsSchema>;
+export type CreatorPayoutSettings = typeof creator_payout_settings.$inferSelect;

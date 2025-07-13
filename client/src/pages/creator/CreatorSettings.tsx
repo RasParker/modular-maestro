@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,8 @@ import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2, 
 import { useToast } from '@/hooks/use-toast';
 import { setLocalStorageItem, getLocalStorageItem } from '@/lib/storage-utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
@@ -46,6 +48,77 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
+  
+  // Payout settings state
+  const [payoutSettings, setPayoutSettings] = useState({
+    payout_method: 'mtn_momo',
+    momo_provider: 'mtn',
+    momo_phone: '',
+    momo_name: '',
+    bank_name: '',
+    account_number: '',
+    account_name: '',
+    auto_withdraw_enabled: false,
+    auto_withdraw_threshold: '500.00'
+  });
+  const [isPayoutSettingsLoading, setIsPayoutSettingsLoading] = useState(false);
+
+  // Load payout settings on component mount
+  useEffect(() => {
+    const loadPayoutSettings = async () => {
+      try {
+        setIsPayoutSettingsLoading(true);
+        const response = await fetch('/api/creators/1/payout-settings');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setPayoutSettings(result.data);
+            setPaymentMethod(result.data.payout_method || 'mtn_momo');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading payout settings:', error);
+      } finally {
+        setIsPayoutSettingsLoading(false);
+      }
+    };
+
+    loadPayoutSettings();
+  }, []);
+
+  const handleSavePayoutSettings = async () => {
+    try {
+      setIsPayoutSettingsLoading(true);
+      const response = await fetch('/api/creators/1/payout-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...payoutSettings,
+          payout_method: paymentMethod,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Payout settings saved",
+          description: "Your payout settings have been updated successfully.",
+        });
+      } else {
+        throw new Error('Failed to save payout settings');
+      }
+    } catch (error) {
+      console.error('Error saving payout settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save payout settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPayoutSettingsLoading(false);
+    }
+  };
 
   const handleSave = () => {
     // Save display name and bio to localStorage
@@ -571,7 +644,13 @@ export const CreatorSettings: React.FC = () => {
                 <CardContent className="space-y-6">
                   <div>
                     <Label htmlFor="payoutMethod">Primary Payout Method</Label>
-                    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <Select 
+                      value={paymentMethod} 
+                      onValueChange={(value) => {
+                        setPaymentMethod(value);
+                        setPayoutSettings(prev => ({ ...prev, payout_method: value }));
+                      }}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
@@ -589,11 +668,21 @@ export const CreatorSettings: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="momoNumber">Mobile Money Number</Label>
-                        <Input id="momoNumber" defaultValue="+233 24 123 4567" />
+                        <Input 
+                          id="momoNumber" 
+                          value={payoutSettings.momo_phone}
+                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, momo_phone: e.target.value }))}
+                          placeholder="+233 24 123 4567"
+                        />
                       </div>
                       <div>
                         <Label htmlFor="momoName">Account Name</Label>
-                        <Input id="momoName" defaultValue="Akosua Art" />
+                        <Input 
+                          id="momoName" 
+                          value={payoutSettings.momo_name}
+                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, momo_name: e.target.value }))}
+                          placeholder="Account Name"
+                        />
                       </div>
                     </div>
                   )}
@@ -604,9 +693,12 @@ export const CreatorSettings: React.FC = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="bankName">Bank Name</Label>
-                          <Select defaultValue="gcb">
+                          <Select 
+                            value={payoutSettings.bank_name}
+                            onValueChange={(value) => setPayoutSettings(prev => ({ ...prev, bank_name: value }))}
+                          >
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select bank" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="gcb">GCB Bank</SelectItem>
@@ -619,12 +711,22 @@ export const CreatorSettings: React.FC = () => {
                         </div>
                         <div>
                           <Label htmlFor="accountNumber">Account Number</Label>
-                          <Input id="accountNumber" defaultValue="1234567890" />
+                          <Input 
+                            id="accountNumber" 
+                            value={payoutSettings.account_number}
+                            onChange={(e) => setPayoutSettings(prev => ({ ...prev, account_number: e.target.value }))}
+                            placeholder="Account Number"
+                          />
                         </div>
                       </div>
                       <div>
                         <Label htmlFor="accountName">Account Name</Label>
-                        <Input id="accountName" defaultValue="Akosua Art" />
+                        <Input 
+                          id="accountName" 
+                          value={payoutSettings.account_name}
+                          onChange={(e) => setPayoutSettings(prev => ({ ...prev, account_name: e.target.value }))}
+                          placeholder="Account Name"
+                        />
                       </div>
                     </div>
                   )}
@@ -633,10 +735,14 @@ export const CreatorSettings: React.FC = () => {
                     <div>
                       <Label htmlFor="autoWithdraw">Auto-withdraw earnings</Label>
                       <p className="text-sm text-muted-foreground">
-                        Automatically withdraw when balance reaches GH₵ 500
+                        Automatically withdraw when balance reaches GH₵ {payoutSettings.auto_withdraw_threshold}
                       </p>
                     </div>
-                    <Switch id="autoWithdraw" />
+                    <Switch 
+                      id="autoWithdraw" 
+                      checked={payoutSettings.auto_withdraw_enabled}
+                      onCheckedChange={(checked) => setPayoutSettings(prev => ({ ...prev, auto_withdraw_enabled: checked }))}
+                    />
                   </div>
 
                   <div>
@@ -645,6 +751,17 @@ export const CreatorSettings: React.FC = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       Required for earnings above GH₵ 10,000 annually
                     </p>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-border/50">
+                    <Button 
+                      onClick={handleSavePayoutSettings}
+                      disabled={isPayoutSettingsLoading}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {isPayoutSettingsLoading ? 'Saving...' : 'Save Payout Settings'}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
