@@ -13,16 +13,18 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Configure Pool with better error handling and connection management
-export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 1, // Limit concurrent connections for serverless
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 30000,
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || "postgresql://user:password@localhost:5432/xclusive",
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-// Add connection error handling
-pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err);
+// Test database connection
+pool.on('connect', () => {
+  console.log('Database connected successfully');
+});
+
+pool.on('error', (err) => {
+  console.error('Database connection error:', err);
 });
 
 export const db = drizzle({ client: pool, schema });

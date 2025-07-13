@@ -160,38 +160,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/register", async (req, res) => {
     try {
       console.log('Registration request received:', req.body);
+      
+      // Validate input data
       const validatedData = insertUserSchema.parse(req.body);
+      console.log('Validated data:', { ...validatedData, password: '[HIDDEN]' });
 
-      // Check if user already exists
+      // Check if user already exists by email
       try {
         const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
         if (existingUserByEmail) {
+          console.log('Email already exists:', validatedData.email);
           return res.status(400).json({ error: "Email already exists" });
         }
       } catch (error) {
         console.log('Email check error (user probably doesn\'t exist):', error);
       }
 
+      // Check if user already exists by username
       try {
         const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
         if (existingUserByUsername) {
+          console.log('Username already exists:', validatedData.username);
           return res.status(400).json({ error: "Username already exists" });
         }
       } catch (error) {
         console.log('Username check error (user probably doesn\'t exist):', error);
       }
 
+      // Create the user
+      console.log('Creating user...');
       const user = await storage.createUser(validatedData);
+      console.log('User created successfully:', user.id);
+
+      if (!user) {
+        throw new Error('Failed to create user account');
+      }
+
       const { password: _, ...userWithoutPassword } = user;
 
       // Set session data
       req.session.userId = user.id;
       req.session.user = userWithoutPassword;
 
+      console.log('Registration successful for user:', user.id);
       res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error('Registration error:', error);
-      res.status(500).json({ error: "Registration failed: " + (error instanceof Error ? error.message : 'Unknown error') });
+      
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('duplicate key')) {
+          return res.status(400).json({ error: "User already exists" });
+        }
+        if (error.message.includes('validation')) {
+          return res.status(400).json({ error: "Invalid input data" });
+        }
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to create user account", 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      });
     }
   });
 

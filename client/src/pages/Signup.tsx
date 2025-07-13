@@ -56,9 +56,25 @@ export const Signup: React.FC = () => {
       const redirectPath = role === 'creator' ? '/creator/dashboard' : '/fan/dashboard';
       navigate(redirectPath);
     } catch (error) {
+      console.error('Signup error:', error);
+      
+      let errorMessage = "Something went wrong";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // Handle specific error cases
+      if (errorMessage.includes("Email already exists")) {
+        errorMessage = "An account with this email already exists. Please use a different email or try logging in.";
+      } else if (errorMessage.includes("Username already exists")) {
+        errorMessage = "This username is already taken. Please choose a different username.";
+      } else if (errorMessage.includes("Failed to create user account")) {
+        errorMessage = "Unable to create your account. Please try again or contact support.";
+      }
+      
       toast({
         title: "Signup failed",
-        description: error instanceof Error ? error.message : "Something went wrong",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
