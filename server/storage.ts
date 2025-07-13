@@ -128,10 +128,10 @@ export class DatabaseStorage implements IStorage {
 
       const [user] = await db
         .insert(users)
-        .values({
+        .values([{
           ...insertUser,
           password: hashedPassword,
-        })
+        }])
         .returning();
 
       console.log('User created successfully:', { ...user, password: '[HIDDEN]' });
@@ -203,7 +203,7 @@ export class DatabaseStorage implements IStorage {
   async createPost(insertPost: InsertPost): Promise<Post> {
     const [post] = await db
       .insert(posts)
-      .values(insertPost)
+      .values([insertPost])
       .returning();
     return post;
   }
@@ -319,7 +319,7 @@ export class DatabaseStorage implements IStorage {
       console.log('Creating subscription tier with data:', tier);
       const [newTier] = await db
         .insert(subscription_tiers)
-        .values(tier)
+        .values([tier])
         .returning();
       console.log('Subscription tier created successfully:', newTier);
       return newTier;
@@ -452,8 +452,8 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(subscription_tiers).where(eq(subscription_tiers.creator_id, creatorId));
   }
 
-  // Get specific subscription tier
-  async getSubscriptionTier(tierId: number): Promise<SubscriptionTier | undefined> {
+  // Get specific subscription tier (renamed to avoid duplicate)
+  async getSubscriptionTierById(tierId: number): Promise<SubscriptionTier | undefined> {
     const result = await db.select().from(subscription_tiers).where(eq(subscription_tiers.id, tierId));
     return result[0];
   }
