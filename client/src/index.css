@@ -265,6 +265,18 @@
     padding: 0 1rem;
   }
 
+  /* Feed Container - constrained on desktop, full width on mobile */
+  .feed-container {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .feed-container {
+      max-width: 600px;
+    }
+  }
+
   .feed-card {
     border: none;
     border-radius: 0;
