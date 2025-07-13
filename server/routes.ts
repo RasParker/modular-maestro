@@ -937,6 +937,27 @@ app.put('/api/admin/platform-settings', async (req, res) => {
   }
 });
 
+// Check current commission rate
+app.get('/api/admin/commission-rate', async (req, res) => {
+  try {
+    const settings = await storage.getPlatformSettings();
+    const commissionPercentage = (settings.commission_rate * 100).toFixed(1);
+    
+    res.json({ 
+      success: true, 
+      commission_rate_decimal: settings.commission_rate,
+      commission_rate_percentage: `${commissionPercentage}%`,
+      message: `Current commission rate is ${commissionPercentage}%`
+    });
+  } catch (error: any) {
+    console.error('Error fetching commission rate:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Failed to fetch commission rate' 
+    });
+  }
+});
+
   const httpServer = createServer(app);
   return httpServer;
 }
