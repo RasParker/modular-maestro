@@ -380,7 +380,7 @@ export const FeedPage: React.FC = () => {
         </div>
 
         {/* Feed Content */}
-        <div className="feed-container">
+        <div className="w-full">
           {feed.map((post) => (
             <div key={post.id} className="feed-card">
               {/* Header */}
@@ -526,14 +526,14 @@ export const FeedPage: React.FC = () => {
               )}
             </div>
           ))}
-          
-          {/* Load More */}
-          <div className="py-8">
-            <div className="text-center">
-              <Button variant="outline">
-                Load More Posts
-              </Button>
-            </div>
+        </div>
+
+        {/* Load More */}
+        <div className="content-container safe-area py-8">
+          <div className="text-center">
+            <Button variant="outline">
+              Load More Posts
+            </Button>
           </div>
         </div>
       </div>
