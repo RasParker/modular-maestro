@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Navbar } from '@/components/shared/Navbar';
+import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Heart, MessageSquare, Calendar, CreditCard, TrendingUp, Star } from 'lucide-react';
 
@@ -70,21 +69,24 @@ export const FanDashboard: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user?.username}!
-          </h1>
-          <p className="text-muted-foreground">
-            Here's what's happening with your favorite creators
-          </p>
-        </div>
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="7xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              Welcome back, {user?.username}!
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Here's what's happening with your favorite creators
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+      {/* Main Content */}
+      <EdgeToEdgeContainer maxWidth="7xl" enablePadding className="py-6 sm:py-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Quick Stats */}
@@ -128,45 +130,61 @@ export const FanDashboard: React.FC = () => {
               </Card>
             </div>
 
-            {/* Active Subscriptions */}
+            {/* Your Subscriptions */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-accent" />
-                  Your Subscriptions
-                </CardTitle>
+                <CardTitle className="text-xl">Your Subscriptions</CardTitle>
                 <CardDescription>
                   Manage your active creator subscriptions
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {MOCK_SUBSCRIPTIONS.map((subscription) => (
-                  <div key={subscription.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-muted/20">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={subscription.creator.avatar} alt={subscription.creator.username} />
-                        <AvatarFallback>{subscription.creator.display_name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h4 className="font-medium text-foreground">{subscription.creator.display_name}</h4>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{subscription.tier}</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            GHS {subscription.price}/month
-                          </span>
+              <CardContent>
+                <div className="space-y-4">
+                  {MOCK_SUBSCRIPTIONS.map((subscription) => (
+                    <div
+                      key={subscription.id}
+                      className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage 
+                            src={subscription.creator.avatar} 
+                            alt={subscription.creator.display_name} 
+                          />
+                          <AvatarFallback>
+                            {subscription.creator.display_name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="font-semibold text-foreground">
+                            {subscription.creator.display_name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            @{subscription.creator.username}
+                          </p>
                         </div>
                       </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <Badge variant="secondary" className="mb-1">
+                            {subscription.tier}
+                          </Badge>
+                          <p className="text-sm font-medium">GHS {subscription.price}/month</p>
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link to={`/creator/${subscription.creator.username}`}>
+                            View Profile
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Next billing</p>
-                      <p className="text-sm font-medium">{subscription.next_billing}</p>
-                    </div>
-                  </div>
-                ))}
-                
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
-                </Button>
+                  ))}
+                </div>
+                <div className="mt-6">
+                  <Button variant="premium" asChild>
+                    <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -261,7 +279,7 @@ export const FanDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </EdgeToEdgeContainer>
+    </EdgeToEdgeContainer>
   );
 };

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Navbar } from '@/components/shared/Navbar';
+import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { DashboardHeader } from '@/components/creator/DashboardHeader';
 import { QuickActionsGrid } from '@/components/creator/QuickActionsGrid';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
@@ -16,7 +16,8 @@ import {
   Calendar, 
   BarChart3,
   Settings,
-  User // Added User import
+  User,
+  Crown
 } from 'lucide-react';
 
 // Mock analytics data
@@ -82,15 +83,26 @@ export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="7xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Crown className="w-10 h-10 text-primary" />
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+                Creator Dashboard
+              </h1>
+            </div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Welcome back, {user?.username}! Here's your creator overview
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <DashboardHeader
-          username={user?.username}
-          title="Creator Dashboard"
-          subtitle="Here's your creator overview"
-        />
+      {/* Main Content */}
+      <EdgeToEdgeContainer maxWidth="7xl" enablePadding className="py-6 sm:py-8">
 
         <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Key Metrics */}
@@ -307,7 +319,7 @@ export const CreatorDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </EdgeToEdgeContainer>
+    </EdgeToEdgeContainer>
   );
 };

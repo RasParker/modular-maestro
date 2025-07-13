@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Navbar } from '@/components/shared/Navbar';
+import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Shield, 
@@ -95,20 +95,26 @@ export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Shield className="w-8 h-8 text-primary" />
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.username}! Platform overview and management tools
-          </p>
-        </div>
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-primary/10 via-red-500/5 to-primary/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="7xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Shield className="w-10 h-10 text-primary" />
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+                Admin Dashboard
+              </h1>
+            </div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Welcome back, {user?.username}! Platform overview and management tools
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
+
+      {/* Main Content */}
+      <EdgeToEdgeContainer maxWidth="7xl" enablePadding className="py-6 sm:py-8">
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Key Metrics */}
@@ -349,7 +355,7 @@ export const AdminDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </EdgeToEdgeContainer>
+    </EdgeToEdgeContainer>
   );
 };

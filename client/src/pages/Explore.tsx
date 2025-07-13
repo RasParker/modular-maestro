@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Navbar } from '@/components/shared/Navbar';
+import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Users, Star, Filter } from 'lucide-react';
 
@@ -213,19 +213,23 @@ export const Explore: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="7xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              Discover Amazing Creators
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Find creators you love and support their exclusive content with subscriptions
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Discover Amazing Creators
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Find creators you love and support their exclusive content with subscriptions
-          </p>
-        </div>
+      {/* Main Content */}
+      <EdgeToEdgeContainer maxWidth="7xl" enablePadding className="py-6 sm:py-8">
 
         {/* Search and Filters */}
         <div className="mb-8 space-y-4">
@@ -354,7 +358,7 @@ export const Explore: React.FC = () => {
                           className="w-full"
                           onClick={() => handleSubscribe(creator.display_name, Math.min(...creator.tiers.map(t => t.price)))}
                         >
-                          Subscribe from ${Math.min(...creator.tiers.map(t => t.price))}/month
+                          Subscribe from GHS {Math.min(...creator.tiers.map(t => t.price))}/month
                         </Button>
                       ) : (
                         <Button
@@ -385,7 +389,7 @@ export const Explore: React.FC = () => {
             </p>
           </div>
         )}
-      </div>
-    </div>
+      </EdgeToEdgeContainer>
+    </EdgeToEdgeContainer>
   );
 };

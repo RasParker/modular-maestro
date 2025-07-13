@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
@@ -51,7 +52,8 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
         <AuthProvider>
           <Router>
-            <Routes>
+            <AppLayout>
+              <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -95,7 +97,8 @@ function App() {
               
               {/* Default route */}
               <Route path="/" element={<Login />} />
-            </Routes>
+              </Routes>
+            </AppLayout>
           </Router>
           <Toaster />
         </AuthProvider>

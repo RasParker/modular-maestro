@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Navbar } from '@/components/shared/Navbar';
+import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music } from 'lucide-react';
@@ -363,19 +363,23 @@ export const FeedPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Your Feed
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Latest content from creators you follow
-          </p>
-        </div>
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="4xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              Your Feed
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Latest content from creators you follow
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
+
+      {/* Feed Content */}
+      <EdgeToEdgeContainer maxWidth="4xl" enablePadding className="py-6 sm:py-8">
 
         {/* Feed Content */}
         <div className="space-y-6">
@@ -529,7 +533,7 @@ export const FeedPage: React.FC = () => {
             Load More Posts
           </Button>
         </div>
-      </div>
+      </EdgeToEdgeContainer>
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -646,6 +650,6 @@ export const FeedPage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </EdgeToEdgeContainer>
   );
 };
