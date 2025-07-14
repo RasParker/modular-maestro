@@ -342,9 +342,9 @@ export const CreatorProfile: React.FC = () => {
           setCreator({
             ...userData,
             display_name: displayName || userData.display_name || userData.username,
-            avatar: profilePhotoUrl || userData.avatar,
-            cover: coverPhotoUrl || userData.cover_image,
-            bio: bio || userData.bio,
+            avatar: profilePhotoUrl || userData.avatar || null,
+            cover: coverPhotoUrl || userData.cover_image || null,
+            bio: bio || userData.bio || null,
             subscribers: userData.total_subscribers || 0,
             tiers: tiers
           });
@@ -630,7 +630,7 @@ export const CreatorProfile: React.FC = () => {
         <div className="h-48 md:h-64 overflow-hidden">
           {creator.cover ? (
             <img 
-              src={creator.cover} 
+              src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`} 
               alt={creator.display_name}
               className="w-full h-full object-cover"
             />
@@ -645,7 +645,7 @@ export const CreatorProfile: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
             <Avatar className="w-24 h-24 border-4 border-background">
-              <AvatarImage src={creator.avatar} alt={creator.username} />
+              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
               <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
             </Avatar>
 
@@ -720,8 +720,8 @@ export const CreatorProfile: React.FC = () => {
                       <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={creator.avatar} alt={creator.username} />
-                            <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
+                            <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
