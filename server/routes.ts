@@ -10,8 +10,8 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/sqlite-schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/sqlite-schema';
-import { eq } from 'drizzle-orm';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable } from '../shared/sqlite-schema';
+import { eq, desc, and, gte, lte, count, sum, sql } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
@@ -160,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/register", async (req, res) => {
     try {
       console.log('Registration request received:', req.body);
-      
+
       // Validate input data
       const validatedData = insertUserSchema.parse(req.body);
       console.log('Validated data:', { ...validatedData, password: '[HIDDEN]' });
@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error('Registration error:', error);
-      
+
       // Handle specific error types
       if (error instanceof Error) {
         if (error.message.includes('duplicate key')) {
@@ -216,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Invalid input data" });
         }
       }
-      
+
       res.status(500).json({ 
         error: "Failed to create user account", 
         details: error instanceof Error ? error.message : 'Unknown error' 
@@ -668,21 +668,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin routes - Get all users
-  app.get("/api/admin/users", async (req, res) => {
+  // Admin routes
+  app.get('/api/admin/users', async (req, res) => {
     try {
-      const allUsers = await db.select().from(users);
+      const users = await db.select({
+        id: usersTable.id,
+        username: usersTable.username,
+        email: usersTable.email,
+        role: usersTable.role,
+        status: usersTable.status,
+        created_at: usersTable.created_at,
+        avatar: usersTable.avatar,
+        total_subscribers: sql<number>`COALESCE(${usersTable.totalSubscribers}, 0)`.as('total_subscribers'),
+        total_earnings: sql<string>`COALESCE(${usersTable.totalEarnings}, '0')`.as('total_earnings')
+      }).from(usersTable);
 
-      // Remove password from response
-      const usersWithoutPassword = allUsers.map(user => {
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
-
-      res.json(usersWithoutPassword);
+      res.json(users);
     } catch (error) {
-      console.error('Failed to fetch all users:', error);
-      res.status(500).json({ error: "Failed to fetch users" });
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
     }
   });
 
@@ -925,7 +929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/creators/:id/payout-settings', async (req, res) => {
     try {
       const creatorId = parseInt(req.params.id);
-      
+
       // Ensure user can only access their own settings or if they're admin
       if (!req.session?.userId || (req.session.userId !== creatorId && req.session.user?.role !== 'admin')) {
         return res.status(403).json({ error: 'Unauthorized' });
@@ -942,7 +946,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/creators/:id/payout-settings', async (req, res) => {
     try {
       const creatorId = parseInt(req.params.id);
-      
+
       // Ensure user can only update their own settings
       if (!req.session?.userId || req.session.userId !== creatorId) {
         return res.status(403).json({ error: 'Unauthorized' });
@@ -964,7 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/creators/:id/payout-settings', async (req, res) => {
     try {
       const creatorId = parseInt(req.params.id);
-      
+
       // Ensure user can only update their own settings
       if (!req.session?.userId || req.session.userId !== creatorId) {
         return res.status(403).json({ error: 'Unauthorized' });
@@ -974,7 +978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!settings) {
         return res.status(404).json({ error: 'Settings not found' });
       }
-      
+
       res.json({ success: true, data: settings });
     } catch (error) {
       console.error('Error updating payout settings:', error);
@@ -1039,7 +1043,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   try {
     const settings = await storage.getPlatformSettings();
     const commissionPercentage = (settings.commission_rate * 100).toFixed(1);
-    
+
     res.json({ 
       success: true, 
       commission_rate_decimal: settings.commission_rate,

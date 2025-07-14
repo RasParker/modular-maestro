@@ -76,7 +76,7 @@ export const ReviewContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -109,7 +109,7 @@ export const ReviewContent: React.FC = () => {
                   onReject={handleReject}
                 />
               ))}
-              
+
               {content.length === 0 && (
                 <div className="text-center py-8 sm:py-12">
                   <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">

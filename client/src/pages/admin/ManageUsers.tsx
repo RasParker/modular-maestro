@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Navbar } from '@/components/shared/Navbar';
 import { UserCard } from '@/components/admin/UserCard';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ArrowLeft, Search, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
@@ -102,9 +102,7 @@ export const ManageUsers: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-
+    <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -194,6 +192,6 @@ export const ManageUsers: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AppLayout>
   );
 };

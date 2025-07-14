@@ -135,7 +135,10 @@ export const Navbar: React.FC = () => {
                         <div className="border-t pt-6">
                           <div className="flex items-center space-x-3 mb-4">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={user.avatar} alt={user.username} />
+                              <AvatarImage 
+                                src={user.avatar?.startsWith('/uploads/') ? user.avatar : user.avatar ? `/uploads/${user.avatar}` : undefined} 
+                                alt={user.username} 
+                              />
                               <AvatarFallback className="bg-primary text-primary-foreground">
                                 {user.username.charAt(0).toUpperCase()}
                               </AvatarFallback>
@@ -197,7 +200,10 @@ export const Navbar: React.FC = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.avatar} alt={user.username} />
+                        <AvatarImage 
+                          src={user.avatar?.startsWith('/uploads/') ? user.avatar : user.avatar ? `/uploads/${user.avatar}` : undefined} 
+                          alt={user.username} 
+                        />
                         <AvatarFallback className="bg-primary text-primary-foreground">
                           {user.username.charAt(0).toUpperCase()}
                         </AvatarFallback>
