@@ -23,7 +23,7 @@ import {
   type InsertPaymentTransaction,
   type CreatorPayoutSettings,
   type InsertCreatorPayoutSettings
-} from "@shared/schema";
+} from "@shared/sqlite-schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
 import bcrypt from "bcryptjs";

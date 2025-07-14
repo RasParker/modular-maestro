@@ -8,9 +8,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
+import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/sqlite-schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/schema';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports } from '../shared/sqlite-schema';
 import { eq } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
@@ -58,24 +58,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure session store based on environment
-  let sessionStore;
-  
-  if (process.env.DATABASE_URL && pool) {
-    // Production: use PostgreSQL session store
-    const PgSession = connectPgSimple(session);
-    sessionStore = new PgSession({
-      pool: pool,
-      tableName: 'session',
-      createTableIfMissing: true,
-    });
-  } else {
-    // Development: use memory store
-    const MemoryStoreSession = MemoryStore(session);
-    sessionStore = new MemoryStoreSession({
-      checkPeriod: 86400000, // Prune expired entries every 24h
-    });
-  }
+  // Use memory store for development
+  const MemoryStoreSession = MemoryStore(session);
+  const sessionStore = new MemoryStoreSession({
+    checkPeriod: 86400000, // Prune expired entries every 24h
+  });
 
   // Configure session middleware
   app.use(session({
