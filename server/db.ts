@@ -6,15 +6,17 @@ import * as schema from "@shared/schema";
 // Configure WebSocket for Neon
 neonConfig.webSocketConstructor = ws;
 
+// Use a default database URL for development if not set
+const defaultDatabaseUrl = "postgresql://user:password@localhost:5432/xclusive";
+const databaseUrl = process.env.DATABASE_URL || defaultDatabaseUrl;
+
 if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  console.warn("DATABASE_URL not set, using default development database");
 }
 
 // Configure Pool with better error handling and connection management
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://user:password@localhost:5432/xclusive",
+  connectionString: databaseUrl,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
