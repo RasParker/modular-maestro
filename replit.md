@@ -221,3 +221,6 @@ Changelog:
   - ✅ Enhanced creator profile display with proper null value handling for avatar, bio, and cover photos
   - ✅ Added proper URL path handling for uploaded media files in profile display
   - ✅ Improved fallback display logic for missing profile information
+  - ✅ Fixed Admin Users page "Failed to load users" error by correcting SQL query syntax
+  - ✅ Removed problematic COALESCE SQL functions that were causing database query failures
+  - ✅ Verified all admin functionality working correctly with proper user data display

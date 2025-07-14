@@ -679,8 +679,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: usersTable.status,
         created_at: usersTable.created_at,
         avatar: usersTable.avatar,
-        total_subscribers: sql<number>`COALESCE(total_subscribers, 0)`.as('total_subscribers'),
-        total_earnings: sql<string>`COALESCE(total_earnings, '0')`.as('total_earnings')
+        total_subscribers: usersTable.total_subscribers,
+        total_earnings: usersTable.total_earnings
       }).from(usersTable);
 
       res.json(users);
