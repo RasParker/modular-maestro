@@ -113,14 +113,14 @@ export const EditPost: React.FC = () => {
           description: "Failed to load post data.",
           variant: "destructive",
         });
-        navigate('/creator/content');
+        setLocation('/creator/content');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [postId, user?.id, form, toast, navigate]);
+  }, [postId, user?.id, form, toast, setLocation]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
