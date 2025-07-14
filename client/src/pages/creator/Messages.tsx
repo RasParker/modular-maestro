@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, MessageSquare, Search, Send, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { AppLayout } from '@/components/layout/AppLayout';
 
 const MOCK_CONVERSATIONS = [
   {
@@ -126,7 +125,7 @@ export const Messages: React.FC = () => {
   };
 
   return (
-    <AppLayout>
+    <div className="min-h-screen bg-background">
       {/* Mobile View */}
       <div className="lg:hidden">
         {!showMobileChat ? (
@@ -400,6 +399,6 @@ export const Messages: React.FC = () => {
           </div>
         </div>
       </div>
-    </AppLayout>
+    </div>
   );
 };

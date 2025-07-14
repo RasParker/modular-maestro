@@ -8,7 +8,6 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Navbar } from '@/components/shared/Navbar';
 import { useToast } from '@/hooks/use-toast';
 import { Settings, Shield, Mail, Users, Save } from 'lucide-react';
 
@@ -135,8 +134,6 @@ export const AdminSettings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
