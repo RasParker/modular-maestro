@@ -3,6 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -57,16 +58,28 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure PostgreSQL session store
-  const PgSession = connectPgSimple(session);
-
-  // Configure session middleware with PostgreSQL store
-  app.use(session({
-    store: new PgSession({
+  // Configure session store based on environment
+  let sessionStore;
+  
+  if (process.env.DATABASE_URL && pool) {
+    // Production: use PostgreSQL session store
+    const PgSession = connectPgSimple(session);
+    sessionStore = new PgSession({
       pool: pool,
       tableName: 'session',
       createTableIfMissing: true,
-    }),
+    });
+  } else {
+    // Development: use memory store
+    const MemoryStoreSession = MemoryStore(session);
+    sessionStore = new MemoryStoreSession({
+      checkPeriod: 86400000, // Prune expired entries every 24h
+    });
+  }
+
+  // Configure session middleware
+  app.use(session({
+    store: sessionStore,
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,

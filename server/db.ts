@@ -1,32 +1,39 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
 import * as schema from "@shared/schema";
 
-// Configure WebSocket for Neon
-neonConfig.webSocketConstructor = ws;
+// Use SQLite for development if PostgreSQL is not available
+let db: any;
 
-// Use a default database URL for development if not set
-const defaultDatabaseUrl = "postgresql://user:password@localhost:5432/xclusive";
-const databaseUrl = process.env.DATABASE_URL || defaultDatabaseUrl;
+let pool: any;
 
-if (!process.env.DATABASE_URL) {
-  console.warn("DATABASE_URL not set, using default development database");
+if (process.env.DATABASE_URL) {
+  // Production: use PostgreSQL
+  const { Pool } = require('pg');
+  const { drizzle: drizzlePg } = require('drizzle-orm/node-postgres');
+  
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  });
+  
+  db = drizzlePg(pool, { schema });
+} else {
+  // Development: use SQLite
+  console.warn("DATABASE_URL not set, using SQLite for development");
+  const sqlite = new Database(':memory:');
+  db = drizzle(sqlite, { schema });
 }
 
-// Configure Pool with better error handling and connection management
-export const pool = new Pool({
-  connectionString: databaseUrl,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+// Test database connection for PostgreSQL
+if (process.env.DATABASE_URL && typeof pool !== 'undefined') {
+  pool.on('connect', () => {
+    console.log('PostgreSQL database connected successfully');
+  });
 
-// Test database connection
-pool.on('connect', () => {
-  console.log('Database connected successfully');
-});
+  pool.on('error', (err) => {
+    console.error('Database connection error:', err);
+  });
+}
 
-pool.on('error', (err) => {
-  console.error('Database connection error:', err);
-});
-
-export const db = drizzle({ client: pool, schema });
+export { db, pool };
