@@ -171,9 +171,9 @@ export const Messages: React.FC = () => {
                       <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.display_name} />
                       <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    {conversation.unreadCount > 0 && (
+                    {conversation.unread_count > 0 && (
                       <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
-                        {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                        {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
                       </div>
                     )}
                   </div>
@@ -185,13 +185,13 @@ export const Messages: React.FC = () => {
                       </h3>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">
-                          {conversation.lastMessage.timestamp}
+                          {getTimeAgo(conversation.timestamp)}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground truncate leading-relaxed">
-                      {conversation.lastMessage.content}
+                      {conversation.last_message}
                     </p>
                   </div>
                 </div>
