@@ -188,7 +188,7 @@ export const Messages: React.FC = () => {
         </div>
       </div>
 
-      {/* Desktop View - Instagram Style */}
+      {/* Desktop View - Instagram Style Split Layout */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="mb-6">
@@ -207,9 +207,9 @@ export const Messages: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex h-[calc(100vh-200px)] border border-border/50 rounded-lg overflow-hidden bg-card">
-            {/* Left Sidebar - Conversations */}
-            <div className="w-80 border-r border-border/50 flex flex-col">
+          <div className="flex h-[calc(100vh-200px)] border border-border/30 rounded-lg overflow-hidden bg-card shadow-sm">
+            {/* Left Sidebar - Conversations List */}
+            <div className="w-80 border-r border-border/30 flex flex-col bg-card">
               <ConversationList
                 conversations={filteredConversations}
                 selectedConversation={selectedConversation}
@@ -220,8 +220,8 @@ export const Messages: React.FC = () => {
               />
             </div>
 
-            {/* Right Chat Area */}
-            <div className="flex-1 flex flex-col">
+            {/* Right Chat Area - Full Width */}
+            <div className="flex-1 flex flex-col bg-background">
               <MessageThread
                 creator={selectedConversation.creator}
                 messages={messages}
