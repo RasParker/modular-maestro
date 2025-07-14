@@ -433,42 +433,47 @@ export const FeedPage: React.FC = () => {
                 </div>
               </div>
                 
-              {/* Action Buttons - Mobile Instagram style */}
+              {/* Action Buttons - Mobile Instagram style with inline stats */}
               <div className="px-3 py-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`h-10 w-10 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                      onClick={() => handleLike(post.id)}
-                    >
-                      <Heart className={`w-7 h-7 ${post.liked ? 'fill-current' : ''}`} />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-10 w-10 p-0 text-muted-foreground"
-                      onClick={() => handleCommentClick(post.id)}
-                    >
-                      <MessageSquare className="w-7 h-7" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-10 w-10 p-0 text-muted-foreground"
-                      onClick={() => handleShare(post.id)}
-                    >
-                      <Share2 className="w-7 h-7" />
-                    </Button>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`h-8 w-8 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                        onClick={() => handleLike(post.id)}
+                      >
+                        <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
+                      </Button>
+                      <span className="text-sm font-medium text-foreground">
+                        {post.likes}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-muted-foreground"
+                        onClick={() => handleCommentClick(post.id)}
+                      >
+                        <MessageSquare className="w-6 h-6" />
+                      </Button>
+                      <span className="text-sm font-medium text-foreground">
+                        {post.comments}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-muted-foreground"
+                        onClick={() => handleShare(post.id)}
+                      >
+                        <Share2 className="w-6 h-6" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Like count - Mobile style */}
-                <div className="mb-1">
-                  <span className="text-sm font-medium text-foreground">
-                    {post.likes} likes
-                  </span>
                 </div>
                 
                 {/* Post Caption - Mobile Instagram style */}
