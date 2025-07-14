@@ -382,77 +382,33 @@ export const FeedPage: React.FC = () => {
       <EdgeToEdgeContainer maxWidth="4xl" enablePadding className="py-6 sm:py-8">
 
         {/* Feed Content */}
-        <div className="space-y-6">
+        <div className="space-y-0 -mx-4">
           {feed.map((post) => (
-            <Card key={post.id} className="bg-gradient-card border-border/50">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                      <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold text-foreground">{post.creator.display_name}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">@{post.creator.username}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {post.tier}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {getTimeAgo(post.posted)}
-                        </span>
-                      </div>
+            <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
+              {/* Post Header - Mobile Instagram style */}
+              <div className="flex items-center justify-between px-3 py-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                    <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm">{post.creator.display_name}</p>
+                    <div className="flex items-center gap-1">
+                      <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                        {post.tier}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        • {getTimeAgo(post.posted)}
+                      </span>
                     </div>
                   </div>
-                  
                 </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div>
-                  {(() => {
-                    const { truncated, needsExpansion } = truncateText(post.content);
-                    const isExpanded = expandedCaptions[post.id];
-                    
-                    return (
-                      <div>
-                        <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                          {isExpanded ? post.content : (
-                            <>
-                              {truncated}
-                              {needsExpansion && !isExpanded && (
-                                <>
-                                  {'... '}
-                                  <button
-                                    onClick={() => toggleCaptionExpansion(post.id)}
-                                    className="text-xs sm:text-sm text-primary hover:underline font-medium inline"
-                                  >
-                                    Read more
-                                  </button>
-                                </>
-                              )}
-                            </>
-                          )}
-                          {isExpanded && needsExpansion && (
-                            <>
-                              {' '}
-                              <button
-                                onClick={() => toggleCaptionExpansion(post.id)}
-                                className="text-xs sm:text-sm text-primary hover:underline font-medium inline"
-                              >
-                                Read less
-                              </button>
-                            </>
-                          )}
-                        </p>
-                      </div>
-                    );
-                  })()}
-                </div>
-                
+              </div>
+              {/* Post Media - Full width mobile Instagram style */}
+              <div className="w-full">
                 <div 
-                  className="rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity active:opacity-80 relative"
+                  className="relative cursor-pointer active:opacity-90 transition-opacity"
                   onClick={() => handleThumbnailClick(post)}
                   role="button"
                   tabIndex={0}
@@ -466,55 +422,114 @@ export const FeedPage: React.FC = () => {
                   <img 
                     src={post.thumbnail} 
                     alt={`${post.creator.display_name}'s post`}
-                    className="w-full h-64 object-cover"
+                    className="w-full aspect-square object-cover"
                   />
-                  {/* Content type overlay */}
-                  <div className="absolute top-3 right-3 w-8 h-8 bg-black/70 rounded-full flex items-center justify-center text-white">
-                    {getTypeIcon(post.type)}
+                  {/* Content type overlay - smaller for mobile */}
+                  <div className="absolute top-2 left-2 z-20">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                      {getTypeIcon(post.type)}
+                    </div>
                   </div>
                 </div>
+              </div>
                 
-                <div className="flex items-center justify-between pt-4 border-t border-border/50">
+              {/* Action Buttons - Mobile Instagram style */}
+              <div className="px-3 py-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={`${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                      className={`h-10 w-10 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                       onClick={() => handleLike(post.id)}
                     >
-                      <Heart className={`w-4 h-4 mr-1 ${post.liked ? 'fill-current' : ''}`} />
-                      {post.likes}
+                      <Heart className={`w-7 h-7 ${post.liked ? 'fill-current' : ''}`} />
                     </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-muted-foreground"
+                      className="h-10 w-10 p-0 text-muted-foreground"
                       onClick={() => handleCommentClick(post.id)}
                     >
-                      <MessageSquare className="w-4 h-4 mr-1" />
-                      {post.comments}
+                      <MessageSquare className="w-7 h-7" />
                     </Button>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Eye className="w-4 h-4" />
-                      {post.views}
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-10 w-10 p-0 text-muted-foreground"
+                      onClick={() => handleShare(post.id)}
+                    >
+                      <Share2 className="w-7 h-7" />
+                    </Button>
                   </div>
-                  
+                </div>
+                
+                {/* Like count - Mobile style */}
+                <div className="mb-1">
+                  <span className="text-sm font-medium text-foreground">
+                    {post.likes} likes
+                  </span>
+                </div>
+                
+                {/* Post Caption - Mobile Instagram style */}
+                <div className="mb-1">
+                  {(() => {
+                    const { truncated, needsExpansion } = truncateText(post.content);
+                    const isExpanded = expandedCaptions[post.id];
+                    
+                    return (
+                      <p className="text-sm leading-relaxed">
+                        <span className="font-medium">{post.creator.display_name}</span>{' '}
+                        <span className="text-foreground">
+                          {isExpanded ? post.content : (
+                            <>
+                              {truncated}
+                              {needsExpansion && !isExpanded && (
+                                <>
+                                  {'... '}
+                                  <button
+                                    onClick={() => toggleCaptionExpansion(post.id)}
+                                    className="text-muted-foreground hover:text-foreground font-normal"
+                                  >
+                                    more
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
+                          {isExpanded && needsExpansion && (
+                            <>
+                              {' '}
+                              <button
+                                onClick={() => toggleCaptionExpansion(post.id)}
+                                className="text-muted-foreground hover:text-foreground font-normal"
+                              >
+                                less
+                              </button>
+                            </>
+                          )}
+                        </span>
+                      </p>
+                    );
+                  })()}
+                </div>
+                
+                {/* View comments link */}
+                {post.comments > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-muted-foreground"
-                    onClick={() => handleShare(post.id)}
+                    className="h-auto p-0 text-muted-foreground text-sm font-normal"
+                    onClick={() => handleCommentClick(post.id)}
                   >
-                    <Share2 className="w-4 h-4" />
+                    View all {post.comments} comments
                   </Button>
-                </div>
-              </CardContent>
-              
-              {/* Comments Section */}
+                )}
+              </div>
+              {/* Comments Section - Mobile optimized */}
               {showComments[post.id] && (
-                <div className="border-t border-border/30">
-                  <div className="p-4">
+                <div className="px-3 pb-3 border-t border-border/30 mx-3">
+                  <div className="pt-3">
                     <CommentSection
                       postId={post.id}
                       initialComments={post.initialComments || []}
@@ -523,7 +538,7 @@ export const FeedPage: React.FC = () => {
                   </div>
                 </div>
               )}
-            </Card>
+            </div>
           ))}
         </div>
 

@@ -239,20 +239,20 @@ export const FanDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Recent Activity */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {/* Recent Activity - Instagram-style */}
+            <div className="bg-background/50 backdrop-blur-sm rounded-lg border border-border/30">
+              <div className="p-4 border-b border-border/30">
+                <h3 className="text-lg font-semibold">Recent Activity</h3>
+              </div>
+              <div className="p-3 space-y-3">
                 {RECENT_ACTIVITY.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3">
+                  <div key={activity.id} className="flex items-center gap-3 py-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={activity.avatar} alt={activity.creator} />
                       <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm">
+                      <p className="text-sm leading-relaxed">
                         <span className="font-medium">{activity.creator}</span>{' '}
                         <span className="text-muted-foreground">{activity.message}</span>
                       </p>
@@ -260,8 +260,11 @@ export const FanDashboard: React.FC = () => {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+                <Button variant="ghost" size="sm" className="w-full mt-2 text-muted-foreground" asChild>
+                  <Link to="/fan/feed">View all activity</Link>
+                </Button>
+              </div>
+            </div>
 
             {/* Recommendations */}
             <Card className="bg-gradient-card border-border/50">
