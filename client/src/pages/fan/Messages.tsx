@@ -129,88 +129,127 @@ export const Messages: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Mobile View - Instagram-style List Layout */}
       <div className="lg:hidden">
-        <div className="px-4 py-6">
-          <div className="mb-6">
-            <Button variant="outline" asChild className="mb-4">
-              <Link to="/fan/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
-              <MessageSquare className="w-6 h-6 text-primary" />
-              Messages
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              Chat with your favorite creators
-            </p>
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search messages..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Conversation List - Instagram Style */}
-          <div className="space-y-0 divide-y divide-border/30">
-            {filteredConversations.map((conversation) => (
-              <Link
-                key={conversation.id}
-                to={`/fan/messages/${conversation.id}`}
-                className="block py-4 hover:bg-accent/5 transition-colors active:bg-accent/10"
-              >
-                <div className="flex items-center gap-4 px-2">
-                  <div className="relative">
-                    <Avatar className="h-14 w-14">
-                      <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.display_name} />
-                      <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {conversation.unread_count > 0 && (
-                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
-                        {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-foreground truncate text-base">
-                        {conversation.creator.display_name}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          {getTimeAgo(conversation.timestamp)}
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate leading-relaxed">
-                      {conversation.last_message}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {filteredConversations.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-                <MessageSquare className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">No conversations</h3>
+        {!showMobileChat ? (
+          <div className="px-4 py-6">
+            <div className="mb-6">
+              <Button variant="outline" asChild className="mb-4">
+                <Link to="/fan/dashboard">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+              <h1 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
+                <MessageSquare className="w-6 h-6 text-primary" />
+                Messages
+              </h1>
               <p className="text-muted-foreground text-sm">
-                Start following creators to begin conversations
+                Chat with your favorite creators
               </p>
             </div>
-          )}
-        </div>
+
+            {/* Search */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search messages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Conversation List - Instagram Style */}
+            <div className="space-y-0 divide-y divide-border/30">
+              {filteredConversations.map((conversation) => (
+                <button
+                  key={conversation.id}
+                  onClick={() => handleSelectConversation(conversation)}
+                  className="block w-full py-4 hover:bg-accent/5 transition-colors active:bg-accent/10 text-left"
+                >
+                  <div className="flex items-center gap-4 px-2">
+                    <div className="relative">
+                      <Avatar className="h-14 w-14">
+                        <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.display_name} />
+                        <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      {conversation.unread_count > 0 && (
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
+                          {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-semibold text-foreground truncate text-base">
+                          {conversation.creator.display_name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {getTimeAgo(conversation.timestamp)}
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate leading-relaxed">
+                        {conversation.last_message}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {filteredConversations.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                  <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No conversations</h3>
+                <p className="text-muted-foreground text-sm">
+                  Start following creators to begin conversations
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-screen flex flex-col bg-background">
+            {/* Mobile Chat Header */}
+            <div className="flex-shrink-0 px-4 py-3 border-b border-border/30 bg-card">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToList}
+                  className="p-1 h-8 w-8"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedConversation.creator.avatar} alt={selectedConversation.creator.display_name} />
+                  <AvatarFallback>{selectedConversation.creator.display_name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-foreground truncate text-base">
+                    {selectedConversation.creator.display_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground truncate">@{selectedConversation.creator.username}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Chat Content */}
+            <div className="flex-1 flex flex-col">
+              <MessageThread
+                creator={selectedConversation.creator}
+                messages={messages}
+                newMessage={newMessage}
+                onNewMessageChange={setNewMessage}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Desktop View - Instagram Style Split Layout */}
