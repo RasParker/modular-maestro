@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -76,6 +77,7 @@ export const Messages: React.FC = () => {
   const [messages, setMessages] = useState(MOCK_MESSAGES);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showMobileChat, setShowMobileChat] = useState(false);
 
   const filteredConversations = MOCK_CONVERSATIONS.filter(conv =>
     conv.creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -102,6 +104,15 @@ export const Messages: React.FC = () => {
     });
   };
 
+  const handleSelectConversation = (conversation: typeof MOCK_CONVERSATIONS[0]) => {
+    setSelectedConversation(conversation);
+    setShowMobileChat(true);
+  };
+
+  const handleBackToList = () => {
+    setShowMobileChat(false);
+  };
+
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -116,43 +127,109 @@ export const Messages: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="mb-6 sm:mb-8">
-          <Button variant="outline" asChild className="mb-4">
-            <Link to="/fan/dashboard">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Link>
-          </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-            Messages
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Chat with your favorite creators
-          </p>
-        </div>
+      {/* Mobile View */}
+      <div className="lg:hidden">
+        <div className="px-4 py-6">
+          <div className="mb-6">
+            <Button variant="outline" asChild className="mb-4">
+              <Link to="/fan/dashboard">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Link>
+            </Button>
+            
+            {!showMobileChat && (
+              <>
+                <h1 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
+                  <MessageSquare className="w-6 h-6 text-primary" />
+                  Messages
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Chat with your favorite creators
+                </p>
+              </>
+            )}
+          </div>
 
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 h-[500px] sm:h-[600px]">
-          {/* Conversations List */}
-          <ConversationList
-            conversations={filteredConversations}
-            selectedConversation={selectedConversation}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onSelectConversation={setSelectedConversation}
-            getTimeAgo={getTimeAgo}
-          />
-
-          {/* Message Thread */}
-          <div className="lg:col-span-2">
-            <MessageThread
-              creator={selectedConversation.creator}
-              messages={messages}
-              newMessage={newMessage}
-              onNewMessageChange={setNewMessage}
-              onSendMessage={handleSendMessage}
+          {!showMobileChat ? (
+            <ConversationList
+              conversations={filteredConversations}
+              selectedConversation={selectedConversation}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onSelectConversation={handleSelectConversation}
+              getTimeAgo={getTimeAgo}
             />
+          ) : (
+            <div className="h-[calc(100vh-140px)]">
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/50">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleBackToList}
+                  className="p-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <h2 className="text-lg font-semibold">
+                  {selectedConversation.creator.display_name}
+                </h2>
+              </div>
+              
+              <MessageThread
+                creator={selectedConversation.creator}
+                messages={messages}
+                newMessage={newMessage}
+                onNewMessageChange={setNewMessage}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop View - Instagram Style */}
+      <div className="hidden lg:block">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="mb-6">
+            <Button variant="outline" asChild className="mb-4">
+              <Link to="/fan/dashboard">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Link>
+            </Button>
+            <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <MessageSquare className="w-8 h-8 text-primary" />
+              Messages
+            </h1>
+            <p className="text-base text-muted-foreground">
+              Chat with your favorite creators
+            </p>
+          </div>
+
+          <div className="flex h-[calc(100vh-200px)] border border-border/50 rounded-lg overflow-hidden bg-card">
+            {/* Left Sidebar - Conversations */}
+            <div className="w-80 border-r border-border/50 flex flex-col">
+              <ConversationList
+                conversations={filteredConversations}
+                selectedConversation={selectedConversation}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onSelectConversation={setSelectedConversation}
+                getTimeAgo={getTimeAgo}
+              />
+            </div>
+
+            {/* Right Chat Area */}
+            <div className="flex-1 flex flex-col">
+              <MessageThread
+                creator={selectedConversation.creator}
+                messages={messages}
+                newMessage={newMessage}
+                onNewMessageChange={setNewMessage}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
           </div>
         </div>
       </div>

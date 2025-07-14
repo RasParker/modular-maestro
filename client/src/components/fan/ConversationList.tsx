@@ -37,9 +37,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   getTimeAgo
 }) => {
   return (
-    <Card className="bg-gradient-card border-border/50">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base sm:text-lg">Conversations</CardTitle>
+    <div className="h-full flex flex-col lg:bg-transparent bg-gradient-card lg:border-0 border-border/50 lg:rounded-none rounded-lg">
+      <div className="flex-shrink-0 p-4 lg:p-3 border-b border-border/50 lg:border-b-0">
+        <div className="lg:hidden mb-3">
+          <h2 className="text-lg font-semibold">Conversations</h2>
+        </div>
+        <div className="hidden lg:block mb-3">
+          <h2 className="text-base font-semibold">Messages</h2>
+        </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -49,27 +54,28 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             className="pl-10 text-sm"
           />
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="space-y-1 max-h-80 sm:max-h-96 overflow-y-auto">
+      </div>
+      
+      <div className="flex-1 overflow-y-auto">
+        <div className="space-y-0">
           {conversations.map((conversation) => (
             <div
               key={conversation.id}
-              className={`p-3 sm:p-4 cursor-pointer transition-colors ${
+              className={`p-3 lg:p-4 cursor-pointer transition-colors border-b border-border/20 last:border-b-0 ${
                 selectedConversation.id === conversation.id 
-                  ? 'bg-muted/50' 
+                  ? 'bg-primary/10 lg:bg-muted/50' 
                   : 'hover:bg-muted/20'
               }`}
               onClick={() => onSelectConversation(conversation)}
             >
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+                <Avatar className="h-12 w-12 flex-shrink-0">
                   <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.username} />
                   <AvatarFallback>{conversation.creator.display_name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium text-foreground truncate text-sm sm:text-base">
+                    <p className="font-medium text-foreground truncate text-sm">
                       {conversation.creator.display_name}
                     </p>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -77,13 +83,13 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         {getTimeAgo(conversation.timestamp)}
                       </span>
                       {conversation.unread && (
-                        <Badge variant="destructive" className="text-xs min-w-0">
+                        <Badge variant="destructive" className="text-xs min-w-0 h-5 px-1.5">
                           {conversation.unread_count}
                         </Badge>
                       )}
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate mt-1">
+                  <p className="text-xs text-muted-foreground truncate mt-1">
                     {conversation.last_message}
                   </p>
                 </div>
@@ -91,7 +97,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
