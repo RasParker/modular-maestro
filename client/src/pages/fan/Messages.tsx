@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, MessageSquare, Search, Send, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { ConversationList } from '@/components/fan/ConversationList';
+import { MessageThread } from '@/components/fan/MessageThread';
 
 const MOCK_CONVERSATIONS = [
   {
@@ -70,14 +72,6 @@ const MOCK_MESSAGES = [
   }
 ];
 
-import { ConversationList } from '@/components/fan/ConversationList';
-import { MessageThread } from '@/components/fan/MessageThread';
-import { ArrowLeft, MessageSquare, Search, Send, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Navbar } from '@/components/shared/Navbar';
-
 export const Messages: React.FC = () => {
   const { toast } = useToast();
   const [selectedConversation, setSelectedConversation] = useState(MOCK_CONVERSATIONS[0]);
@@ -133,8 +127,6 @@ export const Messages: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-
       {/* Mobile View - Instagram-style List Layout */}
       <div className="lg:hidden">
         <div className="px-4 py-6">
