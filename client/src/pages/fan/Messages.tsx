@@ -70,6 +70,14 @@ const MOCK_MESSAGES = [
   }
 ];
 
+import { ConversationList } from '@/components/fan/ConversationList';
+import { MessageThread } from '@/components/fan/MessageThread';
+import { ArrowLeft, MessageSquare, Search, Send, ChevronRight } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Navbar } from '@/components/shared/Navbar';
+
 export const Messages: React.FC = () => {
   const { toast } = useToast();
   const [selectedConversation, setSelectedConversation] = useState(MOCK_CONVERSATIONS[0]);
