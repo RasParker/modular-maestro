@@ -23,7 +23,7 @@ import {
   type InsertPaymentTransaction,
   type CreatorPayoutSettings,
   type InsertCreatorPayoutSettings
-} from "@shared/sqlite-schema";
+} from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -128,10 +128,11 @@ export class DatabaseStorage implements IStorage {
 
       const [user] = await db
         .insert(users)
-        .values([{
+        .values({
           ...insertUser,
           password: hashedPassword,
-        }])
+          social_links: insertUser.social_links || undefined,
+        })
         .returning();
 
       console.log('User created successfully:', { ...user, password: '[HIDDEN]' });
@@ -203,7 +204,10 @@ export class DatabaseStorage implements IStorage {
   async createPost(insertPost: InsertPost): Promise<Post> {
     const [post] = await db
       .insert(posts)
-      .values([insertPost])
+      .values({
+        ...insertPost,
+        media_urls: insertPost.media_urls || []
+      })
       .returning();
     return post;
   }
@@ -318,17 +322,12 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Creating subscription tier with data:', tier);
       
-      // Ensure tier_level is set if not provided
-      const tierData = {
-        ...tier,
-        tier_level: tier.tier_level || 'supporter',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
       const [newTier] = await db
         .insert(subscription_tiers)
-        .values([tierData])
+        .values({
+          ...tier,
+          benefits: tier.benefits || []
+        })
         .returning();
       console.log('Subscription tier created successfully:', newTier);
       return newTier;
@@ -341,7 +340,7 @@ export class DatabaseStorage implements IStorage {
   async updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined> {
     const [tier] = await db
       .update(subscription_tiers)
-      .set({ ...updates, updated_at: new Date().toISOString() })
+      .set({ ...updates, updated_at: new Date() })
       .where(eq(subscription_tiers.id, id))
       .returning();
     return tier || undefined;
@@ -386,7 +385,7 @@ export class DatabaseStorage implements IStorage {
   async updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription | undefined> {
     const [subscription] = await db
       .update(subscriptions)
-      .set({ ...updates, updated_at: new Date().toISOString() })
+      .set({ ...updates, updated_at: new Date() })
       .where(eq(subscriptions.id, id))
       .returning();
     return subscription || undefined;
@@ -398,7 +397,7 @@ export class DatabaseStorage implements IStorage {
       .set({ 
         status: 'cancelled',
         auto_renew: false,
-        updated_at: new Date().toISOString()
+        updated_at: new Date()
       })
       .where(eq(subscriptions.id, id))
       .returning();
@@ -409,7 +408,7 @@ export class DatabaseStorage implements IStorage {
         .update(users)
         .set({ 
           total_subscribers: sql`${users.total_subscribers} - 1`,
-          updated_at: new Date().toISOString()
+          updated_at: new Date()
         })
         .where(eq(users.id, subscription.creator_id));
     }
@@ -616,7 +615,7 @@ export class DatabaseStorage implements IStorage {
         SELECT value FROM platform_settings WHERE key = 'commission_rate'
       `);
 
-      const commissionRate = result.rows[0]?.value || '0.05'; // Default 5%
+      const commissionRate = result.rows[0]?.value as string || '0.05'; // Default 5%
 
       return {
         commission_rate: parseFloat(commissionRate),
