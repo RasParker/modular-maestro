@@ -196,6 +196,46 @@ export const MinimalNavbar: React.FC = () => {
             ))}
           </div>
 
+          {/* User Menu - Desktop */}
+          <div className="hidden md:flex items-center">
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2 h-8 px-3">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={user.profile_photo || ''} alt={user.username} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                        {user.username?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden lg:block text-sm font-medium">{user.username}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to={`/${user.role}/settings`} className="flex items-center space-x-2">
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {user.role === 'creator' && (
+                    <DropdownMenuItem asChild>
+                      <Link to={`/creator/${user.username}`} className="flex items-center space-x-2">
+                        <User className="w-4 h-4" />
+                        <span>View Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center space-x-2 text-red-600">
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+
           {/* Mobile Hamburger Menu */}
           <div className="md:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -208,16 +248,13 @@ export const MinimalNavbar: React.FC = () => {
               <SheetContent side="left" className="w-80 bg-background">
                 <div className="flex flex-col h-full">
                   {/* Header */}
-                  <div className="flex items-center justify-between p-6 border-b">
+                  <div className="flex items-center justify-start p-6 border-b">
                     <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
                       <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                         <span className="text-white font-bold text-lg">X</span>
                       </div>
                       <span className="text-xl font-bold text-gradient-primary">Xclusive</span>
                     </Link>
-                    <Button variant="ghost" size="icon" onClick={closeMobileMenu}>
-                      <X className="h-5 w-5" />
-                    </Button>
                   </div>
 
                   {/* Navigation Items */}
@@ -296,55 +333,7 @@ export const MinimalNavbar: React.FC = () => {
             </Sheet>
           </div>
 
-          {/* User Menu */}
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.profile_photo || ''} alt={user.username} />
-                      <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium text-sm flex items-center gap-2">
-                        {getRoleIcon()}
-                        {user.username}
-                      </p>
-                      <p className="w-[200px] truncate text-xs text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to={`/${user.role}/settings`} className="cursor-pointer">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  {user.role === 'creator' && (
-                    <DropdownMenuItem asChild>
-                      <Link to={`/creator/${user.username}`} className="cursor-pointer">
-                        <User className="w-4 h-4 mr-2" />
-                        My Profile
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
+
         </div>
       </div>
     </nav>
