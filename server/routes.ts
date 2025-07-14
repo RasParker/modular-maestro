@@ -692,7 +692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedUser = await db.update(users)
         .set({ 
           status: status,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .where(eq(users.id, userId))
         .returning();
@@ -866,7 +866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({ 
           display_name: display_name || null,
           bio: bio || null,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .where(eq(users.id, req.session.userId))
         .returning();
@@ -891,7 +891,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { displayName, bio, profilePhotoUrl, coverPhotoUrl } = req.body;
 
-      const updateData: any = { updated_at: new Date() };
+      const updateData: any = { updated_at: new Date().toISOString() };
 
       if (displayName !== undefined) updateData.display_name = displayName;
       if (bio !== undefined) updateData.bio = bio;
