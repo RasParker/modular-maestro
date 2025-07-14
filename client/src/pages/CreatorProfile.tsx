@@ -404,7 +404,18 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const getTimeAgo = (dateString: string) => {
+    // Handle CURRENT_TIMESTAMP literal string
+    if (dateString === "CURRENT_TIMESTAMP") {
+      return 'Just now';
+    }
+    
     const date = new Date(dateString);
+    
+    // Check if date is invalid
+    if (isNaN(date.getTime())) {
+      return 'Just now';
+    }
+    
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
 
