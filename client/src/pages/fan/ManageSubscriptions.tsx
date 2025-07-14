@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Navbar } from '@/components/shared/Navbar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { SubscriptionCard } from '@/components/fan/SubscriptionCard';
 import { ArrowLeft, Heart, CreditCard, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -93,9 +93,7 @@ export const ManageSubscriptions: React.FC = () => {
     .reduce((sum, sub) => sum + sub.price, 0);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -170,6 +168,6 @@ export const ManageSubscriptions: React.FC = () => {
           ))}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };

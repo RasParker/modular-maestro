@@ -325,7 +325,16 @@ export const CreatorProfile: React.FC = () => {
           console.log('Cover photo URL from localStorage:', coverPhotoUrl);
           console.log('Database avatar:', userData.avatar);
           console.log('Database cover:', userData.cover_image);
+          console.log('ProfilePhotoUrl truthy check:', !!(profilePhotoUrl && profilePhotoUrl.trim()));
           console.log('Final avatar choice:', (profilePhotoUrl && profilePhotoUrl.trim()) || userData.avatar || null);
+          
+          // Clear invalid localStorage values for this user if they exist
+          if (profilePhotoUrl === '' || profilePhotoUrl === 'null' || profilePhotoUrl === 'undefined') {
+            localStorage.removeItem('profilePhotoUrl');
+          }
+          if (coverPhotoUrl === '' || coverPhotoUrl === 'null' || coverPhotoUrl === 'undefined') {
+            localStorage.removeItem('coverPhotoUrl');
+          }
 
           // Handle tiers - fetch from API
           let tiers = [];

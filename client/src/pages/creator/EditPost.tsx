@@ -83,13 +83,15 @@ export const EditPost: React.FC = () => {
           });
 
           // Set media preview if exists
-          if (postData.media_urls && postData.media_urls.length > 0) {
-            const mediaUrl = postData.media_urls[0].startsWith('/uploads/')
-              ? postData.media_urls[0]
-              : `/uploads/${postData.media_urls[0]}`;
+          if (postData.media_urls) {
+            const mediaUrl = postData.media_urls.startsWith('/uploads/')
+              ? postData.media_urls
+              : `/uploads/${postData.media_urls}`;
             setMediaPreview(mediaUrl);
             setMediaType(postData.media_type === 'image' ? 'image' : 'video');
           }
+          
+          setOriginalPost(postData);
         } else {
           toast({
             title: "Error",
