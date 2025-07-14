@@ -422,7 +422,7 @@ export const FeedPage: React.FC = () => {
                   <img 
                     src={post.thumbnail} 
                     alt={`${post.creator.display_name}'s post`}
-                    className="w-full aspect-square object-cover"
+                    className="w-full aspect-[4/3] object-cover"
                   />
                   {/* Content type overlay - smaller for mobile */}
                   <div className="absolute top-2 left-2 z-20">
