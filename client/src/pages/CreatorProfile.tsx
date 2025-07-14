@@ -697,51 +697,50 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
               {userPosts.length > 0 ? (
-                <div className="space-y-0">
+                <div className="space-y-0 -mx-4">
                   {userPosts.map((post) => (
-                    <div key={post.id} className="mb-8">{/* Instagram-style borderless post */}
-                      {/* Post Header - Instagram style */}
-                      <div className="flex items-center justify-between px-4 py-3">
+                    <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
+                      {/* Post Header - Mobile Instagram style */}
+                      <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
+                          <Avatar className="h-8 w-8">
                             <AvatarImage src={creator.avatar} alt={creator.username} />
                             <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-muted-foreground">@{creator.username}</p>
-                              <Badge variant="outline" className="text-xs">
+                            <div className="flex items-center gap-1">
+                              <Badge variant="outline" className="text-xs px-1 py-0 h-4">
                                 {post.tier === 'public' ? 'Free' : 
                                  post.tier === 'supporter' ? 'Supporter' :
                                  post.tier === 'fan' ? 'Fan' :
                                  post.tier === 'premium' ? 'Premium' :
                                  post.tier === 'superfan' ? 'Superfan' : 'Free'}
                               </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                • {getTimeAgo(post.created_at || post.createdAt)}
+                              </span>
                             </div>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {getTimeAgo(post.created_at || post.createdAt)}
-                        </div>
                       </div>
 
-                      {/* Post Media - Full width like Instagram */}
+                      {/* Post Media - Full width mobile Instagram style */}
                       {post.media_urls && post.media_urls[0] && (
-                        <div className="w-full overflow-hidden">
+                        <div className="w-full">
                           {hasAccessToTier(post.tier) ? (
-                                <div 
-                                  className="relative cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-                                  onClick={() => handleContentClick(post)}
-                                  role="button"
-                                  tabIndex={0}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                      e.preventDefault();
-                                      handleContentClick(post);
-                                    }
-                                  }}
-                                >
+                            <div 
+                              className="relative cursor-pointer active:opacity-90 transition-opacity"
+                              onClick={() => handleContentClick(post)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleContentClick(post);
+                                }
+                              }}
+                            >
                               {post.media_type === 'video' ? (
                                 <video 
                                   src={`/uploads/${post.media_urls[0]}`}
@@ -761,34 +760,34 @@ export const CreatorProfile: React.FC = () => {
                                   }}
                                 />
                               )}
-                              {/* Media type icon overlay */}
+                              {/* Media type icon overlay - smaller for mobile */}
                               <div className="absolute top-2 left-2 z-20">
-                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
                                   {getMediaOverlayIcon(post.media_type)}
                                 </div>
                               </div>
-                                </div>
+                            </div>
                           ) : (
                             <div className="w-full aspect-square bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
                               <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-                              <div className="text-center z-10 p-6">
-                                <div className="mb-4 opacity-75">
-                                  <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <div className="text-center z-10 p-4">
+                                <div className="mb-3">
+                                  <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                   </svg>
                                 </div>
-                                <h3 className="text-lg font-medium text-foreground mb-2">
+                                <h3 className="text-base font-medium text-foreground mb-2">
                                   {post.tier === 'supporter' ? 'Supporter' : 
                                    post.tier === 'fan' ? 'Fan' : 
                                    post.tier === 'premium' ? 'Premium' : 
                                    post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
                                 </h3>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                  Subscribe to {creator.display_name} to unlock this content
+                                <p className="text-sm text-muted-foreground mb-3">
+                                  Subscribe to unlock
                                 </p>
                                 <Button 
                                   size="sm" 
-                                  className="bg-accent hover:bg-accent/90 text-black"
+                                  className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
                                   onClick={() => {
                                     if (!user) {
                                       window.location.href = `/login?redirect=/creator/${username}`;
@@ -798,7 +797,7 @@ export const CreatorProfile: React.FC = () => {
                                     }
                                   }}
                                 >
-                                  {!user ? 'Login to Subscribe' : 'View Subscription Plans'}
+                                  {!user ? 'Login' : 'Subscribe'}
                                 </Button>
                               </div>
                             </div>
@@ -806,51 +805,41 @@ export const CreatorProfile: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Post Caption - Instagram style */}
-                      {(post.content || post.title) && (
-                        <div className="px-4 py-2">
-                          <p className="text-sm">
-                            <span className="font-semibold">{creator.display_name}</span>{' '}
-                            {post.content || post.title}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Action Buttons - Instagram style */}
-                      <div className="px-4 py-2">
+                      {/* Action Buttons - Mobile Instagram style */}
+                      <div className="px-3 py-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className={`h-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                              className={`h-10 w-10 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                               onClick={() => handleLike(post.id)}
                             >
-                              <Heart className={`w-6 h-6 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                              <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
                             </Button>
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 p-0 text-muted-foreground"
+                              className="h-10 w-10 p-0 text-muted-foreground"
                               onClick={() => handleCommentClick(post.id)}
                             >
-                              <MessageSquare className="w-6 h-6" />
+                              <MessageSquare className="w-7 h-7" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 p-0 text-muted-foreground"
+                              className="h-10 w-10 p-0 text-muted-foreground"
                               onClick={() => handleShare(post.id)}
                             >
-                              <Share2 className="w-6 h-6" />
+                              <Share2 className="w-7 h-7" />
                             </Button>
                           </div>
                           {isOwnProfile && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-8 p-0 text-muted-foreground hover:bg-muted"
+                                className="h-8 w-8 p-0 text-muted-foreground"
                                 onClick={() => handleEdit(post.id)}
                               >
                                 <Edit className="w-4 h-4" />
@@ -858,7 +847,7 @@ export const CreatorProfile: React.FC = () => {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-8 p-0 text-muted-foreground hover:bg-muted"
+                                className="h-8 w-8 p-0 text-muted-foreground"
                                 onClick={() => handleDelete(post.id)}
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -867,22 +856,46 @@ export const CreatorProfile: React.FC = () => {
                           )}
                         </div>
                         
-                        {/* Like count */}
-                        <div className="mt-1">
-                          <span className="text-sm font-semibold text-foreground">
+                        {/* Like count - Mobile style */}
+                        <div className="mb-1">
+                          <span className="text-sm font-medium text-foreground">
                             {postLikes[post.id]?.count || post.likes_count || post.likes || 0} likes
                           </span>
                         </div>
+                        
+                        {/* Post Caption - Mobile Instagram style */}
+                        {(post.content || post.title) && (
+                          <div className="mb-1">
+                            <p className="text-sm leading-relaxed">
+                              <span className="font-medium">{creator.display_name}</span>{' '}
+                              <span className="text-foreground">{post.content || post.title}</span>
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* View comments link */}
+                        {(post.comments_count || 0) > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 text-muted-foreground text-sm font-normal"
+                            onClick={() => handleCommentClick(post.id)}
+                          >
+                            View all {post.comments_count} comments
+                          </Button>
+                        )}
                       </div>
 
-                      {/* Comments Section */}
+                      {/* Comments Section - Mobile optimized */}
                       {showComments[post.id] && (
-                        <div className="px-4 pb-4">
-                          <CommentSection
-                            postId={post.id}
-                            initialComments={post.comments || []}
-                            onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                          />
+                        <div className="px-3 pb-3 border-t border-border/30 mx-3">
+                          <div className="pt-3">
+                            <CommentSection
+                              postId={post.id}
+                              initialComments={post.comments || []}
+                              onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
