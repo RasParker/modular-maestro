@@ -937,12 +937,27 @@ export const CreatorProfile: React.FC = () => {
                       <p className="text-sm text-muted-foreground">{tier.description}</p>
 
                       <ul className="space-y-2">
-                        {(tier.benefits || []).map((benefit, index) => (
-                          <li key={index} className="flex items-center gap-2 text-sm">
-                            <Check className="w-4 h-4 text-accent" />
-                            <span>{benefit}</span>
-                          </li>
-                        ))}
+                        {(() => {
+                          let benefits = tier.benefits || [];
+                          // Handle case where benefits might be a JSON string
+                          if (typeof benefits === 'string') {
+                            try {
+                              benefits = JSON.parse(benefits);
+                            } catch (e) {
+                              benefits = [];
+                            }
+                          }
+                          // Ensure benefits is an array
+                          if (!Array.isArray(benefits)) {
+                            benefits = [];
+                          }
+                          return benefits.map((benefit, index) => (
+                            <li key={index} className="flex items-center gap-2 text-sm">
+                              <Check className="w-4 h-4 text-accent" />
+                              <span>{benefit}</span>
+                            </li>
+                          ));
+                        })()}
                       </ul>
 
                       <Button 
