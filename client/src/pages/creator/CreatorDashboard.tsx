@@ -17,8 +17,13 @@ import {
   BarChart3,
   Settings,
   User,
-  Crown
+  Crown,
+  FileText,
+  Eye,
+  Heart,
+  MessageSquare
 } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 // Mock analytics data
 const ANALYTICS = {
@@ -76,6 +81,40 @@ const SCHEDULED_CONTENT = [
     type: 'Video',
     date: 'Feb 20',
     time: '6:00 PM'
+  }
+];
+
+// Mock posts data
+const mockPosts = [
+  {
+    id: '1',
+    title: 'First post',
+    thumbnail: 'https://images.unsplash.com/photo-1682685797528-f9c46ca970aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
+    tier: 'Fan',
+    createdAt: new Date(),
+    views: 123,
+    likes: 45,
+    comments: 6
+  },
+  {
+    id: '2',
+    title: 'Second post',
+    thumbnail: 'https://images.unsplash.com/photo-1697436594344-6453553c4940?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
+    tier: 'Superfan',
+    createdAt: new Date(),
+    views: 456,
+    likes: 78,
+    comments: 9
+  },
+  {
+    id: '3',
+    title: 'Third post',
+    thumbnail: 'https://images.unsplash.com/photo-1696899994362-425e4224295b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
+    tier: 'Supporter',
+    createdAt: new Date(),
+    views: 789,
+    likes: 101,
+    comments: 12
   }
 ];
 
@@ -319,6 +358,117 @@ export const CreatorDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
+                  {/* Recent Posts - Instagram Style */}
+                  <div className="space-y-4">
+                      <div className="flex items-center justify-between px-4">
+                          <h2 className="text-xl font-semibold">Recent Posts</h2>
+                          <Button variant="outline" size="sm" asChild>
+                              <Link to="/creator/manage-content">
+                                  View All
+                              </Link>
+                          </Button>
+                      </div>
+
+                      {mockPosts.length > 0 ? (
+                          <div className="space-y-0 -mx-4">
+                              {mockPosts.slice(0, 3).map((post) => (
+                                  <div key={post.id} className="mb-6">
+                                      {/* Post Header - Instagram style */}
+                                      <div className="flex items-center justify-between px-3 py-3">
+                                          <div className="flex items-center gap-3">
+                                              <Avatar className="h-8 w-8">
+                                                  <AvatarImage src={user?.avatar} alt={user?.username} />
+                                                  <AvatarFallback>{user?.username?.charAt(0) || 'U'}</AvatarFallback>
+                                              </Avatar>
+                                              <div>
+                                                  <p className="font-semibold text-foreground text-sm">{user?.display_name || user?.username}</p>
+                                                  <div className="flex items-center gap-1">
+                                                      <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                                                          {post.tier}
+                                                      </Badge>
+                                                      <span className="text-xs text-muted-foreground">
+                                                          • {new Date(post.createdAt).toLocaleDateString()}
+                                                      </span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                      {/* Post Media - Instagram style */}
+                                      <div className="w-full">
+                                          <div className="relative">
+                                              {post.thumbnail ? (
+                                                  <img
+                                                      src={post.thumbnail}
+                                                      alt={post.title}
+                                                      className="w-full aspect-[16/10] object-cover"
+                                                  />
+                                              ) : (
+                                                  <div className="w-full aspect-[16/10] bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
+                                                      <div className="text-center">
+                                                          <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                                                          <p className="text-sm text-muted-foreground">Text Post</p>
+                                                      </div>
+                                                  </div>
+                                              )}
+                                          </div>
+                                      </div>
+
+                                      {/* Action Buttons - Instagram style with inline stats */}
+                                      <div className="px-3 py-2">
+                                          <div className="flex items-center justify-between">
+                                              <div className="flex items-center gap-6">
+                                                  <div className="flex items-center gap-2">
+                                                      <div className="w-6 h-6 flex items-center justify-center">
+                                                          <Heart className="w-5 h-5 text-muted-foreground" />
+                                                      </div>
+                                                      <span className="text-sm font-medium text-foreground">
+                                                          {post.likes}
+                                                      </span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2">
+                                                      <div className="w-6 h-6 flex items-center justify-center">
+                                                          <MessageSquare className="w-5 h-5 text-muted-foreground" />
+                                                      </div>
+                                                      <span className="text-sm font-medium text-foreground">
+                                                          {post.comments}
+                                                      </span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2">
+                                                      <div className="w-6 h-6 flex items-center justify-center">
+                                                          <Eye className="w-5 h-5 text-muted-foreground" />
+                                                      </div>
+                                                      <span className="text-sm font-medium text-foreground">
+                                                          {post.views}
+                                                      </span>
+                                                  </div>
+                                              </div>
+                                          </div>
+
+                                          {/* Post Caption */}
+                                          <div className="mb-1">
+                                              <p className="text-sm leading-relaxed">
+                                                  <span className="font-medium">{user?.display_name || user?.username}</span>{' '}
+                                                  <span className="text-foreground">{post.title}</span>
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      ) : (
+                          <Card className="bg-gradient-card border-border/50 mx-4">
+                              <CardContent className="flex flex-col items-center justify-center py-12">
+                                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+                                  <h3 className="text-lg font-medium text-foreground mb-2">No posts yet</h3>
+                                  <p className="text-muted-foreground text-center mb-4">Create your first post to get started</p>
+                                  <Button asChild>
+                                      <Link to="/creator/upload">Create Post</Link>
+                                  </Button>
+                              </CardContent>
+                          </Card>
+                      )}
+                  </div>
       </EdgeToEdgeContainer>
     </EdgeToEdgeContainer>
   );
