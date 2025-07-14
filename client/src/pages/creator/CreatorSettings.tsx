@@ -47,7 +47,7 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
-  
+
   // Payout settings state
   const [payoutSettings, setPayoutSettings] = useState({
     payout_method: 'mtn_momo',
@@ -168,7 +168,7 @@ export const CreatorSettings: React.FC = () => {
 
         // Clear user data and logout
         localStorage.clear();
-        
+
         // Redirect to home page after a brief delay
         setTimeout(() => {
           window.location.href = '/';
@@ -198,12 +198,12 @@ export const CreatorSettings: React.FC = () => {
     try {
       // API call to change email would go here
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Email updated",
         description: "Your email address has been successfully updated.",
       });
-      
+
       // Update the displayed email
       setCurrentEmail(newEmail);
       setIsEmailChangeDialogOpen(false);
@@ -230,12 +230,12 @@ export const CreatorSettings: React.FC = () => {
     setIsPasswordLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Password changed",
         description: "Your password has been successfully updated.",
       });
-      
+
       setPasswordFormData({
         currentPassword: '',
         newPassword: '',
@@ -903,7 +903,7 @@ export const CreatorSettings: React.FC = () => {
                               Permanently delete your creator account and all data
                             </p>
                           </div>
-                          
+
                           <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                             <AlertDialogTrigger asChild>
                               <Button variant="destructive">
@@ -1062,6 +1062,6 @@ export const CreatorSettings: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 };
