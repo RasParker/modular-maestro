@@ -697,48 +697,39 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
               {userPosts.length > 0 ? (
-                <div className="space-y-6">
+                <div className="space-y-0">
                   {userPosts.map((post) => (
-                    <Card key={post.id} className="bg-gradient-card border-border/50">
-                      <CardContent className="p-0">
-                        <div className="p-4 pb-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src={creator.avatar} alt={creator.username} />
-                                <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-semibold text-foreground">{creator.display_name}</p>
-                                <div className="flex items-center gap-2">
-                                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                                  <Badge variant="outline" className="text-xs">
-                                    {post.tier === 'public' ? 'Free' : 
-                                     post.tier === 'supporter' ? 'Supporter' :
-                                     post.tier === 'fan' ? 'Fan' :
-                                     post.tier === 'premium' ? 'Premium' :
-                                     post.tier === 'superfan' ? 'Superfan' : 'Free'}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground">
-                                    {getTimeAgo(post.created_at || post.createdAt)}
-                                  </span>
-                                </div>
-                              </div>
+                    <div key={post.id} className="mb-8">{/* Instagram-style borderless post */}
+                      {/* Post Header - Instagram style */}
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={creator.avatar} alt={creator.username} />
+                            <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-muted-foreground">@{creator.username}</p>
+                              <Badge variant="outline" className="text-xs">
+                                {post.tier === 'public' ? 'Free' : 
+                                 post.tier === 'supporter' ? 'Supporter' :
+                                 post.tier === 'fan' ? 'Fan' :
+                                 post.tier === 'premium' ? 'Premium' :
+                                 post.tier === 'superfan' ? 'Superfan' : 'Free'}
+                              </Badge>
                             </div>
-
                           </div>
                         </div>
+                        <div className="text-xs text-muted-foreground">
+                          {getTimeAgo(post.created_at || post.createdAt)}
+                        </div>
+                      </div>
 
-                        <div className="px-4 pb-4 space-y-4">
-                          <div>
-                            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                              {post.content || post.title}
-                            </p>
-                          </div>
-
-                          {post.media_urls && post.media_urls[0] && (
-                            <div className="rounded-lg overflow-hidden">
-                              {hasAccessToTier(post.tier) ? (
+                      {/* Post Media - Full width like Instagram */}
+                      {post.media_urls && post.media_urls[0] && (
+                        <div className="w-full overflow-hidden">
+                          {hasAccessToTier(post.tier) ? (
                                 <div 
                                   className="relative cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
                                   onClick={() => handleContentClick(post)}
@@ -751,143 +742,150 @@ export const CreatorProfile: React.FC = () => {
                                     }
                                   }}
                                 >
-                                  {post.media_type === 'video' ? (
-                                    <video 
-                                      src={`/uploads/${post.media_urls[0]}`}
-                                      className="w-full h-64 object-cover"
-                                      muted
-                                      preload="metadata"
-                                    />
-                                  ) : (
-                                    <img 
-                                      src={`/uploads/${post.media_urls[0]}`}
-                                      alt={post.title}
-                                      className="w-full h-64 object-cover"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                        target.className = "w-full h-64 object-cover opacity-50";
-                                      }}
-                                    />
-                                  )}
-                                  {/* Media type icon overlay */}
-                                  <div className="absolute top-2 left-2 z-20">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
-                                      {getMediaOverlayIcon(post.media_type)}
-                                    </div>
-                                  </div>
-                                </div>
+                              {post.media_type === 'video' ? (
+                                <video 
+                                  src={`/uploads/${post.media_urls[0]}`}
+                                  className="w-full aspect-square object-cover"
+                                  muted
+                                  preload="metadata"
+                                />
                               ) : (
-                                <div className="w-full h-64 bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
-                                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-                                  <div className="text-center z-10 p-6">
-                                    <div className="mb-4 opacity-75">
-                                      <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-</svg>
-                                    </div>
-                                    <h3 className="text-lg font-medium text-foreground mb-2">
-                                      {post.tier === 'supporter' ? 'Supporter' : 
-                                       post.tier === 'fan' ? 'Fan' : 
-                                       post.tier === 'premium' ? 'Premium' : 
-                                       post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground mb-4">
-                                      Subscribe to {creator.display_name} to unlock this content
-                                    </p>
-                                    <Button 
-                                      size="sm" 
-                                      className="bg-accent hover:bg-accent/90 text-black"
-                                      onClick={() => {
-                                        if (!user) {
-                                          window.location.href = `/login?redirect=/creator/${username}`;
-                                        } else {
-                                          // Scroll to subscription tiers
-                                          document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
-                                        }
-                                      }}
-                                    >
-                                      {!user ? 'Login to Subscribe' : 'View Subscription Plans'}
-                                    </Button>
-                                  </div>
-                                </div>
+                                <img 
+                                  src={`/uploads/${post.media_urls[0]}`}
+                                  alt={post.title}
+                                  className="w-full aspect-square object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full aspect-square object-cover opacity-50";
+                                  }}
+                                />
                               )}
+                              {/* Media type icon overlay */}
+                              <div className="absolute top-2 left-2 z-20">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
+                              </div>
+                                </div>
+                          ) : (
+                            <div className="w-full aspect-square bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                              <div className="text-center z-10 p-6">
+                                <div className="mb-4 opacity-75">
+                                  <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                  </svg>
+                                </div>
+                                <h3 className="text-lg font-medium text-foreground mb-2">
+                                  {post.tier === 'supporter' ? 'Supporter' : 
+                                   post.tier === 'fan' ? 'Fan' : 
+                                   post.tier === 'premium' ? 'Premium' : 
+                                   post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                </h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                  Subscribe to {creator.display_name} to unlock this content
+                                </p>
+                                <Button 
+                                  size="sm" 
+                                  className="bg-accent hover:bg-accent/90 text-black"
+                                  onClick={() => {
+                                    if (!user) {
+                                      window.location.href = `/login?redirect=/creator/${username}`;
+                                    } else {
+                                      // Scroll to subscription tiers
+                                      document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                    }
+                                  }}
+                                >
+                                  {!user ? 'Login to Subscribe' : 'View Subscription Plans'}
+                                </Button>
+                              </div>
                             </div>
                           )}
+                        </div>
+                      )}
 
-                          <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                            <div className="flex items-center gap-4">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className={`${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                                onClick={() => handleLike(post.id)}
+                      {/* Post Caption - Instagram style */}
+                      {(post.content || post.title) && (
+                        <div className="px-4 py-2">
+                          <p className="text-sm">
+                            <span className="font-semibold">{creator.display_name}</span>{' '}
+                            {post.content || post.title}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Action Buttons - Instagram style */}
+                      <div className="px-4 py-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className={`h-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                              onClick={() => handleLike(post.id)}
+                            >
+                              <Heart className={`w-6 h-6 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 p-0 text-muted-foreground"
+                              onClick={() => handleCommentClick(post.id)}
+                            >
+                              <MessageSquare className="w-6 h-6" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 p-0 text-muted-foreground"
+                              onClick={() => handleShare(post.id)}
+                            >
+                              <Share2 className="w-6 h-6" />
+                            </Button>
+                          </div>
+                          {isOwnProfile && (
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 p-0 text-muted-foreground hover:bg-muted"
+                                onClick={() => handleEdit(post.id)}
                               >
-                                <Heart className={`w-4 h-4 mr-1 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
+                                <Edit className="w-4 h-4" />
                               </Button>
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="text-muted-foreground"
-                                onClick={() => handleCommentClick(post.id)}
+                                className="h-8 p-0 text-muted-foreground hover:bg-muted"
+                                onClick={() => handleDelete(post.id)}
                               >
-                                <MessageSquare className="w-4 h-4 mr-1" />
-                                {post.comments_count || (post.comments ? post.comments.length : 0)}
+                                <Trash2 className="w-4 h-4" />
                               </Button>
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Eye className="w-4 h-4" />
-                                0
-                              </div>
                             </div>
-
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-muted-foreground h-8 w-8 p-0"
-                                onClick={() => handleShare(post.id)}
-                              >
-                                <Share2 className="w-4 h-4" />
-                              </Button>
-                              {isOwnProfile && (
-                                <>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
-                                    onClick={() => handleEdit(post.id)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="text-muted-foreground h-8 w-8 p-0 hover:bg-muted"
-                                    onClick={() => handleDelete(post.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </div>
+                          )}
                         </div>
-                      </CardContent>
+                        
+                        {/* Like count */}
+                        <div className="mt-1">
+                          <span className="text-sm font-semibold text-foreground">
+                            {postLikes[post.id]?.count || post.likes_count || post.likes || 0} likes
+                          </span>
+                        </div>
+                      </div>
 
                       {/* Comments Section */}
                       {showComments[post.id] && (
-                        <div className="border-t border-border/30">
-                          <div className="p-4">
-                            <CommentSection
-                              postId={post.id}
-                              initialComments={post.comments || []}
-                              onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                            />
-                          </div>
+                        <div className="px-4 pb-4">
+                          <CommentSection
+                            postId={post.id}
+                            initialComments={post.comments || []}
+                            onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                          />
                         </div>
                       )}
-                    </Card>
+                    </div>
                   ))}
                 </div>
               ) : (
