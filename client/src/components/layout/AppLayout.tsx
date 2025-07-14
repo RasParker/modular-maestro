@@ -23,11 +23,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation - Desktop Only */}
-      {!isMobile && <MinimalNavbar />}
+      {/* Top Navigation - Always shown */}
+      <MinimalNavbar />
       
       {/* Main Content - Edge to Edge */}
-      <main className={`${isMobile ? 'pb-16' : 'pt-16'}`}>
+      <main className={`${isMobile ? 'pb-16' : ''} pt-16`}>
         {children}
       </main>
       
