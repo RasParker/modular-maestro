@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -24,17 +25,24 @@ import {
   CreditCard,
   MessageSquare,
   Upload,
-  Grid3X3
+  Grid3X3,
+  Menu,
+  X
 } from 'lucide-react';
 
 export const MinimalNavbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   const getRoleIcon = () => {
@@ -170,8 +178,8 @@ export const MinimalNavbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Navigation Items */}
-          <div className="flex items-center space-x-1 flex-1 justify-center max-w-md">
+          {/* Navigation Items - Desktop */}
+          <div className="hidden md:flex items-center space-x-1 flex-1 justify-center max-w-md">
             {navigationItems.map((item) => (
               <Link
                 key={item.href}
@@ -186,6 +194,106 @@ export const MinimalNavbar: React.FC = () => {
                 <span className="hidden lg:block">{item.label}</span>
               </Link>
             ))}
+          </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="md:hidden">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-foreground">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80 bg-background">
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-6 border-b">
+                    <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
+                      <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">X</span>
+                      </div>
+                      <span className="text-xl font-bold text-gradient-primary">Xclusive</span>
+                    </Link>
+                    <Button variant="ghost" size="icon" onClick={closeMobileMenu}>
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+
+                  {/* Navigation Items */}
+                  <div className="flex-1 py-6">
+                    <div className="space-y-1 px-6">
+                      {navigationItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          to={item.href}
+                          onClick={closeMobileMenu}
+                          className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
+                            item.active 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'text-foreground hover:text-primary hover:bg-accent'
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Mobile User Section */}
+                    {user && (
+                      <div className="mt-6 px-6">
+                        <div className="border-t pt-6">
+                          <div className="flex items-center space-x-3 mb-4">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={user.profile_photo || ''} alt={user.username} />
+                              <AvatarFallback className="bg-primary text-primary-foreground">
+                                {user.username?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-sm">{user.username}</p>
+                              <p className="text-xs text-muted-foreground capitalize flex items-center gap-1">
+                                {getRoleIcon()}
+                                {user.role}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Link
+                              to={`/${user.role}/settings`}
+                              onClick={closeMobileMenu}
+                              className="flex items-center space-x-3 px-3 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-accent rounded-lg transition-colors"
+                            >
+                              <Settings className="h-5 w-5" />
+                              <span>Settings</span>
+                            </Link>
+                            {user.role === 'creator' && (
+                              <Link
+                                to={`/creator/${user.username}`}
+                                onClick={closeMobileMenu}
+                                className="flex items-center space-x-3 px-3 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-accent rounded-lg transition-colors"
+                              >
+                                <User className="h-5 w-5" />
+                                <span>My Profile</span>
+                              </Link>
+                            )}
+                            <Button
+                              variant="ghost"
+                              onClick={() => { handleLogout(); closeMobileMenu(); }}
+                              className="flex items-center space-x-3 px-3 py-3 text-base font-medium text-foreground hover:text-primary hover:bg-accent rounded-lg transition-colors w-full justify-start"
+                            >
+                              <LogOut className="h-5 w-5" />
+                              <span>Log out</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* User Menu */}
