@@ -971,6 +971,7 @@ export const CreatorSettings: React.FC = () => {
           </Tabs>
         </div>
       </div>
+    </div>
 
       {/* Email Change Dialog */}
       <AlertDialog open={isEmailChangeDialogOpen} onOpenChange={setIsEmailChangeDialogOpen}>
