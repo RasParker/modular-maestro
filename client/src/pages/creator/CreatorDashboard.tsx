@@ -84,11 +84,11 @@ const SCHEDULED_CONTENT = [
   }
 ];
 
-// Real posts will be fetched from API
-const [userPosts, setUserPosts] = useState<any[]>([]);
-
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
+  
+  // Real posts will be fetched from API
+  const [userPosts, setUserPosts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
