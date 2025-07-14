@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -84,42 +84,30 @@ const SCHEDULED_CONTENT = [
   }
 ];
 
-// Mock posts data
-const mockPosts = [
-  {
-    id: '1',
-    title: 'First post',
-    thumbnail: 'https://images.unsplash.com/photo-1682685797528-f9c46ca970aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
-    tier: 'Fan',
-    createdAt: new Date(),
-    views: 123,
-    likes: 45,
-    comments: 6
-  },
-  {
-    id: '2',
-    title: 'Second post',
-    thumbnail: 'https://images.unsplash.com/photo-1697436594344-6453553c4940?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
-    tier: 'Superfan',
-    createdAt: new Date(),
-    views: 456,
-    likes: 78,
-    comments: 9
-  },
-  {
-    id: '3',
-    title: 'Third post',
-    thumbnail: 'https://images.unsplash.com/photo-1696899994362-425e4224295b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=800&q=60',
-    tier: 'Supporter',
-    createdAt: new Date(),
-    views: 789,
-    likes: 101,
-    comments: 12
-  }
-];
+// Real posts will be fetched from API
+const [userPosts, setUserPosts] = useState<any[]>([]);
 
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const posts = await response.json();
+          console.log('Fetched user content:', posts);
+          setUserPosts(posts);
+        }
+      } catch (error) {
+        console.error('Error fetching user posts:', error);
+      }
+    };
+
+    fetchUserPosts();
+  }, [user]);
 
   return (
     <EdgeToEdgeContainer>
@@ -371,43 +359,49 @@ export const CreatorDashboard: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {mockPosts.length > 0 ? (
+                {userPosts.length > 0 ? (
                   <div className="space-y-4">
-                    {mockPosts.slice(0, 3).map((post) => (
+                    {userPosts.slice(0, 3).map((post) => (
                       <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
                         <div className="flex-shrink-0">
-                          {post.thumbnail ? (
+                          {post.mediaPreview ? (
                             <img
-                              src={post.thumbnail}
-                              alt={post.title}
+                              src={post.mediaPreview}
+                              alt={post.caption || post.title || 'Post'}
                               className="w-16 h-16 object-cover rounded-lg"
                             />
                           ) : (
                             <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
-                              <FileText className="w-6 h-6 text-muted-foreground" />
+                              {post.type === 'Image' ? (
+                                <Image className="w-6 h-6 text-muted-foreground" />
+                              ) : post.type === 'Video' ? (
+                                <Video className="w-6 h-6 text-muted-foreground" />
+                              ) : (
+                                <FileText className="w-6 h-6 text-muted-foreground" />
+                              )}
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{post.title}</h4>
+                          <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline" className="text-xs">{post.tier}</Badge>
                             <span className="text-xs text-muted-foreground">
-                              {new Date(post.createdAt).toLocaleDateString()}
+                              {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center gap-4 mt-2">
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Eye className="w-3 h-3" />
-                              <span>{post.views}</span>
+                              <span>{post.views || 0}</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Heart className="w-3 h-3" />
-                              <span>{post.likes}</span>
+                              <span>{post.likes || 0}</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <MessageSquare className="w-3 h-3" />
-                              <span>{post.comments}</span>
+                              <span>{post.comments || 0}</span>
                             </div>
                           </div>
                         </div>
