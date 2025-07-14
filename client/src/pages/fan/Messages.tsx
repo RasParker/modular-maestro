@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/shared/Navbar';
 import { ConversationList } from '@/components/fan/ConversationList';
 import { MessageThread } from '@/components/fan/MessageThread';
-import { ArrowLeft, MessageSquare, Search } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Search, Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
