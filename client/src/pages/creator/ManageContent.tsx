@@ -49,31 +49,47 @@ export const ManageContent: React.FC = () => {
           // Filter posts by current user and transform to match our interface
           const userPosts = allPosts
             .filter((post: any) => post.creator_id === parseInt(user.id))
-            .map((post: any) => ({
-              id: post.id.toString(),
-              caption: post.content || post.title,
-              type: post.media_type === 'image' ? 'Image' as const :
-                    post.media_type === 'video' ? 'Video' as const : 'Text' as const,
-              tier: post.tier === 'public' ? 'Free' : 
-                    post.tier === 'supporter' ? 'Basic Support' :
-                    post.tier === 'fan' ? 'Fan Content' :
-                    post.tier === 'premium' ? 'Premium Content' :
-                    post.tier === 'superfan' ? 'Superfan Content' : 'Free',
-              status: post.status === 'draft' ? 'Draft' as const :
-                      post.status === 'scheduled' ? 'Scheduled' as const : 'Published' as const,
-              date: new Date(post.created_at).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
-              }),
-              views: 0, // Will be implemented later
-              likes: post.likes_count || 0,
-              comments: post.comments_count || 0,
-              mediaPreview: post.media_urls && post.media_urls.length > 0 
-                ? (post.media_urls[0].startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls[0]}`)
-                : null,
-              category: 'General'
-            }));
+            .map((post: any) => {
+              // Handle both string and array formats for media_urls
+              let mediaPreview = null;
+              if (post.media_urls) {
+                const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                if (mediaUrls.length > 0 && mediaUrls[0]) {
+                  const mediaUrl = mediaUrls[0];
+                  mediaPreview = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+                }
+              }
+
+              return {
+                id: post.id.toString(),
+                caption: post.content || post.title,
+                type: post.media_type === 'image' ? 'Image' as const :
+                      post.media_type === 'video' ? 'Video' as const : 'Text' as const,
+                tier: post.tier === 'public' ? 'Free' : 
+                      post.tier === 'supporter' ? 'Basic Support' :
+                      post.tier === 'fan' ? 'Fan Content' :
+                      post.tier === 'premium' ? 'Premium Content' :
+                      post.tier === 'superfan' ? 'Superfan Content' : 'Free',
+                status: post.status === 'draft' ? 'Draft' as const :
+                        post.status === 'scheduled' ? 'Scheduled' as const : 'Published' as const,
+                date: post.created_at === "CURRENT_TIMESTAMP" ? 
+                      new Date().toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      }) :
+                      new Date(post.created_at).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      }),
+                views: 0, // Will be implemented later
+                likes: post.likes_count || 0,
+                comments: post.comments_count || 0,
+                mediaPreview: mediaPreview,
+                category: 'General'
+              };
+            });
           
           setContent(userPosts);
           console.log('Fetched user content:', userPosts);
