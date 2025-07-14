@@ -229,10 +229,10 @@ export const CreatorProfile: React.FC = () => {
 
                 setCreator(prev => prev ? {
                   ...prev,
-                  display_name: newDisplayName || userData.display_name || userData.username,
-                  avatar: newProfilePhotoUrl || userData.avatar || prev.avatar,
-                  cover: newCoverPhotoUrl || userData.cover_image || prev.cover,
-                  bio: newBio || userData.bio || prev.bio,
+                  display_name: (newDisplayName && newDisplayName.trim()) || userData.display_name || userData.username,
+                  avatar: (newProfilePhotoUrl && newProfilePhotoUrl.trim()) || userData.avatar || prev.avatar,
+                  cover: (newCoverPhotoUrl && newCoverPhotoUrl.trim()) || userData.cover_image || prev.cover,
+                  bio: (newBio && newBio.trim()) || userData.bio || prev.bio,
                 } : null);
 
                 console.log('Updated creator from storage event:', {
@@ -325,6 +325,7 @@ export const CreatorProfile: React.FC = () => {
           console.log('Cover photo URL from localStorage:', coverPhotoUrl);
           console.log('Database avatar:', userData.avatar);
           console.log('Database cover:', userData.cover_image);
+          console.log('Final avatar choice:', (profilePhotoUrl && profilePhotoUrl.trim()) || userData.avatar || null);
 
           // Handle tiers - fetch from API
           let tiers = [];
@@ -341,10 +342,10 @@ export const CreatorProfile: React.FC = () => {
 
           setCreator({
             ...userData,
-            display_name: displayName || userData.display_name || userData.username,
-            avatar: profilePhotoUrl || userData.avatar || null,
-            cover: coverPhotoUrl || userData.cover_image || null,
-            bio: bio || userData.bio || null,
+            display_name: (displayName && displayName.trim()) || userData.display_name || userData.username,
+            avatar: (profilePhotoUrl && profilePhotoUrl.trim()) || userData.avatar || null,
+            cover: (coverPhotoUrl && coverPhotoUrl.trim()) || userData.cover_image || null,
+            bio: (bio && bio.trim()) || userData.bio || null,
             subscribers: userData.total_subscribers || 0,
             tiers: tiers
           });

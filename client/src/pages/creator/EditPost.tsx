@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'wouter';
+import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Upload, Image, Video, Save } from 'lucide-react';
 import { Link } from 'wouter';
-import { Navbar } from '@/components/shared/Navbar';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
@@ -40,7 +41,7 @@ interface SubscriptionTier {
 export const EditPost: React.FC = () => {
   const { id: postId } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
@@ -95,7 +96,7 @@ export const EditPost: React.FC = () => {
             description: "Failed to load post data.",
             variant: "destructive",
           });
-          navigate('/creator/content');
+          setLocation('/creator/content');
         }
 
         if (tiersResponse.ok) {
@@ -233,7 +234,7 @@ export const EditPost: React.FC = () => {
       });
 
       // Navigate back to dashboard
-      navigate('/creator/dashboard');
+      setLocation('/creator/dashboard');
     } catch (error) {
       console.error('Error updating post:', error);
       toast({
@@ -248,21 +249,19 @@ export const EditPost: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-muted-foreground">Loading post...</p>
           </div>
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <AppLayout>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
@@ -425,6 +424,6 @@ export const EditPost: React.FC = () => {
           </form>
         </Form>
       </div>
-    </div>
+    </AppLayout>
   );
 };
