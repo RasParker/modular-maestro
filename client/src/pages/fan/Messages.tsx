@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/shared/Navbar';
 import { ConversationList } from '@/components/fan/ConversationList';
 import { MessageThread } from '@/components/fan/MessageThread';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Search } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_CONVERSATIONS = [
@@ -127,65 +130,158 @@ export const Messages: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Mobile View */}
+      {/* Mobile View - Instagram Style Tap-to-Open */}
       <div className="lg:hidden">
-        <div className="px-4 py-6">
-          <div className="mb-6">
-            <Button variant="outline" asChild className="mb-4">
-              <Link to="/fan/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
+        {!showMobileChat ? (
+          /* Conversation List View */
+          <div className="min-h-screen bg-background">
+            <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border/20">
+              <div className="px-4 py-3">
+                <div className="flex items-center justify-between mb-3">
+                  <Button variant="ghost" asChild size="sm">
+                    <Link to="/fan/dashboard">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <h1 className="text-lg font-semibold">Messages</h1>
+                  <div className="w-16"></div> {/* Spacer for center alignment */}
+                </div>
+                
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Search conversations..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-muted/30 border-border/30"
+                  />
+                </div>
+              </div>
+            </div>
             
-            {!showMobileChat && (
-              <>
-                <h1 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
-                  <MessageSquare className="w-6 h-6 text-primary" />
-                  Messages
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Chat with your favorite creators
-                </p>
-              </>
-            )}
+            {/* Conversations List */}
+            <div className="px-0">
+              {filteredConversations.map((conversation) => (
+                <div
+                  key={conversation.id}
+                  className="flex items-center gap-3 p-4 border-b border-border/10 active:bg-muted/20 transition-colors cursor-pointer"
+                  onClick={() => handleSelectConversation(conversation)}
+                >
+                  <Avatar className="h-14 w-14 flex-shrink-0">
+                    <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.username} />
+                    <AvatarFallback>{conversation.creator.display_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-medium text-foreground truncate">
+                        {conversation.creator.display_name}
+                      </h3>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs text-muted-foreground">
+                          {getTimeAgo(conversation.timestamp)}
+                        </span>
+                        {conversation.unread && (
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground truncate flex-1">
+                        {conversation.last_message}
+                      </p>
+                      {conversation.unread && conversation.unread_count > 0 && (
+                        <Badge variant="destructive" className="text-xs min-w-0 h-5 px-1.5 ml-2">
+                          {conversation.unread_count}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-
-          {!showMobileChat ? (
-            <ConversationList
-              conversations={filteredConversations}
-              selectedConversation={selectedConversation}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              onSelectConversation={handleSelectConversation}
-              getTimeAgo={getTimeAgo}
-            />
-          ) : (
-            <div className="h-[calc(100vh-140px)]">
-              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/50">
+        ) : (
+          /* Full-Screen Chat View */
+          <div className="min-h-screen bg-background flex flex-col">
+            {/* Chat Header */}
+            <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border/20">
+              <div className="flex items-center gap-3 p-4">
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={handleBackToList}
-                  className="p-2"
+                  className="p-2 -ml-2"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h2 className="text-lg font-semibold">
-                  {selectedConversation.creator.display_name}
-                </h2>
+                
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedConversation.creator.avatar} alt={selectedConversation.creator.username} />
+                  <AvatarFallback>{selectedConversation.creator.display_name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-semibold text-foreground truncate">
+                    {selectedConversation.creator.display_name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground truncate">
+                    @{selectedConversation.creator.username}
+                  </p>
+                </div>
               </div>
-              
-              <MessageThread
-                creator={selectedConversation.creator}
-                messages={messages}
-                newMessage={newMessage}
-                onNewMessageChange={setNewMessage}
-                onSendMessage={handleSendMessage}
-              />
             </div>
-          )}
-        </div>
+            
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.type === 'sent' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] p-3 rounded-2xl ${
+                      message.type === 'sent'
+                        ? 'bg-primary text-primary-foreground rounded-br-md'
+                        : 'bg-muted text-foreground rounded-bl-md'
+                    }`}
+                  >
+                    <p className="text-sm break-words">{message.content}</p>
+                    <p className={`text-xs mt-1 ${
+                      message.type === 'sent' 
+                        ? 'text-primary-foreground/70' 
+                        : 'text-muted-foreground'
+                    }`}>
+                      {new Date(message.timestamp).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Message Input - Fixed at bottom */}
+            <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/20 p-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 rounded-full border-border/30 bg-muted/30"
+                />
+                <Button onClick={handleSendMessage} size="sm" className="rounded-full px-4">
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Desktop View - Instagram Style Split Layout */}
