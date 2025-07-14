@@ -326,12 +326,41 @@ export const ManageTiers: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-2">
-                    {tier.benefits.map((benefit, index) => (
-                      <li key={index} className="text-sm flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        {benefit}
-                      </li>
-                    ))}
+                    {(() => {
+                      let benefits = tier.benefits || [];
+                      
+                      // Handle case where benefits might be a JSON string
+                      if (typeof benefits === 'string') {
+                        try {
+                          benefits = JSON.parse(benefits);
+                        } catch (e) {
+                          console.warn('Failed to parse benefits JSON:', e);
+                          benefits = [];
+                        }
+                      }
+                      
+                      // Ensure benefits is an array - handle null, undefined, or other non-array types
+                      if (!benefits || !Array.isArray(benefits)) {
+                        benefits = [];
+                      }
+                      
+                      // If no benefits, show a default message
+                      if (benefits.length === 0) {
+                        return (
+                          <li className="flex items-center gap-2 text-sm">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                            <span>No benefits specified</span>
+                          </li>
+                        );
+                      }
+                      
+                      return benefits.map((benefit, index) => (
+                        <li key={index} className="text-sm flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                          {benefit}
+                        </li>
+                      ));
+                    })()}
                   </ul>
                   
                   <div className="flex gap-2 pt-4">
