@@ -90,7 +90,7 @@ export const Navbar: React.FC = () => {
           {/* Desktop User Menu & Mobile Menu Button */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            
+
             {/* Mobile Menu Button */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -201,7 +201,7 @@ export const Navbar: React.FC = () => {
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
                         <AvatarImage 
-                          src={user.avatar?.startsWith('/uploads/') ? user.avatar : user.avatar ? `/uploads/${user.avatar}` : undefined} 
+                          src={user.avatar || undefined} 
                           alt={user.username} 
                         />
                         <AvatarFallback className="bg-primary text-primary-foreground">

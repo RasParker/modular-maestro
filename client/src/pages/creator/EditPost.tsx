@@ -179,8 +179,8 @@ export const EditPost: React.FC = () => {
     setIsSaving(true);
 
     try {
-      // Upload new media file if it exists
-      let uploadedMediaUrls: string[] = originalPost.media_urls || [];
+      // Upload new media file if it exists, otherwise keep existing media
+      let uploadedMediaUrls = originalPost.media_urls || '';
       if (mediaFile) {
         const formData = new FormData();
         formData.append('media', mediaFile);
@@ -195,7 +195,7 @@ export const EditPost: React.FC = () => {
         }
 
         const uploadResult = await uploadResponse.json();
-        uploadedMediaUrls = [uploadResult.filename];
+        uploadedMediaUrls = uploadResult.filename;
       }
 
       // Prepare updated post data
