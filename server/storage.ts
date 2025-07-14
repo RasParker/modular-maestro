@@ -317,9 +317,18 @@ export class DatabaseStorage implements IStorage {
   async createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier> {
     try {
       console.log('Creating subscription tier with data:', tier);
+      
+      // Ensure tier_level is set if not provided
+      const tierData = {
+        ...tier,
+        tier_level: tier.tier_level || 'supporter',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
       const [newTier] = await db
         .insert(subscription_tiers)
-        .values([tier])
+        .values([tierData])
         .returning();
       console.log('Subscription tier created successfully:', newTier);
       return newTier;
@@ -332,7 +341,7 @@ export class DatabaseStorage implements IStorage {
   async updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined> {
     const [tier] = await db
       .update(subscription_tiers)
-      .set({ ...updates, updated_at: new Date() })
+      .set({ ...updates, updated_at: new Date().toISOString() })
       .where(eq(subscription_tiers.id, id))
       .returning();
     return tier || undefined;
@@ -377,7 +386,7 @@ export class DatabaseStorage implements IStorage {
   async updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription | undefined> {
     const [subscription] = await db
       .update(subscriptions)
-      .set({ ...updates, updated_at: new Date() })
+      .set({ ...updates, updated_at: new Date().toISOString() })
       .where(eq(subscriptions.id, id))
       .returning();
     return subscription || undefined;
@@ -389,7 +398,7 @@ export class DatabaseStorage implements IStorage {
       .set({ 
         status: 'cancelled',
         auto_renew: false,
-        updated_at: new Date()
+        updated_at: new Date().toISOString()
       })
       .where(eq(subscriptions.id, id))
       .returning();
@@ -400,7 +409,7 @@ export class DatabaseStorage implements IStorage {
         .update(users)
         .set({ 
           total_subscribers: sql`${users.total_subscribers} - 1`,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .where(eq(users.id, subscription.creator_id));
     }

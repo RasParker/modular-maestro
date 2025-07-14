@@ -538,10 +538,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creatorId = parseInt(req.params.creatorId);
       console.log('Creating tier for creator:', creatorId, 'with data:', req.body);
 
-      const validatedData = insertSubscriptionTierSchema.parse({
+      // Process the request data to match schema requirements
+      const tierData = {
         ...req.body,
-        creator_id: creatorId
-      });
+        creator_id: creatorId,
+        // Convert benefits array to JSON string if it's an array
+        benefits: Array.isArray(req.body.benefits) ? JSON.stringify(req.body.benefits) : req.body.benefits,
+        // Set tier_level based on price or name if not provided
+        tier_level: req.body.tier_level || 'supporter' // default tier level
+      };
+
+      const validatedData = insertSubscriptionTierSchema.parse(tierData);
 
       const tier = await storage.createSubscriptionTier(validatedData);
       res.json(tier);

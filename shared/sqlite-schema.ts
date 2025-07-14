@@ -231,7 +231,7 @@ export const insertSubscriptionTierSchema = createInsertSchema(subscription_tier
   tier_level: true,
   benefits: true,
   is_active: true,
-});
+}).partial({ tier_level: true });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
   fan_id: true,
