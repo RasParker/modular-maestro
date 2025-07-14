@@ -90,7 +90,7 @@ export const EditPost: React.FC = () => {
             setMediaPreview(mediaUrl);
             setMediaType(postData.media_type === 'image' ? 'image' : 'video');
           }
-          
+
           setOriginalPost(postData);
         } else {
           toast({

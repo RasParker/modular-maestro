@@ -41,7 +41,7 @@ export const ManageTiers: React.FC = () => {
   useEffect(() => {
     const fetchTiers = async () => {
       if (!user?.id) return;
-      
+
       try {
         const response = await fetch(`/api/creators/${user.id}/tiers`);
         if (response.ok) {
@@ -116,7 +116,7 @@ export const ManageTiers: React.FC = () => {
 
       if (response.ok) {
         const savedTier = await response.json();
-        
+
         if (editingTier) {
           setTiers(prev => prev.map(t => t.id === editingTier.id ? savedTier : t));
           toast({
@@ -195,7 +195,7 @@ export const ManageTiers: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -255,7 +255,7 @@ export const ManageTiers: React.FC = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
@@ -328,7 +328,7 @@ export const ManageTiers: React.FC = () => {
                   <ul className="space-y-2">
                     {(() => {
                       let benefits = tier.benefits || [];
-                      
+
                       // Handle case where benefits might be a JSON string
                       if (typeof benefits === 'string') {
                         try {
@@ -338,12 +338,12 @@ export const ManageTiers: React.FC = () => {
                           benefits = [];
                         }
                       }
-                      
+
                       // Ensure benefits is an array - handle null, undefined, or other non-array types
                       if (!benefits || !Array.isArray(benefits)) {
                         benefits = [];
                       }
-                      
+
                       // If no benefits, show a default message
                       if (benefits.length === 0) {
                         return (
@@ -353,7 +353,7 @@ export const ManageTiers: React.FC = () => {
                           </li>
                         );
                       }
-                      
+
                       return benefits.map((benefit, index) => (
                         <li key={index} className="text-sm flex items-center gap-2">
                           <div className="w-1.5 h-1.5 bg-primary rounded-full" />
@@ -362,7 +362,7 @@ export const ManageTiers: React.FC = () => {
                       ));
                     })()}
                   </ul>
-                  
+
                   <div className="flex gap-2 pt-4">
                     <Button 
                       variant="outline" 
