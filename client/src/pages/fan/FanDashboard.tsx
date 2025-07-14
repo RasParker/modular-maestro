@@ -239,30 +239,34 @@ export const FanDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Recent Activity - Instagram-style */}
-            <div className="bg-background/50 backdrop-blur-sm rounded-lg border border-border/30">
-              <div className="p-4 border-b border-border/30">
+            {/* Recent Activity - Instagram-style borderless */}
+            <div className="space-y-0">
+              <div className="px-3 py-3 border-b border-border/30">
                 <h3 className="text-lg font-semibold">Recent Activity</h3>
               </div>
-              <div className="p-3 space-y-3">
+              <div className="space-y-0">
                 {RECENT_ACTIVITY.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-3 py-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={activity.avatar} alt={activity.creator} />
-                      <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm leading-relaxed">
-                        <span className="font-medium">{activity.creator}</span>{' '}
-                        <span className="text-muted-foreground">{activity.message}</span>
-                      </p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  <div key={activity.id} className="px-3 py-3 hover:bg-background/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={activity.avatar} alt={activity.creator} />
+                        <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm leading-relaxed">
+                          <span className="font-medium">{activity.creator}</span>{' '}
+                          <span className="text-muted-foreground">{activity.message}</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
-                <Button variant="ghost" size="sm" className="w-full mt-2 text-muted-foreground" asChild>
-                  <Link to="/fan/feed">View all activity</Link>
-                </Button>
+                <div className="px-3 py-3 border-t border-border/20">
+                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground" asChild>
+                    <Link to="/fan/feed">View all activity</Link>
+                  </Button>
+                </div>
               </div>
             </div>
 
