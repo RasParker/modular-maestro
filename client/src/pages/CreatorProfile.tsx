@@ -485,10 +485,15 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleContentClick = (post: any) => {
+    // Handle both string and array formats for media_urls
+    const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+    const mediaUrl = mediaUrls[0];
+    const fullUrl = mediaUrl?.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+    
     // Transform the post data to match the content manager modal structure
     const modalData = {
       ...post,
-      mediaPreview: post.media_urls?.[0]?.startsWith('/uploads/') ? post.media_urls[0] : `/uploads/${post.media_urls?.[0]}`,
+      mediaPreview: fullUrl,
       type: post.media_type === 'image' ? 'Image' : post.media_type === 'video' ? 'Video' : 'Text',
       caption: post.content || post.title
     };
@@ -726,7 +731,11 @@ export const CreatorProfile: React.FC = () => {
                       </div>
 
                       {/* Post Media - Full width mobile Instagram style */}
-                      {post.media_urls && post.media_urls[0] && (
+                      {post.media_urls && ((() => {
+                        // Handle both string and array formats for media_urls
+                        const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                        return mediaUrls[0];
+                      })()) && (
                         <div className="w-full">
                           {hasAccessToTier(post.tier) ? (
                             <div 
@@ -741,25 +750,32 @@ export const CreatorProfile: React.FC = () => {
                                 }
                               }}
                             >
-                              {post.media_type === 'video' ? (
-                                <video 
-                                  src={`/uploads/${post.media_urls[0]}`}
-                                  className="w-full aspect-square object-cover"
-                                  muted
-                                  preload="metadata"
-                                />
-                              ) : (
-                                <img 
-                                  src={`/uploads/${post.media_urls[0]}`}
-                                  alt={post.title}
-                                  className="w-full aspect-square object-cover"
+                              {(() => {
+                                // Handle both string and array formats for media_urls
+                                const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                                const mediaUrl = mediaUrls[0];
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+                                
+                                return post.media_type === 'video' ? (
+                                  <video 
+                                    src={fullUrl}
+                                    className="w-full aspect-square object-cover"
+                                    muted
+                                    preload="metadata"
+                                  />
+                                ) : (
+                                  <img 
+                                    src={fullUrl}
+                                    alt={post.title}
+                                    className="w-full aspect-square object-cover"
                                   onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                    target.className = "w-full aspect-square object-cover opacity-50";
-                                  }}
-                                />
-                              )}
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full aspect-square object-cover opacity-50";
+                                    }}
+                                  />
+                                );
+                              })()}
                               {/* Media type icon overlay - smaller for mobile */}
                               <div className="absolute top-2 left-2 z-20">
                                 <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
@@ -939,18 +955,32 @@ export const CreatorProfile: React.FC = () => {
                       <ul className="space-y-2">
                         {(() => {
                           let benefits = tier.benefits || [];
+                          
                           // Handle case where benefits might be a JSON string
                           if (typeof benefits === 'string') {
                             try {
                               benefits = JSON.parse(benefits);
                             } catch (e) {
+                              console.warn('Failed to parse benefits JSON:', e);
                               benefits = [];
                             }
                           }
-                          // Ensure benefits is an array
-                          if (!Array.isArray(benefits)) {
+                          
+                          // Ensure benefits is an array - handle null, undefined, or other non-array types
+                          if (!benefits || !Array.isArray(benefits)) {
                             benefits = [];
                           }
+                          
+                          // If no benefits, show a default message
+                          if (benefits.length === 0) {
+                            return (
+                              <li className="flex items-center gap-2 text-sm">
+                                <Check className="w-4 h-4 text-accent" />
+                                <span>Access to exclusive content</span>
+                              </li>
+                            );
+                          }
+                          
                           return benefits.map((benefit, index) => (
                             <li key={index} className="flex items-center gap-2 text-sm">
                               <Check className="w-4 h-4 text-accent" />
