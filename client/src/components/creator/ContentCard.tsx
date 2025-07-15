@@ -98,6 +98,32 @@ export const ContentCard: React.FC<ContentCardProps> = ({
       <CardContent className="p-3">
         {/* Content Preview - Profile style layout */}
         <div className="space-y-3">
+          {/* Header - Badges and date at top of card */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
+                {status}
+              </Badge>
+              <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+                {tier}
+              </Badge>
+            </div>
+            <span className="text-xs text-muted-foreground">{date}</span>
+          </div>
+
+          {/* Caption */}
+          <h3 className="font-medium text-foreground text-sm leading-tight line-clamp-2">
+            {caption}
+          </h3>
+
+          {/* Scheduled info */}
+          {status === 'Scheduled' && scheduledFor && (
+            <div className="flex items-center gap-1 text-xs text-primary">
+              <Timer className="w-3 h-3" />
+              <span>Releases {scheduledFor}</span>
+            </div>
+          )}
+
           {/* Media Preview - Square aspect ratio like profile */}
           <div 
             className="relative cursor-pointer active:opacity-90 transition-opacity"
@@ -149,33 +175,6 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Header - Caption, badges and date at top like profile page */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
-                  {status}
-                </Badge>
-                <Badge variant="outline" className="text-xs px-2 py-0 h-5">
-                  {tier}
-                </Badge>
-              </div>
-              <span className="text-xs text-muted-foreground">{date}</span>
-            </div>
-
-            <h3 className="font-medium text-foreground text-sm leading-tight line-clamp-2">
-              {caption}
-            </h3>
-
-            {/* Scheduled info */}
-            {status === 'Scheduled' && scheduledFor && (
-              <div className="flex items-center gap-1 text-xs text-primary">
-                <Timer className="w-3 h-3" />
-                <span>Releases {scheduledFor}</span>
-              </div>
-            )}
           </div>
 
           {/* Bottom row - Stats and Actions combined like profile page */}
