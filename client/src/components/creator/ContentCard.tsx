@@ -34,7 +34,7 @@ interface ContentCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
-  onViewContent?: (id: string) => void;
+  onViewContent?: (item: ContentCardProps) => void;
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
@@ -191,7 +191,20 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               className="w-full aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity"
               onClick={(e) => {
                 e.stopPropagation();
-                onViewContent && onViewContent(id);
+                onViewContent && onViewContent({
+                  id,
+                  caption,
+                  type,
+                  tier,
+                  status,
+                  date,
+                  views,
+                  likes,
+                  comments,
+                  mediaPreview,
+                  category,
+                  scheduledFor
+                });
               }}
             >
               {mediaPreview ? (

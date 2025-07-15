@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 import { ContentCard } from '@/components/creator/ContentCard';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,6 +52,7 @@ export const ManageContent: React.FC = () => {
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewingContent, setViewingContent] = useState<ContentItem | null>(null);
+  const [expandedModalCaption, setExpandedModalCaption] = useState(false);
 
   // Fetch user's posts
   useEffect(() => {
@@ -167,6 +169,11 @@ export const ManageContent: React.FC = () => {
 
   const handleViewContent = (item: ContentItem) => {
     setViewingContent(item);
+  };
+
+  const closeModal = () => {
+    setViewingContent(null);
+    setExpandedModalCaption(false);
   };
 
 
@@ -338,7 +345,96 @@ export const ManageContent: React.FC = () => {
         )}
       </div>
 
+      {/* Instagram-style Content Modal */}
+      <Dialog open={!!viewingContent} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="max-w-[95vh] max-h-[95vh] p-0 overflow-hidden border-0 [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{viewingContent?.type} Content</DialogTitle>
+            <DialogDescription>View content</DialogDescription>
+          </DialogHeader>
+          {viewingContent && (
+            <div className="relative bg-black">
+              {/* Back Arrow Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
+                onClick={closeModal}
+              >
+                <ArrowLeft className="w-7 h-7" />
+              </Button>
 
+              {/* Square container that fills the entire modal */}
+              <div className="relative w-full h-[95vh] overflow-hidden">
+                {/* Blurred background */}
+                {viewingContent.mediaPreview && (
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center blur-md scale-110"
+                    style={{
+                      backgroundImage: `url(${viewingContent.mediaPreview})`,
+                    }}
+                  />
+                )}
+                
+                {/* Main Media with object-contain */}
+                {viewingContent.mediaPreview ? (
+                  <div className="relative z-10 w-full h-full flex items-center justify-center">
+                    {viewingContent.type === 'Video' ? (
+                      <video 
+                        src={viewingContent.mediaPreview}
+                        className="max-w-full max-h-full object-contain"
+                        controls
+                        autoPlay
+                        muted
+                      />
+                    ) : (
+                      <img 
+                        src={viewingContent.mediaPreview}
+                        alt={viewingContent.caption}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative z-10 w-full h-full flex items-center justify-center">
+                    <div className="text-center text-white">
+                      {getTypeIcon(viewingContent.type)}
+                      <p className="mt-2">{viewingContent.type} Content</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Content Overlay - Instagram style with text shadows */}
+                <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
+                  <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
+                    {expandedModalCaption ? viewingContent.caption : (
+                      viewingContent.caption.length > 80 ? (
+                        <>
+                          {viewingContent.caption.substring(0, 80)}
+                          <span 
+                            className="cursor-pointer text-white/80 hover:text-white ml-1"
+                            onClick={() => setExpandedModalCaption(true)}
+                          >
+                            ...
+                          </span>
+                        </>
+                      ) : viewingContent.caption
+                    )}
+                    {expandedModalCaption && viewingContent.caption.length > 80 && (
+                      <span 
+                        className="cursor-pointer text-white/80 hover:text-white ml-2"
+                        onClick={() => setExpandedModalCaption(false)}
+                      >
+                        Show less
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
