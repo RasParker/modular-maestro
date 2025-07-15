@@ -34,7 +34,6 @@ interface ContentCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
-  onClick: () => void;
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
@@ -51,8 +50,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   scheduledFor,
   onEdit,
   onDelete,
-  onPublish,
-  onClick
+  onPublish
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
@@ -186,18 +184,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
 
           {/* Media Preview - Square aspect ratio like profile */}
-          <div 
-            className="relative cursor-pointer active:opacity-90 transition-opacity"
-            onClick={onClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick();
-              }
-            }}
-          >
+          <div className="relative">
             <div className="w-full aspect-square overflow-hidden rounded-lg">
               {mediaPreview ? (
                 <div className="w-full h-full">

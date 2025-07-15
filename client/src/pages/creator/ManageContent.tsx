@@ -3,8 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+
 import { ContentCard } from '@/components/creator/ContentCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -51,9 +50,7 @@ export const ManageContent: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [expandedModalCaption, setExpandedModalCaption] = useState(false);
+
 
   // Fetch user's posts
   useEffect(() => {
@@ -168,16 +165,7 @@ export const ManageContent: React.FC = () => {
     });
   };
 
-  const handleContentClick = (item: ContentItem) => {
-    setSelectedContent(item);
-    setIsModalOpen(true);
-  };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedContent(null);
-    setExpandedModalCaption(false);
-  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -270,7 +258,6 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
-                    onClick={() => handleContentClick(item)}
                   />
                 ))}
               </div>
@@ -298,7 +285,6 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
-                    onClick={() => handleContentClick(item)}
                   />
                 ))}
               </div>
@@ -326,7 +312,6 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
-                    onClick={() => handleContentClick(item)}
                   />
                 ))}
               </div>
@@ -347,145 +332,7 @@ export const ManageContent: React.FC = () => {
         )}
       </div>
 
-      {/* Instagram-style Content Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[95vh] max-h-[95vh] p-0 overflow-hidden border-0 [&>button]:hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>{selectedContent?.type} Content</DialogTitle>
-            <DialogDescription>View and manage your content</DialogDescription>
-          </DialogHeader>
-          {selectedContent && (
-            <div className="relative bg-black">
-              {/* Back Arrow Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
-                onClick={closeModal}
-              >
-                <ArrowLeft className="w-7 h-7" />
-              </Button>
 
-              {/* Use AspectRatio component like the postcard */}
-              <AspectRatio ratio={1} className="overflow-hidden">
-                {selectedContent.mediaPreview ? (
-                  <div className="relative w-full h-full">
-                    {/* Blurred background layer */}
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                      style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
-                    />
-                    {/* Main media content - Square container */}
-                    <div className="relative z-10 w-full h-full">
-                      {selectedContent.type === 'Video' ? (
-                        <video 
-                          src={selectedContent.mediaPreview} 
-                          className="w-full h-full object-contain"
-                          controls
-                          autoPlay
-                          muted
-                        />
-                      ) : (
-                        <img 
-                          src={selectedContent.mediaPreview} 
-                          alt={selectedContent.caption}
-                          className="w-full h-full object-contain"
-                        />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full bg-gradient-primary/10">
-                    <div className="text-center text-white">
-                      {getTypeIcon(selectedContent.type)}
-                      <p className="mt-2">{selectedContent.type} Content</p>
-                    </div>
-                  </div>
-                )}
-              </AspectRatio>
-
-              {/* Vertical Action Icons - Instagram Style */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
-                {selectedContent.status === 'Published' && (
-                  <>
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                        <Heart className="w-7 h-7" />
-                      </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.likes}</span>
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                        <MessageCircle className="w-7 h-7" />
-                      </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                        <Eye className="w-7 h-7" />
-                      </div>
-                      <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.views}</span>
-                    </div>
-                  </>
-                )}
-
-                {selectedContent.status === 'Draft' && (
-                  <div className="flex flex-col items-center">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-green-400 cursor-pointer hover:bg-white/10"
-                      onClick={() => handlePublish(selectedContent.id)}
-                    >
-                      <Share className="w-7 h-7" />
-                    </div>
-                    <span className="text-xs text-green-400 font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>Publish</span>
-                  </div>
-                )}
-
-                <div className="flex flex-col items-center">
-                  <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-red-400 cursor-pointer hover:bg-white/10"
-                    onClick={() => {
-                      handleDelete(selectedContent.id);
-                      closeModal();
-                    }}
-                  >
-                    <Trash2 className="w-7 h-7" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Content Overlay - Instagram style with text shadows */}
-              <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
-                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                  {expandedModalCaption ? selectedContent.caption : (
-                    selectedContent.caption.length > 80 ? (
-                      <>
-                        {selectedContent.caption.substring(0, 80)}
-                        <span 
-                          className="cursor-pointer text-white/80 hover:text-white ml-1"
-                          onClick={() => setExpandedModalCaption(true)}
-                        >
-                          ...
-                        </span>
-                      </>
-                    ) : selectedContent.caption
-                  )}
-                  {expandedModalCaption && selectedContent.caption.length > 80 && (
-                    <span 
-                      className="cursor-pointer text-white/80 hover:text-white ml-2"
-                      onClick={() => setExpandedModalCaption(false)}
-                    >
-                      Show less
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
