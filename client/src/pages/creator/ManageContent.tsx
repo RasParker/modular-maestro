@@ -8,20 +8,19 @@ import { ContentCard } from '@/components/creator/ContentCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { 
+  ArrowLeft, 
   Plus, 
-  Eye, 
-  Heart, 
-  MessageCircle, 
-  Edit3, 
+  Search, 
+  Filter, 
+  MoreVertical, 
+  Edit, 
   Trash2, 
-  ExternalLink,
-  ArrowLeft,
-  Search,
-  Filter,
-  Grid3X3,
-  List,
+  Eye, 
   Calendar,
-  Clock
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 

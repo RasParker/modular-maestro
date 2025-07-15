@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
@@ -19,7 +20,11 @@ import {
   CalendarIcon,
   Upload,
   ArrowLeft,
-  Loader2
+  Loader2,
+  Save,
+  Clock,
+  Image,
+  Video
 } from 'lucide-react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 
