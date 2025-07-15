@@ -66,7 +66,7 @@ export const CreatePost: React.FC = () => {
     defaultValues: {
       caption: '',
       accessTier: '',
-      scheduledTime: '12:00',
+      scheduledTime: '',
     },
   });
 
