@@ -290,7 +290,7 @@ export const CreatorDashboard: React.FC = () => {
                     <p className="text-sm text-muted-foreground">No subscription tiers found</p>
                     <p className="text-xs text-muted-foreground mb-4">Create subscription tiers to start earning revenue</p>
                     <Button variant="outline" size="sm" className="mt-2" asChild>
-                      <Link to="/creator/settings">Create Tiers</Link>
+                      <Link to="/creator/tiers">Create Tiers</Link>
                     </Button>
                   </div>
                 )}
