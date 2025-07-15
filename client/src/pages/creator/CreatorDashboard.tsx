@@ -59,9 +59,9 @@ export const CreatorDashboard: React.FC = () => {
     postsThisMonth: 0
   });
   const [monthlyGoals, setMonthlyGoals] = useState({
-    subscriberGoal: 3000,
-    revenueGoal: 5000,
-    postsGoal: 30,
+    subscriberGoal: 0,
+    revenueGoal: 0,
+    postsGoal: 0,
     currentSubscribers: 0,
     currentRevenue: 0,
     currentPosts: 0
@@ -89,7 +89,9 @@ export const CreatorDashboard: React.FC = () => {
           const goals = await goalsResponse.json();
           setMonthlyGoals(prev => ({
             ...prev,
-            ...goals
+            subscriberGoal: goals.subscriberGoal || 0,
+            revenueGoal: goals.revenueGoal || 0,
+            postsGoal: goals.postsGoal || 0
           }));
         }
 
