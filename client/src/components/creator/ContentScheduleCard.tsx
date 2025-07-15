@@ -26,6 +26,7 @@ interface ContentScheduleCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
+  scheduledFor?: string | null;
 }
 
 export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
@@ -40,7 +41,8 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   thumbnail,
   onEdit,
   onDelete,
-  onPublish
+  onPublish,
+  scheduledFor
 }) => {
   const getTypeIcon = () => {
     switch (type) {

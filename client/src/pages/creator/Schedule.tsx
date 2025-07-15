@@ -69,24 +69,30 @@ export const Schedule: React.FC = () => {
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => post.status === 'scheduled' || post.status === 'draft')
-            .map((post: any) => ({
-              id: post.id.toString(),
-              title: post.title,
-              description: post.content,
-              date: new Date(post.created_at).toLocaleDateString(),
-              time: new Date(post.created_at).toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-              }),
-              type: post.media_type === 'image' ? 'Image' as const : 
-                    post.media_type === 'video' ? 'Video' as const : 
-                    'Text' as const,
-              tier: post.tier || 'Free',
-              status: post.status === 'scheduled' ? 'Scheduled' as const : 'Draft' as const,
-              thumbnail: post.media_urls && post.media_urls.length > 0 ? 
-                `/uploads/${post.media_urls[0]}` : undefined
-            }));
+            .map((post: any) => {
+              // Use scheduled_for if available, otherwise fall back to created_at
+              const scheduledDateTime = post.scheduled_for ? new Date(post.scheduled_for) : new Date(post.created_at);
+              
+              return {
+                id: post.id.toString(),
+                title: post.title,
+                description: post.content,
+                date: scheduledDateTime.toLocaleDateString(),
+                time: scheduledDateTime.toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: false 
+                }),
+                type: post.media_type === 'image' ? 'Image' as const : 
+                      post.media_type === 'video' ? 'Video' as const : 
+                      'Text' as const,
+                tier: post.tier || 'Free',
+                status: post.status === 'scheduled' ? 'Scheduled' as const : 'Draft' as const,
+                thumbnail: post.media_urls && post.media_urls.length > 0 ? 
+                  `/uploads/${post.media_urls[0]}` : undefined,
+                scheduledFor: post.scheduled_for
+              };
+            });
 
           setScheduledPosts(scheduledAndDraftPosts);
 
