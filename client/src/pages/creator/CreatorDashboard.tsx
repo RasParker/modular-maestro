@@ -38,11 +38,7 @@ const ANALYTICS = {
 
 
 
-const TIER_BREAKDOWN = [
-  { name: 'Supporter', price: 5, subscribers: 1200, revenue: 6000 },
-  { name: 'Fan', price: 15, subscribers: 980, revenue: 14700 },
-  { name: 'Superfan', price: 25, subscribers: 660, revenue: 16500 }
-];
+// Tier breakdown will be fetched from API
 
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -51,6 +47,7 @@ export const CreatorDashboard: React.FC = () => {
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [scheduledContent, setScheduledContent] = useState<any[]>([]);
   const [recentSubscribers, setRecentSubscribers] = useState<any[]>([]);
+  const [tierPerformance, setTierPerformance] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState({
     subscribers: 0,
     monthlyEarnings: 0,
@@ -137,6 +134,13 @@ export const CreatorDashboard: React.FC = () => {
       if (subscribersResponse.ok) {
         const subscribers = await subscribersResponse.json();
         setRecentSubscribers(subscribers);
+      }
+
+      // Fetch tier performance data
+      const tierPerformanceResponse = await fetch(`/api/creator/${user.id}/tier-performance`);
+      if (tierPerformanceResponse.ok) {
+        const tierData = await tierPerformanceResponse.json();
+        setTierPerformance(tierData);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error);
@@ -247,24 +251,35 @@ export const CreatorDashboard: React.FC = () => {
                 <CardDescription className="text-sm">Revenue breakdown by tier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {TIER_BREAKDOWN.map((tier) => (
-                  <div key={tier.name} className="space-y-2">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className="text-xs">{tier.name}</Badge>
-                        <span className="text-sm text-muted-foreground">GHS {tier.price}/month</span>
+                {tierPerformance.length > 0 ? (
+                  tierPerformance.map((tier) => (
+                    <div key={tier.name} className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="outline" className="text-xs">{tier.name}</Badge>
+                          <span className="text-sm text-muted-foreground">GHS {tier.price}/month</span>
+                        </div>
+                        <div className="text-left sm:text-right">
+                          <p className="text-sm font-medium">{tier.subscribers} subscribers</p>
+                          <p className="text-xs text-muted-foreground">GHS {tier.revenue.toLocaleString()}/month</p>
+                        </div>
                       </div>
-                      <div className="text-left sm:text-right">
-                        <p className="text-sm font-medium">{tier.subscribers} subscribers</p>
-                        <p className="text-xs text-muted-foreground">GHS {tier.revenue.toLocaleString()}/month</p>
-                      </div>
+                      <Progress 
+                        value={analytics.subscribers > 0 ? (tier.subscribers / analytics.subscribers) * 100 : 0} 
+                        className="h-2"
+                      />
                     </div>
-                    <Progress 
-                      value={analytics.subscribers > 0 ? (tier.subscribers / analytics.subscribers) * 100 : 0} 
-                      className="h-2"
-                    />
+                  ))
+                ) : (
+                  <div className="text-center py-6">
+                    <BarChart3 className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No subscription tiers found</p>
+                    <p className="text-xs text-muted-foreground mb-4">Create subscription tiers to start earning revenue</p>
+                    <Button variant="outline" size="sm" className="mt-2" asChild>
+                      <Link to="/creator/settings">Create Tiers</Link>
+                    </Button>
                   </div>
-                ))}
+                )}
               </CardContent>
             </Card>
 

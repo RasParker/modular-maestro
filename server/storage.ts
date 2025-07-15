@@ -66,6 +66,7 @@ export interface IStorage {
   createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier>;
   updateSubscriptionTier(id: number, updates: Partial<SubscriptionTier>): Promise<SubscriptionTier | undefined>;
   deleteSubscriptionTier(id: number): Promise<boolean>;
+  getSubscriptionTierPerformance(creatorId: number): Promise<any[]>;
 
   getSubscriptions(userId: number): Promise<Subscription[]>;
   getSubscription(id: number): Promise<Subscription | undefined>;
@@ -437,6 +438,51 @@ export class DatabaseStorage implements IStorage {
         eq(subscriptions.status, 'active')
       ))
       .orderBy(desc(subscriptions.created_at));
+  }
+
+  async getSubscriptionTierPerformance(creatorId: number): Promise<any[]> {
+    try {
+      // Get all subscription tiers for the creator
+      const tiers = await db
+        .select()
+        .from(subscription_tiers)
+        .where(and(
+          eq(subscription_tiers.creator_id, creatorId),
+          eq(subscription_tiers.is_active, true)
+        ))
+        .orderBy(subscription_tiers.price);
+
+      // Get subscriber counts and revenue for each tier
+      const tierPerformance = await Promise.all(
+        tiers.map(async (tier) => {
+          // Count active subscribers for this tier
+          const [subscriberCount] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(subscriptions)
+            .where(and(
+              eq(subscriptions.creator_id, creatorId),
+              eq(subscriptions.tier_id, tier.id),
+              eq(subscriptions.status, 'active')
+            ));
+
+          const subscribers = subscriberCount?.count || 0;
+          const monthlyRevenue = subscribers * parseFloat(tier.price);
+
+          return {
+            name: tier.name,
+            price: parseFloat(tier.price),
+            subscribers: subscribers,
+            revenue: monthlyRevenue,
+            tier_id: tier.id
+          };
+        })
+      );
+
+      return tierPerformance;
+    } catch (error) {
+      console.error('Error getting subscription tier performance:', error);
+      return [];
+    }
   }
 
   async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {

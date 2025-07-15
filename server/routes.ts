@@ -546,6 +546,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get subscription tier performance data
+  app.get("/api/creator/:creatorId/tier-performance", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
+      res.json(tierPerformance);
+    } catch (error) {
+      console.error('Error fetching tier performance:', error);
+      res.status(500).json({ error: "Failed to fetch tier performance" });
+    }
+  });
+
   app.post("/api/creators/:creatorId/tiers", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
