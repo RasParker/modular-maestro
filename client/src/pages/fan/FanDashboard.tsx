@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,36 +7,25 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Heart, MessageSquare, Calendar, CreditCard, TrendingUp, Star } from 'lucide-react';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
-// Mock data for subscriptions
-const MOCK_SUBSCRIPTIONS = [
-  {
-    id: '1',
-    creator: {
-      username: 'artisticmia',
-      display_name: 'Artistic Mia',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
-    },
-    tier: 'Fan',
-    price: 15,
-    status: 'active',
-    next_billing: '2024-02-15',
-    joined: '2024-01-15'
-  },
-  {
-    id: '2',
-    creator: {
-      username: 'fitnessking',
-      display_name: 'Fitness King',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-    },
-    tier: 'Basic',
-    price: 10,
-    status: 'active',
-    next_billing: '2024-02-20',
-    joined: '2024-01-20'
-  }
-];
+interface Subscription {
+  id: number;
+  creator: {
+    id: number;
+    username: string;
+    display_name: string;
+    avatar: string;
+  };
+  tier: {
+    name: string;
+    price: number;
+  };
+  status: string;
+  current_period_end: string;
+  created_at: string;
+  auto_renew: boolean;
+}
 
 const RECENT_ACTIVITY = [
   {
@@ -67,6 +56,30 @@ const RECENT_ACTIVITY = [
 
 export const FanDashboard: React.FC = () => {
   const { user } = useAuth();
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`/api/subscriptions/fan/${user.id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch subscriptions');
+        }
+        const data = await response.json();
+        setSubscriptions(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptions();
+  }, [user]);
 
   return (
     <EdgeToEdgeContainer>
@@ -96,7 +109,7 @@ export const FanDashboard: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
-                      <p className="text-2xl font-bold text-foreground">{MOCK_SUBSCRIPTIONS.length}</p>
+                      <p className="text-2xl font-bold text-foreground">{subscriptions.filter(sub => sub.status === 'active').length}</p>
                     </div>
                     <Heart className="h-8 w-8 text-primary" />
                   </div>
@@ -109,7 +122,7 @@ export const FanDashboard: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monthly Spending</p>
                       <p className="text-2xl font-bold text-foreground">
-                        GHS {MOCK_SUBSCRIPTIONS.reduce((sum, sub) => sum + sub.price, 0)}
+                        GHS {subscriptions.filter(sub => sub.status === 'active').reduce((sum, sub) => sum + sub.tier.price, 0)}
                       </p>
                     </div>
                     <CreditCard className="h-8 w-8 text-accent" />
@@ -139,47 +152,65 @@ export const FanDashboard: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {MOCK_SUBSCRIPTIONS.map((subscription) => (
-                    <div
-                      key={subscription.id}
-                      className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage 
-                            src={subscription.creator.avatar} 
-                            alt={subscription.creator.display_name} 
-                          />
-                          <AvatarFallback>
-                            {subscription.creator.display_name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h4 className="font-semibold text-foreground">
-                            {subscription.creator.display_name}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            @{subscription.creator.username}
-                          </p>
+                {loading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Error loading subscriptions: {error}</p>
+                  </div>
+                ) : subscriptions.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No active subscriptions yet.</p>
+                    <Button variant="premium" className="mt-4" asChild>
+                      <Link to="/explore">Discover Creators</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {subscriptions.map((subscription) => (
+                      <div
+                        key={subscription.id}
+                        className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage 
+                              src={subscription.creator.avatar} 
+                              alt={subscription.creator.display_name} 
+                            />
+                            <AvatarFallback>
+                              {subscription.creator.display_name?.charAt(0) || subscription.creator.username.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="font-semibold text-foreground">
+                              {subscription.creator.display_name || subscription.creator.username}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              @{subscription.creator.username}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <Badge variant="secondary" className="mb-1">
+                              {subscription.tier.name}
+                            </Badge>
+                            <p className="text-sm font-medium">GHS {subscription.tier.price}/month</p>
+                          </div>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/creator/${subscription.creator.username}`}>
+                              View Profile
+                            </Link>
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <Badge variant="secondary" className="mb-1">
-                            {subscription.tier}
-                          </Badge>
-                          <p className="text-sm font-medium">GHS {subscription.price}/month</p>
-                        </div>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/creator/${subscription.creator.username}`}>
-                            View Profile
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
                 <div className="mt-6">
                   <Button variant="premium" asChild>
                     <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
@@ -222,7 +253,12 @@ export const FanDashboard: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Next billing</span>
-                      <span className="font-medium">Feb 15, 2024</span>
+                      <span className="font-medium">
+                        {subscriptions.length > 0 
+                          ? new Date(subscriptions[0].current_period_end).toLocaleDateString()
+                          : 'No active subscriptions'
+                        }
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Payment method</span>

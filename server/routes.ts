@@ -688,6 +688,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/subscriptions/fan/:fanId", async (req, res) => {
+    try {
+      const fanId = parseInt(req.params.fanId);
+      const subscriptions = await storage.getFanSubscriptions(fanId);
+      res.json(subscriptions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subscriptions" });
+    }
+  });
+
   app.delete("/api/subscriptions/:subscriptionId", async (req, res) => {
     try {
       const subscriptionId = parseInt(req.params.subscriptionId);

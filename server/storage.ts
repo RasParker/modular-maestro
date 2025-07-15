@@ -322,7 +322,7 @@ export class DatabaseStorage implements IStorage {
   async createSubscriptionTier(tier: InsertSubscriptionTier): Promise<SubscriptionTier> {
     try {
       console.log('Creating subscription tier with data:', tier);
-      
+
       const [newTier] = await db
         .insert(subscription_tiers)
         .values({
