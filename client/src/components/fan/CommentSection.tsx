@@ -182,7 +182,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
         setComments(prev => [comment, ...prev]);
         setNewComment('');
-        // Use the current comments length plus 1 since we just added a new comment
+        // Update comment count by calling the callback with the new count
         onCommentCountChange(comments.length + 1);
 
         toast({
@@ -198,11 +198,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         description: "Failed to post comment. Please try again.",
       });
     }
-
-    toast({
-      title: "Comment added",
-      description: "Your comment has been posted successfully.",
-    });
   };
 
   const handleAddReply = (parentId: string, replyContent: string) => {

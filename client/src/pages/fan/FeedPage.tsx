@@ -271,16 +271,51 @@ export const FeedPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
-  const handleLike = (postId: string) => {
-    setFeed(feed.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            liked: !post.liked,
-            likes: post.liked ? post.likes - 1 : post.likes + 1
-          }
-        : post
-    ));
+  const handleLike = async (postId: string) => {
+    // Get current user from localStorage or context
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    
+    if (!user) return;
+    
+    try {
+      const currentPost = feed.find(post => post.id === postId);
+      if (!currentPost) return;
+      
+      if (currentPost.liked) {
+        // Unlike the post
+        await fetch(`/api/posts/${postId}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+      } else {
+        // Like the post
+        await fetch(`/api/posts/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+      }
+      
+      // Update local state immediately for responsive UI
+      setFeed(feed.map(post => 
+        post.id === postId 
+          ? { 
+              ...post, 
+              liked: !post.liked,
+              likes: post.liked ? post.likes - 1 : post.likes + 1
+            }
+          : post
+      ));
+      
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
   };
 
   const handleCommentClick = (postId: string) => {

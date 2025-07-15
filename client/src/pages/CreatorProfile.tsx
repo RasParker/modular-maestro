@@ -162,11 +162,44 @@ export const CreatorProfile: React.FC = () => {
         // Sort posts by creation date (newest first)
         filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
+        
+        // Initialize like status for current user
+        if (user) {
+          await fetchLikeStatuses(filteredPosts, user.id);
+        }
+        
         console.log('Fetched user posts:', filteredPosts);
         console.log('User ID:', userIdNum, 'Is own profile:', isOwnProfile);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error);
+    }
+  };
+
+  // Function to fetch like statuses for posts
+  const fetchLikeStatuses = async (posts: any[], userId: number) => {
+    try {
+      const likeStatuses: Record<string, { liked: boolean; count: number }> = {};
+      
+      for (const post of posts) {
+        const response = await fetch(`/api/posts/${post.id}/like/${userId}`);
+        if (response.ok) {
+          const { liked } = await response.json();
+          likeStatuses[post.id] = {
+            liked: liked,
+            count: post.likes_count || 0
+          };
+        } else {
+          likeStatuses[post.id] = {
+            liked: false,
+            count: post.likes_count || 0
+          };
+        }
+      }
+      
+      setPostLikes(likeStatuses);
+    } catch (error) {
+      console.error('Error fetching like statuses:', error);
     }
   };
 
@@ -540,17 +573,52 @@ export const CreatorProfile: React.FC = () => {
   };
 
   // Handler functions for post interactions
-  const handleLike = (postId: string) => {
-    setPostLikes(prev => {
-      const currentLike = prev[postId] || { liked: false, count: 0 };
-      return {
+  const handleLike = async (postId: string) => {
+    if (!user) return;
+    
+    try {
+      const currentLike = postLikes[postId] || { liked: false, count: 0 };
+      
+      if (currentLike.liked) {
+        // Unlike the post
+        await fetch(`/api/posts/${postId}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+      } else {
+        // Like the post
+        await fetch(`/api/posts/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+      }
+      
+      // Update local state immediately for responsive UI
+      setPostLikes(prev => ({
         ...prev,
         [postId]: {
           liked: !currentLike.liked,
           count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
         }
-      };
-    });
+      }));
+      
+      // Refetch posts to get updated counts from database
+      if (creator?.id) {
+        fetchUserPosts(creator.id);
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to like post. Please try again.",
+      });
+    }
   };
 
   const handleCommentClick = (postId: string) => {
