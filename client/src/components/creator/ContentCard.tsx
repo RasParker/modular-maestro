@@ -151,21 +151,23 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
           </div>
 
-          {/* Caption and metadata */}
+          {/* Header - Caption, badges and date at top like profile page */}
           <div className="space-y-2">
-            <h3 className="font-medium text-foreground text-sm leading-tight line-clamp-2">
-              {caption}
-            </h3>
-            
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
                   {status}
                 </Badge>
-                <span>{tier}</span>
+                <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+                  {tier}
+                </Badge>
               </div>
-              <span>{date}</span>
+              <span className="text-xs text-muted-foreground">{date}</span>
             </div>
+
+            <h3 className="font-medium text-foreground text-sm leading-tight line-clamp-2">
+              {caption}
+            </h3>
 
             {/* Scheduled info */}
             {status === 'Scheduled' && scheduledFor && (
@@ -176,10 +178,11 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             )}
           </div>
 
-          {/* Stats - compact row */}
-          {status === 'Published' && (
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-3">
+          {/* Bottom row - Stats and Actions combined like profile page */}
+          <div className="flex items-center justify-between pt-1">
+            {/* Stats */}
+            {status === 'Published' ? (
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Eye className="w-3 h-3" />
                   <span>{views}</span>
@@ -193,48 +196,48 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                   <span>{comments}</span>
                 </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div></div>
+            )}
 
-          {/* Action Buttons - compact */}
-          <div className="flex gap-1 pt-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(id);
-              }}
-              className="flex-1 text-xs h-7"
-            >
-              <Edit3 className="w-3 h-3 mr-1" />
-              Edit
-            </Button>
-            
-            <Button
-              variant="default"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPublish(id);
-              }}
-              className="flex-1 text-xs h-7 bg-gradient-primary"
-            >
-              <ExternalLink className="w-3 h-3 mr-1" />
-              {status === 'Published' ? 'View' : 'Publish'}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(id);
-              }}
-              className="w-7 h-7 text-xs text-destructive hover:text-destructive p-0"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
+            {/* Action Buttons - compact inline */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(id);
+                }}
+                className="h-7 px-2 text-xs"
+              >
+                <Edit3 className="w-3 h-3" />
+              </Button>
+              
+              <Button
+                variant="default"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPublish(id);
+                }}
+                className="h-7 px-2 text-xs bg-gradient-primary"
+              >
+                <ExternalLink className="w-3 h-3" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(id);
+                }}
+                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>
