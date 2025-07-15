@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'wouter';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,7 +45,7 @@ interface SubscriptionTier {
 export const EditPost: React.FC = () => {
   const { id: postId } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
@@ -67,12 +67,12 @@ export const EditPost: React.FC = () => {
 
   const handleBackClick = () => {
     console.log('Back button clicked');
-    setLocation('/creator/dashboard');
+    navigate('/creator/dashboard');
   };
 
   const handleCancelClick = () => {
     console.log('Cancel button clicked');
-    setLocation('/creator/dashboard');
+    navigate('/creator/dashboard');
   };
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export const EditPost: React.FC = () => {
             description: "Failed to load post data.",
             variant: "destructive",
           });
-          setLocation('/creator/dashboard');
+          navigate('/creator/dashboard');
           return;
         }
 
@@ -189,14 +189,14 @@ export const EditPost: React.FC = () => {
           description: "Failed to load post data.",
           variant: "destructive",
         });
-        setLocation('/creator/dashboard');
+        navigate('/creator/dashboard');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [postId, user?.id, form, toast, setLocation]);
+  }, [postId, user?.id, form, toast, navigate]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -316,7 +316,7 @@ export const EditPost: React.FC = () => {
       });
 
       // Navigate back to dashboard
-      setLocation('/creator/dashboard');
+      navigate('/creator/dashboard');
     } catch (error) {
       console.error('Error updating post:', error);
       toast({
