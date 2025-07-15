@@ -71,6 +71,14 @@ export const CreatorDashboard: React.FC = () => {
   // Real posts will be fetched from API
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [scheduledContent, setScheduledContent] = useState<any[]>([]);
+  const [monthlyGoals, setMonthlyGoals] = useState({
+    subscriberGoal: 3000,
+    revenueGoal: 5000,
+    postsGoal: 30,
+    currentSubscribers: 2840,
+    currentRevenue: 4200,
+    currentPosts: 24
+  });
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -86,6 +94,19 @@ export const CreatorDashboard: React.FC = () => {
           // Filter for scheduled content
           const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
           setScheduledContent(scheduled);
+        }
+        
+        // Fetch monthly goals
+        const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
+        if (goalsResponse.ok) {
+          const goals = await goalsResponse.json();
+          setMonthlyGoals(prev => ({
+            ...prev,
+            ...goals,
+            currentSubscribers: ANALYTICS.subscribers,
+            currentRevenue: ANALYTICS.monthlyEarnings,
+            currentPosts: ANALYTICS.postsThisMonth
+          }));
         }
       } catch (error) {
         console.error('Error fetching user posts:', error);
@@ -284,29 +305,37 @@ export const CreatorDashboard: React.FC = () => {
             {/* Monthly Goals */}
             <Card className="bg-gradient-card border-border/50">
               <CardHeader>
-                <CardTitle className="text-base sm:text-lg">Monthly Goals</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base sm:text-lg">Monthly Goals</CardTitle>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings?tab=goals">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Goals
+                    </Link>
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Subscriber Goal</span>
-                    <span>2,840 / 3,000</span>
+                    <span>{monthlyGoals.currentSubscribers.toLocaleString()} / {monthlyGoals.subscriberGoal.toLocaleString()}</span>
                   </div>
-                  <Progress value={94.7} className="h-2" />
+                  <Progress value={(monthlyGoals.currentSubscribers / monthlyGoals.subscriberGoal) * 100} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Revenue Goal</span>
-                    <span>GHS 4,200 / 5,000</span>
+                    <span>GHS {monthlyGoals.currentRevenue.toLocaleString()} / {monthlyGoals.revenueGoal.toLocaleString()}</span>
                   </div>
-                  <Progress value={84} className="h-2" />
+                  <Progress value={(monthlyGoals.currentRevenue / monthlyGoals.revenueGoal) * 100} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Posts Goal</span>
-                    <span>24 / 30</span>
+                    <span>{monthlyGoals.currentPosts} / {monthlyGoals.postsGoal}</span>
                   </div>
-                  <Progress value={80} className="h-2" />
+                  <Progress value={(monthlyGoals.currentPosts / monthlyGoals.postsGoal) * 100} className="h-2" />
                 </div>
               </CardContent>
             </Card>
