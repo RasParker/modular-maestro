@@ -10,7 +10,8 @@ import {
   MessageSquare,
   Upload,
   Grid3X3,
-  Shield
+  Shield,
+  UserCircle
 } from 'lucide-react';
 
 export const BottomNavigation: React.FC = () => {
@@ -87,6 +88,12 @@ export const BottomNavigation: React.FC = () => {
             href: '/creator/messages', 
             icon: MessageSquare,
             active: location.pathname === '/creator/messages'
+          },
+          {
+            label: 'My Profile',
+            href: '/creator/profile',
+            icon: UserCircle,
+            active: location.pathname === '/creator/profile'
           }
         ];
 
