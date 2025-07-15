@@ -156,10 +156,8 @@ export const CreatorProfile: React.FC = () => {
         const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
         let filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
         
-        // If not viewing own profile, only show published posts
-        if (!isOwnProfile) {
-          filteredPosts = filteredPosts.filter((post: any) => post.status === 'published');
-        }
+        // Show only published posts to both visitors and profile owner
+        filteredPosts = filteredPosts.filter((post: any) => post.status === 'published');
         
         // Sort posts by creation date (newest first)
         filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
