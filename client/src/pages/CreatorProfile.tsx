@@ -155,6 +155,8 @@ export const CreatorProfile: React.FC = () => {
         // Filter posts by current user (convert both to numbers for comparison)
         const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
         const filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
+        // Sort posts by creation date (newest first)
+        filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
         console.log('Fetched user posts:', filteredPosts);
         console.log('User ID:', userIdNum, 'All posts:', allPosts);
@@ -427,11 +429,16 @@ export const CreatorProfile: React.FC = () => {
     }
     
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffInHours < 1) return 'Just now';
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInHours < 24) return `${diffInHours}h ago`;
-    return `${Math.floor(diffInHours / 24)}d ago`;
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    return `${Math.floor(diffInDays / 7)}w ago`;
   };
 
   const getTypeIcon = (type: string) => {
