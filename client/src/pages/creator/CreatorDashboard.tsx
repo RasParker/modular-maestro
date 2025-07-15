@@ -130,17 +130,30 @@ export const CreatorDashboard: React.FC = () => {
       }
 
       // Fetch recent subscribers
-      const subscribersResponse = await fetch(`/api/creator/${user.id}/subscribers?limit=3&recent=true`);
-      if (subscribersResponse.ok) {
-        const subscribers = await subscribersResponse.json();
-        setRecentSubscribers(subscribers);
+      try {
+        const subscribersResponse = await fetch(`/api/creators/${user.id}/subscribers?limit=3&recent=true`);
+        if (subscribersResponse.ok) {
+          const subscribers = await subscribersResponse.json();
+          setRecentSubscribers(subscribers);
+        }
+      } catch (error) {
+        console.error('Error fetching subscribers:', error);
       }
 
       // Fetch tier performance data
-      const tierPerformanceResponse = await fetch(`/api/creator/${user.id}/tier-performance`);
-      if (tierPerformanceResponse.ok) {
-        const tierData = await tierPerformanceResponse.json();
-        setTierPerformance(tierData);
+      try {
+        console.log('About to fetch tier performance for user:', user.id);
+        const tierPerformanceResponse = await fetch(`/api/creator/${user.id}/tier-performance`);
+        console.log('Tier performance response status:', tierPerformanceResponse.status);
+        if (tierPerformanceResponse.ok) {
+          const tierData = await tierPerformanceResponse.json();
+          console.log('Fetched tier performance data:', tierData);
+          setTierPerformance(tierData);
+        } else {
+          console.error('Failed to fetch tier performance:', tierPerformanceResponse.status);
+        }
+      } catch (error) {
+        console.error('Error fetching tier performance:', error);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error);
@@ -251,6 +264,7 @@ export const CreatorDashboard: React.FC = () => {
                 <CardDescription className="text-sm">Revenue breakdown by tier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {console.log('Rendering tier performance, length:', tierPerformance.length, 'data:', tierPerformance)}
                 {tierPerformance.length > 0 ? (
                   tierPerformance.map((tier) => (
                     <div key={tier.name} className="space-y-2">
