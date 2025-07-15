@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Plus,
@@ -11,84 +13,22 @@ import {
   BarChart3,
   Clock,
   TrendingUp,
-  ArrowLeft
+  ArrowLeft,
+  FileText
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const MOCK_SCHEDULED_POSTS = [
-  {
-    id: '1',
-    title: 'New Digital Art Collection',
-    description: 'Check out my latest digital artwork featuring cyberpunk themes and neon landscapes...',
-    date: '2024-02-20',
-    time: '14:00',
-    type: 'Image' as const,
-    tier: 'Superfan',
-    status: 'Scheduled' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=300&fit=crop'
-  },
-  {
-    id: '2',
-    title: 'Behind the Scenes Video',
-    description: 'Take a look at my creative process and workspace setup with exclusive footage...',
-    date: '2024-02-22',
-    time: '18:00',
-    type: 'Video' as const,
-    tier: 'Fan',
-    status: 'Scheduled' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop'
-  },
-  {
-    id: '3',
-    title: 'Weekly Update',
-    description: 'Hey everyone! This week has been amazing. I wanted to share some thoughts about upcoming projects and collaborations...',
-    date: '2024-02-25',
-    time: '12:00',
-    type: 'Text' as const,
-    tier: 'Supporter',
-    status: 'Draft' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
-  },
-  {
-    id: '4',
-    title: 'Tech Review: Latest Gadgets',
-    description: 'Comprehensive review of the newest tech gadgets and their real-world applications...',
-    date: '2024-02-27',
-    time: '16:30',
-    type: 'Video' as const,
-    tier: 'Pro',
-    status: 'Scheduled' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=300&fit=crop'
-  },
-  {
-    id: '5',
-    title: 'Recipe Collection: Healthy Meals',
-    description: 'A collection of my favorite healthy recipes with step-by-step instructions...',
-    date: '2024-02-28',
-    time: '10:00',
-    type: 'Image' as const,
-    tier: 'Chef',
-    status: 'Draft' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1556909114-b6c75d1fea83?w=300&h=300&fit=crop'
-  },
-  {
-    id: '6',
-    title: 'Fashion Trends Spring 2024',
-    description: 'Latest fashion trends and styling tips for the upcoming spring season...',
-    date: '2024-03-01',
-    time: '13:00',
-    type: 'Image' as const,
-    tier: 'Stylish',
-    status: 'Scheduled' as const,
-    thumbnail: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=300&h=300&fit=crop'
-  }
-];
-
-const QUICK_STATS = [
-  { label: 'Scheduled posts', value: '2', icon: Calendar },
-  { label: 'Draft posts', value: '1', icon: Clock },
-  { label: 'This week', value: '3', icon: TrendingUp }
-];
+interface ScheduledPost {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  type: 'Image' | 'Video' | 'Text';
+  tier: string;
+  status: 'Scheduled' | 'Draft';
+  thumbnail?: string;
+}
 
 const PUBLISHING_TIPS = [
   'Post consistently to keep subscribers engaged',
@@ -104,175 +44,318 @@ const BEST_TIMES = [
 
 export const Schedule: React.FC = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    scheduled: 0,
+    draft: 0,
+    thisWeek: 0
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch scheduled posts
+  useEffect(() => {
+    const fetchScheduledPosts = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const allPosts = await response.json();
+          
+          // Filter for scheduled and draft posts and transform data
+          const scheduledAndDraftPosts = allPosts
+            .filter((post: any) => post.status === 'scheduled' || post.status === 'draft')
+            .map((post: any) => ({
+              id: post.id.toString(),
+              title: post.title,
+              description: post.content,
+              date: new Date(post.created_at).toLocaleDateString(),
+              time: new Date(post.created_at).toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+              }),
+              type: post.media_type === 'image' ? 'Image' as const : 
+                    post.media_type === 'video' ? 'Video' as const : 
+                    'Text' as const,
+              tier: post.tier || 'Free',
+              status: post.status === 'scheduled' ? 'Scheduled' as const : 'Draft' as const,
+              thumbnail: post.media_urls && post.media_urls.length > 0 ? 
+                `/uploads/${post.media_urls[0]}` : undefined
+            }));
+
+          setScheduledPosts(scheduledAndDraftPosts);
+
+          // Calculate stats
+          const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'Scheduled').length;
+          const draft = scheduledAndDraftPosts.filter(p => p.status === 'Draft').length;
+          
+          // Calculate posts for this week (simplified - just count all for now)
+          const thisWeek = scheduledAndDraftPosts.length;
+
+          setStats({
+            scheduled,
+            draft,
+            thisWeek
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching scheduled posts:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load scheduled posts.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScheduledPosts();
+  }, [user, toast]);
 
   const handleEdit = (id: string) => {
     navigate(`/creator/edit-post/${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    // Here you would typically show a confirmation dialog
-    // For now, we'll just show a toast notification
-    toast({
-      title: "Post deleted",
-      description: "The scheduled post has been deleted.",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/posts/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setScheduledPosts(prev => prev.filter(post => post.id !== id));
+        toast({
+          title: "Post deleted",
+          description: "The scheduled post has been deleted.",
+        });
+      } else {
+        throw new Error('Failed to delete post');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete post.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePublish = (id: string) => {
-    // Here you would typically call an API to publish immediately
-    // For now, we'll just show a toast notification
-    toast({
-      title: "Post published",
-      description: "The post has been published immediately.",
-    });
+  const handlePublish = async (id: string) => {
+    try {
+      const response = await fetch(`/api/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: 'published'
+        })
+      });
+
+      if (response.ok) {
+        setScheduledPosts(prev => prev.filter(post => post.id !== id));
+        toast({
+          title: "Post published",
+          description: "The post has been published immediately.",
+        });
+      } else {
+        throw new Error('Failed to publish post');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to publish post.",
+        variant: "destructive"
+      });
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Mobile-Optimized Header */}
-        <div className="space-y-4">
-          {/* Back Button */}
-          <Button variant="ghost" size="sm" asChild className="w-fit">
-            <Link to="/creator/dashboard" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to Dashboard</span>
-              <span className="sm:hidden">Back</span>
-            </Link>
-          </Button>
+  const QUICK_STATS = [
+    { label: 'Scheduled posts', value: stats.scheduled.toString(), icon: Calendar },
+    { label: 'Draft posts', value: stats.draft.toString(), icon: Clock },
+    { label: 'This week', value: stats.thisWeek.toString(), icon: TrendingUp }
+  ];
 
-          {/* Title Section */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" />
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground">Content Schedule</h1>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Manage your scheduled and draft content
-              </p>
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-2 text-sm text-muted-foreground">Loading scheduled content...</p>
             </div>
-
-            <Button 
-              className="bg-gradient-primary text-white w-full sm:w-auto"
-              asChild
-            >
-              <Link to="/creator/upload">
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Create New Post</span>
-                <span className="sm:hidden">Create Post</span>
-              </Link>
-            </Button>
           </div>
         </div>
+      </AppLayout>
+    );
+  }
 
-        {/* Content Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Mobile-Friendly Tab List */}
-          <TabsList className="grid w-full grid-cols-2 h-auto">
-            <TabsTrigger value="upcoming" className="text-sm py-2">
-              Upcoming Posts
-              <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
-                {MOCK_SCHEDULED_POSTS.filter(p => p.status === 'Scheduled').length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="text-sm py-2">
-              Insights
-            </TabsTrigger>
-          </TabsList>
+  return (
+    <AppLayout>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {/* Mobile-Optimized Header */}
+          <div className="space-y-4">
+            {/* Back Button */}
+            <Button variant="ghost" size="sm" asChild className="w-fit">
+              <Link to="/creator/dashboard" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="sm:hidden">Back</span>
+              </Link>
+            </Button>
 
-          <TabsContent value="upcoming" className="space-y-4">
-            {/* Post Count */}
-            <div className="text-sm text-muted-foreground">
-              {MOCK_SCHEDULED_POSTS.length} posts in queue
+            {/* Title Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground">Content Schedule</h1>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Manage your scheduled and draft content
+                </p>
+              </div>
+
+              <Button 
+                className="bg-gradient-primary text-white w-full sm:w-auto"
+                asChild
+              >
+                <Link to="/creator/upload">
+                  <Plus className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Create New Post</span>
+                  <span className="sm:hidden">Create Post</span>
+                </Link>
+              </Button>
             </div>
+          </div>
 
-            {/* Posts List - Mobile-Optimized */}
-            <div className="space-y-4">
-              {MOCK_SCHEDULED_POSTS.map((post) => (
-                <ContentScheduleCard
-                  key={post.id}
-                  {...post}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onPublish={handlePublish}
-                />
-              ))}
-            </div>
-          </TabsContent>
+          {/* Content Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            {/* Mobile-Friendly Tab List */}
+            <TabsList className="grid w-full grid-cols-2 h-auto">
+              <TabsTrigger value="upcoming" className="text-sm py-2">
+                Upcoming Posts
+                <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                  {scheduledPosts.filter(p => p.status === 'Scheduled').length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="text-sm py-2">
+                Insights
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="insights" className="space-y-6">
-            {/* Quick Stats - Mobile Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {QUICK_STATS.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <Card key={index} className="bg-gradient-card border-border/50">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">
-                            {stat.label}
-                          </p>
-                          <p className="text-2xl font-bold text-foreground">
-                            {stat.value}
-                          </p>
-                        </div>
-                        <Icon className="h-6 w-6 text-primary" />
-                      </div>
+            <TabsContent value="upcoming" className="space-y-4">
+              {/* Post Count */}
+              <div className="text-sm text-muted-foreground">
+                {scheduledPosts.length} posts in queue
+              </div>
+
+              {/* Posts List - Mobile-Optimized */}
+              <div className="space-y-4">
+                {scheduledPosts.length > 0 ? (
+                  scheduledPosts.map((post) => (
+                    <ContentScheduleCard
+                      key={post.id}
+                      {...post}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onPublish={handlePublish}
+                    />
+                  ))
+                ) : (
+                  <Card className="bg-gradient-card border-border/50">
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <FileText className="w-12 h-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No scheduled content</h3>
+                      <p className="text-muted-foreground text-center mb-4">Schedule posts to publish them automatically</p>
+                      <Button asChild>
+                        <Link to="/creator/upload">Create Content</Link>
+                      </Button>
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
+                )}
+              </div>
+            </TabsContent>
 
-            {/* Tips and Best Times - Stacked on Mobile */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Publishing Tips */}
-              <Card className="bg-gradient-card border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-primary" />
-                    Publishing Tips
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {PUBLISHING_TIPS.map((tip, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <p className="text-sm text-muted-foreground">{tip}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+            <TabsContent value="insights" className="space-y-6">
+              {/* Quick Stats - Mobile Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {QUICK_STATS.map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <Card key={index} className="bg-gradient-card border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">
+                              {stat.label}
+                            </p>
+                            <p className="text-2xl font-bold text-foreground">
+                              {stat.value}
+                            </p>
+                          </div>
+                          <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
-              {/* Best Times */}
-              <Card className="bg-gradient-card border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-primary" />
-                    Best Times to Post
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {BEST_TIMES.map((time, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
-                        {time.period}
-                      </span>
-                      <span className="text-sm font-medium text-foreground">
-                        {time.time}
-                      </span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+              {/* Tips and Best Times - Stacked on Mobile */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Publishing Tips */}
+                <Card className="bg-gradient-card border-border/50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-primary" />
+                      Publishing Tips
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {PUBLISHING_TIPS.map((tip, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">{tip}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Best Times */}
+                <Card className="bg-gradient-card border-border/50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      Best Times to Post
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {BEST_TIMES.map((time, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">
+                          {time.period}
+                        </span>
+                        <span className="text-sm font-medium text-foreground">
+                          {time.time}
+                        </span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -64,7 +63,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
     <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
       <CardContent className="p-4 space-y-4">
         {/* Mobile-First Layout */}
-        
+
         {/* Content Preview with WhatsApp-style square container */}
         <div className="flex items-start gap-3">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
@@ -96,7 +95,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
               </div>
             )}
           </div>
-          
+
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
               {title}
@@ -104,7 +103,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1">
               {description}
             </p>
-            
+
             {/* Date/Time Info - Mobile optimized */}
             <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
@@ -146,7 +145,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <Edit3 className="w-3 h-3 mr-1" />
             Edit
           </Button>
-          
+
           <Button
             variant="default"
             size="sm"
@@ -156,7 +155,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <ExternalLink className="w-3 h-3 mr-1" />
             Publish
           </Button>
-          
+
           <Button
             variant="outline"
             size="sm"
