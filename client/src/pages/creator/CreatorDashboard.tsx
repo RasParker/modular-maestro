@@ -441,19 +441,21 @@ export const CreatorDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
-                  {/* Recent Posts - Card Style */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base sm:text-lg">Recent Posts</CardTitle>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/manage-content">
-                      View All
-                    </Link>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
+        
+        {/* Recent Posts - Full Width on Mobile */}
+        <div className="mt-6">
+          <Card className="bg-gradient-card border-border/50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base sm:text-lg">Recent Posts</CardTitle>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/creator/manage-content">
+                    View All
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
                 {userPosts.length > 0 ? (
                   <div className="space-y-4">
                     {userPosts.slice(0, 3).map((post) => (
@@ -514,6 +516,8 @@ export const CreatorDashboard: React.FC = () => {
                 )}
               </CardContent>
             </Card>
+        </div>
+        
       </EdgeToEdgeContainer>
     </EdgeToEdgeContainer>
   );
