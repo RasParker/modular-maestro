@@ -210,7 +210,6 @@ export const FanDashboard: React.FC = () => {
                     ))}
                   </div>
                 )}
-              </CardContent>
                 <div className="mt-6">
                   <Button variant="premium" asChild>
                     <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
