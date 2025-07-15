@@ -67,13 +67,13 @@ app.use((req, res, next) => {
   // Graceful shutdown
   process.on('SIGINT', () => {
     console.log('Shutting down server...');
-    cronService.stop();
+    // cronService.stop(); // Temporarily disabled to debug startup issues
     process.exit(0);
   });
 
   process.on('SIGTERM', () => {
     console.log('Shutting down server...');
-    cronService.stop();
+    // cronService.stop(); // Temporarily disabled to debug startup issues
     process.exit(0);
   });
 
