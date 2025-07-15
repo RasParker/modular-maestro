@@ -81,10 +81,19 @@ export const CreatorDashboard: React.FC = () => {
           const goals = await goalsResponse.json();
           setMonthlyGoals(prev => ({
             ...prev,
-            ...goals,
-            currentSubscribers: ANALYTICS.subscribers,
-            currentRevenue: ANALYTICS.monthlyEarnings,
-            currentPosts: ANALYTICS.postsThisMonth
+            ...goals
+          }));
+        }
+
+        // Fetch real analytics data
+        const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
+        if (analyticsResponse.ok) {
+          const analytics = await analyticsResponse.json();
+          setMonthlyGoals(prev => ({
+            ...prev,
+            currentSubscribers: analytics.subscribers || prev.currentSubscribers,
+            currentRevenue: analytics.monthlyEarnings || prev.currentRevenue,
+            currentPosts: analytics.postsThisMonth || prev.currentPosts
           }));
         }
 
