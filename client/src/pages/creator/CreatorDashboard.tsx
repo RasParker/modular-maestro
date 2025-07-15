@@ -443,7 +443,7 @@ export const CreatorDashboard: React.FC = () => {
         </div>
         
         {/* Recent Posts - Full Width on Mobile */}
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           <Card className="bg-gradient-card border-border/50">
             <CardHeader>
               <div className="flex items-center justify-between">
