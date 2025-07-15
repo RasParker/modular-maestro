@@ -139,7 +139,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           >
             <div className="w-full aspect-square overflow-hidden rounded-lg">
               {mediaPreview ? (
-                <div className="relative w-full h-full">
+                <div className="w-full h-full">
                   {type === 'Video' ? (
                     <video 
                       src={mediaPreview}
