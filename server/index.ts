@@ -61,8 +61,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Start cron service for automated payouts
-  // cronService.start(); // Temporarily disabled to debug startup issues
+  // Start cron service for automated post publishing
+  cronService.start();
 
   // Graceful shutdown
   process.on('SIGINT', () => {
