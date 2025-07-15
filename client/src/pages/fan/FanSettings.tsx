@@ -217,6 +217,57 @@ export const FanSettings: React.FC = () => {
     }
   };
 
+  const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        console.log('Uploading profile photo:', file.name);
+        
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: "Please select an image smaller than 5MB.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Create FormData to send the file
+        const formData = new FormData();
+        formData.append('profilePhoto', file);
+
+        // Upload to backend
+        const response = await fetch('/api/upload/profile-photo', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        console.log('Upload successful:', result);
+
+        // Update user avatar in context
+        updateUser({ avatar: result.url });
+
+        toast({
+          title: "Photo updated",
+          description: "Your profile photo has been successfully updated.",
+        });
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload photo. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -273,10 +324,21 @@ export const FanSettings: React.FC = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="space-y-2">
-                        <Button variant="outline">
-                          <Camera className="w-4 h-4 mr-2" />
-                          Change Photo
-                        </Button>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePhotoUpload}
+                          className="hidden"
+                          id="profile-upload"
+                        />
+                        <label htmlFor="profile-upload">
+                          <Button variant="outline" className="cursor-pointer" asChild>
+                            <span>
+                              <Camera className="w-4 h-4 mr-2" />
+                              Change Photo
+                            </span>
+                          </Button>
+                        </label>
                         <p className="text-xs text-muted-foreground">
                           Square image recommended. Max file size: 5MB
                         </p>
