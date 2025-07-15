@@ -83,22 +83,11 @@ export const CreatorDashboard: React.FC = () => {
           setScheduledContent(scheduled);
         }
         
-        // Fetch monthly goals
-        const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
-        if (goalsResponse.ok) {
-          const goals = await goalsResponse.json();
-          setMonthlyGoals(prev => ({
-            ...prev,
-            subscriberGoal: goals.subscriberGoal || 0,
-            revenueGoal: goals.revenueGoal || 0,
-            postsGoal: goals.postsGoal || 0
-          }));
-        }
-
-        // Fetch real analytics data
+        // Fetch real analytics data first
         const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
+        let analyticsData = { subscribers: 0, monthlyEarnings: 0, totalEarnings: 0, growthRate: 0, engagementRate: 0, postsThisMonth: 0 };
         if (analyticsResponse.ok) {
-          const analyticsData = await analyticsResponse.json();
+          analyticsData = await analyticsResponse.json();
           setAnalytics({
             subscribers: analyticsData.subscribers || 0,
             monthlyEarnings: analyticsData.monthlyEarnings || 0,
@@ -107,6 +96,23 @@ export const CreatorDashboard: React.FC = () => {
             engagementRate: analyticsData.engagementRate || 0,
             postsThisMonth: analyticsData.postsThisMonth || 0
           });
+        }
+
+        // Fetch monthly goals and combine with analytics data
+        const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
+        if (goalsResponse.ok) {
+          const goals = await goalsResponse.json();
+          console.log('Fetched goals from API:', goals);
+          setMonthlyGoals({
+            subscriberGoal: goals.subscriberGoal || 0,
+            revenueGoal: goals.revenueGoal || 0,
+            postsGoal: goals.postsGoal || 0,
+            currentSubscribers: analyticsData.subscribers || 0,
+            currentRevenue: analyticsData.monthlyEarnings || 0,
+            currentPosts: analyticsData.postsThisMonth || 0
+          });
+        } else {
+          // Set current values even if goals fetch fails
           setMonthlyGoals(prev => ({
             ...prev,
             currentSubscribers: analyticsData.subscribers || 0,
