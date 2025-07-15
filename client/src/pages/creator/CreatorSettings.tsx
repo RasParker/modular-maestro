@@ -13,11 +13,11 @@ import { ArrowLeft, Save, Upload, Shield, Key, Smartphone, Eye, EyeOff, Trash2, 
 import { useToast } from '@/hooks/use-toast';
 import { setLocalStorageItem, getLocalStorageItem } from '@/lib/storage-utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -165,6 +165,9 @@ export const CreatorSettings: React.FC = () => {
       });
 
       if (response.ok) {
+        // Invalidate the goals cache so the dashboard refetches
+        await queryClient.invalidateQueries({ queryKey: ['creator', 1, 'goals'] });
+        
         toast({
           title: "Monthly goals saved",
           description: "Your monthly goals have been updated successfully.",

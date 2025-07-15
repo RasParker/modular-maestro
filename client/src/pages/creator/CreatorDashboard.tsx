@@ -9,6 +9,7 @@ import { DashboardHeader } from '@/components/creator/DashboardHeader';
 import { QuickActionsGrid } from '@/components/creator/QuickActionsGrid';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import { 
   DollarSign, 
   Users, 
@@ -67,6 +68,20 @@ export const CreatorDashboard: React.FC = () => {
     currentPosts: 0
   });
 
+  // Use React Query for monthly goals
+  const { data: goalsData, refetch: refetchGoals } = useQuery({
+    queryKey: ['creator', user?.id, 'goals'],
+    queryFn: async () => {
+      if (!user) return null;
+      const response = await fetch(`/api/creator/${user.id}/goals`);
+      if (response.ok) {
+        return await response.json();
+      }
+      return null;
+    },
+    enabled: !!user
+  });
+
   const fetchUserPosts = async () => {
     if (!user) return;
     
@@ -97,15 +112,12 @@ export const CreatorDashboard: React.FC = () => {
         });
       }
 
-      // Fetch monthly goals and combine with analytics data
-      const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
-      if (goalsResponse.ok) {
-        const goals = await goalsResponse.json();
-        console.log('Fetched goals from API:', goals);
+      // Update monthly goals with current analytics data
+      if (goalsData) {
         setMonthlyGoals({
-          subscriberGoal: goals.subscriberGoal || 0,
-          revenueGoal: goals.revenueGoal || 0,
-          postsGoal: goals.postsGoal || 0,
+          subscriberGoal: goalsData.subscriberGoal || 0,
+          revenueGoal: goalsData.revenueGoal || 0,
+          postsGoal: goalsData.postsGoal || 0,
           currentSubscribers: analyticsData.subscribers || 0,
           currentRevenue: analyticsData.monthlyEarnings || 0,
           currentPosts: analyticsData.postsThisMonth || 0
@@ -133,17 +145,18 @@ export const CreatorDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchUserPosts();
-  }, [user]);
+  }, [user, goalsData]);
 
   // Refetch data when window gains focus (when user comes back from settings)
   useEffect(() => {
     const handleFocus = () => {
       fetchUserPosts();
+      refetchGoals();
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [user]);
+  }, [user, refetchGoals]);
 
   return (
     <EdgeToEdgeContainer>
