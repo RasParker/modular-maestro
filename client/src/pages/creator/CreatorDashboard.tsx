@@ -65,30 +65,12 @@ const TIER_BREAKDOWN = [
   { name: 'Superfan', price: 25, subscribers: 660, revenue: 16500 }
 ];
 
-const SCHEDULED_CONTENT = [
-  {
-    id: '1',
-    title: 'New Digital Art Collection',
-    tier: 'Superfan',
-    type: 'Image',
-    date: 'Tomorrow',
-    time: '2:00 PM'
-  },
-  {
-    id: '2',
-    title: 'Behind the Scenes Video',
-    tier: 'Fan',
-    type: 'Video',
-    date: 'Feb 20',
-    time: '6:00 PM'
-  }
-];
-
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
   
   // Real posts will be fetched from API
   const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [scheduledContent, setScheduledContent] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -100,6 +82,10 @@ export const CreatorDashboard: React.FC = () => {
           const posts = await response.json();
           console.log('Fetched user content:', posts);
           setUserPosts(posts);
+          
+          // Filter for scheduled content
+          const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
+          setScheduledContent(scheduled);
         }
       } catch (error) {
         console.error('Error fetching user posts:', error);
@@ -233,19 +219,24 @@ export const CreatorDashboard: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {SCHEDULED_CONTENT.length > 0 ? (
+                {scheduledContent.length > 0 ? (
                   <div className="space-y-3">
-                    {SCHEDULED_CONTENT.map((content) => (
+                    {scheduledContent.map((content) => (
                       <div key={content.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm">{content.title}</h4>
+                          <h4 className="font-medium text-sm">{content.caption || content.title || 'Untitled Post'}</h4>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                             <Badge variant="outline" className="text-xs">{content.tier}</Badge>
-                            <span>{content.date} at {content.time}</span>
+                            <span>
+                              {content.scheduled_for 
+                                ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                : 'Scheduled'
+                              }
+                            </span>
                           </div>
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          {content.type}
+                          {content.type || 'Text'}
                         </Badge>
                       </div>
                     ))}
@@ -254,6 +245,7 @@ export const CreatorDashboard: React.FC = () => {
                   <div className="text-center py-6">
                     <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">No scheduled content</p>
+                    <p className="text-xs text-muted-foreground mb-4">Schedule posts to publish them automatically at your chosen time</p>
                     <Button variant="outline" size="sm" className="mt-2" asChild>
                       <Link to="/creator/upload">Create Content</Link>
                     </Button>
