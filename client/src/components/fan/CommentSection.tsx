@@ -182,6 +182,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
         setComments(prev => [comment, ...prev]);
         setNewComment('');
+        // Use the current comments length plus 1 since we just added a new comment
         onCommentCountChange(comments.length + 1);
 
         toast({

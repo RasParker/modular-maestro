@@ -560,9 +560,9 @@ export const CreatorProfile: React.FC = () => {
     }));
   };
 
-  const handleCommentCountChange = (postId: string, newCount: number) => {
+  const handleCommentCountChange = (postId: string | number, newCount: number) => {
     setUserPosts(prev => prev.map(post => 
-      post.id === postId 
+      post.id.toString() === postId.toString() 
         ? { ...post, comments_count: newCount }
         : post
     ));
