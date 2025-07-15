@@ -18,6 +18,10 @@ import { apiRequest } from '@/lib/queryClient';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
+  
+  // Get the tab from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const defaultTab = urlParams.get('tab') || 'profile';
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -48,6 +52,14 @@ export const CreatorSettings: React.FC = () => {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
 
+  // Monthly goals state
+  const [monthlyGoals, setMonthlyGoals] = useState({
+    subscriberGoal: 3000,
+    revenueGoal: 5000,
+    postsGoal: 30
+  });
+  const [isGoalsLoading, setIsGoalsLoading] = useState(false);
+
   // Payout settings state
   const [payoutSettings, setPayoutSettings] = useState({
     payout_method: 'mtn_momo',
@@ -62,7 +74,7 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPayoutSettingsLoading, setIsPayoutSettingsLoading] = useState(false);
 
-  // Load payout settings on component mount
+  // Load payout settings and monthly goals on component mount
   useEffect(() => {
     const loadPayoutSettings = async () => {
       try {
@@ -82,7 +94,29 @@ export const CreatorSettings: React.FC = () => {
       }
     };
 
+    const loadMonthlyGoals = async () => {
+      try {
+        setIsGoalsLoading(true);
+        const response = await fetch('/api/creator/1/goals');
+        if (response.ok) {
+          const goals = await response.json();
+          if (goals) {
+            setMonthlyGoals({
+              subscriberGoal: goals.subscriberGoal || 3000,
+              revenueGoal: goals.revenueGoal || 5000,
+              postsGoal: goals.postsGoal || 30
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading monthly goals:', error);
+      } finally {
+        setIsGoalsLoading(false);
+      }
+    };
+
     loadPayoutSettings();
+    loadMonthlyGoals();
   }, []);
 
   const handleSavePayoutSettings = async () => {
@@ -116,6 +150,37 @@ export const CreatorSettings: React.FC = () => {
       });
     } finally {
       setIsPayoutSettingsLoading(false);
+    }
+  };
+
+  const handleSaveMonthlyGoals = async () => {
+    try {
+      setIsGoalsLoading(true);
+      const response = await fetch('/api/creator/1/goals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(monthlyGoals),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Monthly goals saved",
+          description: "Your monthly goals have been updated successfully.",
+        });
+      } else {
+        throw new Error('Failed to save monthly goals');
+      }
+    } catch (error) {
+      console.error('Error saving monthly goals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save monthly goals. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGoalsLoading(false);
     }
   };
 
@@ -449,10 +514,11 @@ export const CreatorSettings: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+            <Tabs defaultValue={defaultTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="content">Content</TabsTrigger>
+                <TabsTrigger value="goals">Goals</TabsTrigger>
                 <TabsTrigger value="payouts">Payouts</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
               </TabsList>
@@ -626,6 +692,96 @@ export const CreatorSettings: React.FC = () => {
                           <SelectItem value="premium">Premium Content</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="goals" className="space-y-6">
+                <Card className="bg-gradient-card border-border/50">
+                  <CardHeader>
+                    <CardTitle>Monthly Goals</CardTitle>
+                    <CardDescription>
+                      Set your monthly targets to track your creator growth
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="subscriberGoal">Subscriber Goal</Label>
+                        <Input
+                          id="subscriberGoal"
+                          type="number"
+                          value={monthlyGoals.subscriberGoal}
+                          onChange={(e) => setMonthlyGoals(prev => ({ 
+                            ...prev, 
+                            subscriberGoal: parseInt(e.target.value) || 0 
+                          }))}
+                          placeholder="3000"
+                          min="0"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Target number of total subscribers
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="revenueGoal">Revenue Goal (GHS)</Label>
+                        <Input
+                          id="revenueGoal"
+                          type="number"
+                          value={monthlyGoals.revenueGoal}
+                          onChange={(e) => setMonthlyGoals(prev => ({ 
+                            ...prev, 
+                            revenueGoal: parseInt(e.target.value) || 0 
+                          }))}
+                          placeholder="5000"
+                          min="0"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Monthly earnings target in GHS
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="postsGoal">Posts Goal</Label>
+                        <Input
+                          id="postsGoal"
+                          type="number"
+                          value={monthlyGoals.postsGoal}
+                          onChange={(e) => setMonthlyGoals(prev => ({ 
+                            ...prev, 
+                            postsGoal: parseInt(e.target.value) || 0 
+                          }))}
+                          placeholder="30"
+                          min="0"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Number of posts to publish monthly
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-muted/20 space-y-3">
+                      <h4 className="font-medium text-foreground">Goal Setting Tips</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• Set realistic and achievable monthly targets</li>
+                        <li>• Review and adjust your goals each month based on performance</li>
+                        <li>• Subscriber goals should reflect steady growth, not just retention</li>
+                        <li>• Revenue goals help you track monetization effectiveness</li>
+                        <li>• Consistent posting helps maintain audience engagement</li>
+                      </ul>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-border/50">
+                      <Button 
+                        onClick={handleSaveMonthlyGoals}
+                        disabled={isGoalsLoading}
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        {isGoalsLoading ? 'Saving...' : 'Save Monthly Goals'}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
