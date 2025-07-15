@@ -56,16 +56,31 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
-  const truncateText = (text: string, maxWords: number = 8) => {
-    const words = text.split(' ');
-    
-    if (words.length <= maxWords) {
+  const truncateText = (text: string) => {
+    // Only truncate if text is likely to exceed one line (roughly 60-80 characters)
+    if (text.length <= 60) {
       return { truncated: text, needsExpansion: false };
     }
     
+    // Find a good break point around 50-60 characters
+    const words = text.split(' ');
+    let truncated = '';
+    
+    for (let i = 0; i < words.length; i++) {
+      const testString = truncated + (truncated ? ' ' : '') + words[i];
+      if (testString.length > 50) {
+        if (truncated === '') {
+          // If even the first word is too long, take it anyway
+          truncated = words[0];
+        }
+        break;
+      }
+      truncated = testString;
+    }
+    
     return {
-      truncated: words.slice(0, maxWords).join(' '),
-      needsExpansion: true
+      truncated,
+      needsExpansion: truncated !== text
     };
   };
 
