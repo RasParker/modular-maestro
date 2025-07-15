@@ -238,4 +238,9 @@ Changelog:
   - ✅ Updated mobile bottom navigation to optimize UX by removing Content menu and keeping Messages accessible
   - ✅ Fixed subscription tier performance display issue in creator dashboard
   - ✅ Resolved API data type conversion for subscriber counts and revenue calculations
+  - ✅ Fixed Fan Dashboard and Manage Subscriptions page to fetch real subscription data
+  - ✅ Corrected API route method call from getFanSubscriptions to getSubscriptions
+  - ✅ Enhanced getSubscriptions storage method with proper joins for creator and tier data
+  - ✅ Updated ManageSubscriptions component to fetch and display real subscription data
+  - ✅ Added proper loading states and error handling for subscription data fetching
   - ✅ Completed successful migration with all core features working properly

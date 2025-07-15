@@ -352,10 +352,28 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount || 0) > 0;
   }
 
-  async getSubscriptions(userId: number): Promise<Subscription[]> {
+  async getSubscriptions(userId: number): Promise<any[]> {
     return await db
-      .select()
+      .select({
+        id: subscriptions.id,
+        status: subscriptions.status,
+        current_period_end: subscriptions.ends_at,
+        created_at: subscriptions.created_at,
+        auto_renew: subscriptions.auto_renew,
+        creator: {
+          id: users.id,
+          username: users.username,
+          display_name: users.display_name,
+          avatar: users.avatar
+        },
+        tier: {
+          name: subscription_tiers.name,
+          price: subscription_tiers.price
+        }
+      })
       .from(subscriptions)
+      .innerJoin(users, eq(subscriptions.creator_id, users.id))
+      .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
       .where(eq(subscriptions.fan_id, userId))
       .orderBy(desc(subscriptions.created_at));
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,60 +6,56 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { SubscriptionCard } from '@/components/fan/SubscriptionCard';
 import { ArrowLeft, Heart, CreditCard, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
-const MOCK_SUBSCRIPTIONS = [
-  {
-    id: '1',
-    creator: {
-      username: 'artisticmia',
-      display_name: 'Artistic Mia',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
-      category: 'Art'
-    },
-    tier: 'Fan',
-    price: 15,
-    status: 'active',
-    next_billing: '2024-02-15',
-    joined: '2024-01-15',
-    auto_renew: true
-  },
-  {
-    id: '2',
-    creator: {
-      username: 'fitnessking',
-      display_name: 'Fitness King',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      category: 'Fitness'
-    },
-    tier: 'Basic',
-    price: 10,
-    status: 'active',
-    next_billing: '2024-02-20',
-    joined: '2024-01-20',
-    auto_renew: true
-  },
-  {
-    id: '3',
-    creator: {
-      username: 'musicmaker',
-      display_name: 'Music Maker',
-      avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face',
-      category: 'Music'
-    },
-    tier: 'Producer',
-    price: 18,
-    status: 'paused',
-    next_billing: '2024-03-01',
-    joined: '2024-01-10',
-    auto_renew: false
-  }
-];
+interface Subscription {
+  id: number;
+  creator: {
+    id: number;
+    username: string;
+    display_name: string;
+    avatar: string;
+  };
+  tier: {
+    name: string;
+    price: number;
+  };
+  status: string;
+  current_period_end: string;
+  created_at: string;
+  auto_renew: boolean;
+}
 
 export const ManageSubscriptions: React.FC = () => {
   const { toast } = useToast();
-  const [subscriptions, setSubscriptions] = useState(MOCK_SUBSCRIPTIONS);
+  const { user } = useAuth();
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePauseResume = (subscriptionId: string) => {
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`/api/subscriptions/fan/${user.id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch subscriptions');
+        }
+        const data = await response.json();
+        setSubscriptions(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptions();
+  }, [user]);
+
+  const handlePauseResume = (subscriptionId: number) => {
     setSubscriptions(subscriptions.map(sub => 
       sub.id === subscriptionId 
         ? { 
@@ -79,7 +75,7 @@ export const ManageSubscriptions: React.FC = () => {
     });
   };
 
-  const handleCancel = (subscriptionId: string) => {
+  const handleCancel = (subscriptionId: number) => {
     setSubscriptions(subscriptions.filter(sub => sub.id !== subscriptionId));
     toast({
       title: "Subscription cancelled",
@@ -90,7 +86,7 @@ export const ManageSubscriptions: React.FC = () => {
 
   const totalMonthlySpend = subscriptions
     .filter(sub => sub.status === 'active')
-    .reduce((sum, sub) => sum + sub.price, 0);
+    .reduce((sum, sub) => sum + parseFloat(sub.tier.price.toString()), 0);
 
   return (
     <AppLayout>
@@ -155,17 +151,55 @@ export const ManageSubscriptions: React.FC = () => {
         {/* Subscriptions List */}
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-semibold">Your Subscriptions ({subscriptions.length})</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">
+              Your Subscriptions ({loading ? '...' : subscriptions.length})
+            </h2>
           </div>
           
-          {subscriptions.map((subscription) => (
-            <SubscriptionCard
-              key={subscription.id}
-              subscription={subscription}
-              onPauseResume={handlePauseResume}
-              onCancel={handleCancel}
-            />
-          ))}
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <LoadingSpinner />
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Error loading subscriptions: {error}</p>
+            </div>
+          ) : subscriptions.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No active subscriptions yet.</p>
+              <Button variant="premium" className="mt-4" asChild>
+                <Link to="/explore">Discover Creators</Link>
+              </Button>
+            </div>
+          ) : (
+            subscriptions.map((subscription) => {
+              // Transform the subscription data to match SubscriptionCard expectations
+              const transformedSubscription = {
+                id: subscription.id.toString(),
+                creator: {
+                  username: subscription.creator.username,
+                  display_name: subscription.creator.display_name || subscription.creator.username,
+                  avatar: subscription.creator.avatar || '',
+                  category: 'General' // Default category since it's not in our API data
+                },
+                tier: subscription.tier.name,
+                price: parseFloat(subscription.tier.price.toString()),
+                status: subscription.status,
+                next_billing: new Date(subscription.current_period_end).toLocaleDateString(),
+                joined: new Date(subscription.created_at).toLocaleDateString(),
+                auto_renew: subscription.auto_renew
+              };
+
+              return (
+                <SubscriptionCard
+                  key={subscription.id}
+                  subscription={transformedSubscription}
+                  onPauseResume={(id) => handlePauseResume(parseInt(id))}
+                  onCancel={(id) => handleCancel(parseInt(id))}
+                />
+              );
+            })
+          )}
         </div>
       </div>
     </AppLayout>
