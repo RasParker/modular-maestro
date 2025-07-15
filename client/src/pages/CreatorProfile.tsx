@@ -865,14 +865,21 @@ export const CreatorProfile: React.FC = () => {
                             >
                               <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-10 w-10 p-0 text-muted-foreground"
-                              onClick={() => handleCommentClick(post.id)}
-                            >
-                              <MessageSquare className="w-7 h-7" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-10 w-10 p-0 text-muted-foreground"
+                                onClick={() => handleCommentClick(post.id)}
+                              >
+                                <MessageSquare className="w-7 h-7" />
+                              </Button>
+                              {post.comments_count > 0 && (
+                                <span className="text-sm font-medium text-foreground">
+                                  {post.comments_count}
+                                </span>
+                              )}
+                            </div>
                             <Button
                               variant="ghost"
                               size="sm"
