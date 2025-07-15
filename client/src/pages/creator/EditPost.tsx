@@ -151,7 +151,10 @@ export const EditPost: React.FC = () => {
           if (postData.scheduled_for) {
             const scheduledDateTime = new Date(postData.scheduled_for);
             scheduledDate = scheduledDateTime;
-            scheduledTime = scheduledDateTime.toTimeString().slice(0, 5); // HH:MM format
+            // Format time as HH:MM for input field
+            const hours = scheduledDateTime.getHours().toString().padStart(2, '0');
+            const minutes = scheduledDateTime.getMinutes().toString().padStart(2, '0');
+            scheduledTime = `${hours}:${minutes}`;
           }
 
           const formDataObj = {
