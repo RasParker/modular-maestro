@@ -364,7 +364,7 @@ export const ManageContent: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Square container that fills the entire modal */}
+              {/* Full screen container that fills the entire modal */}
               <div className="relative w-full h-[95vh] overflow-hidden">
                 {/* Blurred background */}
                 {viewingContent.mediaPreview && (
@@ -376,13 +376,13 @@ export const ManageContent: React.FC = () => {
                   />
                 )}
                 
-                {/* Main Media with object-contain */}
+                {/* Main Media with proper full display */}
                 {viewingContent.mediaPreview ? (
                   <div className="relative z-10 w-full h-full flex items-center justify-center">
                     {viewingContent.type === 'Video' ? (
                       <video 
                         src={viewingContent.mediaPreview}
-                        className="max-w-full max-h-full object-contain"
+                        className="w-full h-full object-contain"
                         controls
                         autoPlay
                         muted
@@ -391,7 +391,7 @@ export const ManageContent: React.FC = () => {
                       <img 
                         src={viewingContent.mediaPreview}
                         alt={viewingContent.caption}
-                        className="max-w-full max-h-full object-contain"
+                        className="w-full h-full object-contain"
                       />
                     )}
                   </div>
@@ -404,7 +404,7 @@ export const ManageContent: React.FC = () => {
                   </div>
                 )}
 
-                {/* Clean content view - no caption overlay */}
+                {/* Clean content view - no overlays */}
               </div>
             </div>
           )}
