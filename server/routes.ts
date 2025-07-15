@@ -298,16 +298,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all posts for a creator
   app.get("/api/posts", async (req, res) => {
     try {
-      const result = await db.query(`
-        SELECT p.id, p.creator_id, p.title, p.content, p.media_type, p.media_urls, 
-               p.tier, p.status, p.scheduled_for, p.likes_count, p.comments_count, 
-               p.created_at, p.updated_at, c.username, c.avatar
-        FROM posts p 
-        JOIN creators c ON p.creator_id = c.id 
-        ORDER BY p.created_at DESC
-      `);
+      const allPosts = await db
+        .select({
+          id: posts.id,
+          creator_id: posts.creator_id,
+          title: posts.title,
+          content: posts.content,
+          media_type: posts.media_type,
+          media_urls: posts.media_urls,
+          tier: posts.tier,
+          status: posts.status,
+          scheduled_for: posts.scheduled_for,
+          likes_count: posts.likes_count,
+          comments_count: posts.comments_count,
+          created_at: posts.created_at,
+          updated_at: posts.updated_at,
+          username: users.username,
+          avatar: users.avatar
+        })
+        .from(posts)
+        .leftJoin(users, eq(posts.creator_id, users.id))
+        .orderBy(desc(posts.created_at));
 
-      res.json(result.rows);
+      res.json(allPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
       res.status(500).json({ error: 'Failed to fetch posts' });
@@ -346,19 +359,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
       console.log('Creating post with status:', status);
+      console.log('Scheduled for:', scheduled_for);
 
-      const newPost = await db.insert(posts).values({
+      const postData: any = {
         creator_id,
         title,
         content,
         media_type,
         media_urls,
         tier,
-        status: status || 'published', // Default to published if status not provided
-        scheduled_for: scheduled_for ? new Date(scheduled_for) : null,
-      }).returning();
+        status: status || 'published',
+      };
+
+      // Only add scheduled_for if it's provided and status is scheduled
+      if (scheduled_for && status === 'scheduled') {
+        postData.scheduled_for = new Date(scheduled_for);
+      }
+
+      const newPost = await db.insert(posts).values(postData).returning();
 
       console.log('Post created successfully with final status:', newPost[0].status);
+      console.log('Post scheduled_for:', newPost[0].scheduled_for);
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
