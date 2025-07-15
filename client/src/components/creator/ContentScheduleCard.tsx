@@ -46,7 +46,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
-  const truncateText = (text: string, maxWords: number = 12) => {
+  const truncateText = (text: string, maxWords: number = 8) => {
     const words = text.split(' ');
     
     if (words.length <= maxWords) {
@@ -175,44 +175,64 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
           </Badge>
         </div>
 
-        {/* Action Buttons with Release Info */}
+        {/* Action Buttons Row */}
         <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/30">
-          <div className="flex gap-2 flex-1">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onEdit(id)}
-              className="flex-1 text-xs h-8"
+              className="h-7 px-2 text-xs"
             >
-              <Edit3 className="w-3 h-3 mr-1" />
-              Edit
+              <Edit3 className="w-3 h-3" />
             </Button>
 
             <Button
               variant="default"
               size="sm"
               onClick={() => onPublish(id)}
-              className="flex-1 text-xs h-8 bg-gradient-primary"
+              className="h-7 px-2 text-xs bg-gradient-primary"
             >
-              <ExternalLink className="w-3 h-3 mr-1" />
-              Publish
+              <ExternalLink className="w-3 h-3" />
             </Button>
 
             <Button
               variant="outline"
               size="sm"
               onClick={() => onDelete(id)}
-              className="w-10 h-8 text-xs text-destructive hover:text-destructive p-0"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
             >
               <Trash2 className="w-3 h-3" />
             </Button>
           </div>
 
           {/* Release Info */}
-          {status === 'Scheduled' && (
-            <div className="flex items-center gap-1 text-xs text-orange-600 font-medium">
+          {status === 'Scheduled' && scheduledFor && (
+            <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
               <Clock className="w-3 h-3" />
-              <span>Releases {time}</span>
+              <span>
+                {(() => {
+                  const releaseDate = new Date(scheduledFor);
+                  const now = new Date();
+                  const isToday = releaseDate.toDateString() === now.toDateString();
+                  const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+                  
+                  if (isToday) {
+                    return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                  } else if (isTomorrow) {
+                    return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                  } else {
+                    return releaseDate.toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    });
+                  }
+                })()}
+              </span>
             </div>
           )}
         </div>

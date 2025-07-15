@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,21 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   onPublish,
   onClick
 }) => {
+  const [expandedCaption, setExpandedCaption] = useState(false);
+
+  const truncateText = (text: string, maxWords: number = 10) => {
+    const words = text.split(' ');
+    
+    if (words.length <= maxWords) {
+      return { truncated: text, needsExpansion: false };
+    }
+    
+    return {
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
+    };
+  };
+
   const getTypeIcon = () => {
     switch (type) {
       case 'Image':
@@ -112,9 +127,46 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           </div>
 
           {/* Caption */}
-          <h3 className="font-medium text-foreground text-sm leading-tight line-clamp-2">
-            {caption}
-          </h3>
+          {(() => {
+            const { truncated, needsExpansion } = truncateText(caption);
+            return (
+              <div className="font-medium text-foreground text-sm leading-tight">
+                {expandedCaption ? caption : (
+                  <>
+                    {truncated}
+                    {needsExpansion && !expandedCaption && (
+                      <>
+                        {'... '}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedCaption(true);
+                          }}
+                          className="text-primary hover:text-primary/80 font-medium"
+                        >
+                          read more
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+                {expandedCaption && needsExpansion && (
+                  <>
+                    {' '}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedCaption(false);
+                      }}
+                      className="text-primary hover:text-primary/80 font-medium"
+                    >
+                      read less
+                    </button>
+                  </>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Scheduled info */}
           {status === 'Scheduled' && scheduledFor && (
