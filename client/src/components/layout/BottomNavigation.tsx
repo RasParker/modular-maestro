@@ -44,6 +44,12 @@ export const BottomNavigation: React.FC = () => {
             active: location.pathname === '/fan/subscriptions'
           },
           { 
+            label: 'Messages', 
+            href: '/fan/messages', 
+            icon: MessageSquare,
+            active: location.pathname === '/fan/messages'
+          },
+          { 
             label: 'Dashboard', 
             href: '/fan/dashboard', 
             icon: BarChart3,
@@ -60,12 +66,6 @@ export const BottomNavigation: React.FC = () => {
             active: location.pathname === '/creator/dashboard'
           },
           { 
-            label: 'Content', 
-            href: '/creator/manage-content', 
-            icon: Grid3X3,
-            active: location.pathname === '/creator/manage-content'
-          },
-          { 
             label: 'Upload', 
             href: '/creator/upload', 
             icon: Upload,
@@ -76,6 +76,12 @@ export const BottomNavigation: React.FC = () => {
             href: '/creator/subscribers', 
             icon: Users,
             active: location.pathname === '/creator/subscribers'
+          },
+          { 
+            label: 'Messages', 
+            href: '/creator/messages', 
+            icon: MessageSquare,
+            active: location.pathname === '/creator/messages'
           },
           {
             label: 'My Profile',
