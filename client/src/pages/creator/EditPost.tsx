@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'wouter';
-import { useLocation } from 'wouter';
+import { useParams, useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Upload, Image, Video, Save, CalendarIcon, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
@@ -47,7 +45,7 @@ interface SubscriptionTier {
 export const EditPost: React.FC = () => {
   const { id: postId } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
@@ -81,11 +79,48 @@ export const EditPost: React.FC = () => {
           fetch(`/api/creators/${user.id}/tiers`)
         ]);
 
-        if (postResponse.ok) {
-          const postData = await postResponse.json();
+        // Process both responses
+        let postData = null;
+        let tiersData = [];
 
-          // Pre-populate form with existing post data
-          const accessTier = postData.tier === 'public' ? 'free' : postData.tier;
+        if (postResponse.ok) {
+          postData = await postResponse.json();
+          console.log('Fetched post data:', postData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to load post data.",
+            variant: "destructive",
+          });
+          setLocation('/creator/content');
+          return;
+        }
+
+        if (tiersResponse.ok) {
+          tiersData = await tiersResponse.json();
+          setTiers(tiersData);
+          console.log('Fetched tiers data:', tiersData);
+        } else {
+          console.error('Failed to fetch tiers');
+          setTiers([]);
+        }
+
+        // Now process the post data with tiers available
+        if (postData) {
+          // Pre-populate form with existing post data - handle case mismatch
+          let accessTier = postData.tier === 'public' ? 'free' : postData.tier;
+          
+          // Fix case sensitivity issues by finding matching tier
+          if (accessTier !== 'free' && tiersData.length > 0) {
+            const matchingTier = tiersData.find(tier => 
+              tier.name.toLowerCase() === accessTier.toLowerCase()
+            );
+            if (matchingTier) {
+              accessTier = matchingTier.name;
+            }
+          }
+          
+          console.log('Mapped access tier:', accessTier, 'from original:', postData.tier);
           
           // Handle scheduled date and time
           let scheduledDate = undefined;
@@ -96,12 +131,15 @@ export const EditPost: React.FC = () => {
             scheduledTime = scheduledDateTime.toTimeString().slice(0, 5); // HH:MM format
           }
           
-          form.reset({
+          const formData = {
             caption: postData.content || '',
             accessTier: accessTier,
             scheduledDate: scheduledDate,
             scheduledTime: scheduledTime,
-          });
+          };
+          
+          console.log('Setting form data:', formData);
+          form.reset(formData);
 
           // Set media preview if exists
           if (postData.media_urls && postData.media_urls.length > 0) {
@@ -118,21 +156,6 @@ export const EditPost: React.FC = () => {
           }
 
           setOriginalPost(postData);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to load post data.",
-            variant: "destructive",
-          });
-          setLocation('/creator/content');
-        }
-
-        if (tiersResponse.ok) {
-          const tiersData = await tiersResponse.json();
-          setTiers(tiersData);
-        } else {
-          console.error('Failed to fetch tiers');
-          setTiers([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -304,11 +327,13 @@ export const EditPost: React.FC = () => {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Button variant="outline" asChild className="mb-4">
-            <Link to="/creator/dashboard">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Link>
+          <Button 
+            variant="outline" 
+            className="mb-4"
+            onClick={() => setLocation('/creator/dashboard')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
           </Button>
           <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
           <p className="text-muted-foreground">
@@ -513,7 +538,15 @@ export const EditPost: React.FC = () => {
               </CardContent>
             </Card>
 
-            <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row gap-4 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLocation('/creator/dashboard')}
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
               <Button
                 type="submit"
                 disabled={isSaving}
