@@ -75,8 +75,8 @@ export const Schedule: React.FC = () => {
               
               return {
                 id: post.id.toString(),
-                title: post.title,
-                description: post.content,
+                title: post.title || 'Untitled Post',
+                description: post.content || '',
                 date: scheduledDateTime.toLocaleDateString(),
                 time: scheduledDateTime.toLocaleTimeString('en-US', { 
                   hour: '2-digit', 

@@ -138,9 +138,9 @@ export const ManageContent: React.FC = () => {
     return () => window.removeEventListener('localStorageChange', handleNewPost);
   }, [user, toast]);
 
-  const publishedContent = content.filter(item => item.status === 'Published');
-  const scheduledContent = content.filter(item => item.status === 'Scheduled');
-  const draftContent = content.filter(item => item.status === 'Draft');
+  const publishedContent = content.filter(item => item.status === 'published');
+  const scheduledContent = content.filter(item => item.status === 'scheduled');
+  const draftContent = content.filter(item => item.status === 'draft');
 
   const handleEdit = (contentId: string) => {
     navigate(`/creator/edit-post/${contentId}`);

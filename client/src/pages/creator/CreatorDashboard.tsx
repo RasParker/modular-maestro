@@ -42,7 +42,7 @@ const ANALYTICS = {
 
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
-  
+
   // Real posts will be fetched from API
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [scheduledContent, setScheduledContent] = useState<any[]>([]);
@@ -81,19 +81,19 @@ export const CreatorDashboard: React.FC = () => {
 
   const fetchUserPosts = async () => {
     if (!user) return;
-    
+
     try {
       const response = await fetch('/api/posts');
       if (response.ok) {
         const posts = await response.json();
         console.log('Fetched user content:', posts);
         setUserPosts(posts);
-        
+
         // Filter for scheduled content
         const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
         setScheduledContent(scheduled);
       }
-      
+
       // Fetch real analytics data first
       const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
       let analyticsData = { subscribers: 0, monthlyEarnings: 0, totalEarnings: 0, growthRate: 0, engagementRate: 0, postsThisMonth: 0 };
@@ -314,9 +314,9 @@ export const CreatorDashboard: React.FC = () => {
                 {scheduledContent.length > 0 ? (
                   <div className="space-y-3">
                     {scheduledContent.map((content) => (
-                      <div key={content.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm">{content.caption || content.title || 'Untitled Post'}</h4>
+                          <h4 className="font-medium text-sm">{content.content || content.title || 'Untitled Post'}</h4>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                             <Badge variant="outline" className="text-xs">{content.tier}</Badge>
                             <span>
@@ -328,7 +328,7 @@ export const CreatorDashboard: React.FC = () => {
                           </div>
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          {content.type || 'Text'}
+                          {content.media_type === 'image' ? 'Image' : content.media_type === 'video' ? 'Video' : 'Text'}
                         </Badge>
                       </div>
                     ))}
@@ -470,7 +470,7 @@ export const CreatorDashboard: React.FC = () => {
             </Card>
           </div>
         </div>
-        
+
         {/* Recent Posts - Full Width on Mobile */}
         <div className="mt-4 sm:mt-6">
           <Card className="bg-gradient-card border-border/50">
@@ -546,7 +546,7 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
         </div>
-        
+
       </EdgeToEdgeContainer>
     </EdgeToEdgeContainer>
   );
