@@ -1139,32 +1139,7 @@ export const CreatorProfile: React.FC = () => {
                 </div>
               </div>
 
-              {/* Bottom Content Overlay - Instagram style with text shadows */}
-              <div className="absolute bottom-4 left-4 right-16 p-4 z-20">
-                <p className="text-white text-sm leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                  {expandedModalCaption ? (selectedContent.content || selectedContent.title) : (
-                    (selectedContent.content || selectedContent.title).length > 80 ? (
-                      <>
-                        {(selectedContent.content || selectedContent.title).substring(0, 80)}
-                        <span 
-                          className="cursor-pointer text-white/80 hover:text-white ml-1"
-                          onClick={() => setExpandedModalCaption(true)}
-                        >
-                          ...
-                        </span>
-                      </>
-                    ) : (selectedContent.content || selectedContent.title)
-                  )}
-                  {expandedModalCaption && (selectedContent.content || selectedContent.title).length > 80 && (
-                    <span 
-                      className="cursor-pointer text-white/80 hover:text-white ml-2"
-                      onClick={() => setExpandedModalCaption(false)}
-                    >
-                      Show less
-                    </span>
-                  )}
-                </p>
-              </div>
+              {/* Clean content view - no caption overlay */}
             </div>
           )}
         </DialogContent>
