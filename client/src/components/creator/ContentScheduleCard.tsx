@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,20 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   onPublish,
   scheduledFor
 }) => {
+  const [expandedCaption, setExpandedCaption] = useState(false);
+
+  const truncateText = (text: string, maxWords: number = 12) => {
+    const words = text.split(' ');
+    
+    if (words.length <= maxWords) {
+      return { truncated: text, needsExpansion: false };
+    }
+    
+    return {
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
+    };
+  };
   const getTypeIcon = () => {
     switch (type) {
       case 'Image':
@@ -102,9 +116,40 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
               {title}
             </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1">
-              {description}
-            </p>
+            {(() => {
+              const { truncated, needsExpansion } = truncateText(description);
+              return (
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  {expandedCaption ? description : (
+                    <>
+                      {truncated}
+                      {needsExpansion && !expandedCaption && (
+                        <>
+                          {'... '}
+                          <button
+                            onClick={() => setExpandedCaption(true)}
+                            className="text-primary hover:text-primary/80 font-medium"
+                          >
+                            read more
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {expandedCaption && needsExpansion && (
+                    <>
+                      {' '}
+                      <button
+                        onClick={() => setExpandedCaption(false)}
+                        className="text-primary hover:text-primary/80 font-medium"
+                      >
+                        read less
+                      </button>
+                    </>
+                  )}
+                </p>
+              );
+            })()}
 
             {/* Date/Time Info - Mobile optimized */}
             <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
