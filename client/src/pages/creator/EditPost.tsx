@@ -12,8 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Upload, Image, Video, Save } from 'lucide-react';
+import { ArrowLeft, Upload, Image, Video, Save, CalendarIcon, Clock } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 
@@ -24,6 +28,8 @@ const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/quicktime"];
 const formSchema = z.object({
   caption: z.string().min(1, "Caption is required").max(2000, "Caption must be less than 2000 characters"),
   accessTier: z.string().min(1, "Please select an access tier"),
+  scheduledDate: z.date().optional(),
+  scheduledTime: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -56,6 +62,8 @@ export const EditPost: React.FC = () => {
     defaultValues: {
       caption: '',
       accessTier: 'free',
+      scheduledDate: undefined,
+      scheduledTime: '',
     },
   });
 
@@ -77,16 +85,34 @@ export const EditPost: React.FC = () => {
           const postData = await postResponse.json();
 
           // Pre-populate form with existing post data
+          const accessTier = postData.tier === 'public' ? 'free' : postData.tier;
+          
+          // Handle scheduled date and time
+          let scheduledDate = undefined;
+          let scheduledTime = '';
+          if (postData.scheduled_for) {
+            const scheduledDateTime = new Date(postData.scheduled_for);
+            scheduledDate = scheduledDateTime;
+            scheduledTime = scheduledDateTime.toTimeString().slice(0, 5); // HH:MM format
+          }
+          
           form.reset({
             caption: postData.content || '',
-            accessTier: postData.tier || 'free',
+            accessTier: accessTier,
+            scheduledDate: scheduledDate,
+            scheduledTime: scheduledTime,
           });
 
           // Set media preview if exists
-          if (postData.media_urls) {
-            const mediaUrl = postData.media_urls.startsWith('/uploads/')
-              ? postData.media_urls
-              : `/uploads/${postData.media_urls}`;
+          if (postData.media_urls && postData.media_urls.length > 0) {
+            // Handle media_urls as array (from database) or string (legacy)
+            const mediaFileName = Array.isArray(postData.media_urls) 
+              ? postData.media_urls[0] 
+              : postData.media_urls;
+            
+            const mediaUrl = mediaFileName.startsWith('/uploads/')
+              ? mediaFileName
+              : `/uploads/${mediaFileName}`;
             setMediaPreview(mediaUrl);
             setMediaType(postData.media_type === 'image' ? 'image' : 'video');
           }
@@ -180,7 +206,7 @@ export const EditPost: React.FC = () => {
 
     try {
       // Upload new media file if it exists, otherwise keep existing media
-      let uploadedMediaUrls = originalPost.media_urls || '';
+      let uploadedMediaUrls = originalPost.media_urls || [];
       if (mediaFile) {
         const formData = new FormData();
         formData.append('media', mediaFile);
@@ -195,7 +221,16 @@ export const EditPost: React.FC = () => {
         }
 
         const uploadResult = await uploadResponse.json();
-        uploadedMediaUrls = uploadResult.filename;
+        uploadedMediaUrls = [uploadResult.filename];
+      }
+
+      // Handle scheduled date and time
+      let scheduled_for = null;
+      if (data.scheduledDate && data.scheduledTime) {
+        const [hours, minutes] = data.scheduledTime.split(':');
+        const scheduledDateTime = new Date(data.scheduledDate);
+        scheduledDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        scheduled_for = scheduledDateTime.toISOString();
       }
 
       // Prepare updated post data
@@ -205,6 +240,8 @@ export const EditPost: React.FC = () => {
         media_type: mediaType || originalPost.media_type,
         media_urls: uploadedMediaUrls,
         tier: data.accessTier === 'free' ? 'public' : data.accessTier,
+        scheduled_for: scheduled_for,
+        status: scheduled_for ? 'scheduled' : originalPost.status,
       };
 
       console.log('Updating post with data:', updatedPostData);
@@ -392,7 +429,7 @@ export const EditPost: React.FC = () => {
                           <SelectItem value="free">Free for all followers</SelectItem>
                           {tiers.map((tier) => (
                             <SelectItem key={tier.id} value={tier.name}>
-                              {tier.name} (${tier.price}/month)
+                              {tier.name} (GHS {tier.price}/month)
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -401,6 +438,78 @@ export const EditPost: React.FC = () => {
                     </FormItem>
                   )}
                 />
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card border-border/50">
+              <CardHeader>
+                <CardTitle>Schedule Settings</CardTitle>
+                <CardDescription>Update when this post should be published</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Schedule Options */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="scheduledDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Schedule Date (Optional)</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date < new Date() || date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="scheduledTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Schedule Time</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type="time"
+                              {...field}
+                            />
+                            <Clock className="absolute right-3 top-3 h-4 w-4 opacity-50" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </CardContent>
             </Card>
 
