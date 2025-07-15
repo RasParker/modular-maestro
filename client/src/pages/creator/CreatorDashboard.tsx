@@ -67,72 +67,82 @@ export const CreatorDashboard: React.FC = () => {
     currentPosts: 0
   });
 
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      if (!user) return;
-      
-      try {
-        const response = await fetch('/api/posts');
-        if (response.ok) {
-          const posts = await response.json();
-          console.log('Fetched user content:', posts);
-          setUserPosts(posts);
-          
-          // Filter for scheduled content
-          const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
-          setScheduledContent(scheduled);
-        }
+  const fetchUserPosts = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/posts');
+      if (response.ok) {
+        const posts = await response.json();
+        console.log('Fetched user content:', posts);
+        setUserPosts(posts);
         
-        // Fetch real analytics data first
-        const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
-        let analyticsData = { subscribers: 0, monthlyEarnings: 0, totalEarnings: 0, growthRate: 0, engagementRate: 0, postsThisMonth: 0 };
-        if (analyticsResponse.ok) {
-          analyticsData = await analyticsResponse.json();
-          setAnalytics({
-            subscribers: analyticsData.subscribers || 0,
-            monthlyEarnings: analyticsData.monthlyEarnings || 0,
-            totalEarnings: analyticsData.totalEarnings || 0,
-            growthRate: analyticsData.growthRate || 0,
-            engagementRate: analyticsData.engagementRate || 0,
-            postsThisMonth: analyticsData.postsThisMonth || 0
-          });
-        }
-
-        // Fetch monthly goals and combine with analytics data
-        const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
-        if (goalsResponse.ok) {
-          const goals = await goalsResponse.json();
-          console.log('Fetched goals from API:', goals);
-          setMonthlyGoals({
-            subscriberGoal: goals.subscriberGoal || 0,
-            revenueGoal: goals.revenueGoal || 0,
-            postsGoal: goals.postsGoal || 0,
-            currentSubscribers: analyticsData.subscribers || 0,
-            currentRevenue: analyticsData.monthlyEarnings || 0,
-            currentPosts: analyticsData.postsThisMonth || 0
-          });
-        } else {
-          // Set current values even if goals fetch fails
-          setMonthlyGoals(prev => ({
-            ...prev,
-            currentSubscribers: analyticsData.subscribers || 0,
-            currentRevenue: analyticsData.monthlyEarnings || 0,
-            currentPosts: analyticsData.postsThisMonth || 0
-          }));
-        }
-
-        // Fetch recent subscribers
-        const subscribersResponse = await fetch(`/api/creator/${user.id}/subscribers?limit=3&recent=true`);
-        if (subscribersResponse.ok) {
-          const subscribers = await subscribersResponse.json();
-          setRecentSubscribers(subscribers);
-        }
-      } catch (error) {
-        console.error('Error fetching user posts:', error);
+        // Filter for scheduled content
+        const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
+        setScheduledContent(scheduled);
       }
+      
+      // Fetch real analytics data first
+      const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
+      let analyticsData = { subscribers: 0, monthlyEarnings: 0, totalEarnings: 0, growthRate: 0, engagementRate: 0, postsThisMonth: 0 };
+      if (analyticsResponse.ok) {
+        analyticsData = await analyticsResponse.json();
+        setAnalytics({
+          subscribers: analyticsData.subscribers || 0,
+          monthlyEarnings: analyticsData.monthlyEarnings || 0,
+          totalEarnings: analyticsData.totalEarnings || 0,
+          growthRate: analyticsData.growthRate || 0,
+          engagementRate: analyticsData.engagementRate || 0,
+          postsThisMonth: analyticsData.postsThisMonth || 0
+        });
+      }
+
+      // Fetch monthly goals and combine with analytics data
+      const goalsResponse = await fetch(`/api/creator/${user.id}/goals`);
+      if (goalsResponse.ok) {
+        const goals = await goalsResponse.json();
+        console.log('Fetched goals from API:', goals);
+        setMonthlyGoals({
+          subscriberGoal: goals.subscriberGoal || 0,
+          revenueGoal: goals.revenueGoal || 0,
+          postsGoal: goals.postsGoal || 0,
+          currentSubscribers: analyticsData.subscribers || 0,
+          currentRevenue: analyticsData.monthlyEarnings || 0,
+          currentPosts: analyticsData.postsThisMonth || 0
+        });
+      } else {
+        // Set current values even if goals fetch fails
+        setMonthlyGoals(prev => ({
+          ...prev,
+          currentSubscribers: analyticsData.subscribers || 0,
+          currentRevenue: analyticsData.monthlyEarnings || 0,
+          currentPosts: analyticsData.postsThisMonth || 0
+        }));
+      }
+
+      // Fetch recent subscribers
+      const subscribersResponse = await fetch(`/api/creator/${user.id}/subscribers?limit=3&recent=true`);
+      if (subscribersResponse.ok) {
+        const subscribers = await subscribersResponse.json();
+        setRecentSubscribers(subscribers);
+      }
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserPosts();
+  }, [user]);
+
+  // Refetch data when window gains focus (when user comes back from settings)
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchUserPosts();
     };
 
-    fetchUserPosts();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [user]);
 
   return (
