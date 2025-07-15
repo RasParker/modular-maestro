@@ -36,6 +36,7 @@ export const ManageTiers: React.FC = () => {
     description: '',
     benefits: ['']
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load tiers from API on component mount
   useEffect(() => {
@@ -85,6 +86,7 @@ export const ManageTiers: React.FC = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const tierData = {
         name: formData.name,
@@ -145,6 +147,7 @@ export const ManageTiers: React.FC = () => {
     setIsCreating(false);
     setEditingTier(null);
     setFormData({ name: '', price: '', description: '', benefits: [''] });
+    setIsLoading(false);
   };
 
   const handleDeleteTier = async (id: number) => {
@@ -295,8 +298,15 @@ export const ManageTiers: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button onClick={handleSaveTier}>
-                    {editingTier ? 'Update Tier' : 'Create Tier'}
+                  <Button onClick={handleSaveTier} disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                        {editingTier ? 'Updating...' : 'Creating...'}
+                      </>
+                    ) : (
+                      editingTier ? 'Update Tier' : 'Create Tier'
+                    )}
                   </Button>
                   <Button 
                     variant="outline" 
