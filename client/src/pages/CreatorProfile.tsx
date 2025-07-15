@@ -154,12 +154,18 @@ export const CreatorProfile: React.FC = () => {
         const allPosts = await response.json();
         // Filter posts by current user (convert both to numbers for comparison)
         const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
-        const filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
+        let filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
+        
+        // If not viewing own profile, only show published posts
+        if (!isOwnProfile) {
+          filteredPosts = filteredPosts.filter((post: any) => post.status === 'published');
+        }
+        
         // Sort posts by creation date (newest first)
         filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
         console.log('Fetched user posts:', filteredPosts);
-        console.log('User ID:', userIdNum, 'All posts:', allPosts);
+        console.log('User ID:', userIdNum, 'Is own profile:', isOwnProfile);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error);
