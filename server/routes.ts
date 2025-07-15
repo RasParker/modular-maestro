@@ -551,7 +551,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creatorId = parseInt(req.params.creatorId);
       const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
-      res.json(tierPerformance);
+      
+      // Ensure all numeric fields are properly converted
+      const formattedTierPerformance = tierPerformance.map(tier => ({
+        ...tier,
+        subscribers: Number(tier.subscribers),
+        revenue: Number(tier.revenue),
+        price: Number(tier.price)
+      }));
+      
+      console.log('Tier performance data being sent:', formattedTierPerformance);
+      res.json(formattedTierPerformance);
     } catch (error) {
       console.error('Error fetching tier performance:', error);
       res.status(500).json({ error: "Failed to fetch tier performance" });

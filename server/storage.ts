@@ -456,7 +456,7 @@ export class DatabaseStorage implements IStorage {
       const tierPerformance = await Promise.all(
         tiers.map(async (tier) => {
           // Count active subscribers for this tier
-          const [subscriberCount] = await db
+          const subscriberCountResult = await db
             .select({ count: sql<number>`count(*)` })
             .from(subscriptions)
             .where(and(
@@ -465,7 +465,8 @@ export class DatabaseStorage implements IStorage {
               eq(subscriptions.status, 'active')
             ));
 
-          const subscribers = subscriberCount?.count || 0;
+          const subscriberCount = subscriberCountResult[0]?.count || 0;
+          const subscribers = Number(subscriberCount);
           const monthlyRevenue = subscribers * parseFloat(tier.price);
 
           return {
