@@ -48,6 +48,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   likes,
   comments,
   mediaPreview,
+  category,
   scheduledFor,
   onEdit,
   onDelete,
