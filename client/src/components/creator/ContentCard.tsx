@@ -159,12 +159,6 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                       }}
                     />
                   )}
-                  {/* Media type icon overlay - like profile */}
-                  <div className="absolute top-2 left-2 z-20">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                      {getMediaOverlayIcon(type)}
-                    </div>
-                  </div>
                 </div>
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
