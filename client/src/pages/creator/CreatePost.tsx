@@ -194,6 +194,17 @@ export const CreatePost: React.FC = () => {
         uploadedMediaUrls = [uploadResult.filename];
       }
 
+      // Handle scheduled date and time
+      let scheduled_for = null;
+      if (data.scheduledDate && action === 'schedule') {
+        const scheduledDateTime = new Date(data.scheduledDate);
+        if (data.scheduledTime) {
+          const [hours, minutes] = data.scheduledTime.split(':');
+          scheduledDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        }
+        scheduled_for = scheduledDateTime.toISOString();
+      }
+
       // Prepare post data for API
       const postData = {
         creator_id: parseInt(user.id),
@@ -203,8 +214,7 @@ export const CreatePost: React.FC = () => {
         media_urls: uploadedMediaUrls,
         tier: data.accessTier === 'free' ? 'public' : data.accessTier,
         status: action === 'draft' ? 'draft' : action === 'schedule' ? 'scheduled' : 'published',
-        scheduled_for: data.scheduledDate && action === 'schedule' ? 
-          new Date(data.scheduledDate).toISOString() : null
+        scheduled_for: scheduled_for
       };
 
       console.log('Creating post with data:', postData);

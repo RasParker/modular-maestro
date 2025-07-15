@@ -298,29 +298,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all posts for a creator
   app.get("/api/posts", async (req, res) => {
     try {
+      // First get all posts
       const allPosts = await db
-        .select({
-          id: posts.id,
-          creator_id: posts.creator_id,
-          title: posts.title,
-          content: posts.content,
-          media_type: posts.media_type,
-          media_urls: posts.media_urls,
-          tier: posts.tier,
-          status: posts.status,
-          scheduled_for: posts.scheduled_for,
-          likes_count: posts.likes_count,
-          comments_count: posts.comments_count,
-          created_at: posts.created_at,
-          updated_at: posts.updated_at,
-          username: users.username,
-          avatar: users.avatar
-        })
+        .select()
         .from(posts)
-        .leftJoin(users, eq(posts.creator_id, users.id))
         .orderBy(desc(posts.created_at));
 
-      res.json(allPosts);
+      // Then enrich with user data
+      const postsWithUsers = await Promise.all(
+        allPosts.map(async (post) => {
+          const user = await storage.getUser(post.creator_id);
+          return {
+            ...post,
+            username: user?.username || null,
+            avatar: user?.avatar || null
+          };
+        })
+      );
+
+      res.json(postsWithUsers);
     } catch (error) {
       console.error('Error fetching posts:', error);
       res.status(500).json({ error: 'Failed to fetch posts' });

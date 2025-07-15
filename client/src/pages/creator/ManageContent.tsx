@@ -263,7 +263,7 @@ export const ManageContent: React.FC = () => {
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getFilteredContent().map((item) => (
+                {publishedContent.map((item) => (
                   <ContentCard
                     key={item.id}
                     {...item}
@@ -291,7 +291,7 @@ export const ManageContent: React.FC = () => {
           <TabsContent value="scheduled" className="space-y-4">
             {scheduledContent.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getFilteredContent().map((item) => (
+                {scheduledContent.map((item) => (
                   <ContentCard
                     key={item.id}
                     {...item}
@@ -319,7 +319,7 @@ export const ManageContent: React.FC = () => {
           <TabsContent value="drafts" className="space-y-4">
             {draftContent.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getFilteredContent().map((item) => (
+                {draftContent.map((item) => (
                   <ContentCard
                     key={item.id}
                     {...item}
