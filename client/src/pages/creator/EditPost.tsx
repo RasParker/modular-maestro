@@ -65,14 +65,27 @@ export const EditPost: React.FC = () => {
     },
   });
 
+  const handleBackClick = () => {
+    console.log('Back button clicked');
+    setLocation('/creator/dashboard');
+  };
+
+  const handleCancelClick = () => {
+    console.log('Cancel button clicked');
+    setLocation('/creator/dashboard');
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!postId || !user?.id) {
+        console.log('Missing postId or user.id:', { postId, userId: user?.id });
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log('Fetching data for post:', postId);
+        
         // Fetch both post data and creator tiers
         const [postResponse, tiersResponse] = await Promise.all([
           fetch(`/api/posts/${postId}`),
@@ -87,12 +100,13 @@ export const EditPost: React.FC = () => {
           postData = await postResponse.json();
           console.log('Fetched post data:', postData);
         } else {
+          console.error('Failed to fetch post data:', postResponse.status);
           toast({
             title: "Error",
             description: "Failed to load post data.",
             variant: "destructive",
           });
-          setLocation('/creator/content');
+          setLocation('/creator/dashboard');
           return;
         }
 
@@ -131,15 +145,24 @@ export const EditPost: React.FC = () => {
             scheduledTime = scheduledDateTime.toTimeString().slice(0, 5); // HH:MM format
           }
           
-          const formData = {
+          const formDataObj = {
             caption: postData.content || '',
             accessTier: accessTier,
             scheduledDate: scheduledDate,
             scheduledTime: scheduledTime,
           };
           
-          console.log('Setting form data:', formData);
-          form.reset(formData);
+          console.log('Setting form data:', formDataObj);
+          
+          // Use setValue instead of reset for better control
+          form.setValue('caption', formDataObj.caption);
+          form.setValue('accessTier', formDataObj.accessTier);
+          if (formDataObj.scheduledDate) {
+            form.setValue('scheduledDate', formDataObj.scheduledDate);
+          }
+          if (formDataObj.scheduledTime) {
+            form.setValue('scheduledTime', formDataObj.scheduledTime);
+          }
 
           // Set media preview if exists
           if (postData.media_urls && postData.media_urls.length > 0) {
@@ -151,6 +174,8 @@ export const EditPost: React.FC = () => {
             const mediaUrl = mediaFileName.startsWith('/uploads/')
               ? mediaFileName
               : `/uploads/${mediaFileName}`;
+            
+            console.log('Setting media preview:', mediaUrl);
             setMediaPreview(mediaUrl);
             setMediaType(postData.media_type === 'image' ? 'image' : 'video');
           }
@@ -164,7 +189,7 @@ export const EditPost: React.FC = () => {
           description: "Failed to load post data.",
           variant: "destructive",
         });
-        setLocation('/creator/content');
+        setLocation('/creator/dashboard');
       } finally {
         setIsLoading(false);
       }
@@ -223,7 +248,7 @@ export const EditPost: React.FC = () => {
   };
 
   const handleSubmit = async (data: FormData) => {
-    if (!user || !postId) return;
+    if (!user || !postId || !originalPost) return;
 
     setIsSaving(true);
 
@@ -285,11 +310,6 @@ export const EditPost: React.FC = () => {
       const updatedPost = await response.json();
       console.log('Post updated successfully:', updatedPost);
 
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { type: 'postUpdated', post: updatedPost }
-      }));
-
       toast({
         title: "Post updated",
         description: "Your post has been updated successfully.",
@@ -324,13 +344,12 @@ export const EditPost: React.FC = () => {
 
   return (
     <AppLayout>
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button 
             variant="outline" 
             className="mb-4"
-            onClick={() => setLocation('/creator/dashboard')}
+            onClick={handleBackClick}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
@@ -542,7 +561,7 @@ export const EditPost: React.FC = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setLocation('/creator/dashboard')}
+                onClick={handleCancelClick}
                 disabled={isSaving}
               >
                 Cancel
