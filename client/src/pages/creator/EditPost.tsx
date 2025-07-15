@@ -290,7 +290,7 @@ export const EditPost: React.FC = () => {
         const [hours, minutes] = data.scheduledTime.split(':');
         const scheduledDateTime = new Date(data.scheduledDate);
         scheduledDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-        scheduled_for = scheduledDateTime.toISOString();
+        scheduled_for = scheduledDateTime; // Send as Date object, not ISO string
       }
 
       // Prepare updated post data
