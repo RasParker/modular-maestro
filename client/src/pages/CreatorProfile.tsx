@@ -857,14 +857,21 @@ export const CreatorProfile: React.FC = () => {
                       <div className="px-3 py-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className={`h-10 w-10 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                              onClick={() => handleLike(post.id)}
-                            >
-                              <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`h-10 w-10 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                onClick={() => handleLike(post.id)}
+                              >
+                                <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                              </Button>
+                              {(postLikes[post.id]?.count || post.likes_count || post.likes || 0) > 0 && (
+                                <span className="text-sm font-medium text-foreground">
+                                  {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-1">
                               <Button 
                                 variant="ghost" 
@@ -911,12 +918,7 @@ export const CreatorProfile: React.FC = () => {
                           )}
                         </div>
                         
-                        {/* Like count - Mobile style */}
-                        <div className="mb-1">
-                          <span className="text-sm font-medium text-foreground">
-                            {postLikes[post.id]?.count || post.likes_count || post.likes || 0} likes
-                          </span>
-                        </div>
+
                         
                         {/* Post Caption - Mobile Instagram style */}
                         {(post.content || post.title) && (
