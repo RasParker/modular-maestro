@@ -295,28 +295,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Post routes
+  // Get all posts for a creator
   app.get("/api/posts", async (req, res) => {
     try {
-      const posts = await storage.getPosts();
+      const result = await db.query(`
+        SELECT p.id, p.creator_id, p.title, p.content, p.media_type, p.media_urls, 
+               p.tier, p.status, p.scheduled_for, p.likes_count, p.comments_count, 
+               p.created_at, p.updated_at, c.username, c.avatar
+        FROM posts p 
+        JOIN creators c ON p.creator_id = c.id 
+        ORDER BY p.created_at DESC
+      `);
 
-      // Enrich posts with user information
-      const postsWithUsers = await Promise.all(
-        posts.map(async (post) => {
-          const user = await storage.getUser(post.creator_id);
-          return {
-            ...post,
-            creator: user ? {
-              id: user.id,
-              username: user.username,
-              avatar: user.avatar
-            } : null
-          };
-        })
-      );
-
-      res.json(postsWithUsers);
+      res.json(result.rows);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch posts" });
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ error: 'Failed to fetch posts' });
     }
   });
 
@@ -551,7 +545,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creatorId = parseInt(req.params.creatorId);
       const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
-      
+
       // Ensure all numeric fields are properly converted
       const formattedTierPerformance = tierPerformance.map(tier => ({
         ...tier,
@@ -559,7 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         revenue: Number(tier.revenue),
         price: Number(tier.price)
       }));
-      
+
       console.log('Tier performance data being sent:', formattedTierPerformance);
       res.json(formattedTierPerformance);
     } catch (error) {

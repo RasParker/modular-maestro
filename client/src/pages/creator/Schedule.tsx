@@ -70,19 +70,41 @@ export const Schedule: React.FC = () => {
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => post.status === 'scheduled' || post.status === 'draft')
             .map((post: any) => {
-              // Use scheduled_for if available, otherwise fall back to created_at
-              const scheduledDateTime = post.scheduled_for ? new Date(post.scheduled_for) : new Date(post.created_at);
+              // For scheduled posts, use scheduled_for if available, otherwise show "Not scheduled"
+              // For draft posts, show creation time as fallback
+              let displayDateTime;
+              let displayDate;
+              let displayTime;
+              
+              if (post.status === 'scheduled' && post.scheduled_for) {
+                displayDateTime = new Date(post.scheduled_for);
+                displayDate = displayDateTime.toLocaleDateString();
+                displayTime = displayDateTime.toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: false 
+                });
+              } else if (post.status === 'scheduled' && !post.scheduled_for) {
+                // Scheduled but no specific time set
+                displayDate = 'Not scheduled';
+                displayTime = '';
+              } else {
+                // Draft posts - show creation time
+                displayDateTime = new Date(post.created_at);
+                displayDate = displayDateTime.toLocaleDateString();
+                displayTime = displayDateTime.toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: false 
+                });
+              }
               
               return {
                 id: post.id.toString(),
                 title: post.title || 'Untitled Post',
                 description: post.content || '',
-                date: scheduledDateTime.toLocaleDateString(),
-                time: scheduledDateTime.toLocaleTimeString('en-US', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: false 
-                }),
+                date: displayDate,
+                time: displayTime,
                 type: post.media_type === 'image' ? 'Image' as const : 
                       post.media_type === 'video' ? 'Video' as const : 
                       'Text' as const,
