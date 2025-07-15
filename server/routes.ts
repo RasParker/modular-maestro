@@ -386,7 +386,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/posts/:id", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const post = await storage.updatePost(postId, req.body);
+      
+      // Handle date conversion for scheduled_for field
+      const updateData = { ...req.body };
+      if (updateData.scheduled_for && typeof updateData.scheduled_for === 'string') {
+        updateData.scheduled_for = new Date(updateData.scheduled_for);
+      }
+      
+      const post = await storage.updatePost(postId, updateData);
 
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
