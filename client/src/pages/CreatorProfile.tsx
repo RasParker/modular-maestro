@@ -777,25 +777,6 @@ export const CreatorProfile: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            <div>
-              <div className="flex items-center justify-end mb-3">
-                {isOwnProfile && (
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    asChild
-                    className="p-1 h-auto"
-                  >
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                )}
-              </div>
-              <p className="text-muted-foreground leading-relaxed">
-                {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
-              </p>
-            </div>
 
             {/* Recent Posts Preview */}
             <div>
@@ -1043,7 +1024,24 @@ export const CreatorProfile: React.FC = () => {
 
           {/* Subscription Tiers */}
           <div id="subscription-tiers" className="space-y-4">
-            <h2 className="text-xl font-semibold">Subscription Tiers</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Subscription Tiers</h2>
+              {isOwnProfile && (
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  asChild
+                  className="p-1 h-auto"
+                >
+                  <Link to="/creator/settings">
+                    <Settings className="w-4 h-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
+            </p>
 
             {creator.tiers && creator.tiers.length > 0 ? (
               creator.tiers.map((tier) => (
