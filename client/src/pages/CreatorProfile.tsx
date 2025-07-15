@@ -778,8 +778,7 @@ export const CreatorProfile: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-semibold">About</h2>
+              <div className="flex items-center justify-end mb-3">
                 {isOwnProfile && (
                   <Button 
                     size="sm" 
@@ -800,7 +799,7 @@ export const CreatorProfile: React.FC = () => {
 
             {/* Recent Posts Preview */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Recent Posts</h2>
+              <div className="mb-4"></div>
               {userPosts.length > 0 ? (
                 <div className="space-y-0 -mx-4">
                   {userPosts.map((post) => (
