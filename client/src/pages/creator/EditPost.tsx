@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Upload, Image, Video, Save, CalendarIcon, Clock } from 'lucide-react';
-import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { format } from 'date-fns';
+import { 
+  CalendarIcon,
+  Upload,
+  ArrowLeft,
+  Loader2
+} from 'lucide-react';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 
 const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
@@ -85,7 +89,7 @@ export const EditPost: React.FC = () => {
 
       try {
         console.log('Fetching data for post:', postId);
-        
+
         // Fetch both post data and creator tiers
         const [postResponse, tiersResponse] = await Promise.all([
           fetch(`/api/posts/${postId}`),
@@ -123,7 +127,7 @@ export const EditPost: React.FC = () => {
         if (postData) {
           // Pre-populate form with existing post data - handle case mismatch
           let accessTier = postData.tier === 'public' ? 'free' : postData.tier;
-          
+
           // Fix case sensitivity issues by finding matching tier
           if (accessTier !== 'free' && tiersData.length > 0) {
             const matchingTier = tiersData.find(tier => 
@@ -133,9 +137,9 @@ export const EditPost: React.FC = () => {
               accessTier = matchingTier.name;
             }
           }
-          
+
           console.log('Mapped access tier:', accessTier, 'from original:', postData.tier);
-          
+
           // Handle scheduled date and time
           let scheduledDate = undefined;
           let scheduledTime = '';
@@ -144,16 +148,16 @@ export const EditPost: React.FC = () => {
             scheduledDate = scheduledDateTime;
             scheduledTime = scheduledDateTime.toTimeString().slice(0, 5); // HH:MM format
           }
-          
+
           const formDataObj = {
             caption: postData.content || '',
             accessTier: accessTier,
             scheduledDate: scheduledDate,
             scheduledTime: scheduledTime,
           };
-          
+
           console.log('Setting form data:', formDataObj);
-          
+
           // Use setValue instead of reset for better control
           form.setValue('caption', formDataObj.caption);
           form.setValue('accessTier', formDataObj.accessTier);
@@ -170,11 +174,11 @@ export const EditPost: React.FC = () => {
             const mediaFileName = Array.isArray(postData.media_urls) 
               ? postData.media_urls[0] 
               : postData.media_urls;
-            
+
             const mediaUrl = mediaFileName.startsWith('/uploads/')
               ? mediaFileName
               : `/uploads/${mediaFileName}`;
-            
+
             console.log('Setting media preview:', mediaUrl);
             setMediaPreview(mediaUrl);
             setMediaType(postData.media_type === 'image' ? 'image' : 'video');

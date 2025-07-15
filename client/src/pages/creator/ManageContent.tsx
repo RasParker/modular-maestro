@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-
-import { ArrowLeft, Plus, Edit, Trash2, Eye, MessageSquare, Heart, Share, Image, Video, FileText } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ContentCard } from '@/components/creator/ContentCard';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  Plus, 
+  Eye, 
+  Heart, 
+  MessageCircle, 
+  Edit3, 
+  Trash2, 
+  ExternalLink,
+  ArrowLeft,
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Calendar,
+  Clock
+} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ContentItem {
   id: string;
@@ -21,8 +35,9 @@ interface ContentItem {
   views: number;
   likes: number;
   comments: number;
-  mediaPreview: string | null;
-  category?: string;
+  mediaPreview?: string;
+  category: string;
+  scheduledFor?: string;
 }
 
 export const ManageContent: React.FC = () => {
@@ -39,13 +54,13 @@ export const ManageContent: React.FC = () => {
   useEffect(() => {
     const fetchContent = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
         const response = await fetch('/api/posts');
         if (response.ok) {
           const allPosts = await response.json();
-          
+
           // Filter posts by current user and transform to match our interface
           const userPosts = allPosts
             .filter((post: any) => post.creator_id === parseInt(user.id))
@@ -87,10 +102,11 @@ export const ManageContent: React.FC = () => {
                 likes: post.likes_count || 0,
                 comments: post.comments_count || 0,
                 mediaPreview: mediaPreview,
-                category: 'General'
+                category: 'General',
+                scheduledFor: post.scheduled_for || null,
               };
             });
-          
+
           setContent(userPosts);
           console.log('Fetched user content:', userPosts);
         }
@@ -107,12 +123,12 @@ export const ManageContent: React.FC = () => {
     };
 
     fetchContent();
-    
+
     // Listen for new posts
     const handleNewPost = () => {
       fetchContent();
     };
-    
+
     window.addEventListener('localStorageChange', handleNewPost);
     return () => window.removeEventListener('localStorageChange', handleNewPost);
   }, [user, toast]);
@@ -188,166 +204,9 @@ export const ManageContent: React.FC = () => {
     }
   };
 
-  const ContentCard = ({ item }: { item: ContentItem }) => (
-    <div className="rounded-xl border border-border/50 bg-gradient-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden">
-      {/* Top Section - Only Tier Badge and Date */}
-      <div className="p-4 pb-3">
-        <div className="flex items-center justify-between mb-3">
-          <Badge variant={getTierColor(item.tier)} className="text-xs">{item.tier}</Badge>
-          <span className="text-xs text-muted-foreground">{item.date}</span>
-        </div>
-      </div>
-
-      {/* Middle Section - Image Container */}
-      <div className="px-4 pb-3">
-        <AspectRatio ratio={1} className="overflow-hidden rounded-lg touch-manipulation">
-          {item.mediaPreview ? (
-            <div 
-              className="relative w-full h-full cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-              onClick={() => handleContentClick(item)}
-              onTouchStart={() => {}} // Enable touch events on iOS
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleContentClick(item);
-                }
-              }}
-            >
-              {/* Blurred background layer */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                style={{ backgroundImage: `url(${item.mediaPreview})` }}
-              />
-              {/* Main media content - Square container */}
-              <div className="relative z-10 w-full h-full">
-                {item.type === 'Video' ? (
-                  <video 
-                    src={item.mediaPreview} 
-                    className="w-full h-full object-contain"
-                    muted
-                    preload="metadata"
-                  />
-                ) : (
-                  <img 
-                    src={item.mediaPreview} 
-                    alt={item.caption}
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      // If image fails to load, replace with placeholder
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                      target.className = "w-full h-full object-contain opacity-50";
-                    }}
-                  />
-                )}
-              </div>
-              {/* Type indicator overlay */}
-              <div className="absolute top-2 left-2 z-20">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm">
-                  {getTypeIcon(item.type)}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div 
-              className="w-full h-full bg-gradient-primary/10 flex items-center justify-center rounded-lg cursor-pointer hover:opacity-90 transition-opacity active:opacity-80"
-              onClick={() => handleContentClick(item)}
-              onTouchStart={() => {}} // Enable touch events on iOS
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleContentClick(item);
-                }
-              }}
-            >
-              <div className="text-center">
-                {getTypeIcon(item.type)}
-                <p className="text-xs text-muted-foreground mt-2">{item.type}</p>
-              </div>
-            </div>
-          )}
-        </AspectRatio>
-      </div>
-
-      {/* Caption */}
-      <div className="px-4 pb-3">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {item.caption}
-        </p>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="px-4 pb-4">
-        <div className="flex items-center justify-between">
-          {/* Left: Stats */}
-          <div className="flex items-center gap-4">
-            {item.status === 'Published' && (
-              <>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Eye className="w-3 h-3" />
-                  <span>{item.views.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Heart className="w-3 h-3" />
-                  <span>{item.likes}</span>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MessageSquare className="w-3 h-3" />
-                  <span>{item.comments}</span>
-                </div>
-              </>
-            )}
-            {item.status !== 'Published' && (
-              <span className="text-xs text-muted-foreground">No stats yet</span>
-            )}
-          </div>
-
-          {/* Right: Action Icons */}
-          <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="h-8 w-8 p-0 hover:bg-muted"
-              onClick={() => handleEdit(item.id)}
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
-            {item.status === 'Published' && (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-8 w-8 p-0 hover:bg-muted"
-              >
-                <Eye className="w-4 h-4" />
-              </Button>
-            )}
-            {item.status === 'Draft' && (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-8 w-8 p-0 hover:bg-success/10 text-success hover:text-success"
-                onClick={() => handlePublish(item.id)}
-              >
-                <Share className="w-4 h-4" />
-              </Button>
-            )}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="h-8 w-8 p-0 hover:bg-destructive/10 text-destructive hover:text-destructive"
-              onClick={() => handleDelete(item.id)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const getFilteredContent = () => {
+    return content;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -398,9 +257,16 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {publishedContent.map((item) => (
-                  <ContentCard key={item.id} item={item} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getFilteredContent().map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    {...item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPublish={handlePublish}
+                    onClick={() => handleContentClick(item)}
+                  />
                 ))}
               </div>
             ) : (
@@ -419,9 +285,16 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="scheduled" className="space-y-4">
             {scheduledContent.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {scheduledContent.map((item) => (
-                  <ContentCard key={item.id} item={item} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getFilteredContent().map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    {...item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPublish={handlePublish}
+                    onClick={() => handleContentClick(item)}
+                  />
                 ))}
               </div>
             ) : (
@@ -440,9 +313,16 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="drafts" className="space-y-4">
             {draftContent.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {draftContent.map((item) => (
-                  <ContentCard key={item.id} item={item} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getFilteredContent().map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    {...item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPublish={handlePublish}
+                    onClick={() => handleContentClick(item)}
+                  />
                 ))}
               </div>
             ) : (
@@ -532,7 +412,7 @@ export const ManageContent: React.FC = () => {
 
                     <div className="flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                        <MessageSquare className="w-7 h-7" />
+                        <MessageCircle className="w-7 h-7" />
                       </div>
                       <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{selectedContent.comments}</span>
                     </div>

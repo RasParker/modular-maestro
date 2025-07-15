@@ -115,6 +115,12 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
                 <Clock className="w-3 h-3" />
                 <span>{time}</span>
               </div>
+              {status === 'Scheduled' && (
+                <div className="flex items-center gap-1 text-primary">
+                  <Clock className="w-3 h-3" />
+                  <span className="font-medium">Scheduled</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
