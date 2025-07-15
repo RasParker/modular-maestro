@@ -12,7 +12,10 @@ import {
   MessageCircle,
   Calendar,
   Clock,
-  Timer
+  Timer,
+  Image,
+  Video,
+  FileText
 } from 'lucide-react';
 
 interface ContentCardProps {
@@ -54,13 +57,13 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   const getTypeIcon = () => {
     switch (type) {
       case 'Image':
-        return '🖼️';
+        return <Image className="w-4 h-4" />;
       case 'Video':
-        return '🎥';
+        return <Video className="w-4 h-4" />;
       case 'Text':
-        return '📝';
+        return <FileText className="w-4 h-4" />;
       default:
-        return '📄';
+        return <FileText className="w-4 h-4" />;
     }
   };
 
@@ -96,13 +99,19 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                     className="max-w-full max-h-full object-contain"
                   />
                 </div>
-                <div className="absolute top-1 right-1 text-lg">
-                  {getTypeIcon()}
+                <div className="absolute top-1 right-1">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                    <div className="text-white">
+                      {getTypeIcon()}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-2xl">
-                {getTypeIcon()}
+              <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+                <div className="scale-150">
+                  {getTypeIcon()}
+                </div>
               </div>
             )}
           </div>
