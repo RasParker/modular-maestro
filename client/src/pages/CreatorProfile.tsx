@@ -772,30 +772,32 @@ export const CreatorProfile: React.FC = () => {
         </div>
       </div>
 
+      {/* Bio Section */}
+      <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground leading-relaxed flex-1">
+            {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
+          </p>
+          {isOwnProfile && (
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              asChild
+              className="p-1 h-auto ml-4"
+            >
+              <Link to="/creator/settings">
+                <Settings className="w-4 h-4" />
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
+
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            <div>
-              <div className="flex items-center justify-end mb-3">
-                {isOwnProfile && (
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    asChild
-                    className="p-1 h-auto"
-                  >
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                )}
-              </div>
-              <p className="text-muted-foreground leading-relaxed">
-                {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
-              </p>
-            </div>
 
             {/* Recent Posts Preview */}
             <div>
