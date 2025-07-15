@@ -82,7 +82,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
+      console.log('Login attempt received:', { email: req.body?.email });
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        console.log('Missing email or password');
+        return res.status(400).json({ error: "Email and password are required" });
+      }
 
       // Demo users for development
       const DEMO_USERS = [
@@ -118,6 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (password === 'demo123') {
         const demoUser = DEMO_USERS.find(u => u.email === email);
         if (demoUser) {
+          console.log('Demo user login successful:', demoUser.email);
           // Set session data
           req.session.userId = demoUser.id;
           req.session.user = demoUser;
@@ -126,19 +133,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Try database authentication
+      console.log('Attempting database authentication for:', email);
       const user = await storage.getUserByEmail(email);
 
       if (!user) {
+        console.log('User not found:', email);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
       const isValidPassword = await storage.verifyPassword(password, user.password);
       if (!isValidPassword) {
+        console.log('Invalid password for user:', email);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
       // Check if user is suspended
       if (user.status === 'suspended') {
+        console.log('User suspended:', email);
         return res.status(403).json({ 
           error: "Your account has been suspended. Please contact support for assistance.",
           suspended: true 
@@ -151,9 +162,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.user = userWithoutPassword;
 
+      console.log('Database user login successful:', user.email);
       res.json({ user: userWithoutPassword });
     } catch (error) {
-      res.status(500).json({ error: "Login failed" });
+      console.error('Login error:', error);
+      res.status(500).json({ error: "Login failed", details: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
@@ -334,7 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create post
-  app.post('/api/posts', async (req: Request, res: Response) => {
+  app.post('/api/posts', async (req, res) => {
     try {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
