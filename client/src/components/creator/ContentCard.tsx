@@ -208,18 +208,6 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               </Button>
               
               <Button
-                variant="default"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPublish(id);
-                }}
-                className="h-7 px-2 text-xs bg-gradient-primary"
-              >
-                <ExternalLink className="w-3 h-3" />
-              </Button>
-              
-              <Button
                 variant="outline"
                 size="sm"
                 onClick={(e) => {
