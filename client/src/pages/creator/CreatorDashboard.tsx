@@ -35,29 +35,7 @@ const ANALYTICS = {
   postsThisMonth: 24
 };
 
-const RECENT_SUBSCRIBERS = [
-  {
-    id: '1',
-    username: 'johndoe',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    tier: 'Fan',
-    joined: '2 hours ago'
-  },
-  {
-    id: '2',
-    username: 'sarahsmith',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
-    tier: 'Superfan',
-    joined: '5 hours ago'
-  },
-  {
-    id: '3',
-    username: 'mikejones',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-    tier: 'Supporter',
-    joined: '1 day ago'
-  }
-];
+
 
 const TIER_BREAKDOWN = [
   { name: 'Supporter', price: 5, subscribers: 1200, revenue: 6000 },
@@ -71,6 +49,7 @@ export const CreatorDashboard: React.FC = () => {
   // Real posts will be fetched from API
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [scheduledContent, setScheduledContent] = useState<any[]>([]);
+  const [recentSubscribers, setRecentSubscribers] = useState<any[]>([]);
   const [monthlyGoals, setMonthlyGoals] = useState({
     subscriberGoal: 3000,
     revenueGoal: 5000,
@@ -107,6 +86,13 @@ export const CreatorDashboard: React.FC = () => {
             currentRevenue: ANALYTICS.monthlyEarnings,
             currentPosts: ANALYTICS.postsThisMonth
           }));
+        }
+
+        // Fetch recent subscribers
+        const subscribersResponse = await fetch(`/api/creator/${user.id}/subscribers?limit=3&recent=true`);
+        if (subscribersResponse.ok) {
+          const subscribers = await subscribersResponse.json();
+          setRecentSubscribers(subscribers);
         }
       } catch (error) {
         console.error('Error fetching user posts:', error);
@@ -284,21 +270,53 @@ export const CreatorDashboard: React.FC = () => {
                 <CardTitle className="text-base sm:text-lg">Recent Subscribers</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {RECENT_SUBSCRIBERS.map((subscriber) => (
-                  <div key={subscriber.id} className="flex items-center gap-3">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-primary flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{subscriber.username}</p>
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                        <Badge variant="outline" className="text-xs">{subscriber.tier}</Badge>
-                        <span className="text-xs text-muted-foreground">{subscriber.joined}</span>
+                {recentSubscribers.length > 0 ? (
+                  <>
+                    {recentSubscribers.map((subscriber) => (
+                      <div key={subscriber.id} className="flex items-center gap-3">
+                        <Avatar className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
+                          <AvatarImage 
+                            src={subscriber.fan?.avatar || subscriber.avatar} 
+                            alt={subscriber.fan?.username || subscriber.username} 
+                          />
+                          <AvatarFallback className="text-xs">
+                            {(subscriber.fan?.username || subscriber.username)?.charAt(0)?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {subscriber.fan?.username || subscriber.username}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {subscriber.tier_name || subscriber.tier || 'Subscriber'}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {subscriber.created_at 
+                                ? new Date(subscriber.created_at).toLocaleDateString() === new Date().toLocaleDateString()
+                                  ? 'Today'
+                                  : new Date(subscriber.created_at).toLocaleDateString()
+                                : 'Recently'
+                              }
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ))}
+                    <Button variant="outline" size="sm" className="w-full" asChild>
+                      <Link to="/creator/subscribers">View All</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <div className="text-center py-6">
+                    <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No subscribers yet</p>
+                    <p className="text-xs text-muted-foreground mb-4">Share your profile to start gaining subscribers</p>
+                    <Button variant="outline" size="sm" className="mt-2" asChild>
+                      <Link to={`/creator/${user?.username}`}>View Profile</Link>
+                    </Button>
                   </div>
-                ))}
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link to="/creator/subscribers">View All</Link>
-                </Button>
+                )}
               </CardContent>
             </Card>
 
