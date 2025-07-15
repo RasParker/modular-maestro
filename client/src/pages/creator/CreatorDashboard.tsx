@@ -50,13 +50,21 @@ export const CreatorDashboard: React.FC = () => {
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [scheduledContent, setScheduledContent] = useState<any[]>([]);
   const [recentSubscribers, setRecentSubscribers] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState({
+    subscribers: 0,
+    monthlyEarnings: 0,
+    totalEarnings: 0,
+    growthRate: 0,
+    engagementRate: 0,
+    postsThisMonth: 0
+  });
   const [monthlyGoals, setMonthlyGoals] = useState({
     subscriberGoal: 3000,
     revenueGoal: 5000,
     postsGoal: 30,
-    currentSubscribers: 2840,
-    currentRevenue: 4200,
-    currentPosts: 24
+    currentSubscribers: 0,
+    currentRevenue: 0,
+    currentPosts: 0
   });
 
   useEffect(() => {
@@ -88,12 +96,20 @@ export const CreatorDashboard: React.FC = () => {
         // Fetch real analytics data
         const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
         if (analyticsResponse.ok) {
-          const analytics = await analyticsResponse.json();
+          const analyticsData = await analyticsResponse.json();
+          setAnalytics({
+            subscribers: analyticsData.subscribers || 0,
+            monthlyEarnings: analyticsData.monthlyEarnings || 0,
+            totalEarnings: analyticsData.totalEarnings || 0,
+            growthRate: analyticsData.growthRate || 0,
+            engagementRate: analyticsData.engagementRate || 0,
+            postsThisMonth: analyticsData.postsThisMonth || 0
+          });
           setMonthlyGoals(prev => ({
             ...prev,
-            currentSubscribers: analytics.subscribers || prev.currentSubscribers,
-            currentRevenue: analytics.monthlyEarnings || prev.currentRevenue,
-            currentPosts: analytics.postsThisMonth || prev.currentPosts
+            currentSubscribers: analyticsData.subscribers || 0,
+            currentRevenue: analyticsData.monthlyEarnings || 0,
+            currentPosts: analyticsData.postsThisMonth || 0
           }));
         }
 
@@ -141,8 +157,8 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Subscribers</p>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">{ANALYTICS.subscribers.toLocaleString()}</p>
-                    <p className="text-xs text-success">+{ANALYTICS.growthRate}% this month</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{analytics.subscribers.toLocaleString()}</p>
+                    <p className="text-xs text-success">+{analytics.growthRate}% this month</p>
                   </div>
                   <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
@@ -154,7 +170,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Monthly Earnings</p>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {ANALYTICS.monthlyEarnings.toLocaleString()}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {analytics.monthlyEarnings.toLocaleString()}</p>
                     <p className="text-xs text-success">+12% vs last month</p>
                   </div>
                   <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
@@ -167,7 +183,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Earnings</p>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {ANALYTICS.totalEarnings.toLocaleString()}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {analytics.totalEarnings.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">All time</p>
                   </div>
                   <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
@@ -180,7 +196,7 @@ export const CreatorDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Engagement Rate</p>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">{ANALYTICS.engagementRate}%</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{analytics.engagementRate}%</p>
                     <p className="text-xs text-success">Above average</p>
                   </div>
                   <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
@@ -213,7 +229,7 @@ export const CreatorDashboard: React.FC = () => {
                       </div>
                     </div>
                     <Progress 
-                      value={(tier.subscribers / ANALYTICS.subscribers) * 100} 
+                      value={analytics.subscribers > 0 ? (tier.subscribers / analytics.subscribers) * 100 : 0} 
                       className="h-2"
                     />
                   </div>
