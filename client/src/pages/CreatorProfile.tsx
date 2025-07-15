@@ -1111,35 +1111,7 @@ export const CreatorProfile: React.FC = () => {
                 )}
               </AspectRatio>
 
-              {/* Vertical Action Icons - Instagram Style */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                    <Heart className="w-7 h-7" />
-                  </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                    {selectedContent.likes_count || selectedContent.likes || 0}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                    <MessageSquare className="w-7 h-7" />
-                  </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                    {selectedContent.comments_count || (selectedContent.comments ? selectedContent.comments.length : 0)}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                    <Eye className="w-7 h-7" />
-                  </div>
-                  <span className="text-xs text-white font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>0</span>
-                </div>
-              </div>
-
-              {/* Clean content view - no caption overlay */}
+              {/* Clean content view - no overlays */}
             </div>
           )}
         </DialogContent>
