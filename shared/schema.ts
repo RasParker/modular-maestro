@@ -36,6 +36,7 @@ export const posts = pgTable('posts', {
   media_urls: json("media_urls").$type<string[]>().notNull().default([]),
   tier: text('tier').notNull().default('public'),
   status: text('status').notNull().default('published'), // published, draft, scheduled
+  scheduled_for: timestamp('scheduled_for'), // when to publish scheduled posts
   likes_count: integer('likes_count').notNull().default(0),
   comments_count: integer('comments_count').notNull().default(0),
   created_at: timestamp('created_at').notNull().defaultNow(),
