@@ -183,13 +183,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             );
           })()}
 
-          {/* Scheduled info */}
-          {status === 'Scheduled' && scheduledFor && (
-            <div className="flex items-center gap-1 text-xs text-primary">
-              <Timer className="w-3 h-3" />
-              <span>Releases {scheduledFor}</span>
-            </div>
-          )}
+
 
           {/* Media Preview - Square aspect ratio like profile */}
           <div 
@@ -238,9 +232,9 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
           </div>
 
-          {/* Bottom row - Stats and Actions combined like profile page */}
+          {/* Bottom row - Stats/Release Info and Actions combined */}
           <div className="flex items-center justify-between pt-1">
-            {/* Stats */}
+            {/* Stats or Release Info */}
             {status === 'Published' ? (
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
@@ -255,6 +249,32 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                   <MessageCircle className="w-3 h-3" />
                   <span>{comments}</span>
                 </div>
+              </div>
+            ) : status === 'Scheduled' && scheduledFor ? (
+              <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                <Timer className="w-3 h-3" />
+                <span>
+                  {(() => {
+                    const releaseDate = new Date(scheduledFor);
+                    const now = new Date();
+                    const isToday = releaseDate.toDateString() === now.toDateString();
+                    const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+                    
+                    if (isToday) {
+                      return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                    } else if (isTomorrow) {
+                      return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                    } else {
+                      return releaseDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      });
+                    }
+                  })()}
+                </span>
               </div>
             ) : (
               <div></div>
