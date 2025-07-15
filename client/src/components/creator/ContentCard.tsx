@@ -56,7 +56,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
-  const truncateText = (text: string, maxWords: number = 10) => {
+  const truncateText = (text: string, maxWords: number = 8) => {
     const words = text.split(' ');
     
     if (words.length <= maxWords) {

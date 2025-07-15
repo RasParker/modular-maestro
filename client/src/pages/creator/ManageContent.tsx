@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ContentCard } from '@/components/creator/ContentCard';
+import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -292,13 +293,21 @@ export const ManageContent: React.FC = () => {
             {scheduledContent.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {scheduledContent.map((item) => (
-                  <ContentCard
+                  <ContentScheduleCard
                     key={item.id}
-                    {...item}
+                    id={item.id}
+                    title={item.caption}
+                    description={item.caption}
+                    date={item.date}
+                    time={item.scheduledFor ? new Date(item.scheduledFor).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : ''}
+                    type={item.type}
+                    tier={item.tier}
+                    status={item.status as 'Scheduled' | 'Draft'}
+                    thumbnail={item.mediaPreview}
+                    scheduledFor={item.scheduledFor}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
-                    onClick={() => handleContentClick(item)}
                   />
                 ))}
               </div>
