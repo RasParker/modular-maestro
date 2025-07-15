@@ -241,12 +241,27 @@ export class DatabaseStorage implements IStorage {
       .insert(comments)
       .values(insertComment)
       .returning();
+    
+    // Update the comments_count in the posts table
+    await db.update(posts).set({ comments_count: sql`${posts.comments_count} + 1` }).where(eq(posts.id, insertComment.post_id));
+    
     return comment;
   }
 
   async deleteComment(id: number): Promise<boolean> {
+    // First get the comment to know which post to update
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    if (!comment) return false;
+    
     const result = await db.delete(comments).where(eq(comments.id, id));
-    return (result.rowCount || 0) > 0;
+    const success = (result.rowCount || 0) > 0;
+    
+    // Update the comments_count in the posts table if deletion was successful
+    if (success) {
+      await db.update(posts).set({ comments_count: sql`${posts.comments_count} - 1` }).where(eq(posts.id, comment.post_id));
+    }
+    
+    return success;
   }
 
   async likePost(postId: number, userId: number): Promise<boolean> {
