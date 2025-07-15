@@ -34,6 +34,7 @@ interface ContentCardProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
+  onViewContent?: (id: string) => void;
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({
@@ -50,7 +51,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   scheduledFor,
   onEdit,
   onDelete,
-  onPublish
+  onPublish,
+  onViewContent
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
@@ -185,7 +187,13 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
           {/* Media Preview - Square aspect ratio like profile */}
           <div className="relative">
-            <div className="w-full aspect-square overflow-hidden rounded-lg">
+            <div 
+              className="w-full aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewContent && onViewContent(id);
+              }}
+            >
               {mediaPreview ? (
                 <div className="w-full h-full">
                   {type === 'Video' ? (

@@ -50,7 +50,7 @@ export const ManageContent: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [viewingContent, setViewingContent] = useState<ContentItem | null>(null);
 
   // Fetch user's posts
   useEffect(() => {
@@ -165,6 +165,9 @@ export const ManageContent: React.FC = () => {
     });
   };
 
+  const handleViewContent = (item: ContentItem) => {
+    setViewingContent(item);
+  };
 
 
   const getTypeIcon = (type: string) => {
@@ -258,6 +261,7 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
+                    onViewContent={handleViewContent}
                   />
                 ))}
               </div>
@@ -285,6 +289,7 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
+                    onViewContent={handleViewContent}
                   />
                 ))}
               </div>
@@ -312,6 +317,7 @@ export const ManageContent: React.FC = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onPublish={handlePublish}
+                    onViewContent={handleViewContent}
                   />
                 ))}
               </div>
