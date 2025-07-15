@@ -116,12 +116,6 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
                 <Clock className="w-3 h-3" />
                 <span>{time}</span>
               </div>
-              {status === 'Scheduled' && (
-                <div className="flex items-center gap-1 text-primary">
-                  <Clock className="w-3 h-3" />
-                  <span className="font-medium">Scheduled</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -136,36 +130,46 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
           </Badge>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-2 border-t border-border/30">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(id)}
-            className="flex-1 text-xs h-8"
-          >
-            <Edit3 className="w-3 h-3 mr-1" />
-            Edit
-          </Button>
+        {/* Action Buttons with Release Info */}
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/30">
+          <div className="flex gap-2 flex-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(id)}
+              className="flex-1 text-xs h-8"
+            >
+              <Edit3 className="w-3 h-3 mr-1" />
+              Edit
+            </Button>
 
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => onPublish(id)}
-            className="flex-1 text-xs h-8 bg-gradient-primary"
-          >
-            <ExternalLink className="w-3 h-3 mr-1" />
-            Publish
-          </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => onPublish(id)}
+              className="flex-1 text-xs h-8 bg-gradient-primary"
+            >
+              <ExternalLink className="w-3 h-3 mr-1" />
+              Publish
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(id)}
-            className="w-10 h-8 text-xs text-destructive hover:text-destructive p-0"
-          >
-            <Trash2 className="w-3 h-3" />
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(id)}
+              className="w-10 h-8 text-xs text-destructive hover:text-destructive p-0"
+            >
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
+
+          {/* Release Info */}
+          {status === 'Scheduled' && (
+            <div className="flex items-center gap-1 text-xs text-orange-600 font-medium">
+              <Clock className="w-3 h-3" />
+              <span>Releases {time}</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
