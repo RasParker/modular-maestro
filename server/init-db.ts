@@ -1,12 +1,17 @@
+import { db } from './db';
+
 export async function initializeDatabase() {
   console.log('Initializing database tables...');
   
   try {
-    // PostgreSQL database schema is handled by Drizzle migrations
-    // The schema is automatically synced when using `npm run db:push`
+    // Test database connection
+    const result = await db.execute(`SELECT 1 as test`);
+    console.log('Database connection test successful:', result);
+    
     console.log('Database already configured with PostgreSQL schema');
     console.log('Database initialization completed successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
+    throw error; // Re-throw to prevent app startup if DB is not accessible
   }
 }
