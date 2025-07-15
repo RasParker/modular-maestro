@@ -5,13 +5,9 @@ import { Button } from '@/components/ui/button';
 import { 
   Edit3, 
   Trash2, 
-  ExternalLink,
-  Eye,
-  Heart,
-  MessageCircle,
   Calendar,
   Clock,
-  Timer,
+  ExternalLink,
   Image,
   Video,
   FileText
@@ -31,10 +27,6 @@ interface ContentScheduleCardProps {
   onDelete: (id: string) => void;
   onPublish: (id: string) => void;
   scheduledFor?: string | null;
-  views?: number;
-  likes?: number;
-  comments?: number;
-  onClick?: () => void;
 }
 
 export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
@@ -50,39 +42,20 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   onEdit,
   onDelete,
   onPublish,
-  scheduledFor,
-  views = 0,
-  likes = 0,
-  comments = 0,
-  onClick
+  scheduledFor
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
-  const truncateText = (text: string) => {
-    // Only truncate if text is likely to exceed one line (roughly 60-80 characters)
-    if (text.length <= 60) {
+  const truncateText = (text: string, maxWords: number = 8) => {
+    const words = text.split(' ');
+    
+    if (words.length <= maxWords) {
       return { truncated: text, needsExpansion: false };
     }
     
-    // Find a good break point around 50-60 characters
-    const words = text.split(' ');
-    let truncated = '';
-    
-    for (let i = 0; i < words.length; i++) {
-      const testString = truncated + (truncated ? ' ' : '') + words[i];
-      if (testString.length > 50) {
-        if (truncated === '') {
-          // If even the first word is too long, take it anyway
-          truncated = words[0];
-        }
-        break;
-      }
-      truncated = testString;
-    }
-    
     return {
-      truncated,
-      needsExpansion: truncated !== text
+      truncated: words.slice(0, maxWords).join(' '),
+      needsExpansion: true
     };
   };
   const getTypeIcon = () => {
@@ -99,129 +72,95 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
   };
 
   const getStatusColor = () => {
-    switch (status) {
-      case 'Scheduled':
-        return 'secondary';
-      case 'Draft':
-        return 'outline';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getMediaOverlayIcon = (mediaType: string) => {
-    switch (mediaType?.toLowerCase()) {
-      case 'image':
-        return <Image className="w-3 h-3" />;
-      case 'video':
-        return <Video className="w-3 h-3" />;
-      case 'text':
-        return <FileText className="w-3 h-3" />;
-      default:
-        return <FileText className="w-3 h-3" />;
-    }
+    return status === 'Scheduled' ? 'default' : 'secondary';
   };
 
   return (
-    <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200 cursor-pointer" onClick={onClick}>
+    <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
       <CardContent className="p-4 space-y-4">
-        {/* Media Preview Section */}
-        <div className="relative w-full aspect-square bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden">
-          {thumbnail ? (
-            <>
-              {/* Background blurred image */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                style={{ backgroundImage: `url(${thumbnail})` }}
-              />
-              {/* Foreground contained image */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img 
-                  src={thumbnail} 
-                  alt={title}
-                  className="max-w-full max-h-full object-contain"
-                  style={{ objectFit: 'contain' }}
+        {/* Mobile-First Layout */}
+
+        {/* Content Preview with WhatsApp-style square container */}
+        <div className="flex items-start gap-3">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+            {thumbnail ? (
+              <div className="w-full h-full relative overflow-hidden rounded-lg">
+                {/* Background blurred image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
+                  style={{ backgroundImage: `url(${thumbnail})` }}
                 />
-              </div>
-              {/* Media type overlay */}
-              <div className="absolute top-2 right-2 w-8 h-8 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
-                {getMediaOverlayIcon(type)}
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Placeholder for content without media */}
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-primary/30 rounded-full flex items-center justify-center mx-auto mb-2">
+                {/* Foreground contained image */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img 
+                    src={thumbnail} 
+                    alt={title}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+                {/* Content type overlay */}
+                <div className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white">
+                  <div className="scale-75">
                     {getTypeIcon()}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {type} Content
-                  </p>
                 </div>
               </div>
-            </>
-          )}
-        </div>
+            ) : (
+              <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+                {getTypeIcon()}
+              </div>
+            )}
+          </div>
 
-        {/* Content Info */}
-        <div className="space-y-2">
-          {/* Caption with smart truncation */}
-          {(() => {
-            const { truncated, needsExpansion } = truncateText(description);
-            return (
-              <p className="text-sm text-foreground leading-relaxed">
-                {expandedCaption ? description : (
-                  <>
-                    {truncated}
-                    {needsExpansion && !expandedCaption && (
-                      <>
-                        {'... '}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedCaption(true);
-                          }}
-                          className="text-primary hover:text-primary/80 font-medium"
-                        >
-                          read more
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-                {expandedCaption && needsExpansion && (
-                  <>
-                    {' '}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedCaption(false);
-                      }}
-                      className="text-primary hover:text-primary/80 font-medium"
-                    >
-                      read less
-                    </button>
-                  </>
-                )}
-              </p>
-            );
-          })()}
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
+              {title}
+            </h3>
+            {(() => {
+              const { truncated, needsExpansion } = truncateText(description);
+              return (
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  {expandedCaption ? description : (
+                    <>
+                      {truncated}
+                      {needsExpansion && !expandedCaption && (
+                        <>
+                          {'... '}
+                          <button
+                            onClick={() => setExpandedCaption(true)}
+                            className="text-primary hover:text-primary/80 font-medium"
+                          >
+                            read more
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {expandedCaption && needsExpansion && (
+                    <>
+                      {' '}
+                      <button
+                        onClick={() => setExpandedCaption(false)}
+                        className="text-primary hover:text-primary/80 font-medium"
+                      >
+                        read less
+                      </button>
+                    </>
+                  )}
+                </p>
+              );
+            })()}
 
-          {/* Engagement Stats */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              <span>{views}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Heart className="w-3 h-3" />
-              <span>{likes}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageCircle className="w-3 h-3" />
-              <span>{comments}</span>
+            {/* Date/Time Info - Mobile optimized */}
+            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                <span>{date}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>{time}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -243,10 +182,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(id);
-              }}
+              onClick={() => onEdit(id)}
               className="h-7 px-2 text-xs"
             >
               <Edit3 className="w-3 h-3" />
@@ -255,10 +191,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <Button
               variant="default"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPublish(id);
-              }}
+              onClick={() => onPublish(id)}
               className="h-7 px-2 text-xs bg-gradient-primary"
             >
               <ExternalLink className="w-3 h-3" />
@@ -267,10 +200,7 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(id);
-              }}
+              onClick={() => onDelete(id)}
               className="h-7 px-2 text-xs text-destructive hover:text-destructive"
             >
               <Trash2 className="w-3 h-3" />

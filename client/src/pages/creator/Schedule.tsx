@@ -28,9 +28,6 @@ interface ScheduledPost {
   tier: string;
   status: 'Scheduled' | 'Draft';
   thumbnail?: string;
-  views: number;
-  likes: number;
-  comments: number;
 }
 
 const PUBLISHING_TIPS = [
@@ -115,10 +112,7 @@ export const Schedule: React.FC = () => {
                 status: post.status === 'scheduled' ? 'Scheduled' as const : 'Draft' as const,
                 thumbnail: post.media_urls && post.media_urls.length > 0 ? 
                   `/uploads/${post.media_urls[0]}` : undefined,
-                scheduledFor: post.scheduled_for,
-                views: 0,
-                likes: post.likes_count || 0,
-                comments: post.comments_count || 0
+                scheduledFor: post.scheduled_for
               };
             });
 
@@ -208,11 +202,6 @@ export const Schedule: React.FC = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const handleCardClick = (post: ScheduledPost) => {
-    // Navigate to post detail or content manager
-    navigate(`/creator/content`);
   };
 
   const QUICK_STATS = [
@@ -307,7 +296,6 @@ export const Schedule: React.FC = () => {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       onPublish={handlePublish}
-                      onClick={() => handleCardClick(post)}
                     />
                   ))
                 ) : (
