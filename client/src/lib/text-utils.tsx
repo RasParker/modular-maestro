@@ -92,7 +92,7 @@ export const BioDisplay = ({
           </p>
           <button
             onClick={toggleExpanded}
-            className="text-xs text-primary hover:underline mt-1 font-medium"
+            className="text-xs text-primary hover:underline mt-1 font-normal"
           >
             Read less
           </button>
@@ -114,9 +114,9 @@ export const BioDisplay = ({
               <div className="absolute bottom-0 right-0">
                 <button
                   onClick={toggleExpanded}
-                  className="text-primary hover:underline font-medium bg-transparent"
+                  className="text-primary hover:underline font-normal bg-transparent"
                 >
-                  ... read more
+                  {context === 'mobile' ? 'read more' : '... read more'}
                 </button>
               </div>
             </>
