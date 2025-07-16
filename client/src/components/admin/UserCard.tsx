@@ -26,7 +26,7 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onSuspendUser }) => {
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg border border-border/50 gap-4">
       <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
         <Avatar className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
-          <AvatarImage src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} />
+          <AvatarImage src={user.avatar ? (user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} />
           <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">

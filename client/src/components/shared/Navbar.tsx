@@ -136,7 +136,7 @@ export const Navbar: React.FC = () => {
                           <div className="flex items-center space-x-3 mb-4">
                             <Avatar className="h-10 w-10">
                               <AvatarImage 
-                                src={user.avatar?.startsWith('/uploads/') ? user.avatar : user.avatar ? `/uploads/${user.avatar}` : undefined} 
+                                src={user.avatar ? (user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} 
                                 alt={user.username} 
                               />
                               <AvatarFallback className="bg-primary text-primary-foreground">
