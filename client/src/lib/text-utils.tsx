@@ -91,7 +91,7 @@ export const BioDisplay = ({
             {bio}
             <button
               onClick={toggleExpanded}
-              className="text-xs text-primary font-normal ml-2"
+              className="text-sm text-primary font-normal ml-1"
             >
               Read less
             </button>
@@ -114,7 +114,7 @@ export const BioDisplay = ({
               <div className="absolute bottom-0 right-0">
                 <button
                   onClick={toggleExpanded}
-                  className="text-xs text-primary font-normal bg-transparent"
+                  className="text-sm text-primary font-normal bg-transparent"
                 >
                   Read more
                 </button>
