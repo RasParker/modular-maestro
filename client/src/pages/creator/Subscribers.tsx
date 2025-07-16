@@ -140,7 +140,7 @@ export const Subscribers: React.FC = () => {
               totalCount={subscribers.length}
               activeCount={activeCount}
               recentCount={recentCount}
-            /></pre>
+            />
 
         {/* Filters */}
         <div className="mb-6">
