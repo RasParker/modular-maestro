@@ -24,16 +24,17 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   const truncateText = (text: string) => {
     if (!text) return { truncated: '', needsExpansion: false };
 
-    const words = text.split(' ');
-    // Even stricter limits for mobile - ensure exactly 2 lines
-    const maxWords = 12; // Very conservative for mobile 2-line limit
+    // Character-based truncation for precise 2-line usage
+    const maxChars = 80; // Approximate characters for 2 lines in card context
+    const readMoreText = '... read more';
+    const effectiveMaxChars = maxChars - readMoreText.length;
 
-    if (words.length <= maxWords) {
+    if (text.length <= maxChars) {
       return { truncated: text, needsExpansion: false };
     }
 
     return {
-      truncated: words.slice(0, maxWords).join(' '),
+      truncated: text.slice(0, effectiveMaxChars),
       needsExpansion: true
     };
   };
@@ -68,15 +69,26 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
             {(creator.bio || truncated) && (
               <div className="mt-1">
                 <p className="text-xs text-muted-foreground line-clamp-2 leading-tight max-h-[2.2em] overflow-hidden">
-                  {expandedBio ? creator.bio : truncated}
-                  {needsExpansion && !expandedBio && '...'}
+                  {expandedBio ? creator.bio : (
+                    <>
+                      {truncated}
+                      {needsExpansion && !expandedBio && (
+                        <button
+                          onClick={() => setExpandedBio(!expandedBio)}
+                          className="text-primary hover:underline font-medium ml-1"
+                        >
+                          read more
+                        </button>
+                      )}
+                    </>
+                  )}
                 </p>
-                {needsExpansion && (
+                {expandedBio && needsExpansion && (
                   <button
                     onClick={() => setExpandedBio(!expandedBio)}
                     className="text-xs text-primary hover:underline mt-1 font-medium"
                   >
-                    {expandedBio ? 'Read less' : 'Read more'}
+                    Read less
                   </button>
                 )}
               </div>

@@ -2,23 +2,22 @@
 export const truncateBio = (text: string, context: 'profile' | 'card' | 'mobile' = 'card') => {
   if (!text) return { truncated: '', needsExpansion: false };
   
-  const words = text.split(' ');
-  
-  // Different word limits based on context but always 2 lines max
-  const wordsPerLine = {
-    profile: 12,  // Wider profile pages
-    card: 10,     // Card components
-    mobile: 8     // Mobile screens
+  // Character-based limits for different contexts
+  const maxChars = {
+    profile: 120,  // Wider profile pages
+    card: 80,      // Card components  
+    mobile: 100    // Mobile screens
   };
   
-  const maxWords = 2 * wordsPerLine[context]; // Exactly 2 lines
+  const readMoreText = '... read more';
+  const effectiveMaxChars = maxChars[context] - readMoreText.length;
   
-  if (words.length <= maxWords) {
+  if (text.length <= maxChars[context]) {
     return { truncated: text, needsExpansion: false };
   }
   
   return {
-    truncated: words.slice(0, maxWords).join(' '),
+    truncated: text.slice(0, effectiveMaxChars),
     needsExpansion: true
   };
 };
@@ -41,15 +40,26 @@ export const BioDisplay = ({
   return (
     <div>
       <p className={className}>
-        {expanded ? bio : truncated}
-        {needsExpansion && !expanded && '...'}
+        {expanded ? bio : (
+          <>
+            {truncated}
+            {needsExpansion && !expanded && onToggle && (
+              <button
+                onClick={onToggle}
+                className="text-primary hover:underline font-medium ml-1"
+              >
+                read more
+              </button>
+            )}
+          </>
+        )}
       </p>
-      {needsExpansion && onToggle && (
+      {expanded && needsExpansion && onToggle && (
         <button
           onClick={onToggle}
           className="text-xs text-primary hover:underline mt-1 font-medium"
         >
-          {expanded ? 'Read less' : 'Read more'}
+          Read less
         </button>
       )}
     </div>
