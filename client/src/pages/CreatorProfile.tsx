@@ -791,9 +791,9 @@ export const CreatorProfile: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
           
           {/* Profile Photo Overlayed on Cover Photo */}
-          <div className="absolute bottom-4 left-6">
+          <div className="absolute bottom-4 left-4 sm:left-6">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-background bg-background">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-background bg-background">
                 {creator.avatar ? (
                   <img 
                     src={creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`} 
@@ -802,7 +802,7 @@ export const CreatorProfile: React.FC = () => {
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
-                    <span className="text-xl font-bold text-primary-foreground">
+                    <span className="text-lg sm:text-xl font-bold text-primary-foreground">
                       {(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -812,19 +812,19 @@ export const CreatorProfile: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <div className="flex-1 pb-2">
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-white">{creator?.display_name || creator?.username}</h1>
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-end gap-4">
+            <div className="flex-1 pb-2 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
-                  <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                  <Badge variant="secondary" className="bg-accent text-accent-foreground flex-shrink-0">
                     <Star className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
                 )}
               </div>
-              <p className="text-white/80">@{creator.username}</p>
+              <p className="text-white/80 text-sm sm:text-base truncate">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-white/70 mt-1">
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
@@ -832,15 +832,19 @@ export const CreatorProfile: React.FC = () => {
             </div>
             
             {isOwnProfile && (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs sm:text-sm">
                   <Link to="/creator/settings">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Edit Profile
+                    <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Edit Profile</span>
+                    <span className="sm:hidden">Edit</span>
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  <Link to="/creator/upload">Create Post</Link>
+                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs sm:text-sm">
+                  <Link to="/creator/upload">
+                    <span className="hidden sm:inline">Create Post</span>
+                    <span className="sm:hidden">Post</span>
+                  </Link>
                 </Button>
               </div>
             )}
@@ -849,9 +853,9 @@ export const CreatorProfile: React.FC = () => {
       </div>
 
       {/* Bio Section */}
-      <div className="max-w-4xl mx-auto px-6 py-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
 
@@ -882,8 +886,8 @@ export const CreatorProfile: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
 
