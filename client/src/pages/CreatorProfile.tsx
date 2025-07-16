@@ -817,39 +817,33 @@ export const CreatorProfile: React.FC = () => {
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
 
-              // Character-based truncation for precise 2-line usage
-              const maxChars = 120; // Approximate characters for 2 lines on mobile
-              const readMoreText = '... read more';
-              const effectiveMaxChars = maxChars - readMoreText.length;
-
-              const needsExpansion = bioText.length > maxChars;
-              const truncated = needsExpansion ? bioText.slice(0, effectiveMaxChars) : bioText;
-
               return (
                 <div>
-                  <p className="text-muted-foreground leading-tight line-clamp-2 max-h-[2.4em] overflow-hidden text-sm">
-                    {expandedBio ? bioText : (
+                  <p className="text-muted-foreground leading-tight text-sm">
+                    {expandedBio ? (
                       <>
-                        {truncated}
-                        {needsExpansion && !expandedBio && (
+                        {bioText}
+                        <button
+                          onClick={() => setExpandedBio(false)}
+                          className="text-primary hover:underline font-medium ml-1"
+                        >
+                          read less
+                        </button>
+                      </>
+                    ) : (
+                      <span className="line-clamp-2">
+                        {bioText}
+                        {bioText.length > 150 && (
                           <button
-                            onClick={() => setExpandedBio(!expandedBio)}
+                            onClick={() => setExpandedBio(true)}
                             className="text-primary hover:underline font-medium ml-1"
                           >
                             read more
                           </button>
                         )}
-                      </>
+                      </span>
                     )}
                   </p>
-                  {expandedBio && needsExpansion && (
-                    <button
-                      onClick={() => setExpandedBio(!expandedBio)}
-                      className="text-sm text-primary hover:underline mt-1 font-medium"
-                    >
-                      Read less
-                    </button>
-                  )}
                 </div>
               );
             })()}
