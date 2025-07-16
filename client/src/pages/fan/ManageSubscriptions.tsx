@@ -93,7 +93,7 @@ export const ManageSubscriptions: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <Button variant="outline" asChild className="mb-4">
-            <Link to="/fan">
+            <Link to="/fan/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
