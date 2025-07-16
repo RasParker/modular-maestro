@@ -776,7 +776,7 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Creator Header */}
       <div className="relative">
-        <div className="h-48 md:h-64 overflow-hidden">
+        <div className="h-48 md:h-64 overflow-hidden relative">
           {creator.cover ? (
             <img 
               src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`} 
@@ -789,16 +789,32 @@ export const CreatorProfile: React.FC = () => {
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+          
+          {/* Profile Photo Overlayed on Cover Photo */}
+          <div className="absolute bottom-4 left-6">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-background bg-background">
+                {creator.avatar ? (
+                  <img 
+                    src={creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`} 
+                    alt={creator.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
+                    <span className="text-xl font-bold text-primary-foreground">
+                      {(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <Avatar className="w-24 h-24 border-4 border-background">
-              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-              <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 pb-2">
+        <div className="max-w-4xl mx-auto px-6 pt-16 pb-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
@@ -807,27 +823,27 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-
               </div>
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
-              {isOwnProfile && (
-                <div className="flex items-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
-                  </Button>
-                </div>
-              )}
             </div>
+            
+            {isOwnProfile && (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/creator/settings">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/creator/upload">Create Post</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
