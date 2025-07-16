@@ -589,7 +589,7 @@ export const CreatorSettings: React.FC = () => {
                         </div>
                         
                         {/* Profile Photo Overlayed on Cover Photo */}
-                        <div className="absolute -bottom-6 left-6">
+                        <div className="absolute bottom-4 left-6">
                           <div className="relative">
                             <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-background bg-background">
                               {profilePhotoUrl ? (
@@ -626,7 +626,7 @@ export const CreatorSettings: React.FC = () => {
                       </div>
                       
                       {/* Instructions */}
-                      <div className="mt-8 space-y-2">
+                      <div className="mt-16 space-y-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
                           <div>
                             <p className="font-medium text-foreground mb-1">Cover Photo</p>
