@@ -61,13 +61,12 @@ export const ManageContent: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await fetch('/api/posts');
+        const response = await fetch(`/api/posts?status=all&creatorId=${user.id}`);
         if (response.ok) {
           const allPosts = await response.json();
 
-          // Filter posts by current user and transform to match our interface
+          // Transform posts to match our interface (posts already filtered by creator on server)
           const userPosts = allPosts
-            .filter((post: any) => post.creator_id === parseInt(user.id))
             .map((post: any) => {
               // Handle both string and array formats for media_urls
               let mediaPreview = null;
