@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, Calendar, User } from 'lucide-react';
 
 interface Subscriber {
@@ -11,6 +11,8 @@ interface Subscriber {
   tier: string;
   joined: string;
   status: string;
+  avatar?: string;
+  created_at?: string;
 }
 
 interface SubscriberCardProps {
@@ -26,6 +28,10 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
         {/* User Info Row */}
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12">
+            <AvatarImage 
+              src={subscriber.avatar ? (subscriber.avatar.startsWith('/uploads/') ? subscriber.avatar : `/uploads/${subscriber.avatar}`) : null} 
+              alt={subscriber.username || 'User'} 
+            />
             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
               {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
             </AvatarFallback>
@@ -69,6 +75,10 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
       <div className="hidden md:flex md:items-center md:justify-between">
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
+            <AvatarImage 
+              src={subscriber.avatar ? (subscriber.avatar.startsWith('/uploads/') ? subscriber.avatar : `/uploads/${subscriber.avatar}`) : null} 
+              alt={subscriber.username || 'User'} 
+            />
             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
               {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
             </AvatarFallback>

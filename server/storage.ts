@@ -9,6 +9,8 @@ import {
   payment_transactions,
   creator_payouts,
   creator_payout_settings,
+  conversations,
+  messages,
   type User, 
   type InsertUser,
   type Post,
@@ -22,7 +24,11 @@ import {
   type PaymentTransaction,
   type InsertPaymentTransaction,
   type CreatorPayoutSettings,
-  type InsertCreatorPayoutSettings
+  type InsertCreatorPayoutSettings,
+  type Conversation,
+  type InsertConversation,
+  type Message,
+  type InsertMessage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
@@ -89,6 +95,14 @@ export interface IStorage {
   // Platform settings methods
   getPlatformSettings(): Promise<any>;
   updatePlatformSettings(settings: any): Promise<void>;
+
+  // Messaging methods
+  getConversations(userId: number): Promise<any[]>;
+  getConversation(participant1Id: number, participant2Id: number): Promise<Conversation | undefined>;
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  getMessages(conversationId: number): Promise<Message[]>;
+  sendMessage(message: InsertMessage): Promise<Message>;
+  markMessagesAsRead(conversationId: number, userId: number): Promise<void>;
 }
 
 // Database Storage Implementation
@@ -801,6 +815,142 @@ export class DatabaseStorage implements IStorage {
       console.error('Error updating platform settings:', error);
       throw error;
     }
+  }
+
+  // Messaging methods
+  async getConversations(userId: number): Promise<any[]> {
+    try {
+      const userConversations = await db
+        .select()
+        .from(conversations)
+        .where(
+          sql`${conversations.participant_1_id} = ${userId} OR ${conversations.participant_2_id} = ${userId}`
+        )
+        .orderBy(desc(conversations.updated_at));
+
+      // Manually enrich with user data and message info
+      const enrichedConversations = await Promise.all(
+        userConversations.map(async (conv) => {
+          const otherParticipantId = conv.participant_1_id === userId ? conv.participant_2_id : conv.participant_1_id;
+          const otherParticipant = await this.getUser(otherParticipantId);
+          
+          // Get last message
+          const lastMessage = await db
+            .select()
+            .from(messages)
+            .where(eq(messages.conversation_id, conv.id))
+            .orderBy(desc(messages.created_at))
+            .limit(1);
+
+          // Get unread count
+          const unreadCount = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(messages)
+            .where(
+              and(
+                eq(messages.conversation_id, conv.id),
+                eq(messages.recipient_id, userId),
+                eq(messages.read, false)
+              )
+            );
+
+          return {
+            id: conv.id.toString(),
+            other_participant_id: otherParticipantId,
+            creator: {
+              username: otherParticipant?.username || 'Unknown',
+              display_name: otherParticipant?.display_name || otherParticipant?.username || 'Unknown',
+              avatar: otherParticipant?.avatar || null
+            },
+            last_message: lastMessage[0]?.content || 'No messages yet',
+            timestamp: lastMessage[0]?.created_at || conv.created_at,
+            unread: (unreadCount[0]?.count || 0) > 0,
+            unread_count: unreadCount[0]?.count || 0
+          };
+        })
+      );
+
+      return enrichedConversations;
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      return [];
+    }
+  }
+
+  async getConversation(participant1Id: number, participant2Id: number): Promise<Conversation | undefined> {
+    try {
+      const [conversation] = await db
+        .select()
+        .from(conversations)
+        .where(
+          sql`(${conversations.participant_1_id} = ${participant1Id} AND ${conversations.participant_2_id} = ${participant2Id}) OR
+              (${conversations.participant_1_id} = ${participant2Id} AND ${conversations.participant_2_id} = ${participant1Id})`
+        )
+        .limit(1);
+
+      return conversation;
+    } catch (error) {
+      console.error('Error fetching conversation:', error);
+      return undefined;
+    }
+  }
+
+  async createConversation(conversation: InsertConversation): Promise<Conversation> {
+    // Check if conversation already exists
+    const existing = await this.getConversation(conversation.participant_1_id, conversation.participant_2_id);
+    if (existing) {
+      return existing;
+    }
+
+    const [newConversation] = await db
+      .insert(conversations)
+      .values(conversation)
+      .returning();
+
+    return newConversation;
+  }
+
+  async getMessages(conversationId: number): Promise<Message[]> {
+    try {
+      const messageList = await db
+        .select()
+        .from(messages)
+        .where(eq(messages.conversation_id, conversationId))
+        .orderBy(messages.created_at);
+
+      return messageList;
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      return [];
+    }
+  }
+
+  async sendMessage(message: InsertMessage): Promise<Message> {
+    const [newMessage] = await db
+      .insert(messages)
+      .values(message)
+      .returning();
+
+    // Update conversation timestamp
+    await db
+      .update(conversations)
+      .set({ updated_at: new Date() })
+      .where(eq(conversations.id, message.conversation_id));
+
+    return newMessage;
+  }
+
+  async markMessagesAsRead(conversationId: number, userId: number): Promise<void> {
+    await db
+      .update(messages)
+      .set({ read: true })
+      .where(
+        and(
+          eq(messages.conversation_id, conversationId),
+          eq(messages.recipient_id, userId),
+          eq(messages.read, false)
+        )
+      );
   }
 }
 

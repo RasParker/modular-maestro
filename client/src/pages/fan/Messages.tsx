@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,105 +8,121 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { ConversationList } from '@/components/fan/ConversationList';
 import { MessageThread } from '@/components/fan/MessageThread';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-const MOCK_CONVERSATIONS = [
-  {
-    id: '1',
-    creator: {
-      username: 'artisticmia',
-      display_name: 'Artistic Mia',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
-    },
-    last_message: 'Thank you so much for your support! ❤️',
-    timestamp: '2024-02-19T14:30:00',
-    unread: true,
-    unread_count: 2
-  },
-  {
-    id: '2',
-    creator: {
-      username: 'fitnessking',
-      display_name: 'Fitness King',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-    },
-    last_message: 'Great question about the workout routine!',
-    timestamp: '2024-02-19T10:15:00',
-    unread: false,
-    unread_count: 0
-  },
-  {
-    id: '3',
-    creator: {
-      username: 'musicmaker',
-      display_name: 'Music Maker',
-      avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face'
-    },
-    last_message: 'Here\'s the exclusive track you requested!',
-    timestamp: '2024-02-18T16:20:00',
-    unread: false,
-    unread_count: 0
-  }
-];
+interface Conversation {
+  id: string;
+  other_participant_id: number;
+  creator: {
+    username: string;
+    display_name: string;
+    avatar: string | null;
+  };
+  last_message: string;
+  timestamp: string;
+  unread: boolean;
+  unread_count: number;
+}
 
-const MOCK_MESSAGES = [
-  {
-    id: '1',
-    sender: 'artisticmia',
-    content: 'Hi! Thanks for subscribing to my channel! 🎨',
-    timestamp: '2024-02-19T12:00:00',
-    type: 'received'
-  },
-  {
-    id: '2',
-    sender: 'me',
-    content: 'Love your artwork! Can you share more about your creative process?',
-    timestamp: '2024-02-19T12:15:00',
-    type: 'sent'
-  },
-  {
-    id: '3',
-    sender: 'artisticmia',
-    content: 'Thank you so much for your support! ❤️ I usually start with rough sketches and build up the details. I\'ll be sharing a behind-the-scenes video soon!',
-    timestamp: '2024-02-19T14:30:00',
-    type: 'received'
-  }
-];
+interface Message {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+  type: 'sent' | 'received';
+}
 
 export const Messages: React.FC = () => {
   const { toast } = useToast();
-  const [selectedConversation, setSelectedConversation] = useState(MOCK_CONVERSATIONS[0]);
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const queryClient = useQueryClient();
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showMobileChat, setShowMobileChat] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredConversations = MOCK_CONVERSATIONS.filter(conv =>
+  // Fetch conversations
+  const { data: conversations = [], isLoading: conversationsLoading } = useQuery<Conversation[]>({
+    queryKey: ['/api/conversations'],
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  // Fetch messages for selected conversation
+  const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
+    queryKey: ['/api/conversations', selectedConversation?.id, 'messages'],
+    enabled: !!selectedConversation,
+    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
+  });
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async (messageData: { content: string, recipientId: number }) => {
+      const response = await fetch(`/api/conversations/${selectedConversation?.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(messageData),
+      });
+      if (!response.ok) throw new Error('Failed to send message');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations', selectedConversation?.id, 'messages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      setNewMessage('');
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create conversation mutation
+  const createConversationMutation = useMutation({
+    mutationFn: async (otherUserId: number) => {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otherUserId }),
+      });
+      if (!response.ok) throw new Error('Failed to create conversation');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+    },
+  });
+
+  // Set initial selected conversation
+  useEffect(() => {
+    if (conversations.length > 0 && !selectedConversation) {
+      setSelectedConversation(conversations[0]);
+    }
+  }, [conversations, selectedConversation]);
+
+  const filteredConversations = conversations.filter(conv =>
     conv.creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     conv.creator.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedConversation) return;
 
-    const message = {
-      id: Date.now().toString(),
-      sender: 'me',
+    // Use the other participant's ID as the recipient
+    const recipientId = selectedConversation.other_participant_id;
+    
+    sendMessageMutation.mutate({
       content: newMessage,
-      timestamp: new Date().toISOString(),
-      type: 'sent' as const
-    };
-
-    setMessages([...messages, message]);
-    setNewMessage('');
-
-    toast({
-      title: "Message sent",
-      description: "Your message has been sent successfully.",
+      recipientId,
     });
   };
 
-  const handleSelectConversation = (conversation: typeof MOCK_CONVERSATIONS[0]) => {
+  const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
     setShowMobileChat(true);
   };
@@ -159,48 +175,62 @@ export const Messages: React.FC = () => {
             </div>
 
             {/* Conversation List - Instagram Style */}
-            <div className="space-y-0 divide-y divide-border/30">
-              {filteredConversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  onClick={() => handleSelectConversation(conversation)}
-                  className="block w-full py-4 hover:bg-accent/5 transition-colors active:bg-accent/10 text-left"
-                >
-                  <div className="flex items-center gap-4 px-2">
-                    <div className="relative">
-                      <Avatar className="h-14 w-14">
-                        <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.display_name} />
-                        <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {conversation.unread_count > 0 && (
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
-                          {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-foreground truncate text-base">
-                          {conversation.creator.display_name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {getTimeAgo(conversation.timestamp)}
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate leading-relaxed">
-                        {conversation.last_message}
-                      </p>
+            {conversationsLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 animate-pulse">
+                    <div className="h-14 w-14 bg-muted rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-1/2"></div>
                     </div>
                   </div>
-                </button>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-0 divide-y divide-border/30">
+                {filteredConversations.map((conversation) => (
+                  <button
+                    key={conversation.id}
+                    onClick={() => handleSelectConversation(conversation)}
+                    className="block w-full py-4 hover:bg-accent/5 transition-colors active:bg-accent/10 text-left"
+                  >
+                    <div className="flex items-center gap-4 px-2">
+                      <div className="relative">
+                        <Avatar className="h-14 w-14">
+                          <AvatarImage src={conversation.creator.avatar || undefined} alt={conversation.creator.display_name} />
+                          <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        {conversation.unread_count > 0 && (
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
+                            {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
+                          </div>
+                        )}
+                      </div>
 
-            {filteredConversations.length === 0 && (
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-foreground truncate text-base">
+                            {conversation.creator.display_name}
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {getTimeAgo(conversation.timestamp)}
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate leading-relaxed">
+                          {conversation.last_message}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!conversationsLoading && filteredConversations.length === 0 && (
               <div className="text-center py-12">
                 <div className="w-20 h-20 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
                   <MessageSquare className="w-8 h-8 text-muted-foreground" />

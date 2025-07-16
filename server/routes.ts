@@ -1290,6 +1290,117 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   }
 });
 
+  // Messaging API routes
+  app.get("/api/conversations", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const conversations = await storage.getConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+
+  app.get("/api/conversations/:conversationId/messages", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.conversationId);
+      const userId = req.session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const messages = await storage.getMessages(conversationId);
+      
+      // Mark messages as read
+      await storage.markMessagesAsRead(conversationId, userId);
+      
+      // Format messages for frontend
+      const formattedMessages = messages.map(msg => ({
+        id: msg.id.toString(),
+        sender: msg.sender_id === userId ? 'me' : 'other',
+        content: msg.content,
+        timestamp: msg.created_at,
+        type: msg.sender_id === userId ? 'sent' : 'received'
+      }));
+
+      res.json(formattedMessages);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  app.post("/api/conversations/:conversationId/messages", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.conversationId);
+      const userId = req.session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { content, recipientId } = req.body;
+      
+      if (!content || !recipientId) {
+        return res.status(400).json({ error: "Content and recipient ID are required" });
+      }
+
+      const message = await storage.sendMessage({
+        conversation_id: conversationId,
+        sender_id: userId,
+        recipient_id: recipientId,
+        content: content
+      });
+
+      res.json({
+        id: message.id.toString(),
+        sender: 'me',
+        content: message.content,
+        timestamp: message.created_at,
+        type: 'sent'
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.post("/api/conversations", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { otherUserId } = req.body;
+      
+      if (!otherUserId) {
+        return res.status(400).json({ error: "Other user ID is required" });
+      }
+
+      // Check if conversation already exists
+      let conversation = await storage.getConversation(userId, otherUserId);
+      
+      if (!conversation) {
+        conversation = await storage.createConversation({
+          participant_1_id: userId,
+          participant_2_id: otherUserId
+        });
+      }
+
+      res.json({ conversationId: conversation.id });
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      res.status(500).json({ error: "Failed to create conversation" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

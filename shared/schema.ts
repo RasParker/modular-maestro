@@ -158,6 +158,26 @@ export const reports = pgTable("reports", {
   updated_at: timestamp("updated_at").notNull().defaultNow()
 });
 
+// Messaging system tables
+export const conversations = pgTable("conversations", {
+  id: serial("id").primaryKey(),
+  participant_1_id: integer("participant_1_id").notNull(),
+  participant_2_id: integer("participant_2_id").notNull(),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  conversation_id: integer("conversation_id").notNull(),
+  sender_id: integer("sender_id").notNull(),
+  recipient_id: integer("recipient_id").notNull(),
+  content: text("content").notNull(),
+  read: boolean("read").notNull().default(false),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Database relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   posts: many(posts),
@@ -167,6 +187,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   payment_transactions: many(payment_transactions),
   creator_payouts: many(creator_payouts),
   payout_settings: one(creator_payout_settings),
+  sent_messages: many(messages, { relationName: "sentMessages" }),
+  received_messages: many(messages, { relationName: "receivedMessages" }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -231,6 +253,33 @@ export const creatorPayoutsRelations = relations(creator_payouts, ({ one }) => (
 export const creatorPayoutSettingsRelations = relations(creator_payout_settings, ({ one }) => ({
   creator: one(users, {
     fields: [creator_payout_settings.creator_id],
+    references: [users.id],
+  }),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  participant_1: one(users, {
+    fields: [conversations.participant_1_id],
+    references: [users.id],
+  }),
+  participant_2: one(users, {
+    fields: [conversations.participant_2_id],
+    references: [users.id],
+  }),
+  messages: many(messages),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversation_id],
+    references: [conversations.id],
+  }),
+  sender: one(users, {
+    fields: [messages.sender_id],
+    references: [users.id],
+  }),
+  recipient: one(users, {
+    fields: [messages.recipient_id],
     references: [users.id],
   }),
 }));
@@ -347,3 +396,20 @@ export type Report = typeof reports.$inferSelect;
 export type CreatorPayout = typeof creator_payouts.$inferSelect;
 export type InsertCreatorPayoutSettings = z.infer<typeof insertCreatorPayoutSettingsSchema>;
 export type CreatorPayoutSettings = typeof creator_payout_settings.$inferSelect;
+
+export const insertConversationSchema = createInsertSchema(conversations).pick({
+  participant_1_id: true,
+  participant_2_id: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).pick({
+  conversation_id: true,
+  sender_id: true,
+  recipient_id: true,
+  content: true,
+});
+
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;

@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -15,6 +16,8 @@ import { SubscriberStats } from '@/components/subscribers/SubscriberStats';
 export const Subscribers: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTier, setSelectedTier] = useState('all');
   const [subscribers, setSubscribers] = useState<any[]>([]);
@@ -85,11 +88,47 @@ export const Subscribers: React.FC = () => {
     });
   };
 
+  // Create conversation mutation
+  const createConversationMutation = useMutation({
+    mutationFn: async (subscriberId: string) => {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otherUserId: parseInt(subscriberId) }),
+      });
+      if (!response.ok) throw new Error('Failed to create conversation');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      // Navigate to messages page or open conversation
+      navigate('/creator/messages');
+      toast({
+        title: "Conversation started",
+        description: "You can now send messages to this subscriber.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to start conversation. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleMessage = (username: string) => {
-    toast({
-      title: "Message feature",
-      description: `Opening message thread with ${username}. This feature will be fully implemented soon.`,
-    });
+    // Find the subscriber by username to get their ID
+    const subscriber = subscribers.find(s => s.username === username);
+    if (subscriber) {
+      createConversationMutation.mutate(subscriber.id);
+    } else {
+      toast({
+        title: "Error",
+        description: "Could not find subscriber information.",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetFilters = () => {
