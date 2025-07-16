@@ -310,7 +310,7 @@ export const NotificationBell: React.FC = () => {
                   Enable Push Notifications
                 </Button>
               )}
-              <Link to="/fan/notifications">
+              <Link to={`/${user?.role || 'fan'}/notifications`} onClick={() => setIsOpen(false)}>
                 <Button variant="ghost" className="w-full text-sm">
                   View all notifications
                 </Button>
