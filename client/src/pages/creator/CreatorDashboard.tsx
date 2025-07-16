@@ -83,18 +83,6 @@ export const CreatorDashboard: React.FC = () => {
     if (!user) return;
     
     try {
-      // Fetch all posts for the creator (including drafts, scheduled, published)
-      const response = await fetch(`/api/posts?creatorId=${user.id}&status=all`);
-      if (response.ok) {
-        const posts = await response.json();
-        setUserPosts(posts);
-      }
-    } catch (error) {
-      console.error('Error fetching user posts:', error);
-    }
-  };
-
-    try {
       const response = await fetch('/api/posts');
       if (response.ok) {
         const posts = await response.json();
