@@ -150,15 +150,20 @@ export const CreatorProfile: React.FC = () => {
   // Function to fetch user's posts from database
   const fetchUserPosts = async (userId: string | number) => {
     try {
-      const response = await fetch('/api/posts');
+      const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
+      
+      // Build query parameters based on who's viewing
+      let queryParams = `creatorId=${userIdNum}`;
+      
+      // If viewing own profile, show all posts including drafts and scheduled
+      if (isOwnProfile) {
+        queryParams += '&status=all';
+      }
+      // Otherwise, only show published posts (default behavior)
+      
+      const response = await fetch(`/api/posts?${queryParams}`);
       if (response.ok) {
-        const allPosts = await response.json();
-        // Filter posts by current user (convert both to numbers for comparison)
-        const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
-        let filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
-
-        // Show only published posts to both visitors and profile owner
-        filteredPosts = filteredPosts.filter((post: any) => post.status === 'published');
+        const filteredPosts = await response.json();
 
         // Sort posts by creation date (newest first)
         filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

@@ -298,11 +298,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all posts for a creator
   app.get("/api/posts", async (req, res) => {
     try {
-      // First get all posts
-      const allPosts = await db
-        .select()
-        .from(posts)
-        .orderBy(desc(posts.created_at));
+      // Get query parameters to determine what posts to fetch
+      const { status, creatorId } = req.query;
+      
+      let query = db.select().from(posts);
+      
+      // If no specific status is requested, only show published posts (for public feeds)
+      if (!status) {
+        query = query.where(eq(posts.status, 'published'));
+      } else if (status && status !== 'all') {
+        query = query.where(eq(posts.status, status as string));
+      }
+      
+      // Filter by creator if specified
+      if (creatorId) {
+        const creatorIdNum = parseInt(creatorId as string);
+        if (status) {
+          // For creator's own dashboard, allow filtering by status
+          query = query.where(and(
+            eq(posts.creator_id, creatorIdNum),
+            status !== 'all' ? eq(posts.status, status as string) : undefined
+          ).filter(Boolean));
+        } else {
+          // For public viewing, still only show published
+          query = query.where(and(
+            eq(posts.creator_id, creatorIdNum),
+            eq(posts.status, 'published')
+          ));
+        }
+      }
+      
+      const allPosts = await query.orderBy(desc(posts.created_at));
 
       // Then enrich with user data
       const postsWithUsers = await Promise.all(
