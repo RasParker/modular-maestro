@@ -775,7 +775,41 @@ export const CreatorProfile: React.FC = () => {
               <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
 
-            <div className="flex-1 pb-2">
+            {/* Desktop Layout - Action buttons on the right */}
+            <div className="hidden md:flex w-full items-end justify-between">
+              <div className="flex-1 pb-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                  {creator.verified && (
+                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                      <Star className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-muted-foreground">@{creator.username}</p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <Users className="w-4 h-4" />
+                  {(creator?.total_subscribers || 0).toLocaleString()} subscribers
+                </div>
+              </div>
+              {isOwnProfile && (
+                <div className="flex items-center gap-2 pb-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/settings">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/creator/upload">Create Post</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Layout - Action buttons below profile info */}
+            <div className="md:hidden flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
@@ -784,7 +818,6 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-
               </div>
               <p className="text-muted-foreground">@{creator.username}</p>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
