@@ -66,16 +66,6 @@ export const BioDisplay = ({
     };
   }, [expanded, onToggle]);
 
-  if (!needsExpansion) {
-    return (
-      <div ref={bioRef}>
-        <p className={className}>
-          {bio}
-        </p>
-      </div>
-    );
-  }
-
   // Remove restrictive CSS classes for expanded text
   const getExpandedClassName = (originalClassName: string) => {
     return originalClassName
@@ -85,6 +75,10 @@ export const BioDisplay = ({
       .replace(/\s+/g, ' ')
       .trim();
   };
+
+  if (!bio) {
+    return null;
+  }
 
   return (
     <div ref={bioRef}>
@@ -104,20 +98,28 @@ export const BioDisplay = ({
           </button>
         </div>
       ) : (
-        <p className={className}>
-          <span 
-            onClick={toggleExpanded}
-            className="cursor-pointer"
+        <div className="relative">
+          <p 
+            className={`${className} ${needsExpansion ? 'line-clamp-2' : ''}`}
           >
-            {truncated}
-          </span>
-          <button
-            onClick={toggleExpanded}
-            className="text-primary hover:underline font-medium ml-1"
-          >
-            ... read more
-          </button>
-        </p>
+            <span 
+              onClick={toggleExpanded}
+              className="cursor-pointer"
+            >
+              {needsExpansion ? bio : bio}
+            </span>
+          </p>
+          {needsExpansion && (
+            <div className="absolute bottom-0 right-0 bg-background pl-2">
+              <button
+                onClick={toggleExpanded}
+                className="text-primary hover:underline font-medium"
+              >
+                ... read more
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
