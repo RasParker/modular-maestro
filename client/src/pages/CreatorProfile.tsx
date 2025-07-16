@@ -15,6 +15,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { truncateBio } from '@/lib/text-utils';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -815,21 +816,15 @@ export const CreatorProfile: React.FC = () => {
           <div className="flex-1">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
-              
-              // Calculate approximate words per line based on screen size
-              const wordsPerLine = 12; // Conservative estimate for responsive design
-              const maxWords = 2 * wordsPerLine; // Exactly 2 lines
-              const words = bioText.split(' ');
-              const needsTruncation = words.length > maxWords;
-              const truncatedText = needsTruncation ? words.slice(0, maxWords).join(' ') : bioText;
+              const { truncated, needsExpansion } = truncateBio(bioText, 'profile');
 
               return (
                 <div>
                   <p className="text-muted-foreground leading-relaxed">
-                    {expandedBio ? bioText : truncatedText}
-                    {needsTruncation && !expandedBio && '...'}
+                    {expandedBio ? bioText : truncated}
+                    {needsExpansion && !expandedBio && '...'}
                   </p>
-                  {needsTruncation && (
+                  {needsExpansion && (
                     <button
                       onClick={() => setExpandedBio(!expandedBio)}
                       className="text-sm text-primary hover:underline mt-1 font-medium"
