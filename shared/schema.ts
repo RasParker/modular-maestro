@@ -283,6 +283,13 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
   ends_at: true,
   auto_renew: true,
   next_billing_date: true,
+}).extend({
+  fan_id: z.number(),
+  creator_id: z.number(),
+  tier_id: z.number(),
+  started_at: z.date().optional(),
+  ends_at: z.date().optional(),
+  next_billing_date: z.date().optional(),
 });
 
 export const insertPaymentTransactionSchema = createInsertSchema(payment_transactions).pick({

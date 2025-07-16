@@ -673,7 +673,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/subscriptions", async (req, res) => {
     try {
       console.log('Creating subscription with data:', req.body);
-      const validatedData = insertSubscriptionSchema.parse(req.body);
+      
+      // Convert data types before validation
+      const processedData = {
+        ...req.body,
+        fan_id: parseInt(req.body.fan_id),
+        creator_id: parseInt(req.body.creator_id),
+        tier_id: parseInt(req.body.tier_id),
+        started_at: req.body.started_at ? new Date(req.body.started_at) : new Date(),
+        next_billing_date: req.body.next_billing_date ? new Date(req.body.next_billing_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        ends_at: req.body.ends_at ? new Date(req.body.ends_at) : null
+      };
+
+      const validatedData = insertSubscriptionSchema.parse(processedData);
       console.log('Validated data:', validatedData);
 
       // Check if user already has active subscription to this creator

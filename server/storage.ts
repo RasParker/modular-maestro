@@ -445,21 +445,35 @@ export class DatabaseStorage implements IStorage {
           updated_at: new Date()
         })
         .where(eq(users.id, subscription.creator_id));
+
+      return true;
     }
 
-    return !!subscription;
+    return false;
   }
 
   async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<Subscription | undefined> {
     const [subscription] = await db
       .select()
       .from(subscriptions)
-      .where(and(
-        eq(subscriptions.fan_id, fanId),
-        eq(subscriptions.creator_id, creatorId),
-        eq(subscriptions.status, 'active')
-      ));
+      .where(
+        and(
+          eq(subscriptions.fan_id, fanId),
+          eq(subscriptions.creator_id, creatorId),
+          eq(subscriptions.status, 'active')
+        )
+      );
+
     return subscription || undefined;
+  }
+
+  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
+    const [newTransaction] = await db
+      .insert(payment_transactions)
+      .values(transaction)
+      .returning();
+
+    return newTransaction;
   }
 
   async getCreatorSubscribers(creatorId: number): Promise<Subscription[]> {
@@ -517,14 +531,6 @@ export class DatabaseStorage implements IStorage {
       console.error('Error getting subscription tier performance:', error);
       return [];
     }
-  }
-
-  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
-    const [newTransaction] = await db
-      .insert(payment_transactions)
-      .values(transaction)
-      .returning();
-    return newTransaction;
   }
 
   async getPaymentTransactions(subscriptionId: number): Promise<PaymentTransaction[]> {
