@@ -14,10 +14,12 @@ import { useToast } from '@/hooks/use-toast';
 import { setLocalStorageItem, getLocalStorageItem } from '@/lib/storage-utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { updateUser } = useAuth();
   
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -377,6 +379,9 @@ export const CreatorSettings: React.FC = () => {
         // Save to localStorage so it persists across pages
         setLocalStorageItem('profilePhotoUrl', result.url);
 
+        // Update the user context with the new avatar
+        updateUser({ avatar: result.url });
+
         // Dispatch custom event to trigger reactivity
         window.dispatchEvent(new CustomEvent('localStorageChange', {
           detail: { keys: ['profilePhotoUrl'] }
@@ -422,6 +427,9 @@ export const CreatorSettings: React.FC = () => {
         setCoverPhotoUrl(result.url);
         // Save to localStorage so it persists across pages
         setLocalStorageItem('coverPhotoUrl', result.url);
+
+        // Update the user context with the new cover photo
+        updateUser({ cover_photo: result.url });
 
         // Dispatch custom event to trigger reactivity
         window.dispatchEvent(new CustomEvent('localStorageChange', {
@@ -476,6 +484,14 @@ export const CreatorSettings: React.FC = () => {
 
       console.log('Profile synced to database successfully');
       console.log('Dispatching localStorageChange event for displayName and bio');
+
+      // Update the user context with the latest profile data
+      updateUser({ 
+        display_name: displayName.trim() || null,
+        bio: bio.trim() || null,
+        avatar: profilePhotoUrl || null,
+        cover_photo: coverPhotoUrl || null
+      });
 
       toast({
         title: "Profile updated",
