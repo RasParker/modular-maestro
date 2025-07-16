@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -11,56 +12,54 @@ import { SubscriberFilters } from '@/components/subscribers/SubscriberFilters';
 import { SubscriberEmptyState } from '@/components/subscribers/SubscriberEmptyState';
 import { SubscriberStats } from '@/components/subscribers/SubscriberStats';
 
-const SUBSCRIBERS = [
-  {
-    id: '1',
-    username: 'johndoe',
-    email: 'john@example.com',
-    tier: 'Premium Content',
-    joined: '2024-01-15',
-    status: 'Active'
-  },
-  {
-    id: '2',
-    username: 'sarahsmith',
-    email: 'sarah@example.com',
-    tier: 'Basic Support',
-    joined: '2024-01-20',
-    status: 'Active'
-  },
-  {
-    id: '3',
-    username: 'mikejones',
-    email: 'mike@example.com',
-    tier: 'Basic Support',
-    joined: '2024-02-01',
-    status: 'Active'
-  },
-  {
-    id: '4',
-    username: 'emilychen',
-    email: 'emily@example.com',
-    tier: 'Premium Content',
-    joined: '2024-02-10',
-    status: 'Paused'
-  }
-];
-
 export const Subscribers: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTier, setSelectedTier] = useState('all');
-  const [filteredSubscribers, setFilteredSubscribers] = useState(SUBSCRIBERS);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [filteredSubscribers, setFilteredSubscribers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real subscriber data
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/creators/${user.id}/subscribers`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Fetched subscribers:', data);
+          setSubscribers(data);
+          setFilteredSubscribers(data);
+        } else {
+          console.error('Failed to fetch subscribers');
+          setSubscribers([]);
+          setFilteredSubscribers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching subscribers:', error);
+        setSubscribers([]);
+        setFilteredSubscribers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscribers();
+  }, [user]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
-      setFilteredSubscribers(SUBSCRIBERS);
+      setFilteredSubscribers(subscribers);
       return;
     }
 
-    const filtered = SUBSCRIBERS.filter(subscriber => 
-      subscriber.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      subscriber.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = subscribers.filter(subscriber => 
+      subscriber.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subscriber.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
     setFilteredSubscribers(filtered);
@@ -74,9 +73,9 @@ export const Subscribers: React.FC = () => {
     setSelectedTier(tier);
     
     if (tier === 'all') {
-      setFilteredSubscribers(SUBSCRIBERS);
+      setFilteredSubscribers(subscribers);
     } else {
-      const filtered = SUBSCRIBERS.filter(subscriber => subscriber.tier === tier);
+      const filtered = subscribers.filter(subscriber => subscriber.tier_name === tier);
       setFilteredSubscribers(filtered);
     }
     
@@ -96,7 +95,7 @@ export const Subscribers: React.FC = () => {
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedTier('all');
-    setFilteredSubscribers(SUBSCRIBERS);
+    setFilteredSubscribers(subscribers);
     toast({
       title: "Filters cleared",
       description: "Showing all subscribers",
@@ -104,8 +103,8 @@ export const Subscribers: React.FC = () => {
   };
 
   // Calculate stats
-  const activeCount = SUBSCRIBERS.filter(s => s.status === 'Active').length;
-  const recentCount = SUBSCRIBERS.filter(s => new Date(s.joined) > new Date('2024-02-01')).length;
+  const activeCount = subscribers.filter(s => s.status === 'active').length;
+  const recentCount = subscribers.filter(s => new Date(s.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length;
   const hasFilters = searchTerm.trim() !== '' || selectedTier !== 'all';
 
   return (
@@ -128,12 +127,20 @@ export const Subscribers: React.FC = () => {
           </p>
         </div>
 
-        {/* Stats */}
-        <SubscriberStats 
-          totalCount={SUBSCRIBERS.length}
-          activeCount={activeCount}
-          recentCount={recentCount}
-        />
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading subscribers...</p>
+          </div>
+        ) : (
+          <>
+            {/* Stats */}
+            <SubscriberStats 
+              totalCount={subscribers.length}
+              activeCount={activeCount}
+              recentCount={recentCount}
+            /></pre>
 
         {/* Filters */}
         <div className="mb-6">
@@ -154,7 +161,7 @@ export const Subscribers: React.FC = () => {
             <CardDescription className="text-sm">
               {filteredSubscribers.length > 0 ? (
                 <>
-                  Showing {filteredSubscribers.length} of {SUBSCRIBERS.length} subscriber(s)
+                  Showing {filteredSubscribers.length} of {subscribers.length} subscriber(s)
                   {searchTerm && ` matching "${searchTerm}"`}
                   {selectedTier !== 'all' && ` in ${selectedTier}`}
                 </>
@@ -183,6 +190,8 @@ export const Subscribers: React.FC = () => {
             )}
           </CardContent>
         </Card>
+          </>
+        )}
       </div>
     </div>
   );

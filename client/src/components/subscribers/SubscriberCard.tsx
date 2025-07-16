@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +32,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground text-base truncate">{subscriber.username}</p>
-            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined}</p>
+            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined || new Date(subscriber.created_at).toLocaleDateString()}</p>
           </div>
           <Badge 
             variant={subscriber.tier === 'Premium Content' ? 'default' : 'outline'}
@@ -42,7 +41,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
             {subscriber.tier}
           </Badge>
         </div>
-        
+
         {/* Details Row */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -53,7 +52,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
             {subscriber.status}
           </span>
         </div>
-        
+
         {/* Action Row */}
         <Button 
           variant="outline" 
@@ -76,24 +75,24 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-foreground truncate">{subscriber.username}</p>
-            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined}</p>
+            <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined || new Date(subscriber.created_at).toLocaleDateString()}</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <Badge 
             variant={subscriber.tier === 'Premium Content' ? 'default' : 'outline'}
           >
             {subscriber.tier}
           </Badge>
-          
+
           <div className="text-right">
             <p className="text-sm font-medium">Joined {subscriber.joined}</p>
             <p className={`text-xs ${subscriber.status === 'Active' ? 'text-green-600' : 'text-yellow-600'}`}>
               {subscriber.status}
             </p>
           </div>
-          
+
           <Button 
             variant="outline" 
             size="sm"
