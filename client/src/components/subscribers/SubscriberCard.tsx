@@ -27,11 +27,11 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12">
             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-              {subscriber.username.charAt(0).toUpperCase()}
+              {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-foreground text-base truncate">{subscriber.username}</p>
+            <p className="font-medium text-foreground text-base truncate">{subscriber.username || 'Unknown User'}</p>
             <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined || new Date(subscriber.created_at).toLocaleDateString()}</p>
           </div>
           <Badge 
@@ -57,7 +57,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => onMessage(subscriber.username)}
+          onClick={() => onMessage(subscriber.username || 'Unknown User')}
           className="w-full"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
@@ -70,11 +70,11 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
             <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-              {subscriber.username.charAt(0).toUpperCase()}
+              {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-foreground truncate">{subscriber.username}</p>
+            <p className="font-medium text-foreground truncate">{subscriber.username || 'Unknown User'}</p>
             <p className="text-sm text-muted-foreground">Subscriber since {subscriber.joined || new Date(subscriber.created_at).toLocaleDateString()}</p>
           </div>
         </div>
@@ -96,7 +96,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onMessage(subscriber.username)}
+            onClick={() => onMessage(subscriber.username || 'Unknown User')}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Send Message

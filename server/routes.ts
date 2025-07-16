@@ -315,10 +315,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const creatorIdNum = parseInt(creatorId as string);
         if (status) {
           // For creator's own dashboard, allow filtering by status
-          query = query.where(and(
-            eq(posts.creator_id, creatorIdNum),
-            status !== 'all' ? eq(posts.status, status as string) : undefined
-          ).filter(Boolean));
+          if (status === 'all') {
+            query = query.where(eq(posts.creator_id, creatorIdNum));
+          } else {
+            query = query.where(and(
+              eq(posts.creator_id, creatorIdNum),
+              eq(posts.status, status as string)
+            ));
+          }
         } else {
           // For public viewing, still only show published
           query = query.where(and(

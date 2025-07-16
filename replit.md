@@ -257,7 +257,11 @@ Changelog:
   - ✅ Added creator goals API endpoint for dashboard metrics
   - ✅ Enhanced subscriber API with limit and recent filtering capabilities
   - ✅ Updated subscription creation to automatically maintain creator subscriber counts
-  - ✅ Verified all subscription data displays correctly across dashboard, subscribers page, and earnings
+  - ✅ Verified all subscription data displays correctly across dashboard, subscribers page
+  - ✅ Fixed critical post fetching bug where published and draft posts were not displaying
+  - ✅ Resolved incorrect Drizzle ORM query syntax in `/api/posts` endpoint
+  - ✅ Enhanced SubscriberCard component with null safety for usernames and display names
+  - ✅ Fixed "Cannot convert undefined or null to object" error in subscriber management, and earnings
   - ✅ Fixed Earnings Dashboard to replace mock data with authentic API calls
   - ✅ Updated Total Active Subscribers card to show real subscriber count from analytics API
   - ✅ Fixed Revenue Breakdown by Tier to display accurate subscription counts from tier performance data
