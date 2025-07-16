@@ -104,6 +104,7 @@ export const Earnings: React.FC = () => {
   const [currentEarnings, setCurrentEarnings] = useState(null);
   const [creatorTiers, setCreatorTiers] = useState([]);
   const [tierBreakdown, setTierBreakdown] = useState([]);
+  const [analytics, setAnalytics] = useState({ subscribers: 0, monthlyEarnings: 0 });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -131,21 +132,32 @@ export const Earnings: React.FC = () => {
         setPayoutHistory(historyData.data);
       }
 
-      // Fetch creator's subscription tiers
+      // Fetch real analytics data for subscriber count
+      const analyticsResponse = await fetch(`/api/creator/${user.id}/analytics`);
+      if (analyticsResponse.ok) {
+        const analyticsData = await analyticsResponse.json();
+        setAnalytics(analyticsData);
+      }
+
+      // Fetch creator's subscription tiers with real performance data
       const tiersResponse = await fetch(`/api/creators/${user.id}/tiers`);
       if (tiersResponse.ok) {
         const tiersData = await tiersResponse.json();
         setCreatorTiers(tiersData);
+      }
+
+      // Fetch real tier performance data
+      const tierPerformanceResponse = await fetch(`/api/creator/${user.id}/tier-performance`);
+      if (tierPerformanceResponse.ok) {
+        const tierPerformanceData = await tierPerformanceResponse.json();
         
-        // Calculate tier breakdown with mock subscriber data for now
-        // TODO: Replace with real subscription data when available
-        const breakdown = tiersData.map((tier, index) => {
-          const mockSubscribers = Math.floor(Math.random() * 3) + 1; // 1-3 subscribers
-          const monthlyRevenue = parseFloat(tier.price) * mockSubscribers;
+        // Calculate tier breakdown with real data
+        const breakdown = tierPerformanceData.map((tier) => {
+          const monthlyRevenue = tier.revenue || 0;
           return {
             name: tier.name,
             price: parseFloat(tier.price),
-            subscribers: mockSubscribers,
+            subscribers: tier.subscribers || 0,
             monthlyRevenue: monthlyRevenue,
             percentage: 0 // Will calculate after getting total
           };
@@ -230,7 +242,7 @@ export const Earnings: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs sm:text-sm mb-1">Total Active Subscribers</p>
-                  <p className="text-2xl sm:text-3xl font-bold">{currentEarnings?.transaction_count || 0}</p>
+                  <p className="text-2xl sm:text-3xl font-bold">{analytics.subscribers || 0}</p>
                 </div>
                 <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
               </div>
