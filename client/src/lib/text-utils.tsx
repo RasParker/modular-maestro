@@ -114,7 +114,7 @@ export const BioDisplay = ({
               <div className="absolute bottom-0 right-0">
                 <button
                   onClick={toggleExpanded}
-                  className="text-primary font-normal bg-transparent"
+                  className="text-xs text-primary font-normal bg-transparent"
                 >
                   {context === 'mobile' ? 'read more' : '... read more'}
                 </button>
