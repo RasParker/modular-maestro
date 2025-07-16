@@ -89,13 +89,13 @@ export const BioDisplay = ({
             className={`cursor-pointer ${getExpandedClassName(className)}`}
           >
             {bio}
+            <button
+              onClick={toggleExpanded}
+              className="text-xs text-primary font-normal ml-2"
+            >
+              Read less
+            </button>
           </p>
-          <button
-            onClick={toggleExpanded}
-            className="text-xs text-primary mt-1 font-normal"
-          >
-            Read less
-          </button>
         </div>
       ) : (
         <div className="relative">
@@ -116,7 +116,7 @@ export const BioDisplay = ({
                   onClick={toggleExpanded}
                   className="text-xs text-primary font-normal bg-transparent"
                 >
-                  {context === 'mobile' ? 'read more' : '... read more'}
+                  Read more
                 </button>
               </div>
             </>
