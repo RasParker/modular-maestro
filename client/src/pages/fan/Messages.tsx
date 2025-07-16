@@ -316,13 +316,23 @@ export const Messages: React.FC = () => {
 
             {/* Right Chat Area - Full Width */}
             <div className="flex-1 flex flex-col bg-background">
-              <MessageThread
-                creator={selectedConversation.creator}
-                messages={messages}
-                newMessage={newMessage}
-                onNewMessageChange={setNewMessage}
-                onSendMessage={handleSendMessage}
-              />
+              {selectedConversation ? (
+                <MessageThread
+                  creator={selectedConversation.creator}
+                  messages={messages}
+                  newMessage={newMessage}
+                  onNewMessageChange={setNewMessage}
+                  onSendMessage={handleSendMessage}
+                />
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Select a conversation</h3>
+                    <p className="text-muted-foreground">Choose a conversation from the list to start messaging</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
