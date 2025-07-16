@@ -155,11 +155,8 @@ export const CreatorProfile: React.FC = () => {
       // Build query parameters based on who's viewing
       let queryParams = `creatorId=${userIdNum}`;
       
-      // If viewing own profile, show all posts including drafts and scheduled
-      if (isOwnProfile) {
-        queryParams += '&status=all';
-      }
-      // Otherwise, only show published posts (default behavior)
+      // For public profile page, only show published posts regardless of who's viewing
+      // Draft posts should only be managed in the Content Manager, not on the profile page
       
       const response = await fetch(`/api/posts?${queryParams}`);
       if (response.ok) {
@@ -905,10 +902,14 @@ export const CreatorProfile: React.FC = () => {
                             <div className="flex items-center gap-1">
                               <Badge variant="outline" className="text-xs px-1 py-0 h-4">
                                 {post.tier === 'public' ? 'Free' : 
-                                 post.tier === 'supporter' ? 'Supporter' :
-                                 post.tier === 'fan' ? 'Fan' :
-                                 post.tier === 'premium' ? 'Premium' :
-                                 post.tier === 'superfan' ? 'Superfan' : 'Free'}
+                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                                 post.tier}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
                                 • {getTimeAgo(post.created_at || post.createdAt)}

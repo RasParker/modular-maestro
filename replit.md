@@ -261,7 +261,11 @@ Changelog:
   - ✅ Fixed critical post fetching bug where published and draft posts were not displaying
   - ✅ Resolved incorrect Drizzle ORM query syntax in `/api/posts` endpoint
   - ✅ Enhanced SubscriberCard component with null safety for usernames and display names
-  - ✅ Fixed "Cannot convert undefined or null to object" error in subscriber management, and earnings
+  - ✅ Fixed "Cannot convert undefined or null to object" error in subscriber management
+  - ✅ Fixed draft posts incorrectly showing on creator profile page
+  - ✅ Updated post tier display to show correct subscription tier names instead of "Free" 
+  - ✅ Enhanced tier mapping to handle actual subscription tier names (Starter Pump, Power Gains, Elite Beast Mode)
+  - ✅ Creator profile now only shows published posts for public viewing, and earnings
   - ✅ Fixed Earnings Dashboard to replace mock data with authentic API calls
   - ✅ Updated Total Active Subscribers card to show real subscriber count from analytics API
   - ✅ Fixed Revenue Breakdown by Tier to display accurate subscription counts from tier performance data

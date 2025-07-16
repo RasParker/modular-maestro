@@ -84,10 +84,14 @@ export const ManageContent: React.FC = () => {
                 type: post.media_type === 'image' ? 'Image' as const :
                       post.media_type === 'video' ? 'Video' as const : 'Text' as const,
                 tier: post.tier === 'public' ? 'Free' : 
-                      post.tier === 'supporter' ? 'Basic Support' :
-                      post.tier === 'fan' ? 'Fan Content' :
-                      post.tier === 'premium' ? 'Premium Content' :
-                      post.tier === 'superfan' ? 'Superfan Content' : 'Free',
+                      post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                      post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                      post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                      post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                      post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                      post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                      post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                      post.tier,
                 status: post.status === 'draft' ? 'Draft' as const :
                         post.status === 'scheduled' ? 'Scheduled' as const : 'Published' as const,
                 date: post.created_at === "CURRENT_TIMESTAMP" ? 
