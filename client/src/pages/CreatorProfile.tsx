@@ -299,6 +299,29 @@ export const CreatorProfile: React.FC = () => {
       if (e.detail && e.detail.type === 'postCreated' && user && user.username === username) {
         fetchUserPosts(user.id);
       }
+
+      // Refresh profile data if profile was updated
+      if (e.detail && e.detail.type === 'profileUpdate' && user && user.username === username) {
+        // Force refresh creator data from database
+        const refreshCreatorData = async () => {
+          try {
+            const response = await fetch(`/api/users/username/${username}`);
+            if (response.ok) {
+              const userData = await response.json();
+              setCreator(prev => prev ? {
+                ...prev,
+                display_name: userData.display_name || userData.username,
+                bio: userData.bio || null,
+                avatar: userData.avatar || null,
+                cover_image: userData.cover_image || null,
+              } : null);
+            }
+          } catch (error) {
+            console.error('Error refreshing creator data:', error);
+          }
+        };
+        refreshCreatorData();
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
