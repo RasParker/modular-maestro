@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface CreatorCardProps {
   creator: {
@@ -19,70 +19,19 @@ interface CreatorCardProps {
 }
 
 export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
-  return (
-    <Card className="bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <Avatar className="w-12 h-12">
-            <AvatarImage 
-              src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} 
-              alt={creator.username} 
-            />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {(creator.display_name || creator.username).charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm truncate">
-                {creator.display_name || creator.username}
-              </h3>
-              {creator.verified && (
-                <Badge variant="secondary" className="text-xs">
-                  Verified
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">@{creator.username}</p>
-            {creator.bio && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                {creator.bio}
-              </p>
-            )}
-            <div className="flex items-center gap-4 mt-2">
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
-                  {creator.total_subscribers || 0} subscribers
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-3">
-          <Link to={`/creator/${creator.id}`}>
-            <Button variant="outline" size="sm" className="w-full">
-              View Profile
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   const [expandedBio, setExpandedBio] = useState(false);
 
   const truncateText = (text: string) => {
+    if (!text) return { truncated: '', needsExpansion: false };
+
     const words = text.split(' ');
-    const wordsPerLine = 10; // Strict word limit for cards
-    const maxWords = 2 * wordsPerLine; // Exactly 2 lines
-    
+    // Even stricter limits for mobile - ensure exactly 2 lines
+    const maxWords = 12; // Very conservative for mobile 2-line limit
+
     if (words.length <= maxWords) {
       return { truncated: text, needsExpansion: false };
     }
-    
+
     return {
       truncated: words.slice(0, maxWords).join(' '),
       needsExpansion: true
@@ -118,7 +67,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
             <p className="text-xs text-muted-foreground">@{creator.username}</p>
             {(creator.bio || truncated) && (
               <div className="mt-1">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground line-clamp-2 leading-tight max-h-[2.2em] overflow-hidden">
                   {expandedBio ? creator.bio : truncated}
                   {needsExpansion && !expandedBio && '...'}
                 </p>
