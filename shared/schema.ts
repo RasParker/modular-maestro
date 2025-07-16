@@ -279,6 +279,7 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
   creator_id: true,
   tier_id: true,
   status: true,
+  started_at: true,
   ends_at: true,
   auto_renew: true,
   next_billing_date: true,

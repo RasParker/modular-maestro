@@ -672,7 +672,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/subscriptions", async (req, res) => {
     try {
+      console.log('Creating subscription with data:', req.body);
       const validatedData = insertSubscriptionSchema.parse(req.body);
+      console.log('Validated data:', validatedData);
 
       // Check if user already has active subscription to this creator
       const existingSubscription = await storage.getUserSubscriptionToCreator(
@@ -681,12 +683,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       if (existingSubscription) {
+        console.log('User already has subscription:', existingSubscription);
         return res.status(400).json({ error: "Already subscribed to this creator" });
       }
 
       const subscription = await storage.createSubscription(validatedData);
+      console.log('Created subscription:', subscription);
       res.json(subscription);
     } catch (error) {
+      console.error('Subscription creation error:', error);
       res.status(500).json({ error: "Failed to create subscription" });
     }
   });

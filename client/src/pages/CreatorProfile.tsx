@@ -437,7 +437,7 @@ export const CreatorProfile: React.FC = () => {
     );
   }
 
-  const handleSubscribe = (tierId: string) => {
+  const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
       window.location.href = `/login?redirect=/creator/${username}`;
@@ -447,8 +447,44 @@ export const CreatorProfile: React.FC = () => {
     // Find the selected tier
     const tier = creator.tiers.find((t: any) => t.id === tierId);
     if (tier) {
-      setSelectedTier(tier);
-      setPaymentModalOpen(true);
+      try {
+        // Create subscription directly for development/testing
+        const response = await fetch('/api/subscriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fan_id: user.id,
+            creator_id: creator.id,
+            tier_id: tier.id,
+            status: 'active',
+            auto_renew: true,
+            started_at: new Date().toISOString(),
+            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          })
+        });
+
+        if (response.ok) {
+          toast({
+            title: "Successfully subscribed!",
+            description: `You're now subscribed to ${creator.display_name}'s ${tier.name} tier.`,
+          });
+        } else {
+          const errorData = await response.json();
+          toast({
+            title: "Subscription failed",
+            description: errorData.error || "Failed to create subscription. Please try again.",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create subscription. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 

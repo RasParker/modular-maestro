@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Search, Users, Star, Filter, Heart, MessageSquare, Share2, Image, Video } from 'lucide-react';
 
 // Mock creators data
@@ -109,6 +110,7 @@ const CATEGORIES = ['All', 'Art', 'Fitness', 'Music', 'Tech', 'Cooking', 'Fashio
 
 export const Explore: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
@@ -176,11 +178,71 @@ export const Explore: React.FC = () => {
     fetchCreators();
   }, []);
 
-  const handleSubscribe = (creatorName: string, price: number) => {
-    toast({
-      title: "Subscription started!",
-      description: `You've subscribed to ${creatorName} for $${price}/month.`,
-    });
+  const handleSubscribe = async (creatorName: string, price: number) => {
+    if (!user) {
+      window.location.href = `/login?redirect=/explore`;
+      return;
+    }
+
+    try {
+      // Find the creator and tier
+      const creator = allCreators.find(c => c.display_name === creatorName);
+      if (!creator) {
+        toast({
+          title: "Error",
+          description: "Creator not found.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const tier = creator.tiers.find(t => t.price === price);
+      if (!tier) {
+        toast({
+          title: "Error",
+          description: "Subscription tier not found.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create subscription directly
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fan_id: user.id,
+          creator_id: parseInt(creator.id.replace('real_', '')),
+          tier_id: tier.id,
+          status: 'active',
+          auto_renew: true,
+          started_at: new Date().toISOString(),
+          next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Successfully subscribed!",
+          description: `You're now subscribed to ${creatorName}'s ${tier.name} tier.`,
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Subscription failed",
+          description: errorData.error || "Failed to create subscription. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create subscription. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const toggleBioExpansion = (creatorId: string) => {
