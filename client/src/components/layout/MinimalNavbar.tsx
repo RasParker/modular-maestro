@@ -205,7 +205,10 @@ export const MinimalNavbar: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 h-8 px-3">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.profile_photo || ''} alt={user.username} />
+                      <AvatarImage 
+                        src={user.avatar ? (user.avatar.startsWith('http') || user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} 
+                        alt={user.username} 
+                      />
                       <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                         {user.username?.charAt(0).toUpperCase()}
                       </AvatarFallback>
@@ -286,7 +289,10 @@ export const MinimalNavbar: React.FC = () => {
                         <div className="border-t pt-6">
                           <div className="flex items-center space-x-3 mb-4">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={user.profile_photo || ''} alt={user.username} />
+                              <AvatarImage 
+                                src={user.avatar ? (user.avatar.startsWith('http') || user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} 
+                                alt={user.username} 
+                              />
                               <AvatarFallback className="bg-primary text-primary-foreground">
                                 {user.username?.charAt(0).toUpperCase()}
                               </AvatarFallback>
