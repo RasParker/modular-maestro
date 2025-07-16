@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from 'ws';
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import MemoryStore from "memorystore";
@@ -8,6 +9,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
+import { NotificationService } from './notification-service';
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable } from '../shared/schema';
@@ -1656,7 +1658,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      // Create various test notifications
+      // Create various test notifications using NotificationService for real-time broadcasting
       const testNotifications = [
         {
           user_id: userId,
@@ -1692,18 +1694,138 @@ app.get('/api/admin/commission-rate', async (req, res) => {
         }
       ];
 
+      // Use NotificationService to create notifications with real-time broadcasting
       for (const notification of testNotifications) {
-        await storage.createNotification(notification);
+        await NotificationService.createNotification(notification);
       }
 
-      res.json({ message: "Test notifications created successfully", count: testNotifications.length });
+      res.json({ message: "Test notifications created and broadcasted successfully", count: testNotifications.length });
     } catch (error) {
       console.error('Error creating test notifications:', error);
       res.status(500).json({ error: "Failed to create test notifications" });
     }
   });
 
+  // Real-time notification test endpoint
+  app.post("/api/test-realtime-notification", async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { type = 'test', title = 'Test Notification', message = 'This is a real-time test notification' } = req.body;
+
+      // Create a single test notification with real-time broadcasting
+      await NotificationService.createNotification({
+        user_id: userId,
+        type,
+        title,
+        message,
+        action_url: '/fan/notifications',
+        metadata: { test: true, timestamp: new Date().toISOString() }
+      });
+
+      res.json({ message: "Real-time test notification sent successfully" });
+    } catch (error) {
+      console.error('Error creating real-time test notification:', error);
+      res.status(500).json({ error: "Failed to create test notification" });
+    }
+  });
+
   const httpServer = createServer(app);
+  
+  // WebSocket setup for real-time notifications
+  const wss = new WebSocketServer({ 
+    server: httpServer, 
+    path: '/ws',
+    verifyClient: (info) => {
+      // Basic verification - you could add session validation here
+      return true;
+    }
+  });
+
+  // Store active WebSocket connections by user ID
+  const activeConnections = new Map<number, Set<WebSocket>>();
+
+  wss.on('connection', (ws, req) => {
+    console.log('WebSocket client connected');
+    
+    let userId: number | null = null;
+
+    // Handle incoming messages from client
+    ws.on('message', (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+        
+        if (message.type === 'auth' && message.userId) {
+          userId = parseInt(message.userId);
+          
+          // Add connection to user's active connections
+          if (!activeConnections.has(userId)) {
+            activeConnections.set(userId, new Set());
+          }
+          activeConnections.get(userId)!.add(ws);
+          
+          console.log(`User ${userId} connected via WebSocket`);
+          
+          // Send confirmation
+          ws.send(JSON.stringify({
+            type: 'auth_success',
+            message: 'Authentication successful'
+          }));
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    });
+
+    // Handle connection close
+    ws.on('close', () => {
+      console.log('WebSocket client disconnected');
+      
+      if (userId && activeConnections.has(userId)) {
+        activeConnections.get(userId)!.delete(ws);
+        
+        // Remove user entry if no more connections
+        if (activeConnections.get(userId)!.size === 0) {
+          activeConnections.delete(userId);
+        }
+      }
+    });
+
+    // Handle errors
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+  });
+
+  // Function to broadcast notification to specific user
+  const broadcastNotificationToUser = (userId: number, notification: any) => {
+    const userConnections = activeConnections.get(userId);
+    
+    if (userConnections && userConnections.size > 0) {
+      const message = JSON.stringify({
+        type: 'new_notification',
+        notification
+      });
+      
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      
+      console.log(`Broadcast notification to user ${userId} on ${userConnections.size} connection(s)`);
+    }
+  };
+
+  // Attach broadcast function to app for use in other routes
+  app.locals.broadcastNotificationToUser = broadcastNotificationToUser;
+  
+  // Connect the notification service to the broadcast function
+  NotificationService.setBroadcastFunction(broadcastNotificationToUser);
+
   return httpServer;
 }
 

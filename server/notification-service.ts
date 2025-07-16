@@ -2,9 +2,29 @@ import { storage } from './storage';
 import type { InsertNotification } from '@shared/schema';
 
 export class NotificationService {
+  private static broadcastFunction: ((userId: number, notification: any) => void) | null = null;
+
+  static setBroadcastFunction(fn: (userId: number, notification: any) => void) {
+    this.broadcastFunction = fn;
+  }
+
   static async createNotification(data: InsertNotification): Promise<void> {
     try {
-      await storage.createNotification(data);
+      const notification = await storage.createNotification(data);
+      
+      // Broadcast real-time notification if WebSocket is available
+      if (this.broadcastFunction && notification) {
+        this.broadcastFunction(data.user_id, {
+          id: notification.id,
+          type: data.type,
+          title: data.title,
+          message: data.message,
+          read: false,
+          action_url: data.action_url,
+          time_ago: 'just now',
+          created_at: new Date().toISOString()
+        });
+      }
     } catch (error) {
       console.error('Failed to create notification:', error);
     }

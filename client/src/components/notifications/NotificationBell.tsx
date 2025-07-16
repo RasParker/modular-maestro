@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, X, Settings, Check, CheckCheck } from 'lucide-react';
+import { Bell, X, Settings, Check, CheckCheck, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { NotificationWebSocket, useNotificationWebSocket, type WebSocketNotification } from '@/services/NotificationWebSocket';
 
 interface Notification {
   id: number;
@@ -30,8 +33,14 @@ interface Notification {
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<NotificationWebSocket | null>(null);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { createConnection } = useNotificationWebSocket();
 
   // Fetch unread count
   const { data: unreadCount = 0 } = useQuery<{ count: number }>({
@@ -76,6 +85,55 @@ export const NotificationBell: React.FC = () => {
     },
   });
 
+  // Initialize WebSocket connection and push notifications
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Check browser push notification permission
+    if ('Notification' in window) {
+      setPushPermission(Notification.permission);
+    }
+
+    // Create WebSocket connection
+    const handleNewNotification = (notification: WebSocketNotification) => {
+      setHasNewNotification(true);
+      
+      // Update React Query cache
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
+      
+      // Show browser push notification if permission granted
+      if (Notification.permission === 'granted' && document.hidden) {
+        new Notification(notification.title, {
+          body: notification.message,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          tag: `notification-${notification.id}`,
+          requireInteraction: false,
+          silent: false
+        });
+      }
+      
+      // Show toast notification if user is on the page
+      if (!document.hidden) {
+        toast({
+          title: notification.title,
+          description: notification.message,
+          duration: 4000,
+        });
+      }
+    };
+
+    wsRef.current = createConnection(handleNewNotification);
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.disconnect();
+        wsRef.current = null;
+      }
+    };
+  }, [user?.id, createConnection, queryClient, toast]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -93,11 +151,36 @@ export const NotificationBell: React.FC = () => {
     };
   }, [isOpen]);
 
+  // Clear new notification indicator when dropdown opens
+  useEffect(() => {
+    if (isOpen && hasNewNotification) {
+      setTimeout(() => setHasNewNotification(false), 1000);
+    }
+  }, [isOpen, hasNewNotification]);
+
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.read) {
       markAsReadMutation.mutate(notification.id);
     }
     setIsOpen(false);
+  };
+
+  const requestPushPermission = async () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      try {
+        const permission = await Notification.requestPermission();
+        setPushPermission(permission);
+        
+        if (permission === 'granted') {
+          toast({
+            title: "Push Notifications Enabled",
+            description: "You'll now receive browser notifications for new activity",
+          });
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+      }
+    }
   };
 
   const getNotificationIcon = (type: string) => {
@@ -131,7 +214,14 @@ export const NotificationBell: React.FC = () => {
         className="relative p-2 h-10 w-10"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Bell className="h-5 w-5" />
+        {hasNewNotification ? (
+          <BellRing className={cn(
+            "h-5 w-5 text-primary",
+            hasNewNotification && "animate-pulse"
+          )} />
+        ) : (
+          <Bell className="h-5 w-5" />
+        )}
         {unreadCount > 0 && (
           <Badge
             variant="destructive"
@@ -139,6 +229,9 @@ export const NotificationBell: React.FC = () => {
           >
             {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>
+        )}
+        {wsRef.current?.isConnected() && (
+          <div className="absolute top-0 right-0 h-2 w-2 bg-green-500 rounded-full" />
         )}
       </Button>
 
@@ -206,7 +299,17 @@ export const NotificationBell: React.FC = () => {
               )}
             </div>
             
-            <div className="p-3 border-t bg-muted/30">
+            <div className="p-3 border-t bg-muted/30 space-y-2">
+              {pushPermission === 'default' && (
+                <Button 
+                  variant="outline" 
+                  className="w-full text-sm"
+                  onClick={requestPushPermission}
+                >
+                  <BellRing className="w-4 h-4 mr-2" />
+                  Enable Push Notifications
+                </Button>
+              )}
               <Link to="/fan/notifications">
                 <Button variant="ghost" className="w-full text-sm">
                   View all notifications

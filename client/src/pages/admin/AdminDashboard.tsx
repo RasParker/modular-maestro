@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationTester } from '@/components/admin/NotificationTester';
 import { 
   Shield, 
   Users, 
@@ -353,6 +354,9 @@ export const AdminDashboard: React.FC = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Notification Testing */}
+            <NotificationTester />
           </div>
         </div>
       </EdgeToEdgeContainer>
