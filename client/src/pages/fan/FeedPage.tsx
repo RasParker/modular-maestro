@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MOCK_FEED = [
   {
@@ -264,12 +265,62 @@ const MOCK_FEED = [
 
 export const FeedPage: React.FC = () => {
   const { toast } = useToast();
-  const [feed, setFeed] = useState(MOCK_FEED);
+  const { user } = useAuth();
+  const [feed, setFeed] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
   const [expandedCaptions, setExpandedCaptions] = useState<Record<string, boolean>>({});
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<any>(null);
+
+  // Fetch real posts from API
+  useEffect(() => {
+    const fetchFeed = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const posts = await response.json();
+          
+          // Transform posts to match the expected format
+          const transformedPosts = posts.map((post: any) => ({
+            id: post.id.toString(),
+            creator: {
+              username: post.username || 'Unknown',
+              display_name: post.username || 'Unknown',
+              avatar: post.avatar || ''
+            },
+            content: post.content || post.title || '',
+            type: post.media_type || 'image',
+            tier: post.tier || 'public',
+            thumbnail: post.media_urls && post.media_urls.length > 0 
+              ? `/uploads/${post.media_urls[0]}` 
+              : '',
+            posted: post.created_at,
+            likes: post.likes_count || 0,
+            comments: post.comments_count || 0,
+            views: Math.floor(Math.random() * 1000) + 100, // Placeholder until views tracking is implemented
+            liked: false, // Will be updated when user interactions are implemented
+            initialComments: [] // Will be populated when comments are fetched
+          }));
+          
+          setFeed(transformedPosts);
+        }
+      } catch (error) {
+        console.error('Error fetching feed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load feed. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeed();
+  }, [user, toast]);
 
   const handleLike = async (postId: string) => {
     // Get current user from localStorage or context
@@ -415,12 +466,43 @@ export const FeedPage: React.FC = () => {
 
       {/* Feed Content */}
       <EdgeToEdgeContainer maxWidth="4xl" enablePadding className="py-6 sm:py-8">
-
-        {/* Feed Content */}
-        <div className="space-y-0 -mx-4">
-          {feed.map((post) => (
-            <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
-              {/* Post Header - Mobile Instagram style */}
+        {loading ? (
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="bg-gradient-card border-border/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-muted rounded-full animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="w-32 h-4 bg-muted rounded animate-pulse"></div>
+                      <div className="w-24 h-3 bg-muted rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="w-full h-48 bg-muted rounded-lg animate-pulse mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="w-full h-4 bg-muted rounded animate-pulse"></div>
+                    <div className="w-3/4 h-4 bg-muted rounded animate-pulse"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : feed.length === 0 ? (
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
+            <p className="text-muted-foreground mb-6">
+              Follow some creators to see their content in your feed
+            </p>
+            <Button asChild>
+              <Link to="/explore">Discover Creators</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-0 -mx-4">
+            {feed.map((post) => (
+              <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
+                {/* Post Header - Mobile Instagram style */}
               <div className="flex items-center justify-between px-3 py-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
@@ -578,16 +660,19 @@ export const FeedPage: React.FC = () => {
                   </div>
                 </div>
               )}
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Load More */}
-        <div className="text-center mt-8">
-          <Button variant="outline">
-            Load More Posts
-          </Button>
-        </div>
+        {!loading && feed.length > 0 && (
+          <div className="text-center mt-8">
+            <Button variant="outline">
+              Load More Posts
+            </Button>
+          </div>
+        )}
       </EdgeToEdgeContainer>
 
       {/* Instagram-style Content Modal */}
