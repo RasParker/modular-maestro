@@ -553,15 +553,15 @@ export const CreatorDashboard: React.FC = () => {
                           <div className="flex items-center gap-4 mt-2">
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Eye className="w-3 h-3" />
-                              <span>{post.views || 0}</span>
+                              <span>{post.views || post.views_count || 0}</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Heart className="w-3 h-3" />
-                              <span>{post.likes || 0}</span>
+                              <span>{post.likes || post.likes_count || 0}</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <MessageSquare className="w-3 h-3" />
-                              <span>{post.comments || 0}</span>
+                              <span>{post.comments || post.comments_count || 0}</span>
                             </div>
                           </div>
                         </div>

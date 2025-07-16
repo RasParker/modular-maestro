@@ -386,13 +386,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/posts/:id", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
-      
+
       // Handle date conversion for scheduled_for field
       const updateData = { ...req.body };
       if (updateData.scheduled_for && typeof updateData.scheduled_for === 'string') {
         updateData.scheduled_for = new Date(updateData.scheduled_for);
       }
-      
+
       const post = await storage.updatePost(postId, updateData);
 
       if (!post) {
@@ -673,7 +673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/subscriptions", async (req, res) => {
     try {
       console.log('Creating subscription with data:', req.body);
-      
+
       // Convert data types before validation
       const processedData = {
         ...req.body,
