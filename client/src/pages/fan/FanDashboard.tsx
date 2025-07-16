@@ -27,37 +27,21 @@ interface Subscription {
   auto_renew: boolean;
 }
 
-const RECENT_ACTIVITY = [
-  {
-    id: '1',
-    type: 'new_post',
-    creator: 'Artistic Mia',
-    message: 'shared a new digital artwork',
-    time: '2 hours ago',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face'
-  },
-  {
-    id: '2',
-    type: 'live_stream',
-    creator: 'Fitness King',
-    message: 'started a live workout session',
-    time: '4 hours ago',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-  },
-  {
-    id: '3',
-    type: 'message',
-    creator: 'Music Maker',
-    message: 'sent you a message',
-    time: '1 day ago',
-    avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face'
-  }
-];
+interface RecentActivity {
+  id: string;
+  type: string;
+  creator: string;
+  message: string;
+  time: string;
+  avatar: string;
+}
 
 export const FanDashboard: React.FC = () => {
   const { user } = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -78,7 +62,27 @@ export const FanDashboard: React.FC = () => {
       }
     };
 
+    const fetchRecentActivity = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`/api/fan/${user.id}/recent-activity`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch recent activity');
+        }
+        const data = await response.json();
+        setRecentActivity(data);
+      } catch (err) {
+        console.error('Error fetching recent activity:', err);
+        // Don't set error state for activity, just use empty array
+        setRecentActivity([]);
+      } finally {
+        setActivityLoading(false);
+      }
+    };
+
     fetchSubscriptions();
+    fetchRecentActivity();
   }, [user]);
 
   return (
@@ -280,23 +284,34 @@ export const FanDashboard: React.FC = () => {
                 <h3 className="text-lg font-semibold">Recent Activity</h3>
               </div>
               <div className="space-y-0">
-                {RECENT_ACTIVITY.map((activity) => (
-                  <div key={activity.id} className="px-3 py-3 hover:bg-background/50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={activity.avatar} alt={activity.creator} />
-                        <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm leading-relaxed">
-                          <span className="font-medium">{activity.creator}</span>{' '}
-                          <span className="text-muted-foreground">{activity.message}</span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                {activityLoading ? (
+                  <div className="px-3 py-8 text-center">
+                    <LoadingSpinner />
+                  </div>
+                ) : recentActivity.length === 0 ? (
+                  <div className="px-3 py-8 text-center text-muted-foreground">
+                    <p className="text-sm">No recent activity</p>
+                    <p className="text-xs">Subscribe to creators to see their latest posts</p>
+                  </div>
+                ) : (
+                  recentActivity.map((activity) => (
+                    <div key={activity.id} className="px-3 py-3 hover:bg-background/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={activity.avatar} alt={activity.creator} />
+                          <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm leading-relaxed">
+                            <span className="font-medium">{activity.creator}</span>{' '}
+                            <span className="text-muted-foreground">{activity.message}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">{activity.time}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
                 <div className="px-3 py-3 border-t border-border/20">
                   <Button variant="ghost" size="sm" className="w-full text-muted-foreground" asChild>
                     <Link to="/fan/feed">View all activity</Link>

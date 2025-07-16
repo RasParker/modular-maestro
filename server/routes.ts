@@ -10,8 +10,8 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable } from '../shared/schema';
-import { eq, desc, and, gte, lte, count, sum, sql } from 'drizzle-orm';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable } from '../shared/schema';
+import { eq, desc, and, gte, lte, count, sum, sql, inArray } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
@@ -300,16 +300,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get query parameters to determine what posts to fetch
       const { status, creatorId } = req.query;
-      
+
       let query = db.select().from(posts);
-      
+
       // If no specific status is requested, only show published posts (for public feeds)
       if (!status) {
         query = query.where(eq(posts.status, 'published'));
       } else if (status && status !== 'all') {
         query = query.where(eq(posts.status, status as string));
       }
-      
+
       // Filter by creator if specified
       if (creatorId) {
         const creatorIdNum = parseInt(creatorId as string);
@@ -331,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ));
         }
       }
-      
+
       const allPosts = await query.orderBy(desc(posts.created_at));
 
       // Then enrich with user data
@@ -738,7 +738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const subscription = await storage.createSubscription(validatedData);
       console.log('Created subscription:', subscription);
-      
+
       // Update creator's total subscriber count
       try {
         const currentSubscribers = await storage.getCreatorSubscribers(validatedData.creator_id);
@@ -751,7 +751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Error updating creator subscriber count:', error);
         // Don't fail the subscription creation if count update fails
       }
-      
+
       res.json(subscription);
     } catch (error) {
       console.error('Subscription creation error:', error);
@@ -774,19 +774,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/subscriptions/fan/:fanId", async (req, res) => {
+  // Get fan subscriptions
+  app.get('/api/subscriptions/fan/:fanId', async (req, res) => {
     try {
       const fanId = parseInt(req.params.fanId);
+
       console.log('Fetching subscriptions for fan ID:', fanId);
-      const subscriptions = await storage.getSubscriptions(fanId);
+
+      const subscriptions = await db
+        .select({
+          id: subscriptionsTable.id,
+          status: subscriptionsTable.status,
+          current_period_end: subscriptionsTable.next_billing_date,
+          created_at: subscriptionsTable.created_at,
+          auto_renew: subscriptionsTable.auto_renew,
+          creator: {
+            id: usersTable.id,
+            username: usersTable.username,
+            display_name: usersTable.display_name,
+            avatar: usersTable.avatar
+          },
+          tier: {
+            name: tiersTable.name,
+            price: tiersTable.price
+          }
+        })
+        .from(subscriptionsTable)
+        .innerJoin(usersTable, eq(subscriptionsTable.creator_id, usersTable.id))
+        .innerJoin(tiersTable, eq(subscriptionsTable.tier_id, tiersTable.id))
+        .where(eq(subscriptionsTable.fan_id, fanId));
+
       console.log('Found subscriptions:', subscriptions);
+
       res.json(subscriptions);
     } catch (error) {
       console.error('Error fetching fan subscriptions:', error);
-      console.error('Full error details:', error);
-      res.status(500).json({ error: "Failed to fetch subscriptions" });
+      res.status(500).json({ error: 'Failed to fetch subscriptions' });
     }
   });
+
+  // Get recent activity for a fan
+  app.get('/api/fan/:fanId/recent-activity', async (req, res) => {
+    try {
+      const fanId = parseInt(req.params.fanId);
+
+      // Get subscribed creators
+      const subscribedCreators = await db
+        .select({
+          creator_id: subscriptionsTable.creator_id
+        })
+        .from(subscriptionsTable)
+        .where(and(
+          eq(subscriptionsTable.fan_id, fanId),
+          eq(subscriptionsTable.status, 'active')
+        ));
+
+      if (subscribedCreators.length === 0) {
+        return res.json([]);
+      }
+
+      const creatorIds = subscribedCreators.map(sub => sub.creator_id);
+
+      // Get recent posts from subscribed creators
+      const recentPosts = await db
+        .select({
+          id: postsTable.id,
+          title: postsTable.title,
+          content: postsTable.content,
+          media_type: postsTable.media_type,
+          created_at: postsTable.created_at,
+          creator: {
+            id: usersTable.id,
+            username: usersTable.username,
+            display_name: usersTable.display_name,
+            avatar: usersTable.avatar
+          }
+        })
+        .from(postsTable)
+        .innerJoin(usersTable, eq(postsTable.creator_id, usersTable.id))
+        .where(and(
+          inArray(postsTable.creator_id, creatorIds),
+          eq(postsTable.status, 'published')
+        ))
+        .orderBy(desc(postsTable.created_at))
+        .limit(10);
+
+      // Format the activity data
+      const activity = recentPosts.map(post => ({
+        id: post.id.toString(),
+        type: 'new_post',
+        creator: post.creator.display_name || post.creator.username,
+        message: `shared a new ${post.media_type === 'video' ? 'video' : 'post'}`,
+        time: formatTimeAgo```text
+(new Date(post.created_at)),
+        avatar: post.creator.avatar || '/placeholder.svg'
+    }));
+
+    res.json(activity);
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    res.status(500).json({ error: 'Failed to fetch recent activity' });
+  }
+});
 
   app.delete("/api/subscriptions/:subscriptionId", async (req, res) => {
     try {
@@ -872,18 +961,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creatorId = parseInt(req.params.creatorId);
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       const recent = req.query.recent === 'true';
-      
+
       let subscribers = await storage.getCreatorSubscribers(creatorId);
-      
+
       if (recent) {
         // Sort by created_at descending for recent subscribers
         subscribers = subscribers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       }
-      
+
       if (limit) {
         subscribers = subscribers.slice(0, limit);
       }
-      
+
       res.json(subscribers);
     } catch (error) {
       console.error('Error fetching subscribers:', error);
@@ -895,15 +984,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/creator/:creatorId/analytics", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
-      
+
       // Get subscriber count
       const subscribers = await storage.getCreatorSubscribers(creatorId);
       const subscriberCount = subscribers.length;
-      
+
       // Calculate monthly earnings from active subscriptions
       const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
       const monthlyEarnings = tierPerformance.reduce((total, tier) => total + tier.revenue, 0);
-      
+
       // Get total posts count
       const userPosts = await storage.getPosts();
       const creatorPosts = userPosts.filter(post => post.creator_id === creatorId);
@@ -912,14 +1001,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const now = new Date();
         return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
       }).length;
-      
+
       // Calculate total earnings (simplified - using monthly * 12 for demo)
       const totalEarnings = monthlyEarnings * 12;
-      
+
       // Simple growth calculation (mock for now)
       const growthRate = subscriberCount > 0 ? 15.2 : 0; // Placeholder
       const engagementRate = 78; // Placeholder
-      
+
       const analytics = {
         subscribers: subscriberCount,
         monthlyEarnings,
@@ -928,7 +1017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         engagementRate,
         postsThisMonth
       };
-      
+
       res.json(analytics);
     } catch (error) {
       console.error('Error fetching creator analytics:', error);
@@ -940,14 +1029,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/creator/:creatorId/goals", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
-      
+
       // Get current metrics
       const subscribers = await storage.getCreatorSubscribers(creatorId);
       const subscriberCount = subscribers.length;
-      
+
       const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
       const monthlyRevenue = tierPerformance.reduce((total, tier) => total + tier.revenue, 0);
-      
+
       const userPosts = await storage.getPosts();
       const creatorPosts = userPosts.filter(post => post.creator_id === creatorId);
       const postsThisMonth = creatorPosts.filter(post => {
@@ -955,7 +1044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const now = new Date();
         return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
       }).length;
-      
+
       // Return simple goals with current progress
       const goals = {
         subscriberGoal: 100,
@@ -965,7 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentRevenue: monthlyRevenue,
         currentPosts: postsThisMonth
       };
-      
+
       res.json(goals);
     } catch (error) {
       console.error('Error fetching creator goals:', error);
@@ -1310,16 +1399,16 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     try {
       const conversationId = parseInt(req.params.conversationId);
       const userId = req.session.userId;
-      
+
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
       const messages = await storage.getMessages(conversationId);
-      
+
       // Mark messages as read
       await storage.markMessagesAsRead(conversationId, userId);
-      
+
       // Format messages for frontend
       const formattedMessages = messages.map(msg => ({
         id: msg.id.toString(),
@@ -1340,13 +1429,13 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     try {
       const conversationId = parseInt(req.params.conversationId);
       const userId = req.session.userId;
-      
+
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
       const { content, recipientId } = req.body;
-      
+
       if (!content || !recipientId) {
         return res.status(400).json({ error: "Content and recipient ID are required" });
       }
@@ -1379,14 +1468,14 @@ app.get('/api/admin/commission-rate', async (req, res) => {
       }
 
       const { otherUserId } = req.body;
-      
+
       if (!otherUserId) {
         return res.status(400).json({ error: "Other user ID is required" });
       }
 
       // Check if conversation already exists
       let conversation = await storage.getConversation(userId, otherUserId);
-      
+
       if (!conversation) {
         conversation = await storage.createConversation({
           participant_1_id: userId,
@@ -1403,4 +1492,38 @@ app.get('/api/admin/commission-rate', async (req, res) => {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+import { and, eq, desc, asc, count, sum, inArray, sql, like, or, isNull, gt, lt } from 'drizzle-orm';
+import { usersTable, postsTable, subscriptionsTable, tiersTable, commentsTable } from '../shared/schema';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+
+// Helper function to format time ago
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'just now';
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes === 1 ? '' : 's'} ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) {
+    return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+  }
+
+  return date.toLocaleDateString();
 }
