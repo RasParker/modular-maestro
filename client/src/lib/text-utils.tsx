@@ -99,25 +99,36 @@ export const BioDisplay = ({
         </div>
       ) : (
         <div className="relative">
-          <p 
-            className={`${className} ${needsExpansion ? 'line-clamp-2' : ''}`}
-          >
-            <span 
-              onClick={toggleExpanded}
-              className="cursor-pointer"
-            >
-              {needsExpansion ? bio : bio}
-            </span>
-          </p>
-          {needsExpansion && (
-            <div className="absolute bottom-0 right-0 pl-2">
-              <button
-                onClick={toggleExpanded}
-                className="text-primary hover:underline font-medium bg-transparent"
+          {needsExpansion ? (
+            <>
+              <p 
+                className={`${className} line-clamp-2 pr-20`}
               >
-                ... read more
-              </button>
-            </div>
+                <span 
+                  onClick={toggleExpanded}
+                  className="cursor-pointer"
+                >
+                  {bio}
+                </span>
+              </p>
+              <div className="absolute bottom-0 right-0">
+                <button
+                  onClick={toggleExpanded}
+                  className="text-primary hover:underline font-medium bg-transparent"
+                >
+                  ... read more
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className={className}>
+              <span 
+                onClick={toggleExpanded}
+                className="cursor-pointer"
+              >
+                {bio}
+              </span>
+            </p>
           )}
         </div>
       )}
