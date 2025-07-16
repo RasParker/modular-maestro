@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,14 +50,21 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">{subscription.creator.category}</Badge>
-                <Badge variant="outline" className="text-xs">{subscription.tier}</Badge>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant="outline" className="text-xs">{subscription.tier}</Badge>
+                  {subscription.status === 'paused' && (
+                    <Badge variant="destructive" className="text-xs">
+                      Paused
+                    </Badge>
+                  )}
+                </div>
                 <Badge variant={subscription.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                   {subscription.status}
                 </Badge>
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col sm:text-right gap-2">
             <p className="text-lg font-bold text-foreground">
               GHS {subscription.price}/month
@@ -71,7 +77,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
             </p>
           </div>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-4 border-t border-border/50">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Auto-renew:</span>
@@ -79,7 +85,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               {subscription.auto_renew ? 'Enabled' : 'Disabled'}
             </Badge>
           </div>
-          
+
           <div className="flex gap-2">
             <Button
               variant="outline"
