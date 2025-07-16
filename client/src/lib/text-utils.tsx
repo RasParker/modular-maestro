@@ -110,10 +110,10 @@ export const BioDisplay = ({
             </span>
           </p>
           {needsExpansion && (
-            <div className="absolute bottom-0 right-0 bg-background pl-2">
+            <div className="absolute bottom-0 right-0 pl-2">
               <button
                 onClick={toggleExpanded}
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium bg-transparent"
               >
                 ... read more
               </button>
