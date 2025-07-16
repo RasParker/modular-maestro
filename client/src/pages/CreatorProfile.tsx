@@ -812,11 +812,11 @@ export const CreatorProfile: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-6 pt-16 pb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="max-w-4xl mx-auto flex items-end gap-4">
+            <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                <h1 className="text-2xl font-bold text-white">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     <Star className="w-3 h-3 mr-1" />
@@ -824,8 +824,8 @@ export const CreatorProfile: React.FC = () => {
                   </Badge>
                 )}
               </div>
-              <p className="text-muted-foreground">@{creator.username}</p>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+              <p className="text-white/80">@{creator.username}</p>
+              <div className="flex items-center gap-2 text-sm text-white/70 mt-1">
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
@@ -833,13 +833,13 @@ export const CreatorProfile: React.FC = () => {
             
             {isOwnProfile && (
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                   <Link to="/creator/settings">
                     <Settings className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                   <Link to="/creator/upload">Create Post</Link>
                 </Button>
               </div>
@@ -849,7 +849,7 @@ export const CreatorProfile: React.FC = () => {
       </div>
 
       {/* Bio Section */}
-      <div className="max-w-4xl mx-auto px-6 py-4">
+      <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             {(() => {
