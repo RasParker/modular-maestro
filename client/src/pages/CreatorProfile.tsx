@@ -141,6 +141,7 @@ export const CreatorProfile: React.FC = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
+  const [expandedBio, setExpandedBio] = useState(false);
   const { toast } = useToast();
 
   // Define isOwnProfile early to avoid initialization issues
@@ -814,7 +815,6 @@ export const CreatorProfile: React.FC = () => {
           <div className="flex-1">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
-              const [expandedBio, setExpandedBio] = React.useState(false);
               
               // Calculate approximate words per line based on screen size
               const wordsPerLine = 12; // Conservative estimate for responsive design
