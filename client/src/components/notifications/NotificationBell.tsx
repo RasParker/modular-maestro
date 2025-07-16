@@ -236,7 +236,7 @@ export const NotificationBell: React.FC = () => {
       </Button>
 
       {isOpen && (
-        <Card className="absolute right-0 top-12 w-96 max-h-96 shadow-lg border z-50 bg-background">
+        <Card className="absolute right-0 md:right-0 top-12 w-96 max-w-[calc(100vw-2rem)] max-h-96 shadow-lg border z-50 bg-background transform -translate-x-1/2 md:translate-x-0 left-1/2 md:left-auto">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Notifications</CardTitle>
