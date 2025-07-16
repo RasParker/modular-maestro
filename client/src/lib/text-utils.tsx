@@ -76,40 +76,48 @@ export const BioDisplay = ({
     );
   }
 
+  // Remove restrictive CSS classes for expanded text
+  const getExpandedClassName = (originalClassName: string) => {
+    return originalClassName
+      .replace(/\bline-clamp-\d+\b/g, '')
+      .replace(/\bmax-h-\[[^\]]*\]/g, '')
+      .replace(/\boverflow-hidden\b/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   return (
     <div ref={bioRef}>
-      <p className={className}>
-        {expanded ? (
+      {expanded ? (
+        <div>
+          <p 
+            onClick={toggleExpanded}
+            className={`cursor-pointer ${getExpandedClassName(className)}`}
+          >
+            {bio}
+          </p>
+          <button
+            onClick={toggleExpanded}
+            className="text-xs text-primary hover:underline mt-1 font-medium"
+          >
+            Read less
+          </button>
+        </div>
+      ) : (
+        <p className={className}>
           <span 
             onClick={toggleExpanded}
             className="cursor-pointer"
           >
-            {bio}
+            {truncated}
           </span>
-        ) : (
-          <>
-            <span 
-              onClick={toggleExpanded}
-              className="cursor-pointer"
-            >
-              {truncated}
-            </span>
-            <button
-              onClick={toggleExpanded}
-              className="text-primary hover:underline font-medium ml-1"
-            >
-              ... read more
-            </button>
-          </>
-        )}
-      </p>
-      {expanded && (
-        <button
-          onClick={toggleExpanded}
-          className="text-xs text-primary hover:underline mt-1 font-medium"
-        >
-          Read less
-        </button>
+          <button
+            onClick={toggleExpanded}
+            className="text-primary hover:underline font-medium ml-1"
+          >
+            ... read more
+          </button>
+        </p>
       )}
     </div>
   );
