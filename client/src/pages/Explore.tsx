@@ -252,10 +252,10 @@ export const Explore: React.FC = () => {
     }));
   };
 
-  const truncateText = (text: string, maxLines: number = 2) => {
+  const truncateText = (text: string) => {
     const words = text.split(' ');
-    const wordsPerLine = 10; // Approximate words per line in explore cards
-    const maxWords = maxLines * wordsPerLine;
+    const wordsPerLine = 10; // Conservative estimate for card width
+    const maxWords = 2 * wordsPerLine; // Exactly 2 lines
 
     if (words.length <= maxWords) {
       return { truncated: text, needsExpansion: false };

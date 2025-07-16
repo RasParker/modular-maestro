@@ -810,16 +810,43 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Bio Section */}
       <div className="max-w-4xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <p className="text-muted-foreground leading-relaxed flex-1">
-            {creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.')}
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            {(() => {
+              const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
+              const [expandedBio, setExpandedBio] = React.useState(false);
+              
+              // Calculate approximate words per line based on screen size
+              const wordsPerLine = 12; // Conservative estimate for responsive design
+              const maxWords = 2 * wordsPerLine; // Exactly 2 lines
+              const words = bioText.split(' ');
+              const needsTruncation = words.length > maxWords;
+              const truncatedText = needsTruncation ? words.slice(0, maxWords).join(' ') : bioText;
+
+              return (
+                <div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {expandedBio ? bioText : truncatedText}
+                    {needsTruncation && !expandedBio && '...'}
+                  </p>
+                  {needsTruncation && (
+                    <button
+                      onClick={() => setExpandedBio(!expandedBio)}
+                      className="text-sm text-primary hover:underline mt-1 font-medium"
+                    >
+                      {expandedBio ? 'Read less' : 'Read more'}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
           {isOwnProfile && (
             <Button 
               size="sm" 
               variant="ghost" 
               asChild
-              className="p-1 h-auto ml-4"
+              className="p-1 h-auto flex-shrink-0"
             >
               <Link to="/creator/settings">
                 <Settings className="w-4 h-4" />
