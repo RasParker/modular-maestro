@@ -708,6 +708,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const subscription = await storage.createSubscription(validatedData);
       console.log('Created subscription:', subscription);
+      
+      // Update creator's total subscriber count
+      try {
+        const currentSubscribers = await storage.getCreatorSubscribers(validatedData.creator_id);
+        const subscriberCount = currentSubscribers.length;
+        await storage.updateUser(validatedData.creator_id, { 
+          total_subscribers: subscriberCount 
+        });
+        console.log(`Updated creator ${validatedData.creator_id} subscriber count to ${subscriberCount}`);
+      } catch (error) {
+        console.error('Error updating creator subscriber count:', error);
+        // Don't fail the subscription creation if count update fails
+      }
+      
       res.json(subscription);
     } catch (error) {
       console.error('Subscription creation error:', error);
@@ -826,10 +840,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/creators/:creatorId/subscribers", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
-      const subscribers = await storage.getCreatorSubscribers(creatorId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const recent = req.query.recent === 'true';
+      
+      let subscribers = await storage.getCreatorSubscribers(creatorId);
+      
+      if (recent) {
+        // Sort by created_at descending for recent subscribers
+        subscribers = subscribers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+      
+      if (limit) {
+        subscribers = subscribers.slice(0, limit);
+      }
+      
       res.json(subscribers);
     } catch (error) {
+      console.error('Error fetching subscribers:', error);
       res.status(500).json({ error: "Failed to fetch subscribers" });
+    }
+  });
+
+  // Creator analytics endpoint
+  app.get("/api/creator/:creatorId/analytics", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      
+      // Get subscriber count
+      const subscribers = await storage.getCreatorSubscribers(creatorId);
+      const subscriberCount = subscribers.length;
+      
+      // Calculate monthly earnings from active subscriptions
+      const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
+      const monthlyEarnings = tierPerformance.reduce((total, tier) => total + tier.revenue, 0);
+      
+      // Get total posts count
+      const userPosts = await storage.getPosts();
+      const creatorPosts = userPosts.filter(post => post.creator_id === creatorId);
+      const postsThisMonth = creatorPosts.filter(post => {
+        const postDate = new Date(post.created_at);
+        const now = new Date();
+        return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
+      }).length;
+      
+      // Calculate total earnings (simplified - using monthly * 12 for demo)
+      const totalEarnings = monthlyEarnings * 12;
+      
+      // Simple growth calculation (mock for now)
+      const growthRate = subscriberCount > 0 ? 15.2 : 0; // Placeholder
+      const engagementRate = 78; // Placeholder
+      
+      const analytics = {
+        subscribers: subscriberCount,
+        monthlyEarnings,
+        totalEarnings,
+        growthRate,
+        engagementRate,
+        postsThisMonth
+      };
+      
+      res.json(analytics);
+    } catch (error) {
+      console.error('Error fetching creator analytics:', error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  // Creator goals endpoint (simplified)
+  app.get("/api/creator/:creatorId/goals", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      
+      // Get current metrics
+      const subscribers = await storage.getCreatorSubscribers(creatorId);
+      const subscriberCount = subscribers.length;
+      
+      const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
+      const monthlyRevenue = tierPerformance.reduce((total, tier) => total + tier.revenue, 0);
+      
+      const userPosts = await storage.getPosts();
+      const creatorPosts = userPosts.filter(post => post.creator_id === creatorId);
+      const postsThisMonth = creatorPosts.filter(post => {
+        const postDate = new Date(post.created_at);
+        const now = new Date();
+        return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
+      }).length;
+      
+      // Return simple goals with current progress
+      const goals = {
+        subscriberGoal: 100,
+        revenueGoal: 1000,
+        postsGoal: 10,
+        currentSubscribers: subscriberCount,
+        currentRevenue: monthlyRevenue,
+        currentPosts: postsThisMonth
+      };
+      
+      res.json(goals);
+    } catch (error) {
+      console.error('Error fetching creator goals:', error);
+      res.status(500).json({ error: "Failed to fetch goals" });
     }
   });
 

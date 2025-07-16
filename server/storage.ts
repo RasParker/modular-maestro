@@ -476,15 +476,33 @@ export class DatabaseStorage implements IStorage {
     return newTransaction;
   }
 
-  async getCreatorSubscribers(creatorId: number): Promise<Subscription[]> {
-    return await db
-      .select()
+  async getCreatorSubscribers(creatorId: number): Promise<any[]> {
+    const subscribers = await db
+      .select({
+        id: subscriptions.id,
+        status: subscriptions.status,
+        created_at: subscriptions.created_at,
+        current_period_end: subscriptions.current_period_end,
+        auto_renew: subscriptions.auto_renew,
+        fan_id: subscriptions.fan_id,
+        tier_id: subscriptions.tier_id,
+        username: users.username,
+        email: users.email,
+        avatar: users.avatar,
+        display_name: users.display_name,
+        tier_name: subscription_tiers.name,
+        tier_price: subscription_tiers.price
+      })
       .from(subscriptions)
+      .innerJoin(users, eq(subscriptions.fan_id, users.id))
+      .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
       .where(and(
         eq(subscriptions.creator_id, creatorId),
         eq(subscriptions.status, 'active')
       ))
       .orderBy(desc(subscriptions.created_at));
+
+    return subscribers;
   }
 
   async getSubscriptionTierPerformance(creatorId: number): Promise<any[]> {
