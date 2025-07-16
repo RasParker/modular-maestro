@@ -215,13 +215,18 @@ export class PaymentService {
       }
 
       // Create subscription
+      const currentDate = new Date();
+      const nextBillingDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+      
       const subscription = await storage.createSubscription({
         fan_id: parseInt(fanId),
         creator_id: tier.creator_id,
         tier_id: parseInt(tierId),
         status: 'active',
         auto_renew: true,
-        next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        current_period_start: currentDate,
+        current_period_end: nextBillingDate,
+        next_billing_date: nextBillingDate
       });
 
       // Create payment transaction record
