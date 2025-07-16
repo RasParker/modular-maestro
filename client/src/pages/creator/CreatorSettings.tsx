@@ -551,11 +551,12 @@ export const CreatorSettings: React.FC = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Cover Photo Section */}
+                    {/* Combined Cover Photo and Profile Photo Section */}
                     <div className="space-y-3">
-                      <Label>Cover Photo</Label>
+                      <Label>Cover & Profile Photos</Label>
                       <div className="relative">
-                        <div className="w-full h-32 rounded-lg overflow-hidden border-2 border-dashed border-border">
+                        {/* Cover Photo */}
+                        <div className="w-full h-32 rounded-lg overflow-hidden border-2 border-dashed border-border relative">
                           {coverPhotoUrl ? (
                             <img 
                               src={coverPhotoUrl} 
@@ -567,72 +568,73 @@ export const CreatorSettings: React.FC = () => {
                               <span className="text-sm text-muted-foreground">Cover Photo Preview</span>
                             </div>
                           )}
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleCoverPhotoUpload}
-                          className="hidden"
-                          id="cover-upload"
-                        />
-                        <label htmlFor="cover-upload">
-                          <Button variant="outline" size="sm" className="absolute bottom-2 right-2 cursor-pointer" asChild>
-                            <span>
-                              <Image className="w-4 h-4 mr-2" />
-                              Change Cover
-                            </span>
-                          </Button>
-                        </label>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Recommended size: 800x300px. Max file size: 5MB
-                      </p>
-                    </div>
-
-                    {/* Profile Photo Section */}
-                    <div className="space-y-3">
-                      <Label>Profile Photo</Label>
-                      <div className="flex items-center gap-6">
-                        <div className="relative">
-                          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border relative">
-                            {profilePhotoUrl ? (
-                              <img 
-                                src={profilePhotoUrl} 
-                                alt="Profile photo" 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
-                                <span className="text-xl font-bold text-primary-foreground">AA</span>
-                              </div>
-                            )}
-                          </div>
-                          {/* Overlay Icon */}
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full border-2 border-background flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                          
+                          {/* Cover Photo Upload Indicator */}
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-background/80 backdrop-blur-sm rounded-full border-2 border-border flex items-center justify-center cursor-pointer hover:bg-background/90 transition-colors">
                             <input
                               type="file"
                               accept="image/*"
-                              onChange={handleProfilePhotoUpload}
+                              onChange={handleCoverPhotoUpload}
                               className="hidden"
-                              id="profile-upload"
+                              id="cover-upload"
                             />
-                            <label htmlFor="profile-upload" className="cursor-pointer flex items-center justify-center w-full h-full">
-                              {profilePhotoUrl ? (
-                                <Camera className="w-3 h-3 text-primary-foreground" />
+                            <label htmlFor="cover-upload" className="cursor-pointer flex items-center justify-center w-full h-full">
+                              {coverPhotoUrl ? (
+                                <Image className="w-4 h-4 text-foreground" />
                               ) : (
-                                <span className="text-primary-foreground text-sm font-bold">+</span>
+                                <span className="text-foreground text-sm font-bold">+</span>
                               )}
                             </label>
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium text-foreground">
-                              {profilePhotoUrl ? 'Update your profile photo' : 'Add a profile photo'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Square image recommended. Max file size: 5MB
-                            </p>
+                        
+                        {/* Profile Photo Overlayed on Cover Photo */}
+                        <div className="absolute -bottom-6 left-6">
+                          <div className="relative">
+                            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-background bg-background">
+                              {profilePhotoUrl ? (
+                                <img 
+                                  src={profilePhotoUrl} 
+                                  alt="Profile photo" 
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
+                                  <span className="text-xl font-bold text-primary-foreground">AA</span>
+                                </div>
+                              )}
+                            </div>
+                            {/* Profile Photo Upload Indicator */}
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full border-2 border-background flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleProfilePhotoUpload}
+                                className="hidden"
+                                id="profile-upload"
+                              />
+                              <label htmlFor="profile-upload" className="cursor-pointer flex items-center justify-center w-full h-full">
+                                {profilePhotoUrl ? (
+                                  <Camera className="w-3 h-3 text-primary-foreground" />
+                                ) : (
+                                  <span className="text-primary-foreground text-sm font-bold">+</span>
+                                )}
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Instructions */}
+                      <div className="mt-8 space-y-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
+                          <div>
+                            <p className="font-medium text-foreground mb-1">Cover Photo</p>
+                            <p>Recommended size: 800x300px. Max file size: 5MB</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground mb-1">Profile Photo</p>
+                            <p>Square image recommended. Max file size: 5MB</p>
                           </div>
                         </div>
                       </div>
