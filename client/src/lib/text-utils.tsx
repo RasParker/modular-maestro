@@ -102,7 +102,7 @@ export const BioDisplay = ({
           {needsExpansion ? (
             <>
               <p 
-                className={`${className} line-clamp-2 pr-20`}
+                className={`${className} line-clamp-2`}
               >
                 <span 
                   onClick={toggleExpanded}
@@ -110,15 +110,13 @@ export const BioDisplay = ({
                 >
                   {bio}
                 </span>
-              </p>
-              <div className="absolute bottom-0 right-0">
                 <button
                   onClick={toggleExpanded}
-                  className="text-sm text-primary font-normal bg-transparent"
+                  className="text-sm text-primary font-normal bg-transparent ml-1"
                 >
                   Read more
                 </button>
-              </div>
+              </p>
             </>
           ) : (
             <p className={className}>
