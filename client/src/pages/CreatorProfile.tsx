@@ -157,19 +157,19 @@ export const CreatorProfile: React.FC = () => {
         // Filter posts by current user (convert both to numbers for comparison)
         const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
         let filteredPosts = allPosts.filter((post: any) => post.creator_id === userIdNum);
-        
+
         // Show only published posts to both visitors and profile owner
         filteredPosts = filteredPosts.filter((post: any) => post.status === 'published');
-        
+
         // Sort posts by creation date (newest first)
         filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
-        
+
         // Initialize like status for current user
         if (user) {
           await fetchLikeStatuses(filteredPosts, user.id);
         }
-        
+
         console.log('Fetched user posts:', filteredPosts);
         console.log('User ID:', userIdNum, 'Is own profile:', isOwnProfile);
       }
@@ -182,7 +182,7 @@ export const CreatorProfile: React.FC = () => {
   const fetchLikeStatuses = async (posts: any[], userId: number) => {
     try {
       const likeStatuses: Record<string, { liked: boolean; count: number }> = {};
-      
+
       for (const post of posts) {
         const response = await fetch(`/api/posts/${post.id}/like/${userId}`);
         if (response.ok) {
@@ -198,7 +198,7 @@ export const CreatorProfile: React.FC = () => {
           };
         }
       }
-      
+
       setPostLikes(likeStatuses);
     } catch (error) {
       console.error('Error fetching like statuses:', error);
@@ -368,7 +368,7 @@ export const CreatorProfile: React.FC = () => {
           console.log('Database cover:', userData.cover_image);
           console.log('ProfilePhotoUrl truthy check:', !!(profilePhotoUrl && profilePhotoUrl.trim()));
           console.log('Final avatar choice:', (profilePhotoUrl && profilePhotoUrl.trim()) || userData.avatar || null);
-          
+
           // Clear invalid localStorage values for this user if they exist
           if (profilePhotoUrl === '' || profilePhotoUrl === 'null' || profilePhotoUrl === 'undefined') {
             localStorage.removeItem('profilePhotoUrl');
@@ -445,7 +445,7 @@ export const CreatorProfile: React.FC = () => {
       window.location.href = `/login?redirect=/creator/${username}`;
       return;
     }
-    
+
     // Find the selected tier
     const tier = creator.tiers.find((t: any) => t.id === tierId);
     if (tier) {
@@ -495,14 +495,14 @@ export const CreatorProfile: React.FC = () => {
     if (dateString === "CURRENT_TIMESTAMP") {
       return 'Just now';
     }
-    
+
     const date = new Date(dateString);
-    
+
     // Check if date is invalid
     if (isNaN(date.getTime())) {
       return 'Just now';
     }
-    
+
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
@@ -592,7 +592,7 @@ export const CreatorProfile: React.FC = () => {
     const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
     const mediaUrl = mediaUrls[0];
     const fullUrl = mediaUrl?.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
-    
+
     // Transform the post data to match the content manager modal structure
     const modalData = {
       ...post,
@@ -613,10 +613,10 @@ export const CreatorProfile: React.FC = () => {
   // Handler functions for post interactions
   const handleLike = async (postId: string) => {
     if (!user) return;
-    
+
     try {
       const currentLike = postLikes[postId] || { liked: false, count: 0 };
-      
+
       if (currentLike.liked) {
         // Unlike the post
         await fetch(`/api/posts/${postId}/like`, {
@@ -636,7 +636,7 @@ export const CreatorProfile: React.FC = () => {
           body: JSON.stringify({ userId: user.id }),
         });
       }
-      
+
       // Update local state immediately for responsive UI
       setPostLikes(prev => ({
         ...prev,
@@ -645,7 +645,7 @@ export const CreatorProfile: React.FC = () => {
           count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
         }
       }));
-      
+
       // Refetch posts to get updated counts from database
       if (creator?.id) {
         fetchUserPosts(creator.id);
@@ -816,18 +816,23 @@ export const CreatorProfile: React.FC = () => {
           <div className="flex-1">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
-              const { truncated, needsExpansion } = truncateBio(bioText, 'profile');
+
+              // Very strict mobile-first truncation - 2 lines max
+              const words = bioText.split(' ');
+              const maxWords = 8; // Very conservative for mobile (4 words per line)
+
+              const needsExpansion = words.length > maxWords;
+              const truncated = needsExpansion ? words.slice(0, maxWords).join(' ') : bioText;
 
               return (
                 <div>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-tight line-clamp-2 max-h-[2.4em] overflow-hidden text-sm">
                     {expandedBio ? bioText : truncated}
                     {needsExpansion && !expandedBio && '...'}
                   </p>
                   {needsExpansion && (
                     <button
-                      onClick={() => setExpandedBio(!expandedBio)}
-                      className="text-sm text-primary hover:underline mt-1 font-medium"
+                      onClick={() => setExpandedBio(!expandedBio)}                      className="text-sm text-primary hover:underline mt-1 font-medium"
                     >
                       {expandedBio ? 'Read less' : 'Read more'}
                     </button>
@@ -914,7 +919,7 @@ export const CreatorProfile: React.FC = () => {
                                 const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
                                 const mediaUrl = mediaUrls[0];
                                 const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
-                                
+
                                 return post.media_type === 'video' ? (
                                   <video 
                                     src={fullUrl}
@@ -1044,9 +1049,9 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        
 
-                        
+
+
                         {/* Post Caption - Mobile Instagram style */}
                         {(post.content || post.title) && (
                           <div className="mb-1">
@@ -1056,7 +1061,7 @@ export const CreatorProfile: React.FC = () => {
                             </p>
                           </div>
                         )}
-                        
+
                         {/* View comments link */}
                         {(post.comments_count || 0) > 0 && (
                           <Button
@@ -1123,7 +1128,7 @@ export const CreatorProfile: React.FC = () => {
                       <ul className="space-y-2">
                         {(() => {
                           let benefits = tier.benefits || [];
-                          
+
                           // Handle case where benefits might be a JSON string
                           if (typeof benefits === 'string') {
                             try {
@@ -1133,12 +1138,12 @@ export const CreatorProfile: React.FC = () => {
                               benefits = [];
                             }
                           }
-                          
+
                           // Ensure benefits is an array - handle null, undefined, or other non-array types
                           if (!benefits || !Array.isArray(benefits)) {
                             benefits = [];
                           }
-                          
+
                           // If no benefits, show a default message
                           if (benefits.length === 0) {
                             return (
@@ -1148,7 +1153,7 @@ export const CreatorProfile: React.FC = () => {
                               </li>
                             );
                           }
-                          
+
                           return benefits.map((benefit, index) => (
                             <li key={index} className="flex items-center gap-2 text-sm">
                               <Check className="w-4 h-4 text-accent" />
