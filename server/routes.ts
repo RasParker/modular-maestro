@@ -10,8 +10,8 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable } from '../shared/schema';
-import { eq, desc, and, gte, lte, count, sum, sql, inArray } from 'drizzle-orm';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable } from '../shared/schema';
+import { eq, desc, and, gte, lte, count, sum, sql, inArray, asc, like, or, isNull, gt, lt } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
@@ -746,7 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUser(validatedData.creator_id, { 
           total_subscribers: subscriberCount 
         });
-        console.log(`Updated creator ${validatedData.creator_id} subscriber count to ${subscriberCount}`);
+        console.log("Updated creator " + validatedData.creator_id + " subscriber count to " + subscriberCount);
       } catch (error) {
         console.error('Error updating creator subscriber count:', error);
         // Don't fail the subscription creation if count update fails
@@ -864,9 +864,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: post.id.toString(),
         type: 'new_post',
         creator: post.creator.display_name || post.creator.username,
-        message: `shared a new ${post.media_type === 'video' ? 'video' : 'post'}`,
-        time: formatTimeAgo```text
-(new Date(post.created_at)),
+        message: "shared a new " + (post.media_type === 'video' ? 'video' : 'post'),
+        time: formatTimeAgo(new Date(post.created_at)),
         avatar: post.creator.avatar || '/placeholder.svg'
     }));
 
@@ -1069,7 +1068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      const photoUrl = `/uploads/${req.file.filename}`;
+      const photoUrl = "/uploads/" + req.file.filename;
 
       // Update user's avatar in database if user is authenticated
       if (req.session?.userId) {
@@ -1077,7 +1076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await db.update(users)
             .set({ avatar: photoUrl })
             .where(eq(users.id, req.session.userId));
-          console.log(`Updated avatar for user ${req.session.userId}: ${photoUrl}`);
+          console.log("Updated avatar for user " + req.session.userId + ": " + photoUrl);
         } catch (dbError) {
           console.error('Failed to update avatar in database:', dbError);
           // Continue with response even if DB update fails
@@ -1101,7 +1100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      const photoUrl = `/uploads/${req.file.filename}`;
+      const photoUrl = "/uploads/" + req.file.filename;
 
       // Update user's cover image in database if user is authenticated
       if (req.session?.userId) {
@@ -1109,7 +1108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await db.update(users)
             .set({ cover_image: photoUrl })
             .where(eq(users.id, req.session.userId));
-          console.log(`Updated cover image for user ${req.session.userId}: ${photoUrl}`);
+          console.log("Updated cover image for user " + req.session.userId + ": " + photoUrl);
         } catch (dbError) {
           console.error('Failed to update cover image in database:', dbError);
           // Continue with response even if DB update fails
@@ -1134,7 +1133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate the URL for the uploaded file
-      const fileUrl = `/uploads/${req.file.filename}`;
+      const fileUrl = "/uploads/" + req.file.filename;
 
       res.json({ 
         success: true, 
@@ -1367,8 +1366,8 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     res.json({ 
       success: true, 
       commission_rate_decimal: settings.commission_rate,
-      commission_rate_percentage: `${commissionPercentage}%`,
-      message: `Current commission rate is ${commissionPercentage}%`
+      commission_rate_percentage: commissionPercentage + "%",
+      message: "Current commission rate is " + commissionPercentage + "%"
     });
   } catch (error: any) {
     console.error('Error fetching commission rate:', error);
@@ -1494,13 +1493,6 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   return httpServer;
 }
 
-import { and, eq, desc, asc, count, sum, inArray, sql, like, or, isNull, gt, lt } from 'drizzle-orm';
-import { usersTable, postsTable, subscriptionsTable, tiersTable, commentsTable } from '../shared/schema';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
-
 // Helper function to format time ago
 function formatTimeAgo(date: Date): string {
   const now = new Date();
@@ -1512,17 +1504,17 @@ function formatTimeAgo(date: Date): string {
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} minute${diffInMinutes === 1 ? '' : 's'} ago`;
+    return diffInMinutes + " minute" + (diffInMinutes === 1 ? '' : 's') + " ago";
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`;
+    return diffInHours + " hour" + (diffInHours === 1 ? '' : 's') + " ago";
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) {
-    return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+    return diffInDays + " day" + (diffInDays === 1 ? '' : 's') + " ago";
   }
 
   return date.toLocaleDateString();
