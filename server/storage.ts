@@ -477,32 +477,69 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCreatorSubscribers(creatorId: number): Promise<any[]> {
-    const subscribers = await db
-      .select({
-        id: subscriptions.id,
-        status: subscriptions.status,
-        created_at: subscriptions.created_at,
-        current_period_end: subscriptions.current_period_end,
-        auto_renew: subscriptions.auto_renew,
-        fan_id: subscriptions.fan_id,
-        tier_id: subscriptions.tier_id,
-        username: users.username,
-        email: users.email,
-        avatar: users.avatar,
-        display_name: users.display_name,
-        tier_name: subscription_tiers.name,
-        tier_price: subscription_tiers.price
-      })
-      .from(subscriptions)
-      .innerJoin(users, eq(subscriptions.fan_id, users.id))
-      .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
-      .where(and(
-        eq(subscriptions.creator_id, creatorId),
-        eq(subscriptions.status, 'active')
-      ))
-      .orderBy(desc(subscriptions.created_at));
+    try {
+      const subscribers = await db
+        .select({
+          id: subscriptions.id,
+          status: subscriptions.status,
+          created_at: subscriptions.created_at,
+          current_period_end: subscriptions.current_period_end,
+          auto_renew: subscriptions.auto_renew,
+          fan_id: subscriptions.fan_id,
+          tier_id: subscriptions.tier_id,
+          username: users.username,
+          email: users.email,
+          avatar: users.avatar,
+          display_name: users.display_name,
+          tier_name: subscription_tiers.name,
+          tier_price: subscription_tiers.price
+        })
+        .from(subscriptions)
+        .innerJoin(users, eq(subscriptions.fan_id, users.id))
+        .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
+        .where(and(
+          eq(subscriptions.creator_id, creatorId),
+          eq(subscriptions.status, 'active')
+        ))
+        .orderBy(desc(subscriptions.created_at));
 
-    return subscribers;
+      return subscribers;
+    } catch (error) {
+      console.error('Error in getCreatorSubscribers:', error);
+      // Fallback to simple query if join fails
+      try {
+        const simpleSubscribers = await db
+          .select()
+          .from(subscriptions)
+          .where(and(
+            eq(subscriptions.creator_id, creatorId),
+            eq(subscriptions.status, 'active')
+          ))
+          .orderBy(desc(subscriptions.created_at));
+        
+        // Manually fetch user and tier data for each subscription
+        const enrichedSubscribers = await Promise.all(
+          simpleSubscribers.map(async (sub) => {
+            const user = await this.getUser(sub.fan_id);
+            const tier = await this.getSubscriptionTier(sub.tier_id);
+            return {
+              ...sub,
+              username: user?.username || 'Unknown',
+              email: user?.email || 'Unknown',
+              avatar: user?.avatar || null,
+              display_name: user?.display_name || user?.username || 'Unknown',
+              tier_name: tier?.name || 'Unknown',
+              tier_price: tier?.price || '0'
+            };
+          })
+        );
+        
+        return enrichedSubscribers;
+      } catch (fallbackError) {
+        console.error('Fallback query also failed:', fallbackError);
+        return [];
+      }
+    }
   }
 
   async getSubscriptionTierPerformance(creatorId: number): Promise<any[]> {
