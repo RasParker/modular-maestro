@@ -288,7 +288,7 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
   creator_id: z.number(),
   tier_id: z.number(),
   started_at: z.date().optional(),
-  ends_at: z.date().optional(),
+  ends_at: z.date().optional().nullable(),
   next_billing_date: z.date().optional(),
 });
 

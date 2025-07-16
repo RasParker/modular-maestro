@@ -685,6 +685,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ends_at: req.body.ends_at ? new Date(req.body.ends_at) : null
       };
 
+      // Remove undefined values and handle null properly
+      Object.keys(processedData).forEach(key => {
+        if (processedData[key] === undefined) {
+          delete processedData[key];
+        }
+      });
+
       const validatedData = insertSubscriptionSchema.parse(processedData);
       console.log('Validated data:', validatedData);
 
