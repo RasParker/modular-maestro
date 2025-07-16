@@ -37,7 +37,7 @@ export const ManageSubscriptions: React.FC = () => {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       if (!user) return;
-      
+
       try {
         const response = await fetch(`/api/subscriptions/fan/${user.id}`);
         if (!response.ok) {
@@ -65,7 +65,7 @@ export const ManageSubscriptions: React.FC = () => {
           }
         : sub
     ));
-    
+
     const subscription = subscriptions.find(sub => sub.id === subscriptionId);
     toast({
       title: subscription?.status === 'active' ? "Subscription paused" : "Subscription resumed",
@@ -155,7 +155,7 @@ export const ManageSubscriptions: React.FC = () => {
               Your Subscriptions ({loading ? '...' : subscriptions.length})
             </h2>
           </div>
-          
+
           {loading ? (
             <div className="flex justify-center py-8">
               <LoadingSpinner />
