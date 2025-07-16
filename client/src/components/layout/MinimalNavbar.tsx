@@ -29,6 +29,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export const MinimalNavbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -197,7 +198,8 @@ export const MinimalNavbar: React.FC = () => {
           </div>
 
           {/* User Menu - Desktop */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center space-x-3">
+            {user && <NotificationBell />}
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -237,7 +239,8 @@ export const MinimalNavbar: React.FC = () => {
           </div>
 
           {/* Mobile Hamburger Menu */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-3">
+            {user && <NotificationBell />}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-foreground">

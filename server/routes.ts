@@ -1378,6 +1378,165 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   }
 });
 
+  // Notification API routes
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 20;
+      const notifications = await storage.getNotifications(userId, limit);
+
+      // Enrich notifications with actor data
+      const enrichedNotifications = await Promise.all(
+        notifications.map(async (notification) => {
+          let actor = null;
+          if (notification.actor_id) {
+            actor = await storage.getUser(notification.actor_id);
+          }
+
+          return {
+            ...notification,
+            actor: actor ? {
+              id: actor.id,
+              username: actor.username,
+              display_name: actor.display_name,
+              avatar: actor.avatar
+            } : null,
+            time_ago: formatTimeAgo(notification.created_at)
+          };
+        })
+      );
+
+      res.json(enrichedNotifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
+
+  app.get("/api/notifications/unread-count", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const count = await storage.getUnreadNotificationCount(userId);
+      res.json({ count });
+    } catch (error) {
+      console.error('Error fetching unread notification count:', error);
+      res.status(500).json({ error: "Failed to fetch unread count" });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const notificationId = parseInt(req.params.id);
+      const success = await storage.markNotificationAsRead(notificationId);
+
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Notification not found" });
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  app.patch("/api/notifications/mark-all-read", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const success = await storage.markAllNotificationsAsRead(userId);
+
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ error: "Failed to mark notifications as read" });
+      }
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      res.status(500).json({ error: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.delete("/api/notifications/:id", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const notificationId = parseInt(req.params.id);
+      const success = await storage.deleteNotification(notificationId);
+
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Notification not found" });
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      res.status(500).json({ error: "Failed to delete notification" });
+    }
+  });
+
+  app.get("/api/notification-preferences", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      let preferences = await storage.getNotificationPreferences(userId);
+      
+      // Create default preferences if they don't exist
+      if (!preferences) {
+        preferences = await storage.createNotificationPreferences({ user_id: userId });
+      }
+
+      res.json(preferences);
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+      res.status(500).json({ error: "Failed to fetch notification preferences" });
+    }
+  });
+
+  app.patch("/api/notification-preferences", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const updates = req.body;
+      let preferences = await storage.updateNotificationPreferences(userId, updates);
+
+      // Create preferences if they don't exist
+      if (!preferences) {
+        preferences = await storage.createNotificationPreferences({ user_id: userId, ...updates });
+      }
+
+      res.json(preferences);
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      res.status(500).json({ error: "Failed to update notification preferences" });
+    }
+  });
+
   // Messaging API routes
   app.get("/api/conversations", async (req, res) => {
     try {
@@ -1486,6 +1645,61 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     } catch (error) {
       console.error('Error creating conversation:', error);
       res.status(500).json({ error: "Failed to create conversation" });
+    }
+  });
+
+  // Test endpoint to create sample notifications
+  app.post("/api/test-notifications", async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Create various test notifications
+      const testNotifications = [
+        {
+          user_id: userId,
+          type: 'new_subscriber',
+          title: 'New Subscriber!',
+          message: 'John Doe subscribed to your Premium tier',
+          action_url: '/creator/subscribers',
+          metadata: { tier_name: 'Premium' }
+        },
+        {
+          user_id: userId,
+          type: 'new_message',
+          title: 'New Message',
+          message: 'Sarah Wilson: Hey! Love your content...',
+          action_url: '/fan/messages',
+          metadata: {}
+        },
+        {
+          user_id: userId,
+          type: 'payment_success',
+          title: 'Payment Successful',
+          message: 'Your payment of GHS 50 for Premium tier was processed successfully',
+          action_url: '/fan/subscriptions',
+          metadata: { amount: '50', tier_name: 'Premium' }
+        },
+        {
+          user_id: userId,
+          type: 'new_post',
+          title: 'New Content',
+          message: 'FitnessGuru posted: "5 Tips for Building Muscle"',
+          action_url: '/fan/posts/123',
+          metadata: { post_title: '5 Tips for Building Muscle' }
+        }
+      ];
+
+      for (const notification of testNotifications) {
+        await storage.createNotification(notification);
+      }
+
+      res.json({ message: "Test notifications created successfully", count: testNotifications.length });
+    } catch (error) {
+      console.error('Error creating test notifications:', error);
+      res.status(500).json({ error: "Failed to create test notifications" });
     }
   });
 

@@ -11,6 +11,8 @@ import {
   creator_payout_settings,
   conversations,
   messages,
+  notifications,
+  notification_preferences,
   type User, 
   type InsertUser,
   type Post,
@@ -28,7 +30,11 @@ import {
   type Conversation,
   type InsertConversation,
   type Message,
-  type InsertMessage
+  type InsertMessage,
+  type Notification,
+  type InsertNotification,
+  type NotificationPreferences,
+  type InsertNotificationPreferences
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
@@ -103,6 +109,19 @@ export interface IStorage {
   getMessages(conversationId: number): Promise<Message[]>;
   sendMessage(message: InsertMessage): Promise<Message>;
   markMessagesAsRead(conversationId: number, userId: number): Promise<void>;
+
+  // Notification methods
+  getNotifications(userId: number, limit?: number): Promise<Notification[]>;
+  getUnreadNotificationCount(userId: number): Promise<number>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(notificationId: number): Promise<boolean>;
+  markAllNotificationsAsRead(userId: number): Promise<boolean>;
+  deleteNotification(notificationId: number): Promise<boolean>;
+  
+  // Notification preferences methods
+  getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined>;
+  createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences>;
+  updateNotificationPreferences(userId: number, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined>;
 }
 
 // Database Storage Implementation
@@ -951,6 +970,139 @@ export class DatabaseStorage implements IStorage {
           eq(messages.read, false)
         )
       );
+  }
+
+  // Notification methods
+  async getNotifications(userId: number, limit: number = 20): Promise<Notification[]> {
+    try {
+      const userNotifications = await db
+        .select()
+        .from(notifications)
+        .where(eq(notifications.user_id, userId))
+        .orderBy(desc(notifications.created_at))
+        .limit(limit);
+
+      return userNotifications;
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      return [];
+    }
+  }
+
+  async getUnreadNotificationCount(userId: number): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.user_id, userId),
+            eq(notifications.read, false)
+          )
+        );
+
+      return result[0]?.count || 0;
+    } catch (error) {
+      console.error('Error getting unread notification count:', error);
+      return 0;
+    }
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+
+    return newNotification;
+  }
+
+  async markNotificationAsRead(notificationId: number): Promise<boolean> {
+    try {
+      const result = await db
+        .update(notifications)
+        .set({ read: true })
+        .where(eq(notifications.id, notificationId))
+        .returning();
+
+      return result.length > 0;
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      return false;
+    }
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    try {
+      await db
+        .update(notifications)
+        .set({ read: true })
+        .where(
+          and(
+            eq(notifications.user_id, userId),
+            eq(notifications.read, false)
+          )
+        );
+
+      return true;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      return false;
+    }
+  }
+
+  async deleteNotification(notificationId: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(notifications)
+        .where(eq(notifications.id, notificationId))
+        .returning();
+
+      return result.length > 0;
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      return false;
+    }
+  }
+
+  // Notification preferences methods
+  async getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined> {
+    try {
+      const [preferences] = await db
+        .select()
+        .from(notification_preferences)
+        .where(eq(notification_preferences.user_id, userId))
+        .limit(1);
+
+      return preferences;
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+      return undefined;
+    }
+  }
+
+  async createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences> {
+    const [newPreferences] = await db
+      .insert(notification_preferences)
+      .values(preferences)
+      .returning();
+
+    return newPreferences;
+  }
+
+  async updateNotificationPreferences(userId: number, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined> {
+    try {
+      const [updatedPreferences] = await db
+        .update(notification_preferences)
+        .set({ ...updates, updated_at: new Date() })
+        .where(eq(notification_preferences.user_id, userId))
+        .returning();
+
+      return updatedPreferences;
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      return undefined;
+    }
   }
 }
 

@@ -167,6 +167,55 @@ export const conversations = pgTable("conversations", {
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Notification system tables
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").notNull(),
+  type: text("type").notNull(), // 'new_subscriber', 'new_message', 'new_comment', 'new_post', 'payment_success', 'payment_failed', 'payout_completed', 'like'
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  action_url: text("action_url"), // URL to navigate to when clicked
+  actor_id: integer("actor_id"), // ID of user who triggered the notification
+  entity_type: text("entity_type"), // 'post', 'comment', 'subscription', 'message', 'payment'
+  entity_id: integer("entity_id"), // ID of the related entity
+  metadata: json("metadata").$type<{
+    amount?: string;
+    tier_name?: string;
+    post_title?: string;
+    comment_content?: string;
+    [key: string]: any;
+  }>(),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const notification_preferences = pgTable("notification_preferences", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").notNull().unique(),
+  // Email notifications
+  email_new_subscribers: boolean("email_new_subscribers").notNull().default(true),
+  email_new_messages: boolean("email_new_messages").notNull().default(true),
+  email_new_comments: boolean("email_new_comments").notNull().default(true),
+  email_new_posts: boolean("email_new_posts").notNull().default(false),
+  email_payments: boolean("email_payments").notNull().default(true),
+  email_payouts: boolean("email_payouts").notNull().default(true),
+  email_likes: boolean("email_likes").notNull().default(false),
+  // In-app notifications
+  app_new_subscribers: boolean("app_new_subscribers").notNull().default(true),
+  app_new_messages: boolean("app_new_messages").notNull().default(true),
+  app_new_comments: boolean("app_new_comments").notNull().default(true),
+  app_new_posts: boolean("app_new_posts").notNull().default(true),
+  app_payments: boolean("app_payments").notNull().default(true),
+  app_payouts: boolean("app_payouts").notNull().default(true),
+  app_likes: boolean("app_likes").notNull().default(true),
+  // Push notifications (for future mobile app)
+  push_enabled: boolean("push_enabled").notNull().default(false),
+  push_new_messages: boolean("push_new_messages").notNull().default(false),
+  push_new_subscribers: boolean("push_new_subscribers").notNull().default(false),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   conversation_id: integer("conversation_id").notNull(),
@@ -189,6 +238,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   payout_settings: one(creator_payout_settings),
   sent_messages: many(messages, { relationName: "sentMessages" }),
   received_messages: many(messages, { relationName: "receivedMessages" }),
+  notifications: many(notifications),
+  notification_preferences: one(notification_preferences),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -280,6 +331,24 @@ export const messagesRelations = relations(messages, ({ one }) => ({
   }),
   recipient: one(users, {
     fields: [messages.recipient_id],
+    references: [users.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.user_id],
+    references: [users.id],
+  }),
+  actor: one(users, {
+    fields: [notifications.actor_id],
+    references: [users.id],
+  }),
+}));
+
+export const notificationPreferencesRelations = relations(notification_preferences, ({ one }) => ({
+  user: one(users, {
+    fields: [notification_preferences.user_id],
     references: [users.id],
   }),
 }));
@@ -413,3 +482,41 @@ export type InsertConversation = z.infer<typeof insertConversationSchema>;
 export type Conversation = typeof conversations.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  user_id: true,
+  type: true,
+  title: true,
+  message: true,
+  action_url: true,
+  actor_id: true,
+  entity_type: true,
+  entity_id: true,
+  metadata: true,
+});
+
+export const insertNotificationPreferencesSchema = createInsertSchema(notification_preferences).pick({
+  user_id: true,
+  email_new_subscribers: true,
+  email_new_messages: true,
+  email_new_comments: true,
+  email_new_posts: true,
+  email_payments: true,
+  email_payouts: true,
+  email_likes: true,
+  app_new_subscribers: true,
+  app_new_messages: true,
+  app_new_comments: true,
+  app_new_posts: true,
+  app_payments: true,
+  app_payouts: true,
+  app_likes: true,
+  push_enabled: true,
+  push_new_messages: true,
+  push_new_subscribers: true,
+});
+
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+export type NotificationPreferences = typeof notification_preferences.$inferSelect;

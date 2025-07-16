@@ -31,6 +31,7 @@ import { ManageSubscriptions } from '@/pages/fan/ManageSubscriptions';
 import { Messages } from '@/pages/fan/Messages';
 import { PaymentMethod } from '@/pages/fan/PaymentMethod';
 import { FanSettings } from '@/pages/fan/FanSettings';
+import { Notifications } from '@/pages/fan/Notifications';
 
 // Admin pages
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
@@ -66,6 +67,7 @@ function App() {
               <Route path="/fan/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
               <Route path="/fan/subscriptions" element={<ProtectedRoute allowedRoles={['fan']}><ManageSubscriptions /></ProtectedRoute>} />
               <Route path="/fan/messages" element={<ProtectedRoute allowedRoles={['fan']}><Messages /></ProtectedRoute>} />
+              <Route path="/fan/notifications" element={<ProtectedRoute allowedRoles={['fan']}><Notifications /></ProtectedRoute>} />
               <Route path="/fan/payment" element={<ProtectedRoute allowedRoles={['fan']}><PaymentMethod /></ProtectedRoute>} />
               <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
               <Route path="/creator/:username" element={<CreatorProfile />} />
@@ -84,6 +86,7 @@ function App() {
               <Route path="/creator/settings" element={<ProtectedRoute allowedRoles={['creator']}><CreatorSettings /></ProtectedRoute>} />
               <Route path="/creator/tiers" element={<ProtectedRoute allowedRoles={['creator']}><ManageTiers /></ProtectedRoute>} />
               <Route path="/creator/messages" element={<ProtectedRoute allowedRoles={['creator']}><CreatorMessages /></ProtectedRoute>} />
+              <Route path="/creator/notifications" element={<ProtectedRoute allowedRoles={['creator']}><Notifications /></ProtectedRoute>} />
               <Route path="/creator/edit-post/:id" element={<ProtectedRoute allowedRoles={['creator']}><EditPost /></ProtectedRoute>} />
               
               {/* Admin Routes */}
@@ -94,6 +97,7 @@ function App() {
               <Route path="/admin/content" element={<ProtectedRoute allowedRoles={['admin']}><ReviewContent /></ProtectedRoute>} />
               <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><Reports /></ProtectedRoute>} />
               <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnalytics /></ProtectedRoute>} />
+              <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={['admin']}><Notifications /></ProtectedRoute>} />
               
               {/* Default route */}
               <Route path="/" element={<Login />} />
