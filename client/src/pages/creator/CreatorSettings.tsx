@@ -452,6 +452,15 @@ export const CreatorSettings: React.FC = () => {
 
   const handleSaveProfile = async () => {
     try {
+      // Save display name and bio to localStorage
+      if (displayName.trim()) {
+        setLocalStorageItem('displayName', displayName.trim());
+      }
+
+      if (bio.trim()) {
+        setLocalStorageItem('bio', bio.trim());
+      }
+
       // Sync to database
       const profilePhotoUrl = getLocalStorageItem('profilePhotoUrl');
       const coverPhotoUrl = getLocalStorageItem('coverPhotoUrl');
@@ -473,14 +482,8 @@ export const CreatorSettings: React.FC = () => {
         throw new Error('Failed to sync profile to database');
       }
 
-      const result = await response.json();
       console.log('Profile synced to database successfully');
-
-      // Clear localStorage values since they're now in the database
-      // This ensures the profile page will fetch fresh data from the database
-      localStorage.removeItem('displayName');
-      localStorage.removeItem('bio');
-      // Note: We keep photo URLs in localStorage for now since they're file paths
+      console.log('Dispatching localStorageChange event for displayName and bio');
 
       // Update the user context with the latest profile data
       updateUser({ 
@@ -489,11 +492,6 @@ export const CreatorSettings: React.FC = () => {
         avatar: profilePhotoUrl || null,
         cover_photo: coverPhotoUrl || null
       });
-
-      // Dispatch event to trigger profile refresh
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { keys: ['displayName', 'bio'], type: 'profileUpdate' }
-      }));
 
       toast({
         title: "Profile updated",
