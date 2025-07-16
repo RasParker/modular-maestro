@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Navbar } from '@/components/shared/Navbar';
 import { ArrowLeft, CreditCard, Plus, Trash2, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -33,7 +32,7 @@ export const PaymentMethod: React.FC = () => {
   const [paymentMethods, setPaymentMethods] = useState(MOCK_PAYMENT_METHODS);
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [cardForm, setCardForm] = useState({
     number: '',
     expiry: '',
@@ -47,7 +46,7 @@ export const PaymentMethod: React.FC = () => {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const newCard = {
         id: Date.now().toString(),
         type: 'card',
@@ -60,7 +59,7 @@ export const PaymentMethod: React.FC = () => {
       setPaymentMethods([...paymentMethods, newCard]);
       setCardForm({ number: '', expiry: '', cvc: '', name: '' });
       setIsAddingCard(false);
-      
+
       toast({
         title: "Payment method added",
         description: "Your card has been added successfully.",
@@ -97,8 +96,6 @@ export const PaymentMethod: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -176,7 +173,7 @@ export const PaymentMethod: React.FC = () => {
                     </div>
                   </div>
                 ))}
-                
+
                 {paymentMethods.length === 0 && (
                   <div className="text-center py-8">
                     <CreditCard className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
@@ -208,7 +205,7 @@ export const PaymentMethod: React.FC = () => {
                       required
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="expiry">Expiry Date</Label>
@@ -231,7 +228,7 @@ export const PaymentMethod: React.FC = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="cardName">Cardholder Name</Label>
                     <Input
@@ -247,7 +244,7 @@ export const PaymentMethod: React.FC = () => {
                     <Shield className="w-4 h-4" />
                     Your payment information is encrypted and secure
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Adding..." : "Add Card"}
@@ -284,7 +281,7 @@ export const PaymentMethod: React.FC = () => {
                   <p className="font-medium">GHS 25.00</p>
                 </div>
               </div>
-              
+
               <Button variant="outline" className="w-full">
                 View Billing History
               </Button>
