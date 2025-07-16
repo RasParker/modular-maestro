@@ -15,7 +15,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { truncateBio } from '@/lib/text-utils';
+import { BioDisplay } from '@/lib/text-utils';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -142,7 +142,6 @@ export const CreatorProfile: React.FC = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
-  const [expandedBio, setExpandedBio] = useState(false);
   const { toast } = useToast();
 
   // Define isOwnProfile early to avoid initialization issues
@@ -819,31 +818,11 @@ export const CreatorProfile: React.FC = () => {
 
               return (
                 <div>
-                  <p className="text-muted-foreground leading-tight text-sm">
-                    {expandedBio ? (
-                      <>
-                        {bioText}
-                        <button
-                          onClick={() => setExpandedBio(false)}
-                          className="text-primary hover:underline font-medium ml-1"
-                        >
-                          read less
-                        </button>
-                      </>
-                    ) : (
-                      <span className="line-clamp-2">
-                        {bioText}
-                        {bioText.length > 150 && (
-                          <button
-                            onClick={() => setExpandedBio(true)}
-                            className="text-primary hover:underline font-medium ml-1"
-                          >
-                            read more
-                          </button>
-                        )}
-                      </span>
-                    )}
-                  </p>
+                  <BioDisplay 
+                    bio={bioText}
+                    context="profile"
+                    className="text-muted-foreground leading-tight text-sm line-clamp-2"
+                  />
                 </div>
               );
             })()}

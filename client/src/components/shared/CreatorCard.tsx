@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users } from 'lucide-react';
+import { BioDisplay } from '@/lib/text-utils';
 
 interface CreatorCardProps {
   creator: {
@@ -19,27 +20,6 @@ interface CreatorCardProps {
 }
 
 export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
-  const [expandedBio, setExpandedBio] = useState(false);
-
-  const truncateText = (text: string) => {
-    if (!text) return { truncated: '', needsExpansion: false };
-
-    // Character-based truncation for precise 2-line usage
-    const maxChars = 80; // Approximate characters for 2 lines in card context
-    const readMoreText = '... read more';
-    const effectiveMaxChars = maxChars - readMoreText.length;
-
-    if (text.length <= maxChars) {
-      return { truncated: text, needsExpansion: false };
-    }
-
-    return {
-      truncated: text.slice(0, effectiveMaxChars),
-      needsExpansion: true
-    };
-  };
-
-  const { truncated, needsExpansion } = truncateText(creator.bio || '');
 
   return (
     <Card className="bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300">
@@ -66,31 +46,13 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
               )}
             </div>
             <p className="text-xs text-muted-foreground">@{creator.username}</p>
-            {(creator.bio || truncated) && (
+            {creator.bio && (
               <div className="mt-1">
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-tight max-h-[2.2em] overflow-hidden">
-                  {expandedBio ? creator.bio : (
-                    <>
-                      {truncated}
-                      {needsExpansion && !expandedBio && (
-                        <button
-                          onClick={() => setExpandedBio(!expandedBio)}
-                          className="text-primary hover:underline font-medium ml-1"
-                        >
-                          read more
-                        </button>
-                      )}
-                    </>
-                  )}
-                </p>
-                {expandedBio && needsExpansion && (
-                  <button
-                    onClick={() => setExpandedBio(!expandedBio)}
-                    className="text-xs text-primary hover:underline mt-1 font-medium"
-                  >
-                    Read less
-                  </button>
-                )}
+                <BioDisplay 
+                  bio={creator.bio}
+                  context="card"
+                  className="text-xs text-muted-foreground line-clamp-2 leading-tight max-h-[2.2em] overflow-hidden"
+                />
               </div>
             )}
             <div className="flex items-center gap-4 mt-2">
