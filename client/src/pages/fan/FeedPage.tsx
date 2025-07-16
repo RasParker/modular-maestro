@@ -323,10 +323,6 @@ export const FeedPage: React.FC = () => {
   }, [user, toast]);
 
   const handleLike = async (postId: string) => {
-    // Get current user from localStorage or context
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    
     if (!user) return;
     
     try {
@@ -428,13 +424,13 @@ export const FeedPage: React.FC = () => {
   const getTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'image':
-        return <Image className="w-3 h-3" />;
+        return <Image className="w-4 h-4" />;
       case 'video':
-        return <Video className="w-3 h-3" />;
+        return <Video className="w-4 h-4" />;
       case 'audio':
-        return <Music className="w-3 h-3" />;
+        return <Music className="w-4 h-4" />;
       default:
-        return <Image className="w-3 h-3" />;
+        return <Image className="w-4 h-4" />;
     }
   };
 
@@ -548,7 +544,7 @@ export const FeedPage: React.FC = () => {
                   />
                   {/* Content type overlay - smaller for mobile */}
                   <div className="absolute top-2 left-2 z-20">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
                       {getTypeIcon(post.type)}
                     </div>
                   </div>
@@ -714,6 +710,7 @@ export const FeedPage: React.FC = () => {
                   src={selectedContent.thumbnail} 
                   alt={`${selectedContent.creator.display_name}'s post`}
                   className="relative z-10 w-full h-full object-contain"
+                  style={{ objectFit: 'contain' }}
                 />
               </div>
 
