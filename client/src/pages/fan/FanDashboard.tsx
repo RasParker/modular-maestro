@@ -198,7 +198,7 @@ export const FanDashboard: React.FC = () => {
                         key={subscription.id}
                         className="p-4 rounded-lg bg-muted/10 border border-border/50"
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 sm:items-center">
                           <Avatar className="w-12 h-12 flex-shrink-0">
                             <AvatarImage 
                               src={subscription.creator.avatar} 
@@ -209,32 +209,29 @@ export const FanDashboard: React.FC = () => {
                               {subscription.creator.display_name?.charAt(0) || subscription.creator.username.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex-1 min-w-0 space-y-3">
-                            {/* Username, Tier Badge, and Amount Row */}
-                            <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground truncate">
                                   {subscription.creator.display_name || subscription.creator.username}
                                 </p>
-                                <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent flex-shrink-0">
+                                <p className="text-xs text-muted-foreground">
                                   {subscription.tier.name}
-                                </Badge>
+                                </p>
+                                <p className="text-xs font-medium text-foreground mt-1">
+                                  GHS {subscription.tier.price}/month
+                                </p>
                               </div>
-                              <p className="text-sm font-medium text-foreground flex-shrink-0">
-                                GHS {subscription.tier.price}/month
-                              </p>
-                            </div>
-                            
-                            {/* Status Badge and View Profile Row */}
-                            <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <Badge variant="outline" className="text-xs">
-                                {subscription.status}
-                              </Badge>
-                              <Button variant="outline" size="sm" className="flex-shrink-0" asChild>
-                                <Link to={`/creator/${subscription.creator.username}`}>
-                                  View Profile
-                                </Link>
-                              </Button>
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <Badge variant="outline" className="text-xs self-start">
+                                  {subscription.status}
+                                </Badge>
+                                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                                  <Link to={`/creator/${subscription.creator.username}`}>
+                                    View Profile
+                                  </Link>
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
