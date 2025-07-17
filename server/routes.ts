@@ -856,8 +856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(subscriptionsTable)
         .where(and(
-          eq```text
-(subscriptionsTable.fan_id, fanId),
+          eq(subscriptionsTable.fan_id, fanId),
           eq(subscriptionsTable.status, 'active')
         ));
 
@@ -1720,9 +1719,9 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   app.get("/api/health/database", async (req, res) => {
     try {
       // Check if users table has data
-      const userCount = await db.select({ count: sql<number>`count(*)` }).from(users);
-      const postCount = await db.select({ count: sql<number>`count(*)` }).from(posts);
-      const subscriptionCount = await db.select({ count: sql<number>`count(*)` }).from(subscriptions);
+      const userCount = await db.select({ count: count() }).from(users);
+      const postCount = await db.select({ count: count() }).from(posts);
+      const subscriptionCount = await db.select({ count: count() }).from(subscriptions);
 
       res.json({
         status: "healthy",
@@ -1755,7 +1754,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
       const testNotifications = [
         {
           user_id: userId,
-          type: 'new_subscriber',```text
+          type: 'new_subscriber',
           title: 'New Subscriber!',
           message: 'John Doe subscribed to your Premium tier',
           action_url: '/creator/subscribers',
