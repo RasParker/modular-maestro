@@ -61,65 +61,54 @@ export const Schedule: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await fetch(`/api/posts?status=all&creatorId=${user.id}`);
+        const response = await fetch(`/api/creator/${user.id}/content`);
         if (response.ok) {
           const allPosts = await response.json();
 
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
-            .filter((post: any) => post.status === 'scheduled' || post.status === 'draft')
+            .filter((post: any) => post.status === 'Scheduled' || post.status === 'Draft')
             .map((post: any) => {
-              // For scheduled posts, use scheduled_for if available, otherwise show "Not scheduled"
-              // For draft posts, show creation time as fallback
-              let displayDateTime;
+              // For scheduled posts, use scheduledFor if available
               let displayDate;
               let displayTime;
 
-              if (post.status === 'scheduled' && post.scheduled_for) {
-                displayDateTime = new Date(post.scheduled_for);
+              if (post.status === 'Scheduled' && post.scheduledFor) {
+                const displayDateTime = new Date(post.scheduledFor);
                 displayDate = displayDateTime.toLocaleDateString();
                 displayTime = displayDateTime.toLocaleTimeString('en-US', { 
                   hour: '2-digit', 
                   minute: '2-digit',
                   hour12: false 
                 });
-              } else if (post.status === 'scheduled' && !post.scheduled_for) {
-                // Scheduled but no specific time set
+              } else if (post.status === 'Scheduled' && !post.scheduledFor) {
                 displayDate = 'Not scheduled';
                 displayTime = '';
               } else {
-                // Draft posts - show creation time
-                displayDateTime = new Date(post.created_at);
-                displayDate = displayDateTime.toLocaleDateString();
-                displayTime = displayDateTime.toLocaleTimeString('en-US', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: false 
-                });
+                // Draft posts - show creation date
+                displayDate = post.date;
+                displayTime = '';
               }
 
               return {
                 id: post.id.toString(),
-                title: post.title || 'Untitled Post',
-                description: post.content || '',
+                title: post.caption || 'Untitled Post',
+                description: post.caption || '',
                 date: displayDate,
                 time: displayTime,
-                type: post.media_type === 'image' ? 'Image' as const : 
-                      post.media_type === 'video' ? 'Video' as const : 
-                      'Text' as const,
+                type: post.type,
                 tier: post.tier || 'Free',
-                status: post.status === 'scheduled' ? 'Scheduled' as const : 'Draft' as const,
-                thumbnail: post.media_urls && post.media_urls.length > 0 ? 
-                  `/uploads/${post.media_urls[0]}` : undefined,
-                scheduledFor: post.scheduled_for
+                status: post.status,
+                thumbnail: post.mediaPreview,
+                scheduledFor: post.scheduledFor
               };
             });
 
           setScheduledPosts(scheduledAndDraftPosts);
 
           // Calculate stats
-          const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'Scheduled').length;
-          const draft = scheduledAndDraftPosts.filter(p => p.status === 'Draft').length;
+          const scheduled = allPosts.filter((post: any) => post.status === 'Scheduled').length;
+          const draft = allPosts.filter((post: any) => post.status === 'Draft').length;
 
           // Calculate posts for this week (simplified - just count all for now)
           const thisWeek = scheduledAndDraftPosts.length;
