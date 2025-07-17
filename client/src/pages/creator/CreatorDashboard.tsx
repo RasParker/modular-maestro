@@ -83,14 +83,18 @@ export const CreatorDashboard: React.FC = () => {
     if (!user) return;
     
     try {
-      const response = await fetch('/api/posts');
+      const response = await fetch(`/api/creator/${user.id}/content`);
       if (response.ok) {
         const posts = await response.json();
         console.log('Fetched user content:', posts);
         setUserPosts(posts);
 
-        // Filter for scheduled content
-        const scheduled = posts.filter((post: any) => post.status === 'scheduled');
+        // Filter for scheduled content - check for both status and scheduled_for date
+        const scheduled = posts.filter((post: any) => 
+          post.status === 'scheduled' || 
+          (post.scheduled_for && new Date(post.scheduled_for) > new Date())
+        );
+        console.log('Filtered scheduled content:', scheduled);
         setScheduledContent(scheduled);
       }
 

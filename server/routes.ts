@@ -1055,6 +1055,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Creator content endpoint
+  app.get("/api/creator/:creatorId/content", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+
+      // Get all posts for this creator with user information
+      const creatorPosts = await db
+        .select({
+          id: postsTable.id,
+          creator_id: postsTable.creator_id,
+          title: postsTable.title,
+          content: postsTable.content,
+          media_type: postsTable.media_type,
+          media_urls: postsTable.media_urls,
+          tier: postsTable.tier,
+          status: postsTable.status,
+          scheduled_for: postsTable.scheduled_for,
+          likes_count: postsTable.likes_count,
+          comments_count: postsTable.comments_count,
+          created_at: postsTable.created_at,
+          updated_at: postsTable.updated_at,
+          username: usersTable.username,
+          avatar: usersTable.avatar
+        })
+        .from(postsTable)
+        .leftJoin(usersTable, eq(postsTable.creator_id, usersTable.id))
+        .where(eq(postsTable.creator_id, creatorId))
+        .orderBy(desc(postsTable.created_at));
+
+      res.json(creatorPosts);
+    } catch (error) {
+      console.error('Error fetching creator content:', error);
+      res.status(500).json({ error: "Failed to fetch creator content" });
+    }
+  });
+
   // Creator goals endpoint (simplified)
   app.get("/api/creator/:creatorId/goals", async (req, res) => {
     try {
