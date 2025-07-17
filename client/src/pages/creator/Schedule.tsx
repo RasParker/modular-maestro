@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,10 +61,10 @@ export const Schedule: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await fetch('/api/posts');
+        const response = await fetch(`/api/posts?status=all&creatorId=${user.id}`);
         if (response.ok) {
           const allPosts = await response.json();
-          
+
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => post.status === 'scheduled' || post.status === 'draft')
@@ -75,7 +74,7 @@ export const Schedule: React.FC = () => {
               let displayDateTime;
               let displayDate;
               let displayTime;
-              
+
               if (post.status === 'scheduled' && post.scheduled_for) {
                 displayDateTime = new Date(post.scheduled_for);
                 displayDate = displayDateTime.toLocaleDateString();
@@ -98,7 +97,7 @@ export const Schedule: React.FC = () => {
                   hour12: false 
                 });
               }
-              
+
               return {
                 id: post.id.toString(),
                 title: post.title || 'Untitled Post',
@@ -121,7 +120,7 @@ export const Schedule: React.FC = () => {
           // Calculate stats
           const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'Scheduled').length;
           const draft = scheduledAndDraftPosts.filter(p => p.status === 'Draft').length;
-          
+
           // Calculate posts for this week (simplified - just count all for now)
           const thisWeek = scheduledAndDraftPosts.length;
 
