@@ -62,10 +62,12 @@ export const Schedule: React.FC = () => {
       try {
         setLoading(true);
         const response = await fetch(`/api/creator/${user.id}/content`);
+        console.log('Schedule API response status:', response.status);
         if (response.ok) {
           const allPosts = await response.json();
 
-          console.log('All posts received:', allPosts);
+          console.log('Schedule - All posts received:', allPosts);
+          console.log('Schedule - Posts array length:', allPosts.length);
           
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
