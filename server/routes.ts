@@ -428,7 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
-      
+
       // Provide more specific error messages
       if (error instanceof Error) {
         if (error.message.includes('foreign key')) {
@@ -856,7 +856,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(subscriptionsTable)
         .where(and(
-          eq(subscriptionsTable.fan_id, fanId),
+          eq```text
+(subscriptionsTable.fan_id, fanId),
           eq(subscriptionsTable.status, 'active')
         ));
 
@@ -1569,7 +1570,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
       }
 
       let preferences = await storage.getNotificationPreferences(userId);
-      
+
       // Create default preferences if they don't exist
       if (!preferences) {
         preferences = await storage.createNotificationPreferences({ user_id: userId });
@@ -1722,7 +1723,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
       const userCount = await db.select({ count: sql<number>`count(*)` }).from(users);
       const postCount = await db.select({ count: sql<number>`count(*)` }).from(posts);
       const subscriptionCount = await db.select({ count: sql<number>`count(*)` }).from(subscriptions);
-      
+
       res.json({
         status: "healthy",
         data: {
@@ -1754,7 +1755,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
       const testNotifications = [
         {
           user_id: userId,
-          type: 'new_subscriber',
+          type: 'new_subscriber',```text
           title: 'New Subscriber!',
           message: 'John Doe subscribed to your Premium tier',
           action_url: '/creator/subscribers',
@@ -1826,7 +1827,7 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   });
 
   const httpServer = createServer(app);
-  
+
   // WebSocket setup for real-time notifications
   const wss = new WebSocketServer({ 
     server: httpServer, 
@@ -1842,25 +1843,25 @@ app.get('/api/admin/commission-rate', async (req, res) => {
 
   wss.on('connection', (ws, req) => {
     console.log('WebSocket client connected');
-    
+
     let userId: number | null = null;
 
     // Handle incoming messages from client
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
-        
+
         if (message.type === 'auth' && message.userId) {
           userId = parseInt(message.userId);
-          
+
           // Add connection to user's active connections
           if (!activeConnections.has(userId)) {
             activeConnections.set(userId, new Set());
           }
           activeConnections.get(userId)!.add(ws);
-          
+
           console.log(`User ${userId} connected via WebSocket`);
-          
+
           // Send confirmation
           ws.send(JSON.stringify({
             type: 'auth_success',
@@ -1875,10 +1876,10 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     // Handle connection close
     ws.on('close', () => {
       console.log('WebSocket client disconnected');
-      
+
       if (userId && activeConnections.has(userId)) {
         activeConnections.get(userId)!.delete(ws);
-        
+
         // Remove user entry if no more connections
         if (activeConnections.get(userId)!.size === 0) {
           activeConnections.delete(userId);
@@ -1895,26 +1896,26 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   // Function to broadcast notification to specific user
   const broadcastNotificationToUser = (userId: number, notification: any) => {
     const userConnections = activeConnections.get(userId);
-    
+
     if (userConnections && userConnections.size > 0) {
       const message = JSON.stringify({
         type: 'new_notification',
         notification
       });
-      
+
       userConnections.forEach(ws => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(message);
         }
       });
-      
+
       console.log(`Broadcast notification to user ${userId} on ${userConnections.size} connection(s)`);
     }
   };
 
   // Attach broadcast function to app for use in other routes
   app.locals.broadcastNotificationToUser = broadcastNotificationToUser;
-  
+
   // Connect the notification service to the broadcast function
   NotificationService.setBroadcastFunction(broadcastNotificationToUser);
 

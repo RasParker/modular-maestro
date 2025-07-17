@@ -40,6 +40,7 @@ export const FanDashboard: React.FC = () => {
   const { user } = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [newContentCount, setNewContentCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [activityLoading, setActivityLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,8 +82,25 @@ export const FanDashboard: React.FC = () => {
       }
     };
 
+    const fetchNewContentCount = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`/api/fan/${user.id}/new-content-count`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch new content count');
+        }
+        const data = await response.json();
+        setNewContentCount(data.count || 0);
+      } catch (err) {
+        console.error('Error fetching new content count:', err);
+        setNewContentCount(0);
+      }
+    };
+
     fetchSubscriptions();
     fetchRecentActivity();
+    fetchNewContentCount();
   }, [user]);
 
   return (
@@ -139,7 +157,7 @@ export const FanDashboard: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">New Content</p>
-                      <p className="text-2xl font-bold text-foreground">12</p>
+                      <p className="text-2xl font-bold text-foreground">{newContentCount}</p>
                     </div>
                     <TrendingUp className="h-8 w-8 text-success" />
                   </div>
