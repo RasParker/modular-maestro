@@ -354,7 +354,9 @@ export const CreatorProfile: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await fetch(`/api/users/username/${username}`);
+        // Decode the username from URL encoding
+        const decodedUsername = decodeURIComponent(username);
+        const response = await fetch(`/api/users/username/${encodeURIComponent(decodedUsername)}`);
         if (response.ok) {
           const userData = await response.json();
           console.log('Creator data loaded:', userData);
