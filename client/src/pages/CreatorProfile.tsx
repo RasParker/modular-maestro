@@ -11,6 +11,7 @@ import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -113,6 +114,8 @@ const MOCK_CREATORS = {
 export const CreatorProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
     () => localStorage.getItem('profilePhotoUrl')
   );
@@ -142,7 +145,6 @@ export const CreatorProfile: React.FC = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
-  const { toast } = useToast();
 
   // Define isOwnProfile early to avoid initialization issues
   const isOwnProfile = user?.username === username;
@@ -683,6 +685,64 @@ export const CreatorProfile: React.FC = () => {
     });
   };
 
+  // Chat initiation functionality
+  const initiateChatMutation = useMutation({
+    mutationFn: async (creatorId: number) => {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otherUserId: creatorId }),
+      });
+      if (!response.ok) throw new Error('Failed to create conversation');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Invalidate conversations query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      // Navigate to messages page
+      window.location.href = '/fan/messages';
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to start conversation. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleChatClick = () => {
+    if (!user) {
+      // Redirect to login if not authenticated
+      window.location.href = `/login?redirect=/creator/${username}`;
+      return;
+    }
+
+    if (user.role !== 'fan') {
+      toast({
+        title: "Access Restricted",
+        description: "Only fans can initiate conversations with creators.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!userSubscription) {
+      toast({
+        title: "Subscription Required",
+        description: "You need an active subscription to message this creator.",
+        variant: "destructive"
+      });
+      // Scroll to subscription tiers
+      document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    if (creator?.id) {
+      initiateChatMutation.mutate(creator.id);
+    }
+  };
+
   const handleEdit = (postId: string) => {
     const post = userPosts.find(p => p.id === postId);
     if (post) {
@@ -795,7 +855,7 @@ export const CreatorProfile: React.FC = () => {
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
               </div>
-              {isOwnProfile && (
+              {isOwnProfile ? (
                 <div className="flex items-center gap-2 pb-2">
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/settings">
@@ -805,6 +865,19 @@ export const CreatorProfile: React.FC = () => {
                   </Button>
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/upload">Create Post</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 pb-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleChatClick}
+                    disabled={initiateChatMutation.isPending}
+                    className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
+                    title="Start conversation"
+                  >
+                    <MessageSquare className="w-5 h-5" />
                   </Button>
                 </div>
               )}
@@ -819,6 +892,18 @@ export const CreatorProfile: React.FC = () => {
                     <Star className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
+                )}
+                {!isOwnProfile && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleChatClick}
+                    disabled={initiateChatMutation.isPending}
+                    className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors ml-auto"
+                    title="Start conversation"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
                 )}
               </div>
               <p className="text-muted-foreground">@{creator.username}</p>
