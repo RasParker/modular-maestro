@@ -80,135 +80,101 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
       <CardContent className="p-4 space-y-4">
         {/* Mobile-First Layout */}
 
-        {/* Content Preview with WhatsApp-style square container */}
-        <div className="flex items-start gap-3">
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-            {thumbnail ? (
-              <div className="w-full h-full relative overflow-hidden rounded-lg">
-                {/* Background blurred image */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                  style={{ backgroundImage: `url(${thumbnail})` }}
-                />
-                {/* Foreground contained image */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <img 
-                    src={thumbnail} 
-                    alt={title}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-                {/* Content type overlay */}
-                <div className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white">
-                  <div className="scale-75">
-                    {getTypeIcon()}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
-                {getTypeIcon()}
-              </div>
-            )}
+        {/* Header - Badges and date at top of card */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
+              {status}
+            </Badge>
+            <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+              {tier}
+            </Badge>
           </div>
+          <span className="text-xs text-muted-foreground">{date}</span>
+        </div>
 
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
-              {title}
-            </h3>
-            {(() => {
-              const { truncated, needsExpansion } = truncateText(description);
-              return (
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  {expandedCaption ? description : (
+        {/* Caption/Title */}
+        {(() => {
+          const { truncated, needsExpansion } = truncateText(title || description);
+          return (
+            <div className="font-medium text-foreground text-sm leading-tight">
+              {expandedCaption ? (title || description) : (
+                <>
+                  {truncated}
+                  {needsExpansion && !expandedCaption && (
                     <>
-                      {truncated}
-                      {needsExpansion && !expandedCaption && (
-                        <>
-                          {'... '}
-                          <button
-                            onClick={() => setExpandedCaption(true)}
-                            className="text-primary hover:text-primary/80 font-medium"
-                          >
-                            read more
-                          </button>
-                        </>
-                      )}
-                    </>
-                  )}
-                  {expandedCaption && needsExpansion && (
-                    <>
-                      {' '}
+                      {'... '}
                       <button
-                        onClick={() => setExpandedCaption(false)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedCaption(true);
+                        }}
                         className="text-primary hover:text-primary/80 font-medium"
                       >
-                        read less
+                        read more
                       </button>
                     </>
                   )}
-                </p>
-              );
-            })()}
-
-            {/* Date/Time Info - Mobile optimized */}
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                <span>{date}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                <span>{time}</span>
-              </div>
+                </>
+              )}
+              {expandedCaption && needsExpansion && (
+                <>
+                  {' '}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedCaption(false);
+                    }}
+                    className="text-primary hover:text-primary/80 font-medium"
+                  >
+                    read less
+                  </button>
+                </>
+              )}
             </div>
+          );
+        })()}
+
+        {/* Media Preview - Square aspect ratio like Recent Posts */}
+        <div className="relative">
+          <div className="w-full aspect-square overflow-hidden rounded-lg">
+            {thumbnail ? (
+              <div className="w-full h-full">
+                {type === 'Video' ? (
+                  <video 
+                    src={thumbnail}
+                    className="w-full h-full object-cover"
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <img 
+                    src={thumbnail}
+                    alt={title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                      target.className = "w-full h-full object-cover opacity-50";
+                    }}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  {getTypeIcon()}
+                  <p className="mt-2 text-xs">{type} Content</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Badges Row */}
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="text-xs">
-            {tier}
-          </Badge>
-          <Badge variant={getStatusColor()} className="text-xs">
-            {status}
-          </Badge>
-        </div>
-
-        {/* Action Buttons Row */}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/30">
-          {/* Action Buttons */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(id)}
-              className="h-7 px-2 text-xs"
-            >
-              <Edit3 className="w-3 h-3" />
-            </Button>
-
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => onPublish(id)}
-              className="h-7 px-2 text-xs bg-gradient-primary"
-            >
-              <ExternalLink className="w-3 h-3" />
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onDelete(id)}
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
-          </div>
-
+        {/* Bottom row - Release Info and Actions combined */}
+        <div className="flex items-center justify-between pt-1">
           {/* Release Info */}
-          {status === 'Scheduled' && scheduledFor && (
+          {status === 'Scheduled' && scheduledFor ? (
             <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
               <Clock className="w-3 h-3" />
               <span>
@@ -234,7 +200,36 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
                 })()}
               </span>
             </div>
+          ) : (
+            <div></div>
           )}
+
+          {/* Action Buttons - compact inline */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(id);
+              }}
+              className="h-7 px-2 text-xs"
+            >
+              <Edit3 className="w-3 h-3" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(id);
+              }}
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+            >
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

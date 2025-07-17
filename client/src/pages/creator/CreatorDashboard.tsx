@@ -89,7 +89,7 @@ export const CreatorDashboard: React.FC = () => {
       if (response.ok) {
         const posts = await response.json();
         console.log('Fetched user content:', posts);
-        setUserPosts(posts);
+        
 
         // Filter for scheduled content - check for both status and scheduled_for date
         const scheduled = posts.filter((post: any) => 
@@ -98,6 +98,12 @@ export const CreatorDashboard: React.FC = () => {
         );
         console.log('Filtered scheduled content:', scheduled);
         setScheduledContent(scheduled);
+
+        // Filter for published posts only for Recent Posts section
+        const publishedPosts = posts.filter((post: any) => 
+          post.status === 'published'
+        );
+        setUserPosts(publishedPosts);
       }
 
       // Fetch real analytics data first
