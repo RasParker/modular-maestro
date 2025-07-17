@@ -1607,11 +1607,14 @@ app.get('/api/admin/commission-rate', async (req, res) => {
 
   // Messaging API routes
   // Get conversations for current user
-app.get('/api/conversations', authenticateToken, async (req, res) => {
+app.get('/api/conversations', async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.session?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
     console.log('Fetching conversations for user:', userId);
-    console.log('User object:', req.user);
 
     // Get conversations where current user is participant1 (fan)
     const fanConversations = await db
@@ -1714,9 +1717,6 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
     allConversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     console.log('Found conversations:', allConversations.length);
-    console.log('Fan conversations:', fanConversations.length);
-    console.log('Creator conversations:', creatorConversations.length);
-    console.log('All conversations data:', JSON.stringify(allConversations, null, 2));
     res.json(allConversations);
   } catch (error) {
     console.error('Error fetching conversations:', error);
@@ -1725,10 +1725,14 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
 });
 
 // Get messages for a conversation
-app.get('/api/conversations/:conversationId/messages', authenticateToken, async (req, res) => {
+app.get('/api/conversations/:conversationId/messages', async (req, res) => {
   try {
     const { conversationId } = req.params;
-    const currentUserId = req.user.id;
+    const currentUserId = req.session?.userId;
+
+    if (!currentUserId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
     console.log('Fetching messages for conversation:', conversationId, 'user:', currentUserId);
 
@@ -1774,11 +1778,15 @@ app.get('/api/conversations/:conversationId/messages', authenticateToken, async 
 });
 
 // Send message
-app.post('/api/conversations/:conversationId/messages', authenticateToken, async (req, res) => {
+app.post('/api/conversations/:conversationId/messages', async (req, res) => {
   try {
     const { conversationId } = req.params;
     const { content, recipientId } = req.body;
-    const senderId = req.user.id;
+    const senderId = req.session?.userId;
+
+    if (!senderId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
     console.log('Sending message in conversation:', conversationId, 'from:', senderId, 'to:', recipientId);
 
@@ -1810,10 +1818,14 @@ app.post('/api/conversations/:conversationId/messages', authenticateToken, async
 });
 
 // Create or get conversation
-app.post('/api/conversations', authenticateToken, async (req, res) => {
+app.post('/api/conversations', async (req, res) => {
   try {
     const { otherUserId } = req.body;
-    const currentUserId = req.user.id;
+    const currentUserId = req.session?.userId;
+
+    if (!currentUserId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
     console.log('Creating conversation between:', currentUserId, 'and', otherUserId);
 

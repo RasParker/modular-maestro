@@ -1,26 +1,30 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Extend Express Request interface to include user property
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: {
+        id: number;
+        [key: string]: any;
+      };
     }
   }
 }
 
-// Middleware to authenticate token/session
-export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
+export function authenticateToken(req: Request, res: Response, next: NextFunction) {
   // Check if user is authenticated via session
-  if (req.session?.userId && req.session?.user) {
-    req.user = req.session.user;
-    next();
-    return;
+  if (!req.session?.userId) {
+    return res.status(401).json({ error: 'Authentication required' });
   }
 
-  // If no session, return unauthorized
-  res.status(401).json({ error: 'Unauthorized' });
-};
+  // Attach user info to request
+  req.user = {
+    id: req.session.userId,
+    ...req.session.user
+  };
+
+  next();
+}
 
 // Middleware to check if user has specific role
 export const requireRole = (allowedRoles: string[]) => {
