@@ -85,9 +85,9 @@ export const BottomNavigation: React.FC = () => {
           },
           {
             label: 'My Profile',
-            href: '/creator/settings',
+            href: `/creator/${user?.username}`,
             icon: UserCircle,
-            active: location.pathname === '/creator/settings'
+            active: location.pathname === `/creator/${user?.username}`
           }
         ];
 
