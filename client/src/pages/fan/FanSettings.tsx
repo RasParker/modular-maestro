@@ -315,47 +315,51 @@ export const FanSettings: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
-                    <Label>Profile Photo</Label>
-                    <div className="relative inline-block">
-                      <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-background bg-background">
-                        {user?.avatar ? (
-                          <img 
-                            src={user.avatar} 
-                            alt="Profile photo" 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
-                            <span className="text-xl font-bold text-primary-foreground">
-                              {user?.username?.charAt(0).toUpperCase() || 'U'}
-                            </span>
+                    <div className="space-y-3">
+                      <Label>Profile Photo</Label>
+                      <div className="flex items-start gap-4">
+                        <div className="relative">
+                          <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-background bg-background">
+                            {user?.avatar ? (
+                              <img 
+                                src={user.avatar} 
+                                alt="Profile photo" 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
+                                <span className="text-xl font-bold text-primary-foreground">
+                                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                          {/* Profile Photo Upload Indicator */}
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full border-2 border-background flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProfilePhotoUpload}
+                              className="hidden"
+                              id="profile-upload"
+                            />
+                            <label htmlFor="profile-upload" className="cursor-pointer flex items-center justify-center w-full h-full">
+                              {user?.avatar ? (
+                                <Camera className="w-3 h-3 text-primary-foreground" />
+                              ) : (
+                                <span className="text-primary-foreground text-sm font-bold">+</span>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                        
+                        {/* Instructions */}
+                        <div className="flex-1">
+                          <p className="text-xs text-muted-foreground">
+                            Square image recommended. Max file size: 5MB
+                          </p>
+                        </div>
                       </div>
-                      {/* Profile Photo Upload Indicator */}
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full border-2 border-background flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleProfilePhotoUpload}
-                          className="hidden"
-                          id="profile-upload"
-                        />
-                        <label htmlFor="profile-upload" className="cursor-pointer flex items-center justify-center w-full h-full">
-                          {user?.avatar ? (
-                            <Camera className="w-3 h-3 text-primary-foreground" />
-                          ) : (
-                            <span className="text-primary-foreground text-sm font-bold">+</span>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                    
-                    {/* Instructions */}
-                    <div className="mt-4">
-                      <p className="text-xs text-muted-foreground">
-                        Square image recommended. Max file size: 5MB
-                      </p>
                     </div>
                   </div>
                   
