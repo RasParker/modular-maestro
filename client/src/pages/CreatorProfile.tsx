@@ -988,31 +988,29 @@ export const CreatorProfile: React.FC = () => {
                     <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
                       {/* Post Header - Mobile Instagram style */}
                       <div className="flex items-center justify-between px-3 py-3">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
                             <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <div>
+                          <div className="flex items-center gap-2 flex-1">
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
-                            <div className="flex items-center gap-1">
-                              <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                                {post.tier === 'public' ? 'Free' : 
-                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                                 post.tier}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                • {getTimeAgo(post.created_at || post.createdAt)}
-                              </span>
-                            </div>
+                            <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                              {post.tier === 'public' ? 'Free' : 
+                               post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                               post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                               post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                               post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                               post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                               post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                               post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                               post.tier}
+                            </Badge>
                           </div>
                         </div>
+                        <span className="text-xs text-muted-foreground">
+                          {getTimeAgo(post.created_at || post.createdAt)}
+                        </span>
                       </div>
 
                       {/* Post Media - Full width mobile Instagram style */}
@@ -1176,9 +1174,8 @@ export const CreatorProfile: React.FC = () => {
                         {/* Post Caption - Mobile Instagram style */}
                         {(post.content || post.title) && (
                           <div className="mb-1">
-                            <p className="text-sm leading-relaxed">
-                              <span className="font-medium">{creator.display_name}</span>{' '}
-                              <span className="text-foreground">{post.content || post.title}</span>
+                            <p className="text-sm leading-relaxed text-foreground">
+                              {post.content || post.title}
                             </p>
                           </div>
                         )}

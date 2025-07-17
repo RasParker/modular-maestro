@@ -505,23 +505,21 @@ export const FeedPage: React.FC = () => {
               <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
                 {/* Post Header - Mobile Instagram style */}
               <div className="flex items-center justify-between px-3 py-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
                     <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <div>
+                  <div className="flex items-center gap-2 flex-1">
                     <p className="font-semibold text-foreground text-sm">{post.creator.display_name}</p>
-                    <div className="flex items-center gap-1">
-                      <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                        {post.tier}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        • {getTimeAgo(post.posted)}
-                      </span>
-                    </div>
+                    <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                      {post.tier}
+                    </Badge>
                   </div>
                 </div>
+                <span className="text-xs text-muted-foreground">
+                  {getTimeAgo(post.posted)}
+                </span>
               </div>
               {/* Post Media - Full width mobile Instagram style */}
               <div className="w-full">
@@ -601,37 +599,34 @@ export const FeedPage: React.FC = () => {
                     const isExpanded = expandedCaptions[post.id];
                     
                     return (
-                      <p className="text-sm leading-relaxed">
-                        <span className="font-medium">{post.creator.display_name}</span>{' '}
-                        <span className="text-foreground">
-                          {isExpanded ? post.content : (
-                            <>
-                              {truncated}
-                              {needsExpansion && !isExpanded && (
-                                <>
-                                  {'... '}
-                                  <button
-                                    onClick={() => toggleCaptionExpansion(post.id)}
-                                    className="text-muted-foreground hover:text-foreground font-normal"
-                                  >
-                                    more
-                                  </button>
-                                </>
-                              )}
-                            </>
-                          )}
-                          {isExpanded && needsExpansion && (
-                            <>
-                              {' '}
-                              <button
-                                onClick={() => toggleCaptionExpansion(post.id)}
-                                className="text-muted-foreground hover:text-foreground font-normal"
-                              >
-                                less
-                              </button>
-                            </>
-                          )}
-                        </span>
+                      <p className="text-sm leading-relaxed text-foreground">
+                        {isExpanded ? post.content : (
+                          <>
+                            {truncated}
+                            {needsExpansion && !isExpanded && (
+                              <>
+                                {'... '}
+                                <button
+                                  onClick={() => toggleCaptionExpansion(post.id)}
+                                  className="text-muted-foreground hover:text-foreground font-normal"
+                                >
+                                  more
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+                        {isExpanded && needsExpansion && (
+                          <>
+                            {' '}
+                            <button
+                              onClick={() => toggleCaptionExpansion(post.id)}
+                              className="text-muted-foreground hover:text-foreground font-normal"
+                            >
+                              less
+                            </button>
+                          </>
+                        )}
                       </p>
                     );
                   })()}
