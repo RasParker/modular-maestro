@@ -40,7 +40,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
       <div className="flex-shrink-0 p-4 lg:p-3 border-b border-border/50">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={creator.avatar} alt={creator.username} />
+            <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
             <AvatarFallback>{creator.display_name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">

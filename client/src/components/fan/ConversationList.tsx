@@ -70,7 +70,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 flex-shrink-0">
-                  <AvatarImage src={conversation.creator.avatar} alt={conversation.creator.username} />
+                  <AvatarImage src={conversation.creator.avatar ? (conversation.creator.avatar.startsWith('/uploads/') ? conversation.creator.avatar : `/uploads/${conversation.creator.avatar}`) : undefined} alt={conversation.creator.username} />
                   <AvatarFallback>{conversation.creator.display_name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">

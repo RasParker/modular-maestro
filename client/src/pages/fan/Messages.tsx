@@ -109,7 +109,7 @@ export const Messages: React.FC = () => {
 
   // Set initial selected conversation
   useEffect(() => {
-    if (conversations.length > 0 && !selectedConversation) {
+    if (conversations.length > 0) {
       // Check if there's an auto-select conversation ID from chat initiation
       const autoSelectId = sessionStorage.getItem('autoSelectConversationId');
       
@@ -124,10 +124,12 @@ export const Messages: React.FC = () => {
         }
       }
       
-      // Default to first conversation if no auto-select
-      setSelectedConversation(conversations[0]);
+      // Default to first conversation if no conversation is selected
+      if (!selectedConversation) {
+        setSelectedConversation(conversations[0]);
+      }
     }
-  }, [conversations, selectedConversation]);
+  }, [conversations]); // Remove selectedConversation dependency to allow proper updates
 
   const filteredConversations = conversations.filter(conv =>
     conv.creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -222,7 +224,7 @@ export const Messages: React.FC = () => {
                     <div className="flex items-center gap-4 px-2">
                       <div className="relative">
                         <Avatar className="h-14 w-14">
-                          <AvatarImage src={conversation.creator.avatar || undefined} alt={conversation.creator.display_name} />
+                          <AvatarImage src={conversation.creator.avatar ? (conversation.creator.avatar.startsWith('/uploads/') ? conversation.creator.avatar : `/uploads/${conversation.creator.avatar}`) : undefined} alt={conversation.creator.display_name} />
                           <AvatarFallback className="text-lg">{conversation.creator.display_name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         {conversation.unread_count > 0 && (
@@ -280,7 +282,7 @@ export const Messages: React.FC = () => {
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={selectedConversation.creator.avatar} alt={selectedConversation.creator.display_name} />
+                  <AvatarImage src={selectedConversation.creator.avatar ? (selectedConversation.creator.avatar.startsWith('/uploads/') ? selectedConversation.creator.avatar : `/uploads/${selectedConversation.creator.avatar}`) : undefined} alt={selectedConversation.creator.display_name} />
                   <AvatarFallback>{selectedConversation.creator.display_name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
