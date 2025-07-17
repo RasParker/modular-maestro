@@ -60,6 +60,9 @@ function App() {
               {/* Public Routes */}
               <Route path="/explore" element={<Explore />} />
 
+              {/* Public Creator Profile Route - Must be accessible to everyone */}
+              <Route path="/creator/:username" element={<CreatorProfile />} />
+
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
               <Route path="/fan/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
@@ -68,7 +71,6 @@ function App() {
               <Route path="/fan/notifications" element={<ProtectedRoute allowedRoles={['fan']}><Notifications /></ProtectedRoute>} />
               <Route path="/fan/payment" element={<ProtectedRoute allowedRoles={['fan']}><PaymentMethod /></ProtectedRoute>} />
               <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
-              <Route path="/creator/:username" element={<CreatorProfile />} />
 
               {/* Payment Routes */}
               <Route path="/payment/callback" element={<PaymentCallback />} />
