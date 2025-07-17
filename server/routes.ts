@@ -1616,40 +1616,40 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
     const fanConversations = await db
       .select({
         id: conversationsTable.id,
-        other_participant_id: conversationsTable.participant2_id,
+        other_participant_id: conversationsTable.participant_2_id,
         creator: {
           username: usersTable.username,
           display_name: usersTable.display_name,
           avatar: usersTable.avatar,
         },
-        last_message: conversationsTable.last_message,
+        last_message: sql<string>`''`,
         timestamp: conversationsTable.updated_at,
         unread: sql<boolean>`false`,
         unread_count: sql<number>`0`,
       })
       .from(conversationsTable)
-      .leftJoin(usersTable, eq(conversationsTable.participant2_id, usersTable.id))
-      .where(eq(conversationsTable.participant1_id, userId))
+      .leftJoin(usersTable, eq(conversationsTable.participant_2_id, usersTable.id))
+      .where(eq(conversationsTable.participant_1_id, userId))
       .orderBy(desc(conversationsTable.updated_at));
 
     // Get conversations where current user is participant2 (creator)
     const creatorConversations = await db
       .select({
         id: conversationsTable.id,
-        other_participant_id: conversationsTable.participant1_id,
+        other_participant_id: conversationsTable.participant_1_id,
         fan: {
           username: usersTable.username,
           display_name: usersTable.display_name,
           avatar: usersTable.avatar,
         },
-        last_message: conversationsTable.last_message,
+        last_message: sql<string>`''`,
         timestamp: conversationsTable.updated_at,
         unread: sql<boolean>`false`,
         unread_count: sql<number>`0`,
       })
       .from(conversationsTable)
-      .leftJoin(usersTable, eq(conversationsTable.participant1_id, usersTable.id))
-      .where(eq(conversationsTable.participant2_id, userId))
+      .leftJoin(usersTable, eq(conversationsTable.participant_1_id, usersTable.id))
+      .where(eq(conversationsTable.participant_2_id, userId))
       .orderBy(desc(conversationsTable.updated_at));
 
     // Combine and format conversations based on user role
@@ -1708,8 +1708,8 @@ app.get('/api/conversations/:conversationId/messages', authenticateToken, async 
         and(
           eq(conversationsTable.id, conversationId),
           or(
-            eq(conversationsTable.participant1_id, currentUserId),
-            eq(conversationsTable.participant2_id, currentUserId)
+            eq(conversationsTable.participant_1_id, currentUserId),
+            eq(conversationsTable.participant_2_id, currentUserId)
           )
         )
       )
@@ -1761,11 +1761,10 @@ app.post('/api/conversations/:conversationId/messages', authenticateToken, async
       })
       .returning();
 
-    // Update conversation last_message and timestamp
+    // Update conversation timestamp
     await db
       .update(conversationsTable)
       .set({
-        last_message: content,
         updated_at: new Date(),
       })
       .where(eq(conversationsTable.id, conversationId));
@@ -1793,12 +1792,12 @@ app.post('/api/conversations', authenticateToken, async (req, res) => {
       .where(
         or(
           and(
-            eq(conversationsTable.participant1_id, currentUserId),
-            eq(conversationsTable.participant2_id, otherUserId)
+            eq(conversationsTable.participant_1_id, currentUserId),
+            eq(conversationsTable.participant_2_id, otherUserId)
           ),
           and(
-            eq(conversationsTable.participant1_id, otherUserId),
-            eq(conversationsTable.participant2_id, currentUserId)
+            eq(conversationsTable.participant_1_id, otherUserId),
+            eq(conversationsTable.participant_2_id, currentUserId)
           )
         )
       )
@@ -1813,10 +1812,8 @@ app.post('/api/conversations', authenticateToken, async (req, res) => {
     const [newConversation] = await db
       .insert(conversationsTable)
       .values({
-        participant1_id: currentUserId,
-        participant2_id: otherUserId,
-        last_message: 'Conversation started',
-        updated_at: new Date(),
+        participant_1_id: currentUserId,
+        participant_2_id: otherUserId,
       })
       .returning();
 
