@@ -995,7 +995,7 @@ export const CreatorProfile: React.FC = () => {
                           </Avatar>
                           <div className="flex items-center gap-2 flex-1">
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
-                            <Badge variant="secondary" className="text-xs px-1 py-0 h-4 bg-accent text-accent-foreground">
+                            <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
                               {post.tier === 'public' ? 'Free' : 
                                post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
                                post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
