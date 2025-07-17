@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
@@ -18,7 +17,6 @@ import { CreatorDashboard } from '@/pages/creator/CreatorDashboard';
 import { CreatePost } from '@/pages/creator/CreatePost';
 import { Analytics } from '@/pages/creator/Analytics';
 import { Subscribers } from '@/pages/creator/Subscribers';
-import { Schedule } from '@/pages/creator/Schedule';
 import { CreatorSettings } from '@/pages/creator/CreatorSettings';
 import { EditPost } from '@/pages/creator/EditPost';
 import { ManageTiers } from '@/pages/creator/ManageTiers';
@@ -58,10 +56,10 @@ function App() {
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              
+
               {/* Public Routes */}
               <Route path="/explore" element={<Explore />} />
-              
+
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
               <Route path="/fan/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
@@ -71,7 +69,7 @@ function App() {
               <Route path="/fan/payment" element={<ProtectedRoute allowedRoles={['fan']}><PaymentMethod /></ProtectedRoute>} />
               <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
               <Route path="/creator/:username" element={<CreatorProfile />} />
-              
+
               {/* Payment Routes */}
               <Route path="/payment/callback" element={<PaymentCallback />} />
 
@@ -82,13 +80,13 @@ function App() {
               <Route path="/creator/earnings" element={<ProtectedRoute allowedRoles={['creator']}><Earnings /></ProtectedRoute>} />
               <Route path="/creator/analytics" element={<ProtectedRoute allowedRoles={['creator']}><Analytics /></ProtectedRoute>} />
               <Route path="/creator/subscribers" element={<ProtectedRoute allowedRoles={['creator']}><Subscribers /></ProtectedRoute>} />
-              <Route path="/creator/schedule" element={<ProtectedRoute allowedRoles={['creator']}><Schedule /></ProtectedRoute>} />
+              <Route path="/creator/schedule" element={<ProtectedRoute allowedRoles={['creator']}><Navigate to="/creator/manage-content" replace /></ProtectedRoute>} />
               <Route path="/creator/settings" element={<ProtectedRoute allowedRoles={['creator']}><CreatorSettings /></ProtectedRoute>} />
               <Route path="/creator/tiers" element={<ProtectedRoute allowedRoles={['creator']}><ManageTiers /></ProtectedRoute>} />
               <Route path="/creator/messages" element={<ProtectedRoute allowedRoles={['creator']}><CreatorMessages /></ProtectedRoute>} />
               <Route path="/creator/notifications" element={<ProtectedRoute allowedRoles={['creator']}><Notifications /></ProtectedRoute>} />
               <Route path="/creator/edit-post/:id" element={<ProtectedRoute allowedRoles={['creator']}><EditPost /></ProtectedRoute>} />
-              
+
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminRedirect />} />
               <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
@@ -98,7 +96,7 @@ function App() {
               <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><Reports /></ProtectedRoute>} />
               <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnalytics /></ProtectedRoute>} />
               <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={['admin']}><Notifications /></ProtectedRoute>} />
-              
+
               {/* Default route */}
               <Route path="/" element={<Login />} />
               </Routes>

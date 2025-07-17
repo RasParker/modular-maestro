@@ -318,9 +318,9 @@ export const CreatorDashboard: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base sm:text-lg">Scheduled Content</CardTitle>
                     <Button variant="outline" size="sm" asChild>
-                      <Link to="/creator/schedule">
+                      <Link to="/creator/manage-content">
                         <Calendar className="w-4 h-4 mr-2" />
-                        Schedule
+                        Manage
                       </Link>
                     </Button>
                   </div>
