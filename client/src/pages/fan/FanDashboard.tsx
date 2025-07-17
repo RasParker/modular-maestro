@@ -48,7 +48,7 @@ export const FanDashboard: React.FC = () => {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       if (!user) return;
-      
+
       try {
         const response = await fetch(`/api/subscriptions/fan/${user.id}`);
         if (!response.ok) {
@@ -65,7 +65,7 @@ export const FanDashboard: React.FC = () => {
 
     const fetchRecentActivity = async () => {
       if (!user) return;
-      
+
       try {
         const response = await fetch(`/api/fan/${user.id}/recent-activity`);
         if (!response.ok) {
@@ -84,7 +84,7 @@ export const FanDashboard: React.FC = () => {
 
     const fetchNewContentCount = async () => {
       if (!user) return;
-      
+
       try {
         const response = await fetch(`/api/fan/${user.id}/new-content-count`);
         if (!response.ok) {
@@ -185,9 +185,11 @@ export const FanDashboard: React.FC = () => {
                 ) : subscriptions.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <p>No active subscriptions yet.</p>
-                    <Button variant="premium" className="mt-4" asChild>
-                      <Link to="/explore">Discover Creators</Link>
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                      <Button variant="premium" asChild>
+                        <Link to="/explore">Discover Creators</Link>
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -197,31 +199,24 @@ export const FanDashboard: React.FC = () => {
                         className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50"
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage 
-                              src={subscription.creator.avatar} 
-                              alt={subscription.creator.display_name} 
-                            />
-                            <AvatarFallback>
-                              {subscription.creator.display_name?.charAt(0) || subscription.creator.username.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
+                          <img
+                            src={subscription.creator.avatar || '/placeholder.svg'}
+                            alt={subscription.creator.display_name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
                           <div>
-                            <h4 className="font-semibold text-foreground">
-                              {subscription.creator.display_name || subscription.creator.username}
-                            </h4>
+                            <h3 className="font-medium text-foreground">
+                              {subscription.creator.display_name}
+                            </h3>
                             <p className="text-sm text-muted-foreground">
-                              @{subscription.creator.username}
+                              {subscription.tier.name} • GHS {subscription.tier.price}/month
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <Badge variant="secondary" className="mb-1">
-                              {subscription.tier.name}
-                            </Badge>
-                            <p className="text-sm font-medium">GHS {subscription.tier.price}/month</p>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {subscription.status === 'active' ? 'Active' : 'Inactive'}
+                          </Badge>
                           <Button variant="outline" size="sm" asChild>
                             <Link to={`/creator/${subscription.creator.username}`}>
                               View Profile
@@ -230,13 +225,13 @@ export const FanDashboard: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+                      <Button variant="premium" asChild>
+                        <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
+                      </Button>
+                    </div>
                   </div>
                 )}
-                <div className="mt-6">
-                  <Button variant="premium" asChild>
-                    <Link to="/fan/subscriptions">Manage All Subscriptions</Link>
-                  </Button>
-                </div>
               </CardContent>
             </Card>
 
