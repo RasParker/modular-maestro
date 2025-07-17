@@ -418,32 +418,6 @@ export const CreatorProfile: React.FC = () => {
     fetchCreatorData();
   }, [username, user?.username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers]); // Include necessary dependencies
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading profile...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!creator) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-foreground mb-2">Creator Not Found</h1>
-            <p className="text-muted-foreground">The creator profile you're looking for doesn't exist.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
@@ -813,12 +787,23 @@ export const CreatorProfile: React.FC = () => {
   };
 
   // Show loading state while data is being fetched
-  if (loading || !creator) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading creator profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!creator) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Creator Not Found</h1>
+          <p className="text-muted-foreground">The creator profile you're looking for doesn't exist.</p>
         </div>
       </div>
     );
