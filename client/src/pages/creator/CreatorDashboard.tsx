@@ -303,6 +303,166 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Two-Column Layout for Scheduled Content and Recent Posts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Scheduled Content */}
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base sm:text-lg">Scheduled Content</CardTitle>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/creator/schedule">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Schedule
+                      </Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {scheduledContent.length > 0 ? (
+                    <div className="space-y-3">
+                      {scheduledContent.slice(0, 3).map((content) => (
+                        <div key={content.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm">{content.content || content.title || 'Untitled Post'}</h4>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                              <Badge variant="outline" className="text-xs">{content.tier}</Badge>
+                              <span>
+                                {content.scheduled_for 
+                                  ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                  : 'Scheduled'
+                                }
+                              </span>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {content.media_type === 'image' ? 'Image' : content.media_type === 'video' ? 'Video' : 'Text'}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No scheduled content</p>
+                      <p className="text-xs text-muted-foreground mb-4">Schedule posts to publish them automatically at your chosen time</p>
+                      <Button variant="outline" size="sm" className="mt-2" asChild>
+                        <Link to="/creator/upload">Create Content</Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recent Posts */}
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base sm:text-lg">Recent Posts</CardTitle>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/creator/manage-content">
+                        View All
+                      </Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {userPosts.length > 0 ? (
+                    <div className="space-y-4">
+                      {userPosts.slice(0, 3).map((post) => (
+                        <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                          <div className="flex-shrink-0">
+                            {post.media_urls && post.media_urls.length > 0 ? (
+                              (() => {
+                                // Construct full URL - add /uploads/ prefix if not present
+                                const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
+                                  ? post.media_urls[0] 
+                                  : `/uploads/${post.media_urls[0]}`;
+                                
+                                return post.media_type === 'video' ? (
+                                  <video
+                                    src={mediaUrl}
+                                    className="w-16 h-16 object-cover rounded-lg"
+                                    muted
+                                    preload="metadata"
+                                    onError={(e) => {
+                                      // Hide video and show fallback icon
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <img
+                                    src={mediaUrl}
+                                    alt={post.title || 'Post'}
+                                    className="w-16 h-16 object-cover rounded-lg"
+                                    onError={(e) => {
+                                      // Hide image and show fallback icon
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                      }
+                                    }}
+                                  />
+                                );
+                              })()
+                            ) : (
+                              <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                {post.media_type === 'image' ? (
+                                  <Image className="w-6 h-6 text-muted-foreground" />
+                                ) : post.media_type === 'video' ? (
+                                  <Video className="w-6 h-6 text-muted-foreground" />
+                                ) : (
+                                  <FileText className="w-6 h-6 text-muted-foreground" />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">{post.tier}</Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Eye className="w-3 h-3" />
+                                <span>{post.views || post.views_count || 0}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Heart className="w-3 h-3" />
+                                <span>{post.likes || post.likes_count || 0}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MessageSquare className="w-3 h-3" />
+                                <span>{post.comments || post.comments_count || 0}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No posts yet</p>
+                      <Button variant="outline" size="sm" className="mt-2" asChild>
+                        <Link to="/creator/upload">Create Post</Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
           </div>
 
           {/* Sidebar */}
@@ -427,166 +587,6 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Two-Column Layout for Scheduled Content and Recent Posts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
-          {/* Scheduled Content */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base sm:text-lg">Scheduled Content</CardTitle>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/creator/schedule">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Schedule
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {scheduledContent.length > 0 ? (
-                <div className="space-y-3">
-                  {scheduledContent.slice(0, 3).map((content) => (
-                    <div key={content.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{content.content || content.title || 'Untitled Post'}</h4>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          <Badge variant="outline" className="text-xs">{content.tier}</Badge>
-                          <span>
-                            {content.scheduled_for 
-                              ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                              : 'Scheduled'
-                            }
-                          </span>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {content.media_type === 'image' ? 'Image' : content.media_type === 'video' ? 'Video' : 'Text'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No scheduled content</p>
-                  <p className="text-xs text-muted-foreground mb-4">Schedule posts to publish them automatically at your chosen time</p>
-                  <Button variant="outline" size="sm" className="mt-2" asChild>
-                    <Link to="/creator/upload">Create Content</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Recent Posts */}
-          <Card className="bg-gradient-card border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base sm:text-lg">Recent Posts</CardTitle>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/creator/manage-content">
-                    View All
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {userPosts.length > 0 ? (
-                <div className="space-y-4">
-                  {userPosts.slice(0, 3).map((post) => (
-                    <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
-                      <div className="flex-shrink-0">
-                        {post.media_urls && post.media_urls.length > 0 ? (
-                          (() => {
-                            // Construct full URL - add /uploads/ prefix if not present
-                            const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
-                              ? post.media_urls[0] 
-                              : `/uploads/${post.media_urls[0]}`;
-                            
-                            return post.media_type === 'video' ? (
-                              <video
-                                src={mediaUrl}
-                                className="w-16 h-16 object-cover rounded-lg"
-                                muted
-                                preload="metadata"
-                                onError={(e) => {
-                                  // Hide video and show fallback icon
-                                  const target = e.target as HTMLVideoElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
-                                  }
-                                }}
-                              />
-                            ) : (
-                              <img
-                                src={mediaUrl}
-                                alt={post.title || 'Post'}
-                                className="w-16 h-16 object-cover rounded-lg"
-                                onError={(e) => {
-                                  // Hide image and show fallback icon
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
-                                  }
-                                }}
-                              />
-                            );
-                          })()
-                        ) : (
-                          <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
-                            {post.media_type === 'image' ? (
-                              <Image className="w-6 h-6 text-muted-foreground" />
-                            ) : post.media_type === 'video' ? (
-                              <Video className="w-6 h-6 text-muted-foreground" />
-                            ) : (
-                              <FileText className="w-6 h-6 text-muted-foreground" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Eye className="w-3 h-3" />
-                            <span>{post.views || post.views_count || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Heart className="w-3 h-3" />
-                            <span>{post.likes || post.likes_count || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <MessageSquare className="w-3 h-3" />
-                            <span>{post.comments || post.comments_count || 0}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No posts yet</p>
-                  <Button variant="outline" size="sm" className="mt-2" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
       </EdgeToEdgeContainer>
