@@ -1715,6 +1715,33 @@ app.get('/api/admin/commission-rate', async (req, res) => {
     }
   });
 
+  // Database health check endpoint
+  app.get("/api/health/database", async (req, res) => {
+    try {
+      // Check if users table has data
+      const userCount = await db.select({ count: sql<number>`count(*)` }).from(users);
+      const postCount = await db.select({ count: sql<number>`count(*)` }).from(posts);
+      const subscriptionCount = await db.select({ count: sql<number>`count(*)` }).from(subscriptions);
+      
+      res.json({
+        status: "healthy",
+        data: {
+          users: userCount[0]?.count || 0,
+          posts: postCount[0]?.count || 0,
+          subscriptions: subscriptionCount[0]?.count || 0
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Database health check failed:', error);
+      res.status(500).json({
+        status: "error",
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Test endpoint to create sample notifications
   app.post("/api/test-notifications", async (req, res) => {
     try {
