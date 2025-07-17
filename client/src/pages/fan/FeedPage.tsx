@@ -512,14 +512,14 @@ export const FeedPage: React.FC = () => {
                   </Avatar>
                   <div className="flex items-center gap-2 flex-1">
                     <p className="font-semibold text-foreground text-sm">{post.creator.display_name}</p>
-                    <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
-                      {post.tier}
-                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {getTimeAgo(post.posted)}
+                    </span>
                   </div>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {getTimeAgo(post.posted)}
-                </span>
+                <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
+                  {post.tier}
+                </Badge>
               </div>
               {/* Post Media - Full width mobile Instagram style */}
               <div className="w-full">
