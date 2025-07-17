@@ -65,10 +65,17 @@ export const Schedule: React.FC = () => {
         if (response.ok) {
           const allPosts = await response.json();
 
+          console.log('All posts received:', allPosts);
+          
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
-            .filter((post: any) => post.status === 'Scheduled' || post.status === 'Draft')
+            .filter((post: any) => {
+              console.log(`Post ${post.id} status: "${post.status}"`);
+              return post.status === 'Scheduled' || post.status === 'Draft';
+            })
             .map((post: any) => {
+              console.log(`Processing post ${post.id}:`, post);
+              
               // For scheduled posts, use scheduledFor if available
               let displayDate;
               let displayTime;
@@ -81,6 +88,7 @@ export const Schedule: React.FC = () => {
                   minute: '2-digit',
                   hour12: false 
                 });
+                console.log(`Scheduled post ${post.id} time:`, displayDate, displayTime);
               } else if (post.status === 'Scheduled' && !post.scheduledFor) {
                 displayDate = 'Not scheduled';
                 displayTime = '';
@@ -90,7 +98,7 @@ export const Schedule: React.FC = () => {
                 displayTime = '';
               }
 
-              return {
+              const transformedPost = {
                 id: post.id.toString(),
                 title: post.caption || 'Untitled Post',
                 description: post.caption || '',
@@ -102,13 +110,19 @@ export const Schedule: React.FC = () => {
                 thumbnail: post.mediaPreview,
                 scheduledFor: post.scheduledFor
               };
+              
+              console.log(`Transformed post ${post.id}:`, transformedPost);
+              return transformedPost;
             });
 
+          console.log('Final scheduled and draft posts:', scheduledAndDraftPosts);
           setScheduledPosts(scheduledAndDraftPosts);
 
           // Calculate stats
-          const scheduled = allPosts.filter((post: any) => post.status === 'Scheduled').length;
-          const draft = allPosts.filter((post: any) => post.status === 'Draft').length;
+          const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'Scheduled').length;
+          const draft = scheduledAndDraftPosts.filter(p => p.status === 'Draft').length;
+
+          console.log('Stats - Scheduled:', scheduled, 'Draft:', draft);
 
           // Calculate posts for this week (simplified - just count all for now)
           const thisWeek = scheduledAndDraftPosts.length;
