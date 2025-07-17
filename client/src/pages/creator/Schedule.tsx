@@ -73,7 +73,7 @@ export const Schedule: React.FC = () => {
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => {
               console.log(`Post ${post.id} status: "${post.status}"`);
-              const isScheduledOrDraft = post.status === 'Scheduled' || post.status === 'Draft';
+              const isScheduledOrDraft = post.status === 'scheduled' || post.status === 'draft';
               console.log(`Post ${post.id} matches filter: ${isScheduledOrDraft}`);
               return isScheduledOrDraft;
             })
@@ -123,8 +123,8 @@ export const Schedule: React.FC = () => {
           setScheduledPosts(scheduledAndDraftPosts);
 
           // Calculate stats
-          const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'Scheduled').length;
-          const draft = scheduledAndDraftPosts.filter(p => p.status === 'Draft').length;
+          const scheduled = scheduledAndDraftPosts.filter(p => p.status === 'scheduled').length;
+          const draft = scheduledAndDraftPosts.filter(p => p.status === 'draft').length;
 
           console.log('Stats - Scheduled:', scheduled, 'Draft:', draft);
 
@@ -278,7 +278,7 @@ export const Schedule: React.FC = () => {
               <TabsTrigger value="upcoming" className="text-sm py-2">
                 Upcoming Posts
                 <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
-                  {scheduledPosts.filter(p => p.status === 'Scheduled').length}
+                  {scheduledPosts.filter(p => p.status === 'scheduled').length}
                 </span>
               </TabsTrigger>
               <TabsTrigger value="insights" className="text-sm py-2">
