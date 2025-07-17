@@ -41,7 +41,7 @@ export const Messages: React.FC = () => {
   const [showMobileChat, setShowMobileChat] = useState(false);
 
   // Fetch conversations
-  const { data: conversations = [], isLoading: conversationsLoading } = useQuery<Conversation[]>({
+  const { data: conversations = [], isLoading: conversationsLoading, refetch: refetchConversations } = useQuery<Conversation[]>({
     queryKey: ['/api/conversations'],
     refetchInterval: 30000, // Refetch every 30 seconds
   });
@@ -97,6 +97,15 @@ export const Messages: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
     },
   });
+
+  // Force refetch on component mount if there's an auto-select ID
+  useEffect(() => {
+    const autoSelectId = sessionStorage.getItem('autoSelectConversationId');
+    if (autoSelectId) {
+      // Force refetch conversations to ensure we have the latest data
+      refetchConversations();
+    }
+  }, [refetchConversations]); // Only run on mount
 
   // Set initial selected conversation
   useEffect(() => {
