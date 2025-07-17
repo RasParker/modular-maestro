@@ -12,11 +12,12 @@ import { storage } from "./storage";
 import { NotificationService } from './notification-service';
 import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable } from '../shared/schema';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable, conversations as conversationsTable, messages as messagesTable } from '../shared/schema';
 import { eq, desc, and, gte, lte, count, sum, sql, inArray, asc, like, or, isNull, gt, lt } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
+import { authenticateToken } from "./middleware/auth";
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -1605,115 +1606,227 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   });
 
   // Messaging API routes
-  app.get("/api/conversations", async (req, res) => {
-    try {
-      const userId = req.session.userId;
-      if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
+  // Get conversations for current user
+app.get('/api/conversations', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log('Fetching conversations for user:', userId);
 
-      const conversations = await storage.getConversations(userId);
-      res.json(conversations);
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-      res.status(500).json({ error: "Failed to fetch conversations" });
+    // Get conversations where current user is participant1 (fan)
+    const fanConversations = await db
+      .select({
+        id: conversationsTable.id,
+        other_participant_id: conversationsTable.participant2_id,
+        creator: {
+          username: usersTable.username,
+          display_name: usersTable.display_name,
+          avatar: usersTable.avatar,
+        },
+        last_message: conversationsTable.last_message,
+        timestamp: conversationsTable.updated_at,
+        unread: sql<boolean>`false`,
+        unread_count: sql<number>`0`,
+      })
+      .from(conversationsTable)
+      .leftJoin(usersTable, eq(conversationsTable.participant2_id, usersTable.id))
+      .where(eq(conversationsTable.participant1_id, userId))
+      .orderBy(desc(conversationsTable.updated_at));
+
+    // Get conversations where current user is participant2 (creator)
+    const creatorConversations = await db
+      .select({
+        id: conversationsTable.id,
+        other_participant_id: conversationsTable.participant1_id,
+        fan: {
+          username: usersTable.username,
+          display_name: usersTable.display_name,
+          avatar: usersTable.avatar,
+        },
+        last_message: conversationsTable.last_message,
+        timestamp: conversationsTable.updated_at,
+        unread: sql<boolean>`false`,
+        unread_count: sql<number>`0`,
+      })
+      .from(conversationsTable)
+      .leftJoin(usersTable, eq(conversationsTable.participant1_id, usersTable.id))
+      .where(eq(conversationsTable.participant2_id, userId))
+      .orderBy(desc(conversationsTable.updated_at));
+
+    // Combine and format conversations based on user role
+    let allConversations = [];
+
+    // Add fan conversations (where current user is the fan)
+    fanConversations.forEach(conv => {
+      allConversations.push({
+        id: conv.id,
+        other_participant_id: conv.other_participant_id,
+        creator: conv.creator,
+        last_message: conv.last_message || 'No messages yet',
+        timestamp: conv.timestamp,
+        unread: conv.unread,
+        unread_count: conv.unread_count,
+      });
+    });
+
+    // Add creator conversations (where current user is the creator)
+    creatorConversations.forEach(conv => {
+      allConversations.push({
+        id: conv.id,
+        other_participant_id: conv.other_participant_id,
+        creator: conv.fan, // For creator view, the "creator" field shows the fan
+        last_message: conv.last_message || 'No messages yet',
+        timestamp: conv.timestamp,
+        unread: conv.unread,
+        unread_count: conv.unread_count,
+      });
+    });
+
+    // Sort by timestamp
+    allConversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    console.log('Found conversations:', allConversations.length);
+    res.json(allConversations);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    res.status(500).json({ error: 'Failed to fetch conversations' });
+  }
+});
+
+// Get messages for a conversation
+app.get('/api/conversations/:conversationId/messages', authenticateToken, async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const currentUserId = req.user.id;
+
+    console.log('Fetching messages for conversation:', conversationId, 'user:', currentUserId);
+
+    // Verify user has access to this conversation
+    const conversation = await db
+      .select()
+      .from(conversationsTable)
+      .where(
+        and(
+          eq(conversationsTable.id, conversationId),
+          or(
+            eq(conversationsTable.participant1_id, currentUserId),
+            eq(conversationsTable.participant2_id, currentUserId)
+          )
+        )
+      )
+      .limit(1);
+
+    if (conversation.length === 0) {
+      return res.status(403).json({ error: 'Access denied to this conversation' });
     }
-  });
 
-  app.get("/api/conversations/:conversationId/messages", async (req, res) => {
-    try {
-      const conversationId = parseInt(req.params.conversationId);
-      const userId = req.session.userId;
+    // Get messages
+    const messages = await db
+      .select({
+        id: messagesTable.id,
+        sender: usersTable.username,
+        content: messagesTable.content,
+        timestamp: messagesTable.created_at,
+        type: sql<'sent' | 'received'>`CASE WHEN ${messagesTable.sender_id} = ${currentUserId} THEN 'sent' ELSE 'received' END`,
+      })
+      .from(messagesTable)
+      .leftJoin(usersTable, eq(messagesTable.sender_id, usersTable.id))
+      .where(eq(messagesTable.conversation_id, conversationId))
+      .orderBy(asc(messagesTable.created_at));
 
-      if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
+    console.log('Found messages:', messages.length);
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
 
-      const messages = await storage.getMessages(conversationId);
+// Send message
+app.post('/api/conversations/:conversationId/messages', authenticateToken, async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const { content, recipientId } = req.body;
+    const senderId = req.user.id;
 
-      // Mark messages as read
-      await storage.markMessagesAsRead(conversationId, userId);
+    console.log('Sending message in conversation:', conversationId, 'from:', senderId, 'to:', recipientId);
 
-      // Format messages for frontend
-      const formattedMessages = messages.map(msg => ({
-        id: msg.id.toString(),
-        sender: msg.sender_id === userId ? 'me' : 'other',
-        content: msg.content,
-        timestamp: msg.created_at,
-        type: msg.sender_id === userId ? 'sent' : 'received'
-      }));
-
-      res.json(formattedMessages);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      res.status(500).json({ error: "Failed to fetch messages" });
-    }
-  });
-
-  app.post("/api/conversations/:conversationId/messages", async (req, res) => {
-    try {
-      const conversationId = parseInt(req.params.conversationId);
-      const userId = req.session.userId;
-
-      if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-
-      const { content, recipientId } = req.body;
-
-      if (!content || !recipientId) {
-        return res.status(400).json({ error: "Content and recipient ID are required" });
-      }
-
-      const message = await storage.sendMessage({
+    // Create message
+    const [message] = await db
+      .insert(messagesTable)
+      .values({
         conversation_id: conversationId,
-        sender_id: userId,
+        sender_id: senderId,
         recipient_id: recipientId,
-        content: content
-      });
+        content,
+      })
+      .returning();
 
-      res.json({
-        id: message.id.toString(),
-        sender: 'me',
-        content: message.content,
-        timestamp: message.created_at,
-        type: 'sent'
-      });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      res.status(500).json({ error: "Failed to send message" });
+    // Update conversation last_message and timestamp
+    await db
+      .update(conversationsTable)
+      .set({
+        last_message: content,
+        updated_at: new Date(),
+      })
+      .where(eq(conversationsTable.id, conversationId));
+
+    console.log('Message sent successfully:', message.id);
+    res.json({ message: 'Message sent successfully', messageId: message.id });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// Create or get conversation
+app.post('/api/conversations', authenticateToken, async (req, res) => {
+  try {
+    const { otherUserId } = req.body;
+    const currentUserId = req.user.id;
+
+    console.log('Creating conversation between:', currentUserId, 'and', otherUserId);
+
+    // Check if conversation already exists
+    const existingConversation = await db
+      .select()
+      .from(conversationsTable)
+      .where(
+        or(
+          and(
+            eq(conversationsTable.participant1_id, currentUserId),
+            eq(conversationsTable.participant2_id, otherUserId)
+          ),
+          and(
+            eq(conversationsTable.participant1_id, otherUserId),
+            eq(conversationsTable.participant2_id, currentUserId)
+          )
+        )
+      )
+      .limit(1);
+
+    if (existingConversation.length > 0) {
+      console.log('Found existing conversation:', existingConversation[0].id);
+      return res.json({ conversationId: existingConversation[0].id });
     }
-  });
 
-  app.post("/api/conversations", async (req, res) => {
-    try {
-      const userId = req.session.userId;
-      if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
+    // Create new conversation
+    const [newConversation] = await db
+      .insert(conversationsTable)
+      .values({
+        participant1_id: currentUserId,
+        participant2_id: otherUserId,
+        last_message: 'Conversation started',
+        updated_at: new Date(),
+      })
+      .returning();
 
-      const { otherUserId } = req.body;
-
-      if (!otherUserId) {
-        return res.status(400).json({ error: "Other user ID is required" });
-      }
-
-      // Check if conversation already exists
-      let conversation = await storage.getConversation(userId, otherUserId);
-
-      if (!conversation) {
-        conversation = await storage.createConversation({
-          participant_1_id: userId,
-          participant_2_id: otherUserId
-        });
-      }
-
-      res.json({ conversationId: conversation.id });
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      res.status(500).json({ error: "Failed to create conversation" });
-    }
-  });
+    console.log('Created new conversation:', newConversation.id);
+    res.json({ conversationId: newConversation.id });
+  } catch (error) {
+    console.error('Error creating conversation:', error);
+    res.status(500).json({ error: 'Failed to create conversation' });
+  }
+});
 
   // Database health check endpoint
   app.get("/api/health/database", async (req, res) => {
