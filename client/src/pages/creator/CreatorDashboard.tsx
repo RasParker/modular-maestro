@@ -90,7 +90,7 @@ export const CreatorDashboard: React.FC = () => {
         setUserPosts(posts);
 
         // Filter for scheduled content
-        const scheduled = posts.filter((post: any) => post.status === 'Scheduled');
+        const scheduled = posts.filter((post: any) => post.status === 'scheduled');
         setScheduledContent(scheduled);
       }
 
