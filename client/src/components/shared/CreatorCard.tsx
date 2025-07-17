@@ -66,7 +66,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
           </div>
         </div>
         <div className="mt-3">
-          <Link to={`/creator/${creator.id}`}>
+          <Link to={`/creator/${encodeURIComponent(creator.username)}`}>
             <Button variant="outline" size="sm" className="w-full">
               View Profile
             </Button>

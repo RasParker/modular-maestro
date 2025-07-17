@@ -218,7 +218,7 @@ export const FanDashboard: React.FC = () => {
                             {subscription.status === 'active' ? 'Active' : 'Inactive'}
                           </Badge>
                           <Button variant="outline" size="sm" asChild>
-                            <Link to={`/creator/${subscription.creator.username}`}>
+                            <Link to={`/creator/${encodeURIComponent(subscription.creator.username)}`}>
                               View Profile
                             </Link>
                           </Button>
