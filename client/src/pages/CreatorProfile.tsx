@@ -675,8 +675,17 @@ export const CreatorProfile: React.FC = () => {
     onSuccess: (data) => {
       // Invalidate conversations query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+      
+      // Store the conversation ID in sessionStorage so Messages component can auto-select it
+      sessionStorage.setItem('autoSelectConversationId', data.conversationId.toString());
+      
       // Navigate to messages page
       window.location.href = '/fan/messages';
+      
+      toast({
+        title: "Chat started!",
+        description: `You can now message ${creator?.display_name}.`,
+      });
     },
     onError: (error) => {
       toast({

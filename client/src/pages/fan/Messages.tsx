@@ -101,6 +101,21 @@ export const Messages: React.FC = () => {
   // Set initial selected conversation
   useEffect(() => {
     if (conversations.length > 0 && !selectedConversation) {
+      // Check if there's an auto-select conversation ID from chat initiation
+      const autoSelectId = sessionStorage.getItem('autoSelectConversationId');
+      
+      if (autoSelectId) {
+        // Find the conversation with the specified ID
+        const targetConversation = conversations.find(conv => conv.id === autoSelectId);
+        if (targetConversation) {
+          setSelectedConversation(targetConversation);
+          setShowMobileChat(true); // Auto-open chat on mobile
+          sessionStorage.removeItem('autoSelectConversationId'); // Clear after use
+          return;
+        }
+      }
+      
+      // Default to first conversation if no auto-select
       setSelectedConversation(conversations[0]);
     }
   }, [conversations, selectedConversation]);
