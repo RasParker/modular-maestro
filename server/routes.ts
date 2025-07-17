@@ -1611,6 +1611,7 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     console.log('Fetching conversations for user:', userId);
+    console.log('User object:', req.user);
 
     // Get conversations where current user is participant1 (fan)
     const fanConversations = await db
@@ -1685,6 +1686,9 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
     allConversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     console.log('Found conversations:', allConversations.length);
+    console.log('Fan conversations:', fanConversations.length);
+    console.log('Creator conversations:', creatorConversations.length);
+    console.log('All conversations data:', JSON.stringify(allConversations, null, 2));
     res.json(allConversations);
   } catch (error) {
     console.error('Error fetching conversations:', error);
