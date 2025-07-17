@@ -196,32 +196,44 @@ export const FanDashboard: React.FC = () => {
                     {subscriptions.map((subscription) => (
                       <div
                         key={subscription.id}
-                        className="flex items-center justify-between p-4 border border-border rounded-lg bg-background/50"
+                        className="p-4 rounded-lg bg-muted/10 border border-border/50"
                       >
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={subscription.creator.avatar || '/placeholder.svg'}
-                            alt={subscription.creator.display_name}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                          <div>
-                            <h3 className="font-medium text-foreground">
-                              {subscription.creator.display_name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {subscription.tier.name} • GHS {subscription.tier.price}/month
-                            </p>
+                        <div className="flex items-start gap-3 sm:items-center">
+                          <Avatar className="w-12 h-12 flex-shrink-0">
+                            <AvatarImage 
+                              src={subscription.creator.avatar} 
+                              alt={subscription.creator.username}
+                              className="object-cover" 
+                            />
+                            <AvatarFallback className="text-sm">
+                              {subscription.creator.display_name?.charAt(0) || subscription.creator.username.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">
+                                  {subscription.creator.display_name || subscription.creator.username}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {subscription.tier.name}
+                                </p>
+                                <p className="text-xs font-medium text-foreground mt-1">
+                                  GHS {subscription.tier.price}/month
+                                </p>
+                              </div>
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <Badge variant="outline" className="text-xs self-start">
+                                  {subscription.status}
+                                </Badge>
+                                <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                                  <Link to={`/creator/${subscription.creator.username}`}>
+                                    View Profile
+                                  </Link>
+                                </Button>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {subscription.status === 'active' ? 'Active' : 'Inactive'}
-                          </Badge>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link to={`/creator/${encodeURIComponent(subscription.creator.username)}`}>
-                              View Profile
-                            </Link>
-                          </Button>
                         </div>
                       </div>
                     ))}
