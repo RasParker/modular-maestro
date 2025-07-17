@@ -411,9 +411,13 @@ export const CreatorDashboard: React.FC = () => {
                                 </span>
                               </div>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Badge variant="secondary" className="text-xs px-1 py-0">
-                                  {content.media_type === 'image' ? 'IMG' : content.media_type === 'video' ? 'VID' : 'TXT'}
-                                </Badge>
+                                {content.media_type === 'image' ? (
+                                  <Image className="w-3 h-3" />
+                                ) : content.media_type === 'video' ? (
+                                  <Video className="w-3 h-3" />
+                                ) : (
+                                  <FileText className="w-3 h-3" />
+                                )}
                               </div>
                             </div>
                           </div>
