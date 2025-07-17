@@ -386,32 +386,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
-      console.log('Creating post with status:', status);
-      console.log('Scheduled for:', scheduled_for);
+      console.log('Creating post with data:', { creator_id, title, content, media_type, tier, status });
+
+      // Validate required fields
+      if (!creator_id) {
+        return res.status(400).json({ error: 'Creator ID is required' });
+      }
+
+      if (!content && (!media_urls || media_urls.length === 0)) {
+        return res.status(400).json({ error: 'Post must have content or media' });
+      }
+
+      if (!tier) {
+        return res.status(400).json({ error: 'Access tier is required' });
+      }
 
       const postData: any = {
-        creator_id,
-        title,
-        content,
-        media_type,
-        media_urls,
+        creator_id: parseInt(creator_id),
+        title: title || 'Untitled Post',
+        content: content || '',
+        media_type: media_type || 'text',
+        media_urls: media_urls || [],
         tier,
         status: status || 'published',
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       // Only add scheduled_for if it's provided and status is scheduled
       if (scheduled_for && status === 'scheduled') {
-        postData.scheduled_for = new Date(scheduled_for);
+        const scheduledDate = new Date(scheduled_for);
+        if (scheduledDate <= new Date()) {
+          return res.status(400).json({ error: 'Scheduled date must be in the future' });
+        }
+        postData.scheduled_for = scheduledDate;
       }
 
       const newPost = await db.insert(posts).values(postData).returning();
 
-      console.log('Post created successfully with final status:', newPost[0].status);
-      console.log('Post scheduled_for:', newPost[0].scheduled_for);
+      console.log('Post created successfully:', newPost[0].id);
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
-      res.status(500).json({ error: 'Failed to create post' });
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('foreign key')) {
+          res.status(400).json({ error: 'Invalid creator ID or tier' });
+        } else if (error.message.includes('duplicate')) {
+          res.status(400).json({ error: 'Post already exists' });
+        } else {
+          res.status(500).json({ error: error.message });
+        }
+      } else {
+        res.status(500).json({ error: 'Failed to create post' });
+      }
     }
   });
 

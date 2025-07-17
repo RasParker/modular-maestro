@@ -24,16 +24,10 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif
 const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/mov'];
 
 const formSchema = z.object({
-  caption: z.string().min(1, "Caption is required when no media is uploaded").optional(),
+  caption: z.string().optional(),
   accessTier: z.string().min(1, "Please select who can see this post"),
   scheduledDate: z.date().optional(),
   scheduledTime: z.string().optional(),
-}).refine((data) => {
-  // At least caption or media file must be provided (media file validation happens separately)
-  return data.caption && data.caption.length > 0;
-}, {
-  message: "Please provide a caption or upload media",
-  path: ["caption"],
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -153,6 +147,16 @@ export const CreatePost: React.FC = () => {
       return;
     }
 
+    // Validate scheduled posts have a date
+    if (action === 'schedule' && !data.scheduledDate) {
+      toast({
+        title: "Schedule date required",
+        description: "Please select a date and time to schedule your post.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Set specific loading state based on action
     setIsUploading(true);
     if (action === 'draft') {
@@ -178,20 +182,35 @@ export const CreatePost: React.FC = () => {
       // Upload media file first if it exists
       let uploadedMediaUrls: string[] = [];
       if (mediaFile) {
-        const formData = new FormData();
-        formData.append('media', mediaFile);
+        try {
+          const formData = new FormData();
+          formData.append('media', mediaFile);
 
-        const uploadResponse = await fetch('/api/upload/post-media', {
-          method: 'POST',
-          body: formData,
-        });
+          const uploadResponse = await fetch('/api/upload/post-media', {
+            method: 'POST',
+            body: formData,
+          });
 
-        if (!uploadResponse.ok) {
-          throw new Error('Failed to upload media');
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            throw new Error(errorData.error || 'Failed to upload media');
+          }
+
+          const uploadResult = await uploadResponse.json();
+          uploadedMediaUrls = uploadResult.filename ? [uploadResult.filename] : [];
+          
+          if (uploadedMediaUrls.length === 0) {
+            throw new Error('Media upload did not return a valid filename');
+          }
+        } catch (uploadError) {
+          console.error('Media upload error:', uploadError);
+          toast({
+            title: "Media upload failed",
+            description: uploadError instanceof Error ? uploadError.message : "Please try uploading again.",
+            variant: "destructive",
+          });
+          return;
         }
-
-        const uploadResult = await uploadResponse.json();
-        uploadedMediaUrls = [uploadResult.filename];
       }
 
       // Handle scheduled date and time
