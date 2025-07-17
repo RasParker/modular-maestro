@@ -812,6 +812,18 @@ export const CreatorProfile: React.FC = () => {
     }
   };
 
+  // Show loading state while data is being fetched
+  if (loading || !creator) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading creator profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
 
