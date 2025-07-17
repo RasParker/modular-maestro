@@ -1618,15 +1618,12 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
       .select({
         id: conversationsTable.id,
         other_participant_id: conversationsTable.participant_2_id,
-        creator: {
-          username: usersTable.username,
-          display_name: usersTable.display_name,
-          avatar: usersTable.avatar,
-        },
-        last_message: sql<string>`''`,
-        timestamp: conversationsTable.updated_at,
-        unread: sql<boolean>`false`,
-        unread_count: sql<number>`0`,
+        participant_1_id: conversationsTable.participant_1_id,
+        participant_2_id: conversationsTable.participant_2_id,
+        updated_at: conversationsTable.updated_at,
+        creator_username: usersTable.username,
+        creator_display_name: usersTable.display_name,
+        creator_avatar: usersTable.avatar,
       })
       .from(conversationsTable)
       .leftJoin(usersTable, eq(conversationsTable.participant_2_id, usersTable.id))
@@ -1638,22 +1635,45 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
       .select({
         id: conversationsTable.id,
         other_participant_id: conversationsTable.participant_1_id,
-        fan: {
-          username: usersTable.username,
-          display_name: usersTable.display_name,
-          avatar: usersTable.avatar,
-        },
-        last_message: sql<string>`''`,
-        timestamp: conversationsTable.updated_at,
-        unread: sql<boolean>`false`,
-        unread_count: sql<number>`0`,
+        participant_1_id: conversationsTable.participant_1_id,
+        participant_2_id: conversationsTable.participant_2_id,
+        updated_at: conversationsTable.updated_at,
+        fan_username: usersTable.username,
+        fan_display_name: usersTable.display_name,
+        fan_avatar: usersTable.avatar,
       })
       .from(conversationsTable)
       .leftJoin(usersTable, eq(conversationsTable.participant_1_id, usersTable.id))
       .where(eq(conversationsTable.participant_2_id, userId))
       .orderBy(desc(conversationsTable.updated_at));
 
-    // Combine and format conversations based on user role
+    // Get last message for each conversation
+    const allConversationIds = [
+      ...fanConversations.map(c => c.id),
+      ...creatorConversations.map(c => c.id)
+    ];
+
+    let lastMessages = new Map();
+    if (allConversationIds.length > 0) {
+      const messages = await db
+        .select({
+          conversation_id: messagesTable.conversation_id,
+          content: messagesTable.content,
+          created_at: messagesTable.created_at,
+        })
+        .from(messagesTable)
+        .where(inArray(messagesTable.conversation_id, allConversationIds))
+        .orderBy(desc(messagesTable.created_at));
+
+      // Group by conversation and get the latest message
+      messages.forEach(message => {
+        if (!lastMessages.has(message.conversation_id)) {
+          lastMessages.set(message.conversation_id, message.content);
+        }
+      });
+    }
+
+    // Combine and format conversations
     let allConversations = [];
 
     // Add fan conversations (where current user is the fan)
@@ -1661,11 +1681,15 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
       allConversations.push({
         id: conv.id,
         other_participant_id: conv.other_participant_id,
-        creator: conv.creator,
-        last_message: conv.last_message || 'No messages yet',
-        timestamp: conv.timestamp,
-        unread: conv.unread,
-        unread_count: conv.unread_count,
+        creator: {
+          username: conv.creator_username,
+          display_name: conv.creator_display_name,
+          avatar: conv.creator_avatar,
+        },
+        last_message: lastMessages.get(conv.id) || 'No messages yet',
+        timestamp: conv.updated_at,
+        unread: false,
+        unread_count: 0,
       });
     });
 
@@ -1674,11 +1698,15 @@ app.get('/api/conversations', authenticateToken, async (req, res) => {
       allConversations.push({
         id: conv.id,
         other_participant_id: conv.other_participant_id,
-        creator: conv.fan, // For creator view, the "creator" field shows the fan
-        last_message: conv.last_message || 'No messages yet',
-        timestamp: conv.timestamp,
-        unread: conv.unread,
-        unread_count: conv.unread_count,
+        creator: {
+          username: conv.fan_username,
+          display_name: conv.fan_display_name,
+          avatar: conv.fan_avatar,
+        },
+        last_message: lastMessages.get(conv.id) || 'No messages yet',
+        timestamp: conv.updated_at,
+        unread: false,
+        unread_count: 0,
       });
     });
 
