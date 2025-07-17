@@ -71,7 +71,9 @@ export const Schedule: React.FC = () => {
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => {
               console.log(`Post ${post.id} status: "${post.status}"`);
-              return post.status === 'Scheduled' || post.status === 'Draft';
+              const isScheduledOrDraft = post.status === 'Scheduled' || post.status === 'Draft';
+              console.log(`Post ${post.id} matches filter: ${isScheduledOrDraft}`);
+              return isScheduledOrDraft;
             })
             .map((post: any) => {
               console.log(`Processing post ${post.id}:`, post);
