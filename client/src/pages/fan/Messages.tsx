@@ -122,13 +122,6 @@ export const Messages: React.FC = () => {
     }
 
     return () => {
-      // Don't disconnect on every effect run, only on unmount
-    };
-  }, [user?.id]);
-
-  // Cleanup WebSocket on unmount
-  useEffect(() => {
-    return () => {
       if (wsServiceRef.current) {
         wsServiceRef.current.disconnect();
         wsServiceRef.current = null;
