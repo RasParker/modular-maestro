@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { BioDisplay } from '@/lib/text-utils';
+import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 
 // Mock creators database
 const MOCK_CREATORS = {
@@ -970,7 +971,10 @@ export const CreatorProfile: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-                <p className="text-muted-foreground">@{creator.username}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-muted-foreground">@{creator.username}</p>
+                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
+                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Users className="w-4 h-4" />
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
@@ -1027,7 +1031,10 @@ export const CreatorProfile: React.FC = () => {
                   </Button>
                 )}
               </div>
-              <p className="text-muted-foreground">@{creator.username}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-muted-foreground">@{creator.username}</p>
+                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
+              </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers

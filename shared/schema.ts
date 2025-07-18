@@ -26,6 +26,8 @@ export const users = pgTable("users", {
   comments_enabled: boolean("comments_enabled").notNull().default(true), // Allow comments on posts
   profile_discoverable: boolean("profile_discoverable").notNull().default(true), // Allow profile to appear in search results
   activity_status_visible: boolean("activity_status_visible").notNull().default(false), // Show when user is online
+  is_online: boolean("is_online").notNull().default(false), // Current online status
+  last_seen: timestamp("last_seen"), // Last activity timestamp
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });

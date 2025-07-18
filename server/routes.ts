@@ -1424,6 +1424,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           comments_enabled: users.comments_enabled,
           profile_discoverable: users.profile_discoverable,
           activity_status_visible: users.activity_status_visible,
+          is_online: users.is_online,
+          last_seen: users.last_seen,
         })
         .from(users)
         .where(eq(users.id, userId))
@@ -1493,6 +1495,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error saving privacy settings:', error);
       res.status(500).json({ error: 'Failed to save privacy settings' });
+    }
+  });
+
+  // Get online status for a user (respects privacy settings)
+  app.get('/api/users/:id/online-status', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      const userData = await db
+        .select({
+          is_online: users.is_online,
+          last_seen: users.last_seen,
+          activity_status_visible: users.activity_status_visible,
+        })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userData.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = userData[0];
+
+      // Check if user has allowed their activity status to be visible
+      if (!user.activity_status_visible) {
+        return res.json({ 
+          is_online: false, 
+          last_seen: null,
+          activity_status_visible: false 
+        });
+      }
+
+      res.json({
+        is_online: user.is_online,
+        last_seen: user.last_seen,
+        activity_status_visible: user.activity_status_visible
+      });
+    } catch (error) {
+      console.error('Error fetching online status:', error);
+      res.status(500).json({ error: 'Failed to fetch online status' });
     }
   });
 
@@ -2333,7 +2376,7 @@ app.post('/api/conversations', async (req, res) => {
     let userId: number | null = null;
 
     // Handle incoming messages from client
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
       try {
         const message = JSON.parse(data.toString());
 
@@ -2345,6 +2388,19 @@ app.post('/api/conversations', async (req, res) => {
             activeConnections.set(userId, new Set());
           }
           activeConnections.get(userId)!.add(ws);
+
+          // Update user's online status in the database
+          try {
+            await db.update(users)
+              .set({ 
+                is_online: true, 
+                last_seen: new Date(),
+                updated_at: new Date()
+              })
+              .where(eq(users.id, userId));
+          } catch (error) {
+            console.error('Error updating online status:', error);
+          }
 
           console.log(`User ${userId} connected via WebSocket`);
 
@@ -2360,7 +2416,7 @@ app.post('/api/conversations', async (req, res) => {
     });
 
     // Handle connection close
-    ws.on('close', () => {
+    ws.on('close', async () => {
       console.log('WebSocket client disconnected');
 
       if (userId && activeConnections.has(userId)) {
@@ -2369,6 +2425,19 @@ app.post('/api/conversations', async (req, res) => {
         // Remove user entry if no more connections
         if (activeConnections.get(userId)!.size === 0) {
           activeConnections.delete(userId);
+          
+          // Update user's offline status in the database
+          try {
+            await db.update(users)
+              .set({ 
+                is_online: false, 
+                last_seen: new Date(),
+                updated_at: new Date()
+              })
+              .where(eq(users.id, userId));
+          } catch (error) {
+            console.error('Error updating offline status:', error);
+          }
         }
       }
     });
