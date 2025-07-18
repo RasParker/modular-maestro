@@ -223,7 +223,7 @@ export const CreatorDashboard: React.FC = () => {
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Monthly Earnings</p>
                     <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {analytics.monthlyEarnings.toLocaleString()}</p>
-                    <p className="text-xs text-success">+12% vs last month</p>
+                    <p className="text-xs text-success">+{analytics.growthRate}% vs last month</p>
                   </div>
                   <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
                 </div>
