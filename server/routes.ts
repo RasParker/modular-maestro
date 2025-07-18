@@ -1955,12 +1955,28 @@ app.get('/api/conversations/:conversationId/messages', async (req, res) => {
 app.post('/api/conversations/:conversationId/messages', async (req, res) => {
   try {
     const { conversationId } = req.params;
-    const { content, recipientId } = req.body;
+    const { content } = req.body;
     const senderId = req.session?.userId;
 
     if (!senderId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
+
+    // Get the conversation to determine recipient ID
+    const conversation = await db
+      .select()
+      .from(conversationsTable)
+      .where(eq(conversationsTable.id, conversationId))
+      .limit(1);
+
+    if (conversation.length === 0) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    // Determine recipient ID (the participant who is not the sender)
+    const recipientId = conversation[0].participant_1_id === senderId 
+      ? conversation[0].participant_2_id 
+      : conversation[0].participant_1_id;
 
     console.log('Sending message in conversation:', conversationId, 'from:', senderId, 'to:', recipientId);
 
@@ -1968,7 +1984,7 @@ app.post('/api/conversations/:conversationId/messages', async (req, res) => {
     const [message] = await db
       .insert(messagesTable)
       .values({
-        conversation_id: conversationId,
+        conversation_id: parseInt(conversationId),
         sender_id: senderId,
         recipient_id: recipientId,
         content,
@@ -1981,7 +1997,7 @@ app.post('/api/conversations/:conversationId/messages', async (req, res) => {
       .set({
         updated_at: new Date(),
       })
-      .where(eq(conversationsTable.id, conversationId));
+      .where(eq(conversationsTable.id, parseInt(conversationId)));
 
     console.log('Message sent successfully:', message.id);
     res.json({ message: 'Message sent successfully', messageId: message.id });
