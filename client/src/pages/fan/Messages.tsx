@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNotificationWebSocket, NotificationWebSocket } from '@/contexts/NotificationContext';
+import { useNotificationWebSocket } from '@/contexts/NotificationContext';
 
 interface Creator {
   username: string;
@@ -35,9 +36,7 @@ interface Message {
 
 export const Messages: React.FC = () => {
   const [pushPermission, setPushPermission] = useState(Notification.permission);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<NotificationWebSocket | null>(null);
-  const wsServiceRef = useRef<NotificationWebSocket | null>(null);
+  const wsServiceRef = useRef<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -72,62 +71,55 @@ export const Messages: React.FC = () => {
     }
   }, [messages]);
 
-  // Initialize WebSocket connection and push notifications
+  // Initialize WebSocket connection - only once
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || wsServiceRef.current) return;
 
     // Check browser push notification permission
     if ('Notification' in window) {
       setPushPermission(Notification.permission);
     }
 
-    // Create WebSocket connection for real-time messages only once
-    if (!wsServiceRef.current) {
-      const wsService = createConnection(
-        (notification) => {
-          // Handle notifications
-          console.log('Received notification:', notification);
-        },
-        (messageData) => {
-          // Handle real-time messages
-          console.log('Received real-time message:', messageData);
+    // Create single WebSocket connection
+    const wsService = createConnection(
+      (notification) => {
+        console.log('Received notification:', notification);
+      },
+      (messageData) => {
+        console.log('Received real-time message:', messageData);
 
-          if (messageData.type === 'new_message_realtime') {
-            console.log('Processing real-time message:', messageData);
-            
-            // Check if the message is for the current conversation
-            setMessages(prev => {
-              // Get the current selected conversation from state
-              const currentConversationId = selectedConversation?.id;
-              if (currentConversationId && messageData.conversationId === currentConversationId) {
-                // Adjust message type based on current user
-                const adjustedMessage = {
-                  ...messageData.message,
-                  type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
-                };
+        if (messageData.type === 'new_message_realtime') {
+          console.log('Processing real-time message:', messageData);
+          
+          setMessages(prev => {
+            const currentConversationId = selectedConversation?.id;
+            if (currentConversationId && messageData.conversationId === currentConversationId) {
+              const adjustedMessage = {
+                ...messageData.message,
+                type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+              };
 
-                // Check if message already exists to avoid duplicates
-                const exists = prev.some(msg => msg.id === adjustedMessage.id);
-                if (!exists) {
-                  return [...prev, adjustedMessage];
-                }
+              const exists = prev.some(msg => msg.id === adjustedMessage.id);
+              if (!exists) {
+                return [...prev, adjustedMessage];
               }
-              return prev;
-            });
-          }
+            }
+            return prev;
+          });
         }
-      );
+      }
+    );
 
-      wsServiceRef.current = wsService;
-    }
+    wsServiceRef.current = wsService;
 
+    // Cleanup on unmount
     return () => {
       if (wsServiceRef.current) {
         wsServiceRef.current.disconnect();
         wsServiceRef.current = null;
       }
     };
-  }, []);
+  }, [user?.id, selectedConversation?.id]);
 
   const fetchConversations = async (isInitialLoad = false) => {
     try {
