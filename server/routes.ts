@@ -1024,9 +1024,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierPerformance = await storage.getSubscriptionTierPerformance(creatorId);
       const monthlyEarnings = tierPerformance.reduce((total, tier) => total + tier.revenue, 0);
 
-      // Get total posts count
-      const userPosts = await storage.getPosts();
-      const creatorPosts = userPosts.filter(post => post.creator_id === creatorId);
+      // Get creator's posts for engagement calculation
+      const creatorPosts = await db
+        .select({
+          id: posts.id,
+          likes_count: posts.likes_count,
+          comments_count: posts.comments_count,
+          created_at: posts.created_at
+        })
+        .from(posts)
+        .where(and(
+          eq(posts.creator_id, creatorId),
+          eq(posts.status, 'published')
+        ));
+
+      // Calculate engagement rate based on actual data
+      let engagementRate = 0;
+      if (creatorPosts.length > 0 && subscriberCount > 0) {
+        const totalEngagements = creatorPosts.reduce((sum, post) => 
+          sum + (post.likes_count || 0) + (post.comments_count || 0), 0
+        );
+        const totalPossibleEngagements = creatorPosts.length * subscriberCount;
+        engagementRate = Math.round((totalEngagements / totalPossibleEngagements) * 100);
+      }
+
       const postsThisMonth = creatorPosts.filter(post => {
         const postDate = new Date(post.created_at);
         const now = new Date();
@@ -1036,9 +1057,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate total earnings (simplified - using monthly * 12 for demo)
       const totalEarnings = monthlyEarnings * 12;
 
-      // Simple growth calculation (mock for now)
-      const growthRate = subscriberCount > 0 ? 15.2 : 0; // Placeholder
-      const engagementRate = 78; // Placeholder
+      // Calculate growth rate based on recent subscriber activity
+      let growthRate = 0;
+      if (subscriberCount > 0) {
+        const lastMonth = new Date();
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        
+        const recentSubscribers = subscribers.filter(sub => {
+          const subDate = new Date(sub.created_at);
+          return subDate >= lastMonth;
+        }).length;
+        
+        if (subscriberCount > recentSubscribers) {
+          growthRate = Math.round((recentSubscribers / (subscriberCount - recentSubscribers)) * 100);
+        }
+      }
 
       const analytics = {
         subscribers: subscriberCount,

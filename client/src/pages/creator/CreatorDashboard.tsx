@@ -29,15 +29,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
-// Mock analytics data
-const ANALYTICS = {
-  subscribers: 2840,
-  monthlyEarnings: 4200,
-  totalEarnings: 18500,
-  growthRate: 15.2,
-  engagementRate: 78,
-  postsThisMonth: 24
-};
+// Analytics data will be fetched from API
 
 
 
