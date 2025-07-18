@@ -81,53 +81,60 @@ export const Messages: React.FC = () => {
       setPushPermission(Notification.permission);
     }
 
-    // Create WebSocket connection for real-time messages
-    const wsService = createConnection(
-      (notification) => {
-        // Handle notifications
-        console.log('Received notification:', notification);
-      },
-      (messageData) => {
-        // Handle real-time messages
-        console.log('Received real-time message:', messageData);
+    // Create WebSocket connection for real-time messages only once
+    if (!wsServiceRef.current) {
+      const wsService = createConnection(
+        (notification) => {
+          // Handle notifications
+          console.log('Received notification:', notification);
+        },
+        (messageData) => {
+          // Handle real-time messages
+          console.log('Received real-time message:', messageData);
 
-        if (messageData.type === 'new_message_realtime') {
-          console.log('Processing real-time message:', messageData);
-          
-          // Check if the message is for the current conversation
-          setMessages(prev => {
-            // Get the current selected conversation from state
-            const currentConversationId = selectedConversation?.id;
-            if (currentConversationId && messageData.conversationId === currentConversationId) {
-              // Adjust message type based on current user
-              const adjustedMessage = {
-                ...messageData.message,
-                type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
-              };
+          if (messageData.type === 'new_message_realtime') {
+            console.log('Processing real-time message:', messageData);
+            
+            // Check if the message is for the current conversation
+            setMessages(prev => {
+              // Get the current selected conversation from state
+              const currentConversationId = selectedConversation?.id;
+              if (currentConversationId && messageData.conversationId === currentConversationId) {
+                // Adjust message type based on current user
+                const adjustedMessage = {
+                  ...messageData.message,
+                  type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+                };
 
-              // Check if message already exists to avoid duplicates
-              const exists = prev.some(msg => msg.id === adjustedMessage.id);
-              if (!exists) {
-                return [...prev, adjustedMessage];
+                // Check if message already exists to avoid duplicates
+                const exists = prev.some(msg => msg.id === adjustedMessage.id);
+                if (!exists) {
+                  return [...prev, adjustedMessage];
+                }
               }
-            }
-            return prev;
-          });
-
-          // Refresh conversations to update last message
-          // fetchConversations(); // Commented out to prevent blank screen
+              return prev;
+            });
+          }
         }
-      }
-    );
+      );
 
-    wsServiceRef.current = wsService;
+      wsServiceRef.current = wsService;
+    }
 
+    return () => {
+      // Don't disconnect on every effect run, only on unmount
+    };
+  }, [user?.id]);
+
+  // Cleanup WebSocket on unmount
+  useEffect(() => {
     return () => {
       if (wsServiceRef.current) {
         wsServiceRef.current.disconnect();
+        wsServiceRef.current = null;
       }
     };
-  }, [user?.id]); // Remove createConnection from dependencies to prevent constant reconnections
+  }, []);
 
   const fetchConversations = async (isInitialLoad = false) => {
     try {
