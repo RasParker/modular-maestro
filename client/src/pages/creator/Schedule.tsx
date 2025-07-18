@@ -296,17 +296,33 @@ export const Schedule: React.FC = () => {
               {/* Posts List - Mobile-Optimized */}
               <div className="space-y-4">
                 {scheduledPosts.length > 0 ? (
-                  <ScrollArea className="h-[400px]">
-                    {scheduledPosts.map((post) => (
-                      <ContentScheduleCard
-                        key={post.id}
-                        {...post}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onPublish={handlePublish}
-                      />
-                    ))}
-                  </ScrollArea>
+                  scheduledPosts.length > 2 ? (
+                    <ScrollArea className="h-[400px]">
+                      <div className="space-y-4 pr-4">
+                        {scheduledPosts.map((post) => (
+                          <ContentScheduleCard
+                            key={post.id}
+                            {...post}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            onPublish={handlePublish}
+                          />
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <div className="space-y-4">
+                      {scheduledPosts.map((post) => (
+                        <ContentScheduleCard
+                          key={post.id}
+                          {...post}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          onPublish={handlePublish}
+                        />
+                      ))}
+                    </div>
+                  )
                 ) : (
                   <Card className="bg-gradient-card border-border/50">
                     <CardContent className="flex flex-col items-center justify-center py-12">
