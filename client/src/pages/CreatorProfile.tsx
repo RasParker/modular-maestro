@@ -351,7 +351,7 @@ export const CreatorProfile: React.FC = () => {
   // Check if current user is subscribed to this creator
   useEffect(() => {
     const checkSubscription = async () => {
-      if (!user || !creator) {
+      if (!user || !creator || isOwnProfile) {
         setUserSubscription(null);
         return;
       }
@@ -360,14 +360,19 @@ export const CreatorProfile: React.FC = () => {
         const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
         if (response.ok) {
           const subscription = await response.json();
-          // Only set subscription if it exists and is active
-          if (subscription && subscription.status === 'active') {
+          // Only set subscription if it exists, is active, and is for this creator
+          if (subscription && 
+              subscription.status === 'active' && 
+              subscription.creator_id === creator.id) {
             setUserSubscription(subscription);
+            console.log(`User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
           } else {
             setUserSubscription(null);
+            console.log(`User ${user.id} has no active subscription to creator ${creator.id}`);
           }
         } else {
           setUserSubscription(null);
+          console.log(`No subscription found for user ${user.id} to creator ${creator.id}`);
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -376,7 +381,7 @@ export const CreatorProfile: React.FC = () => {
     };
 
     checkSubscription();
-  }, [user, creator]);
+  }, [user, creator, isOwnProfile]);
 
   useEffect(() => {
     const fetchCreatorData = async () => {
@@ -579,8 +584,11 @@ export const CreatorProfile: React.FC = () => {
     // If user is not logged in, no access to premium content
     if (!user) return false;
 
-    // If user has no subscription, no access to premium content
-    if (!userSubscription) return false;
+    // If user has no active subscription to this creator, no access to premium content
+    if (!userSubscription || userSubscription.status !== 'active') return false;
+
+    // Verify subscription is to this specific creator
+    if (userSubscription.creator_id !== creator?.id) return false;
 
     // Define tier hierarchy - higher tiers include lower tier content
     const tierHierarchy = {
@@ -1050,7 +1058,20 @@ export const CreatorProfile: React.FC = () => {
                         return mediaUrls[0];
                       })()) && (
                         <div className="w-full">
-                          {hasAccessToTier(post.tier) ? (
+                          {(() => {
+                            const hasAccess = hasAccessToTier(post.tier);
+                            console.log(`Access check for post ${post.id} (tier: ${post.tier}):`, {
+                              hasAccess,
+                              isOwnProfile,
+                              user: user?.id,
+                              creator: creator?.id,
+                              userSubscription: userSubscription ? {
+                                status: userSubscription.status,
+                                creator_id: userSubscription.creator_id
+                              } : null
+                            });
+                            return hasAccess;
+                          })() ? (
                             <div 
                               className="relative cursor-pointer active:opacity-90 transition-opacity"
                               onClick={() => handleContentClick(post)}
