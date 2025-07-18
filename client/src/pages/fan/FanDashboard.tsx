@@ -303,47 +303,51 @@ export const FanDashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Recent Activity - Instagram-style borderless */}
-            <div className="space-y-0">
-              <div className="px-3 py-3 border-b border-border/30">
-                <h3 className="text-lg font-semibold">Recent Activity</h3>
-              </div>
-              <div className="space-y-0">
+            {/* Recent Activity */}
+            <Card className="bg-gradient-card border-border/50 overflow-hidden">
+              <CardHeader className="pb-0">
+                <CardTitle className="text-lg">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
                 {activityLoading ? (
-                  <div className="px-3 py-8 text-center">
+                  <div className="px-6 py-8 text-center">
                     <LoadingSpinner />
                   </div>
                 ) : recentActivity.length === 0 ? (
-                  <div className="px-3 py-8 text-center text-muted-foreground">
+                  <div className="px-6 py-8 text-center text-muted-foreground">
                     <p className="text-sm">No recent activity</p>
                     <p className="text-xs">Subscribe to creators to see their latest posts</p>
                   </div>
                 ) : (
-                  recentActivity.map((activity) => (
-                    <div key={activity.id} className="px-3 py-3 hover:bg-background/50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={activity.avatar} alt={activity.creator} />
-                          <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm leading-relaxed">
-                            <span className="font-medium">{activity.creator}</span>{' '}
-                            <span className="text-muted-foreground">{activity.message}</span>
-                          </p>
-                          <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  <>
+                    <div className="space-y-0">
+                      {recentActivity.map((activity) => (
+                        <div key={activity.id} className="px-6 py-3 hover:bg-background/50 transition-colors border-b border-border/20 last:border-b-0">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={activity.avatar} alt={activity.creator} />
+                              <AvatarFallback>{activity.creator.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm leading-relaxed">
+                                <span className="font-medium">{activity.creator}</span>{' '}
+                                <span className="text-muted-foreground">{activity.message}</span>
+                              </p>
+                              <p className="text-xs text-muted-foreground">{activity.time}</p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))
+                    <div className="px-6 py-3 bg-muted/20">
+                      <Button variant="ghost" size="sm" className="w-full text-muted-foreground" asChild>
+                        <Link to="/fan/feed">View all activity</Link>
+                      </Button>
+                    </div>
+                  </>
                 )}
-                <div className="px-3 py-3 border-t border-border/20">
-                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground" asChild>
-                    <Link to="/fan/feed">View all activity</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Recommendations */}
             <Card className="bg-gradient-card border-border/50">
