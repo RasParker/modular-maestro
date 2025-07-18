@@ -124,8 +124,12 @@ export const Messages: React.FC = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      // Add the new message to the messages state
-      setMessages(prev => [...prev, data]);
+      // Instead of creating a new message object, just refetch the messages
+      // to get the most up-to-date data from the server
+      if (selectedConversation) {
+        fetchMessages(selectedConversation.id);
+      }
+      
       setNewMessage('');
       
       // Refresh conversations to update last message
