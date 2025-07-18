@@ -124,7 +124,7 @@ export const Messages: React.FC = () => {
         wsServiceRef.current.disconnect();
       }
     };
-  }, [user?.id, createConnection]); // Remove selectedConversation from dependencies
+  }, [user?.id]); // Remove createConnection from dependencies to prevent constant reconnections
 
   const fetchConversations = async () => {
     try {
