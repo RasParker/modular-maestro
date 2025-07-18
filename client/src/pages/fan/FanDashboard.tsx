@@ -222,8 +222,8 @@ export const FanDashboard: React.FC = () => {
                                   GHS {subscription.tier.price}/month
                                 </p>
                               </div>
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                <Badge variant="outline" className="text-xs self-start">
+                              <div className="flex flex-col sm:flex-row items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
                                   {subscription.status}
                                 </Badge>
                                 <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
