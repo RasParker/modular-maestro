@@ -321,7 +321,7 @@ export const CreatorDashboard: React.FC = () => {
                   {scheduledContent.length > 0 ? (
                     scheduledContent.length > 2 ? (
                       <div>
-                        <ScrollArea className="h-[400px] w-full">
+                        <ScrollArea className="h-[200px] w-full">
                           <div className="space-y-4 pr-4">
                             {scheduledContent.map((content) => (
                               <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
