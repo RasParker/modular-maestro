@@ -270,9 +270,29 @@ export class DatabaseStorage implements IStorage {
     return post || undefined;
   }
 
-  async deletePost(id: number): Promise<boolean> {
-    const result = await db.delete(posts).where(eq(posts.id, id));
-    return (result.rowCount || 0) > 0;
+  async updatePost(id: number, updates: Partial<typeof posts.$inferInsert>) {
+    try {
+      const [post] = await db.update(posts)
+        .set(updates)
+        .where(eq(posts.id, id))
+        .returning();
+      return post;
+    } catch (error) {
+      console.error('Error updating post:', error);
+      throw error;
+    }
+  }
+
+  async deletePost(id: number) {
+    try {
+      const [deletedPost] = await db.delete(posts)
+        .where(eq(posts.id, id))
+        .returning();
+      return !!deletedPost;
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      throw error;
+    }
   }
 
   async getComments(postId: number): Promise<Comment[]> {

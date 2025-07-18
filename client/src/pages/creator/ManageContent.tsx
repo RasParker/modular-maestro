@@ -148,12 +148,28 @@ export const ManageContent: React.FC = () => {
     navigate(`/creator/edit-post/${contentId}`);
   };
 
-  const handleDelete = (contentId: string) => {
-    setContent(prev => prev.filter(item => item.id !== contentId));
-    toast({
-      title: "Content deleted",
-      description: "Your content has been deleted successfully.",
-    });
+  const handleDelete = async (contentId: string) => {
+    try {
+      const response = await fetch(`/api/posts/${contentId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setContent(prev => prev.filter(item => item.id !== contentId));
+        toast({
+          title: "Content deleted",
+          description: "Your content has been deleted successfully.",
+        });
+      } else {
+        throw new Error('Failed to delete post');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete content. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePublish = (contentId: string) => {

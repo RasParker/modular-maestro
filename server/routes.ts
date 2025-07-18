@@ -468,6 +468,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/posts/:id", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+
+      // Check if post exists
+      const post = await storage.getPost(postId);
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      // Delete the post
+      const deleted = await storage.deletePost(postId);
+
+      if (!deleted) {
+        return res.status(500).json({ error: "Failed to delete post" });
+      }
+
+      res.json({ success: true, message: "Post deleted successfully" });
+    } catch (error) {
+      console.error('Delete post error:', error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
   // Comment routes
   app.get("/api/posts/:postId/comments", async (req, res) => {
     try {
