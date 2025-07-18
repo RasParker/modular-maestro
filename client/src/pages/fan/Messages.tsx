@@ -36,7 +36,6 @@ interface Message {
 
 export const Messages: React.FC = () => {
   const [pushPermission, setPushPermission] = useState(Notification.permission);
-  const wsRef = useRef<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -51,9 +50,11 @@ export const Messages: React.FC = () => {
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [refreshingConversations, setRefreshingConversations] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const wsConnectionRef = useRef<any>(null);
 
   // Fetch conversations on component mount
   useEffect(() => {
+    console.log('Messages component mounted');
     fetchConversations(true);
   }, []);
 
@@ -71,68 +72,68 @@ export const Messages: React.FC = () => {
     }
   }, [messages]);
 
-  // Initialize single WebSocket connection
+  // Initialize WebSocket connection
   useEffect(() => {
-    if (!user?.id || wsRef.current) return;
+    if (!user?.id || wsConnectionRef.current) return;
 
-    // Check browser push notification permission
-    if ('Notification' in window) {
-      setPushPermission(Notification.permission);
+    console.log('Initializing WebSocket connection for Messages');
+    
+    try {
+      const wsService = createConnection(
+        (notification) => {
+          console.log('Messages: Received notification:', notification);
+        },
+        (messageData) => {
+          console.log('Messages: Received real-time message:', messageData);
+          
+          if (messageData.type === 'new_message_realtime') {
+            setMessages(prev => {
+              const currentConversationId = selectedConversation?.id;
+              if (currentConversationId && messageData.conversationId === currentConversationId) {
+                const adjustedMessage = {
+                  ...messageData.message,
+                  type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+                };
+
+                const exists = prev.some(msg => msg.id === adjustedMessage.id);
+                if (!exists) {
+                  return [...prev, adjustedMessage];
+                }
+              }
+              return prev;
+            });
+          }
+        }
+      );
+
+      wsConnectionRef.current = wsService;
+      console.log('WebSocket connection initialized for Messages');
+    } catch (error) {
+      console.error('Failed to initialize WebSocket connection:', error);
     }
 
-    console.log('Creating single WebSocket connection');
-    
-    const wsService = createConnection(
-      (notification) => {
-        console.log('Received notification:', notification);
-      },
-      (messageData) => {
-        console.log('Received real-time message:', messageData);
-
-        if (messageData.type === 'new_message_realtime') {
-          console.log('Processing real-time message:', messageData);
-          
-          setMessages(prev => {
-            const currentConversationId = selectedConversation?.id;
-            if (currentConversationId && messageData.conversationId === currentConversationId) {
-              const adjustedMessage = {
-                ...messageData.message,
-                type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
-              };
-
-              const exists = prev.some(msg => msg.id === adjustedMessage.id);
-              if (!exists) {
-                return [...prev, adjustedMessage];
-              }
-            }
-            return prev;
-          });
-        }
-      }
-    );
-
-    wsRef.current = wsService;
-
-    // Cleanup on unmount only
     return () => {
-      console.log('Cleaning up WebSocket connection');
-      if (wsRef.current) {
-        wsRef.current.disconnect();
-        wsRef.current = null;
+      console.log('Cleaning up Messages WebSocket connection');
+      if (wsConnectionRef.current) {
+        wsConnectionRef.current.disconnect();
+        wsConnectionRef.current = null;
       }
     };
-  }, [user?.id]); // Only depend on user.id, not selectedConversation
+  }, [user?.id, selectedConversation, createConnection]);
 
   const fetchConversations = async (isInitialLoad = false) => {
     try {
+      console.log('Fetching conversations...');
       if (isInitialLoad) {
         setLoading(true);
       } else {
         setRefreshingConversations(true);
       }
+      
       const response = await fetch('/api/conversations');
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched conversations:', data);
         setConversations(data);
         // Auto-select first conversation if available
         if (data.length > 0 && !selectedConversation) {
@@ -140,6 +141,11 @@ export const Messages: React.FC = () => {
         }
       } else {
         console.error('Failed to fetch conversations');
+        toast({
+          title: "Error",
+          description: "Failed to load conversations. Please try again.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -159,13 +165,20 @@ export const Messages: React.FC = () => {
 
   const fetchMessages = async (conversationId: string) => {
     try {
+      console.log('Fetching messages for conversation:', conversationId);
       setMessagesLoading(true);
       const response = await fetch(`/api/conversations/${conversationId}/messages`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched messages:', data);
         setMessages(data);
       } else {
         console.error('Failed to fetch messages');
+        toast({
+          title: "Error",
+          description: "Failed to load messages. Please try again.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -198,6 +211,7 @@ export const Messages: React.FC = () => {
       return response.json();
     },
     onSuccess: async (data) => {
+      console.log('Message sent successfully:', data);
       setNewMessage('');
 
       // Add the message immediately to the UI for better UX
@@ -236,6 +250,7 @@ export const Messages: React.FC = () => {
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
+    console.log('Sending message:', newMessage.trim());
     sendMessageMutation.mutate({
       conversationId: selectedConversation.id,
       content: newMessage.trim()
@@ -243,6 +258,7 @@ export const Messages: React.FC = () => {
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
+    console.log('Selected conversation:', conversation);
     setSelectedConversation(conversation);
     setShowMobileChat(true);
   };
