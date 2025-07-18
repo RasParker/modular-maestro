@@ -384,6 +384,19 @@ export const CreatorProfile: React.FC = () => {
     };
 
     checkSubscription();
+
+    // Listen for subscription changes
+    const handleSubscriptionChange = (event: CustomEvent) => {
+      if (event.detail && event.detail.type === 'subscriptionCreated') {
+        console.log('🔄 Subscription created, refreshing subscription status...');
+        checkSubscription();
+      }
+    };
+
+    window.addEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
+    return () => {
+      window.removeEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
+    };
   }, [user, creator, isOwnProfile]);
 
   useEffect(() => {
@@ -776,7 +789,7 @@ export const CreatorProfile: React.FC = () => {
     }
   });
 
-  const handleChatClick = () => {
+  const handleChatClick = async () => {
     if (!user) {
       // Redirect to login if not authenticated
       window.location.href = `/login?redirect=/creator/${username}`;
@@ -792,20 +805,40 @@ export const CreatorProfile: React.FC = () => {
       return;
     }
 
-    if (!userSubscription) {
-      toast({
-        title: "Subscription Required",
-        description: "You need an active subscription to message this creator.",
-        variant: "destructive"
-      });
-      // Scroll to subscription tiers
-      document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+    // Force refresh the subscription status before checking
+    console.log('🔄 Refreshing subscription status before messaging...');
+    if (!creator) {
+      console.log('❌ No creator found');
       return;
     }
 
-    if (creator?.id) {
-      initiateChatMutation.mutate(creator.id);
+    try {
+      const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
+      if (response.ok) {
+        const subscription = await response.json();
+        console.log('💬 Fresh subscription check for messaging:', subscription);
+        
+        if (subscription && subscription.status === 'active' && subscription.creator_id === creator.id) {
+          console.log('✅ Subscription confirmed for messaging');
+          setUserSubscription(subscription);
+          if (creator?.id) {
+            initiateChatMutation.mutate(creator.id);
+          }
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking subscription for messaging:', error);
     }
+
+    console.log('❌ No valid subscription found for messaging');
+    toast({
+      title: "Subscription Required",
+      description: "You need an active subscription to message this creator.",
+      variant: "destructive"
+    });
+    // Scroll to subscription tiers
+    document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleEdit = (postId: string) => {

@@ -34,13 +34,24 @@ export const PaymentCallback: React.FC = () => {
       const response = await fetch(`/api/payments/verify/${reference}`);
       const data = await response.json();
       
+      const isSuccess = data.success && data.data.status === 'success';
+      
       setPaymentStatus({
-        success: data.success && data.data.status === 'success',
-        message: data.success && data.data.status === 'success' 
+        success: isSuccess,
+        message: isSuccess 
           ? 'Payment completed successfully!' 
           : data.data.gateway_response || 'Payment failed',
         data: data.data
       });
+
+      // Dispatch custom event to notify components about successful subscription
+      if (isSuccess) {
+        const event = new CustomEvent('subscriptionStatusChange', {
+          detail: { type: 'subscriptionCreated', paymentData: data.data }
+        });
+        window.dispatchEvent(event);
+        console.log('🔄 Dispatched subscription status change event');
+      }
     } catch (error) {
       setPaymentStatus({
         success: false,
