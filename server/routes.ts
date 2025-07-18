@@ -1125,10 +1125,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Creator goals endpoint (simplified)
+  // Creator goals endpoint
   app.get("/api/creator/:creatorId/goals", async (req, res) => {
     try {
       const creatorId = parseInt(req.params.creatorId);
+
+      // Get stored goals from storage
+      const storedGoals = await storage.getCreatorGoals(creatorId);
 
       // Get current metrics
       const subscribers = await storage.getCreatorSubscribers(creatorId);
@@ -1145,11 +1148,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
       }).length;
 
-      // Return simple goals with current progress
+      // Return goals with current progress
       const goals = {
-        subscriberGoal: 100,
-        revenueGoal: 1000,
-        postsGoal: 10,
+        subscriberGoal: storedGoals?.subscriberGoal || 100,
+        revenueGoal: storedGoals?.revenueGoal || 1000,
+        postsGoal: storedGoals?.postsGoal || 10,
         currentSubscribers: subscriberCount,
         currentRevenue: monthlyRevenue,
         currentPosts: postsThisMonth
@@ -1159,6 +1162,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching creator goals:', error);
       res.status(500).json({ error: "Failed to fetch goals" });
+    }
+  });
+
+  // Save creator goals endpoint
+  app.post("/api/creator/:creatorId/goals", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const { subscriberGoal, revenueGoal, postsGoal } = req.body;
+
+      // Save goals to storage
+      await storage.saveCreatorGoals(creatorId, {
+        subscriberGoal: parseInt(subscriberGoal) || 0,
+        revenueGoal: parseInt(revenueGoal) || 0,
+        postsGoal: parseInt(postsGoal) || 0
+      });
+
+      res.json({ success: true, message: "Goals saved successfully" });
+    } catch (error) {
+      console.error('Error saving creator goals:', error);
+      res.status(500).json({ error: "Failed to save goals" });
     }
   });
 

@@ -117,15 +117,20 @@ export interface IStorage {
   markNotificationAsRead(notificationId: number): Promise<boolean>;
   markAllNotificationsAsRead(userId: number): Promise<boolean>;
   deleteNotification(notificationId: number): Promise<boolean>;
-  
+
   // Notification preferences methods
   getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined>;
   createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences>;
   updateNotificationPreferences(userId: number, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined>;
+
+    // Creator goals methods
+  getCreatorGoals(creatorId: number): Promise<any>;
+  saveCreatorGoals(creatorId: number, goals: any): Promise<void>;
 }
 
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
+  private inMemoryGoals = new Map<string, any>();
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
@@ -549,7 +554,7 @@ export class DatabaseStorage implements IStorage {
             eq(subscriptions.status, 'active')
           ))
           .orderBy(desc(subscriptions.created_at));
-        
+
         // Manually fetch user and tier data for each subscription
         const enrichedSubscribers = await Promise.all(
           simpleSubscribers.map(async (sub) => {
@@ -566,7 +571,7 @@ export class DatabaseStorage implements IStorage {
             };
           })
         );
-        
+
         return enrichedSubscribers;
       } catch (fallbackError) {
         console.error('Fallback query also failed:', fallbackError);
@@ -780,7 +785,6 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // Platform settings methods
   async getPlatformSettings(): Promise<any> {
     // For now, we'll store platform settings in a simple key-value approach
     // In production, you might want a dedicated platform_settings table
@@ -836,6 +840,36 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+    async getCreatorGoals(creatorId: number): Promise<any> {
+    try {
+      // For now, we'll store goals in a simple in-memory map
+      // In production, this would be stored in the database
+      const goalsKey = `creator_goals_${creatorId}`;
+      const storedGoals = this.inMemoryGoals.get(goalsKey);
+      return storedGoals || null;
+    } catch (error) {
+      console.error('Error getting creator goals:', error);
+      return null;
+    }
+  }
+
+  async saveCreatorGoals(creatorId: number, goals: any): Promise<void> {
+    try {
+      // For now, we'll store goals in a simple in-memory map
+      // In production, this would be stored in the database
+      const goalsKey = `creator_goals_${creatorId}`;
+      this.inMemoryGoals.set(goalsKey, {
+        ...goals,
+        updated_at: new Date()
+      });
+      console.log(`Saved goals for creator ${creatorId}:`, goals);
+    } catch (error) {
+      ```python
+console.error('Error saving creator goals:', error);
+      throw error;
+    }
+  }
+
   // Messaging methods
   async getConversations(userId: number): Promise<any[]> {
     try {
@@ -852,7 +886,7 @@ export class DatabaseStorage implements IStorage {
         userConversations.map(async (conv) => {
           const otherParticipantId = conv.participant_1_id === userId ? conv.participant_2_id : conv.participant_1_id;
           const otherParticipant = await this.getUser(otherParticipantId);
-          
+
           // Get last message
           const lastMessage = await db
             .select()
