@@ -427,7 +427,6 @@ export const Messages: React.FC = () => {
                       ))
                     )}
                     <div ref={messagesEndRef} />
-                    )}
                   </div>
 
                   {/* Message Input */}
@@ -614,7 +613,6 @@ export const Messages: React.FC = () => {
                 ))
               )}
               <div ref={messagesEndRef} />
-              )}
             </div>
 
             {/* Mobile Message Input */}
