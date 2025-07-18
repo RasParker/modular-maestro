@@ -103,6 +103,9 @@ function App() {
 
               {/* Default route */}
               <Route path="/" element={<Login />} />
+              
+              {/* Catch-all route for undefined paths */}
+              <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppLayout>
           </Router>

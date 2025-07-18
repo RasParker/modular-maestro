@@ -230,7 +230,7 @@ export const NotificationBell: React.FC = () => {
             {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>
         )}
-        {wsRef.current?.isConnected() && (
+        {wsRef.current && (
           <div className="absolute top-0 right-0 h-2 w-2 bg-green-500 rounded-full" />
         )}
       </Button>
