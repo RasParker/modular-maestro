@@ -297,7 +297,7 @@ export const Schedule: React.FC = () => {
               <div className="space-y-4">
                 {scheduledPosts.length > 0 ? (
                   scheduledPosts.length > 2 ? (
-                    <ScrollArea className="h-[400px]">
+                    <ScrollArea className="h-[500px] w-full">
                       <div className="space-y-4 pr-4">
                         {scheduledPosts.map((post) => (
                           <ContentScheduleCard
