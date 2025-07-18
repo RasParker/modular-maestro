@@ -1062,12 +1062,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (subscriberCount > 0) {
         const lastMonth = new Date();
         lastMonth.setMonth(lastMonth.getMonth() - 1);
-        
+
         const recentSubscribers = subscribers.filter(sub => {
           const subDate = new Date(sub.created_at);
           return subDate >= lastMonth;
         }).length;
-        
+
         if (subscriberCount > recentSubscribers) {
           growthRate = Math.round((recentSubscribers / (subscriberCount - recentSubscribers)) * 100);
         }
@@ -1370,7 +1370,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Creator payout settings endpoints
+  // User settings endpoints
+  app.get('/api/user/settings', async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const userId = req.session.userId;
+      const userData = await db
+        .select({
+          comments_enabled: users.comments_enabled,
+        })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userData.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json(userData[0]);
+    } catch (error) {
+      console.error('Error fetching user settings:', error);
+      res.status(500).json({ error: 'Failed to fetch user settings' });
+    }
+  });
+
+  app.post('/api/user/content-settings', async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const userId = req.session.userId;
+      const { comments_enabled } = req.body;
+
+      await db
+        .update(users)
+        .set({ 
+          comments_enabled: comments_enabled,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error saving content settings:', error);
+      res.status(500).json({ error: 'Failed to save content settings' });
+    }
+  });
+
+  // Check if comments are enabled for a creator
+  app.get('/api/creators/:id/comments-enabled', async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.id);
+
+      const result = await db
+        .select({
+          comments_enabled: users.comments_enabled,
+        })
+        .from(users)
+        .where(eq(users.id, creatorId))
+        .limit(1);
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Creator not found' });
+      }
+
+      res.json({ comments_enabled: result[0].comments_enabled });
+    } catch (error) {
+      console.error('Error checking comments enabled:', error);
+      res.status(500).json({ error: 'Failed to check comments enabled' });
+    }
+  });
+
+  // Creator payout settings endpoint
   app.get('/api/creators/:id/payout-settings', async (req, res) => {
     try {
       const creatorId = parseInt(req.params.id);

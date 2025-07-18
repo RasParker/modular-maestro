@@ -153,13 +153,13 @@ export const CreatorProfile: React.FC = () => {
   const fetchUserPosts = async (userId: string | number) => {
     try {
       const userIdNum = typeof userId === 'string' ? parseInt(userId) : userId;
-      
+
       // Build query parameters based on who's viewing
       let queryParams = `creatorId=${userIdNum}`;
-      
+
       // For public profile page, only show published posts regardless of who's viewing
       // Draft posts should only be managed in the Content Manager, not on the profile page
-      
+
       const response = await fetch(`/api/posts?${queryParams}`);
       if (response.ok) {
         const filteredPosts = await response.json();
@@ -675,13 +675,13 @@ export const CreatorProfile: React.FC = () => {
     onSuccess: async (data) => {
       // Store the conversation ID in sessionStorage so Messages component can auto-select it
       sessionStorage.setItem('autoSelectConversationId', data.conversationId.toString());
-      
+
       // Show success message
       toast({
         title: "Chat started!",
         description: `You can now message ${creator?.display_name}.`,
       });
-      
+
       // Wait a moment to ensure conversation is created, then navigate
       setTimeout(() => {
         // Invalidate conversations query to refresh the list
@@ -1201,6 +1201,7 @@ export const CreatorProfile: React.FC = () => {
                               postId={post.id}
                               initialComments={post.comments || []}
                               onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                              creatorId={creator?.id?.toString()}
                             />
                           </div>
                         </div>

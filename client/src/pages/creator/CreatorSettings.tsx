@@ -53,6 +53,7 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
 
   // Monthly goals state
   const [monthlyGoals, setMonthlyGoals] = useState({
@@ -76,8 +77,20 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPayoutSettingsLoading, setIsPayoutSettingsLoading] = useState(false);
 
-  // Load payout settings and monthly goals on component mount
+  // Load user settings, payout settings and monthly goals on component mount
   useEffect(() => {
+    const loadUserSettings = async () => {
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const userData = await response.json();
+          setCommentsEnabled(userData.comments_enabled ?? true);
+        }
+      } catch (error) {
+        console.error('Error loading user settings:', error);
+      }
+    };
+
     const loadPayoutSettings = async () => {
       try {
         setIsPayoutSettingsLoading(true);
@@ -117,6 +130,7 @@ export const CreatorSettings: React.FC = () => {
       }
     };
 
+    loadUserSettings();
     loadPayoutSettings();
     loadMonthlyGoals();
   }, []);
@@ -186,6 +200,36 @@ export const CreatorSettings: React.FC = () => {
       });
     } finally {
       setIsGoalsLoading(false);
+    }
+  };
+
+  const handleSaveContentSettings = async () => {
+    try {
+      const response = await fetch('/api/user/content-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          comments_enabled: commentsEnabled,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Content settings saved",
+          description: "Your content settings have been updated successfully.",
+        });
+      } else {
+        throw new Error('Failed to save content settings');
+      }
+    } catch (error) {
+      console.error('Error saving content settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save content settings. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -707,7 +751,11 @@ export const CreatorSettings: React.FC = () => {
                           Let subscribers comment on your posts
                         </p>
                       </div>
-                      <Switch id="comments" defaultChecked />
+                      <Switch 
+                        id="comments" 
+                        checked={commentsEnabled}
+                        onCheckedChange={setCommentsEnabled}
+                      />
                     </div>
 
                     <div>
@@ -722,6 +770,16 @@ export const CreatorSettings: React.FC = () => {
                           <SelectItem value="premium">Premium Content</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-border/50">
+                      <Button 
+                        onClick={handleSaveContentSettings}
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Content Settings
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

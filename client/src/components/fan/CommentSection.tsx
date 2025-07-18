@@ -26,6 +26,7 @@ interface CommentSectionProps {
   postId: string;
   initialComments: Comment[];
   onCommentCountChange: (count: number) => void;
+  creatorId?: string;
 }
 
 // Separate component for reply input to avoid cursor jumping
@@ -96,7 +97,8 @@ const ReplyInput: React.FC<{
 export const CommentSection: React.FC<CommentSectionProps> = ({
   postId,
   initialComments,
-  onCommentCountChange
+  onCommentCountChange,
+  creatorId
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -107,6 +109,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [showAllComments, setShowAllComments] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
 
   // Fetch comments when component mounts
   const fetchComments = useCallback(async () => {
@@ -137,7 +140,24 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
   React.useEffect(() => {
     fetchComments();
-  }, [postId]);
+    
+    // Check if comments are enabled for this creator
+    const checkCommentsEnabled = async () => {
+      if (creatorId) {
+        try {
+          const response = await fetch(`/api/creators/${creatorId}/comments-enabled`);
+          if (response.ok) {
+            const data = await response.json();
+            setCommentsEnabled(data.comments_enabled);
+          }
+        } catch (error) {
+          console.error('Error checking comments enabled:', error);
+        }
+      }
+    };
+
+    checkCommentsEnabled();
+  }, [postId, creatorId]);
 
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -393,10 +413,22 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     );
   };
 
+  // If comments are disabled, show a message
+  if (!commentsEnabled) {
+    return (
+      <div className="w-full bg-background">
+        <div className="px-3 py-8 text-center text-muted-foreground">
+          <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">Comments are disabled for this creator's posts.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-background">
       {/* Add Comment - Instagram style */}
-      <div className="px-3 py-3 border-b border-border/30">
+      <div className="px-3 py-3 border-b border-border/30"></div>
         <div className="flex gap-3">
           <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={user?.avatar} alt={user?.username} />

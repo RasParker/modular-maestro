@@ -23,6 +23,7 @@ export const users = pgTable("users", {
   total_subscribers: integer("total_subscribers").notNull().default(0),
   total_earnings: decimal("total_earnings", { precision: 10, scale: 2 }).notNull().default("0.00"),
   commission_rate: decimal("commission_rate", { precision: 5, scale: 2 }).notNull().default("0.15"), // 15% platform fee
+  comments_enabled: boolean("comments_enabled").notNull().default(true), // Allow comments on posts
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
