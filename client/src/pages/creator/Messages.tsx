@@ -17,7 +17,9 @@ interface Fan {
 
 interface Conversation {
   id: string;
-  fan: Fan;
+  fan?: Fan;
+  creator?: Fan;
+  other_participant_id: number;
   last_message: string;
   timestamp: string;
   unread: boolean;
@@ -150,10 +152,12 @@ export const Messages: React.FC = () => {
     }
   });
 
-  const filteredConversations = conversations.filter(conv =>
-    conv.fan.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conv.fan.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredConversations = conversations.filter(conv => {
+    const participant = conv.fan || conv.creator;
+    if (!participant) return false;
+    return participant.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           participant.username?.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
@@ -259,15 +263,15 @@ export const Messages: React.FC = () => {
                     >
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12 flex-shrink-0">
-                          <AvatarImage src={conv.fan.avatar} alt={conv.fan.display_name} />
+                          <AvatarImage src={(conv.fan || conv.creator)?.avatar} alt={(conv.fan || conv.creator)?.display_name} />
                           <AvatarFallback>
-                            {conv.fan.display_name?.charAt(0) || conv.fan.username.charAt(0)}
+                            {(conv.fan || conv.creator)?.display_name?.charAt(0) || (conv.fan || conv.creator)?.username?.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <p className="font-medium text-foreground truncate">
-                              {conv.fan.display_name || conv.fan.username}
+                              {(conv.fan || conv.creator)?.display_name || (conv.fan || conv.creator)?.username}
                             </p>
                             <span className="text-xs text-muted-foreground flex-shrink-0">
                               {getTimeAgo(conv.timestamp)}
@@ -296,17 +300,17 @@ export const Messages: React.FC = () => {
                   {/* Chat Header */}
                   <div className="p-4 border-b border-border/50 flex items-center gap-3">
                     <Avatar className="w-10 h-10">
-                      <AvatarImage src={selectedConversation.fan.avatar} alt={selectedConversation.fan.display_name} />
+                      <AvatarImage src={(selectedConversation.fan || selectedConversation.creator)?.avatar} alt={(selectedConversation.fan || selectedConversation.creator)?.display_name} />
                       <AvatarFallback>
-                        {selectedConversation.fan.display_name?.charAt(0) || selectedConversation.fan.username.charAt(0)}
+                        {(selectedConversation.fan || selectedConversation.creator)?.display_name?.charAt(0) || (selectedConversation.fan || selectedConversation.creator)?.username?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground">
-                        {selectedConversation.fan.display_name || selectedConversation.fan.username}
+                        {(selectedConversation.fan || selectedConversation.creator)?.display_name || (selectedConversation.fan || selectedConversation.creator)?.username}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        @{selectedConversation.fan.username}
+                        @{(selectedConversation.fan || selectedConversation.creator)?.username}
                       </p>
                     </div>
                   </div>
@@ -434,15 +438,15 @@ export const Messages: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="w-12 h-12 flex-shrink-0">
-                        <AvatarImage src={conv.fan.avatar} alt={conv.fan.display_name} />
+                        <AvatarImage src={(conv.fan || conv.creator)?.avatar} alt={(conv.fan || conv.creator)?.display_name} />
                         <AvatarFallback>
-                          {conv.fan.display_name?.charAt(0) || conv.fan.username.charAt(0)}
+                          {(conv.fan || conv.creator)?.display_name?.charAt(0) || (conv.fan || conv.creator)?.username?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <p className="font-medium text-foreground truncate">
-                            {conv.fan.display_name || conv.fan.username}
+                            {(conv.fan || conv.creator)?.display_name || (conv.fan || conv.creator)?.username}
                           </p>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-muted-foreground flex-shrink-0">
@@ -478,17 +482,17 @@ export const Messages: React.FC = () => {
                 {selectedConversation && (
                   <>
                     <Avatar className="w-10 h-10">
-                      <AvatarImage src={selectedConversation.fan.avatar} alt={selectedConversation.fan.display_name} />
+                      <AvatarImage src={(selectedConversation.fan || selectedConversation.creator)?.avatar} alt={(selectedConversation.fan || selectedConversation.creator)?.display_name} />
                       <AvatarFallback>
-                        {selectedConversation.fan.display_name?.charAt(0) || selectedConversation.fan.username.charAt(0)}
+                        {(selectedConversation.fan || selectedConversation.creator)?.display_name?.charAt(0) || (selectedConversation.fan || selectedConversation.creator)?.username?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground">
-                        {selectedConversation.fan.display_name || selectedConversation.fan.username}
+                        {(selectedConversation.fan || selectedConversation.creator)?.display_name || (selectedConversation.fan || selectedConversation.creator)?.username}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        @{selectedConversation.fan.username}
+                        @{(selectedConversation.fan || selectedConversation.creator)?.username}
                       </p>
                     </div>
                   </>
