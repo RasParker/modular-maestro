@@ -16,7 +16,7 @@ const CREATORS = [
     id: '1',
     username: 'artisticmia',
     display_name: 'Artistic Mia',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=200&fit=crop',
     bio: 'Digital artist creating stunning fantasy worlds and character designs',
     category: 'Art',
