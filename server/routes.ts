@@ -748,12 +748,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.userId);
       const creatorId = parseInt(req.params.creatorId);
 
+      console.log(`Checking subscription API: user ${userId} to creator ${creatorId}`);
+      
       const subscription = await storage.getUserSubscriptionToCreator(userId, creatorId);
+      
+      console.log('Found subscription:', subscription);
       
       // Only return subscription if it exists and is active
       if (subscription && subscription.status === 'active') {
+        console.log(`✓ Active subscription found: ${subscription.id}`);
         res.json(subscription);
       } else {
+        console.log(`✗ No active subscription found`);
         res.json(null);
       }
     } catch (error) {

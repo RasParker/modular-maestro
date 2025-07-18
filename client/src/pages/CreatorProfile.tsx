@@ -357,22 +357,25 @@ export const CreatorProfile: React.FC = () => {
       }
 
       try {
+        console.log(`Checking subscription for user ${user.id} to creator ${creator.id}`);
         const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
         if (response.ok) {
           const subscription = await response.json();
+          console.log('Subscription API response:', subscription);
+          
           // Only set subscription if it exists, is active, and is for this creator
           if (subscription && 
               subscription.status === 'active' && 
               subscription.creator_id === creator.id) {
             setUserSubscription(subscription);
-            console.log(`User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
+            console.log(`✓ User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
           } else {
             setUserSubscription(null);
-            console.log(`User ${user.id} has no active subscription to creator ${creator.id}`);
+            console.log(`✗ User ${user.id} has no active subscription to creator ${creator.id}`);
           }
         } else {
           setUserSubscription(null);
-          console.log(`No subscription found for user ${user.id} to creator ${creator.id}`);
+          console.log(`✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})`);
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -582,26 +585,50 @@ export const CreatorProfile: React.FC = () => {
     if (postTier === 'public') return true;
 
     // If user is not logged in, no access to premium content
-    if (!user) return false;
+    if (!user) {
+      console.log('Access denied: User not logged in');
+      return false;
+    }
 
     // If user has no active subscription to this creator, no access to premium content
-    if (!userSubscription || userSubscription.status !== 'active') return false;
+    if (!userSubscription || userSubscription.status !== 'active') {
+      console.log('Access denied: No active subscription', { userSubscription });
+      return false;
+    }
 
     // Verify subscription is to this specific creator
-    if (userSubscription.creator_id !== creator?.id) return false;
+    if (userSubscription.creator_id !== creator?.id) {
+      console.log('Access denied: Subscription not for this creator', { 
+        subscriptionCreatorId: userSubscription.creator_id, 
+        currentCreatorId: creator?.id 
+      });
+      return false;
+    }
 
     // Define tier hierarchy - higher tiers include lower tier content
     const tierHierarchy = {
       'supporter': 1,
+      'starter pump': 1,
       'fan': 2,
       'premium': 2,
-      'superfan': 3
+      'power gains': 2,
+      'superfan': 3,
+      'elite beast mode': 3
     };
 
     const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
-    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 0;
+    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1; // Default to tier 1 for premium content
 
-    return userTierLevel >= postTierLevel;
+    const hasAccess = userTierLevel >= postTierLevel;
+    console.log('Tier access check:', { 
+      postTier, 
+      userTierLevel, 
+      postTierLevel, 
+      userTierName: userSubscription.tier_name,
+      hasAccess 
+    });
+
+    return hasAccess;
   };
 
   const handleContentClick = (post: any) => {
@@ -1060,15 +1087,17 @@ export const CreatorProfile: React.FC = () => {
                         <div className="w-full">
                           {(() => {
                             const hasAccess = hasAccessToTier(post.tier);
-                            console.log(`Access check for post ${post.id} (tier: ${post.tier}):`, {
+                            console.log(`🔒 Access check for post ${post.id} (tier: ${post.tier}):`, {
                               hasAccess,
                               isOwnProfile,
                               user: user?.id,
                               creator: creator?.id,
                               userSubscription: userSubscription ? {
                                 status: userSubscription.status,
-                                creator_id: userSubscription.creator_id
-                              } : null
+                                creator_id: userSubscription.creator_id,
+                                tier_name: userSubscription.tier_name
+                              } : null,
+                              postTier: post.tier
                             });
                             return hasAccess;
                           })() ? (
