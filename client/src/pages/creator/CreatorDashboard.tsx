@@ -423,7 +423,7 @@ export const CreatorDashboard: React.FC = () => {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {scheduledContent.map((content) => (
+                        {scheduledContent.slice(0, 2).map((content) => (
                           <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
                             <div className="flex-shrink-0">
                               {content.media_urls && content.media_urls.length > 0 ? (
