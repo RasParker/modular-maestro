@@ -757,10 +757,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Only return subscription if it exists and is active
       if (subscription && subscription.status === 'active') {
         console.log(`✓ Active subscription found: ${subscription.id}`);
-        res.json(subscription);
+        // Include tier information for proper access control
+        const enrichedSubscription = {
+          ...subscription,
+          tier_name: subscription.tier_name || 'unknown'
+        };
+        res.json(enrichedSubscription);
       } else {
         console.log(`✗ No active subscription found`);
-        res.json(null);
+        res.status(404).json(null);
       }
     } catch (error) {
       console.error('Error checking subscription:', error);

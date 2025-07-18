@@ -579,10 +579,16 @@ export const CreatorProfile: React.FC = () => {
   // Check if user has access to content based on subscription tier
   const hasAccessToTier = (postTier: string): boolean => {
     // Own profile - can see all content
-    if (isOwnProfile) return true;
+    if (isOwnProfile) {
+      console.log('Access granted: Own profile');
+      return true;
+    }
 
     // Public content - everyone can see
-    if (postTier === 'public') return true;
+    if (postTier === 'public') {
+      console.log('Access granted: Public content');
+      return true;
+    }
 
     // If user is not logged in, no access to premium content
     if (!user) {
@@ -592,7 +598,11 @@ export const CreatorProfile: React.FC = () => {
 
     // If user has no active subscription to this creator, no access to premium content
     if (!userSubscription || userSubscription.status !== 'active') {
-      console.log('Access denied: No active subscription', { userSubscription });
+      console.log('Access denied: No active subscription', { 
+        userSubscription: userSubscription,
+        hasSubscription: !!userSubscription,
+        subscriptionStatus: userSubscription?.status
+      });
       return false;
     }
 
@@ -625,7 +635,9 @@ export const CreatorProfile: React.FC = () => {
       userTierLevel, 
       postTierLevel, 
       userTierName: userSubscription.tier_name,
-      hasAccess 
+      hasAccess,
+      creatorId: creator?.id,
+      userId: user?.id
     });
 
     return hasAccess;

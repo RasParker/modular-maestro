@@ -520,10 +520,24 @@ export class DatabaseStorage implements IStorage {
     return false;
   }
 
-  async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<Subscription | undefined> {
+  async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<any> {
     const [subscription] = await db
-      .select()
+      .select({
+        id: subscriptions.id,
+        fan_id: subscriptions.fan_id,
+        creator_id: subscriptions.creator_id,
+        tier_id: subscriptions.tier_id,
+        status: subscriptions.status,
+        auto_renew: subscriptions.auto_renew,
+        started_at: subscriptions.started_at,
+        ends_at: subscriptions.ends_at,
+        next_billing_date: subscriptions.next_billing_date,
+        created_at: subscriptions.created_at,
+        updated_at: subscriptions.updated_at,
+        tier_name: subscription_tiers.name
+      })
       .from(subscriptions)
+      .leftJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
       .where(
         and(
           eq(subscriptions.fan_id, fanId),
