@@ -200,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Username already exists" });
         }
       } catch (error) {
-        console.log('Username check error (user probably doesn't exist):', error);
+        console.log('Username check error (user probably doesn\'t exist):', error);
       }
 
       // Create the user
@@ -857,8 +857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subscriptions = await db
         .select({
           id: subscriptionsTable.id,
-          ```text
-status: subscriptionsTable.status,
+          status: subscriptionsTable.status,
           current_period_end: subscriptionsTable.next_billing_date,
           created_at: subscriptionsTable.created_at,
           auto_renew: subscriptionsTable.auto_renew,
@@ -2475,6 +2474,31 @@ app.post('/api/conversations', async (req, res) => {
   // Connect the notification service to the broadcast function
   NotificationService.setBroadcastFunction(broadcastNotificationToUser);
 
+  // Get user by username
+  app.get('/api/users/username/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+
+      // Decode the username parameter
+      const decodedUsername = decodeURIComponent(username);
+
+      console.log('Looking for user with username:', decodedUsername);
+
+      const user = await db.select().from(users).where(eq(users.username, decodedUsername)).limit(1);
+
+      if (user.length === 0) {
+        console.log('User not found:', decodedUsername);
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      console.log('Found user:', user[0]);
+      res.json(user[0]);
+    } catch (error) {
+      console.error('Error fetching user by username:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   return httpServer;
 }
 
@@ -2504,50 +2528,3 @@ function formatTimeAgo(date: Date): string {
 
   return date.toLocaleDateString();
 }
-
-  // Get user by username
-  app.get('/api/users/username/:username', async (req, res) => {
-    try {
-      const { username } = req.params;
-
-      // Decode the username parameter
-      const decodedUsername = decodeURIComponent(username);
-
-      console.log('Looking for user with username:', decodedUsername);
-
-      const user = await db.select().from(users).where(eq(users.username, decodedUsername)).limit(1);
-
-      if (user.length === 0) {
-        console.log('User not found:', decodedUsername);
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      console.log('Found user:', user[0]);
-      res.json(user[0]);
-    } catch (error) {
-      console.error('Error fetching user by username:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
-  // Get user online status
-  app.get('/api/users/:userId/online-status', async (req, res) => {
-    try {
-      const userId = parseInt(req.params.userId);
-
-      const user = await db.select({
-        is_online: users.is_online,
-        last_seen: users.last_seen,
-        activity_status_visible: users.activity_status_visible
-      }).from(users).where(eq(users.id, userId)).limit(1);
-
-      if (user.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json(user[0]);
-    } catch (error) {
-      console.error('Error fetching user online status:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
