@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { NotificationWebSocket, useNotificationWebSocket, type WebSocketNotification } from '@/services/NotificationWebSocket';
+import { useNotificationWebSocket } from '@/contexts/NotificationContext';
 
 interface Notification {
   id: number;
