@@ -1999,6 +1999,48 @@ app.post('/api/conversations/:conversationId/messages', async (req, res) => {
       })
       .where(eq(conversationsTable.id, parseInt(conversationId)));
 
+    // Get sender information for real-time message
+    const senderInfo = await db
+      .select({
+        username: usersTable.username,
+        display_name: usersTable.display_name,
+        avatar: usersTable.avatar,
+      })
+      .from(usersTable)
+      .where(eq(usersTable.id, senderId))
+      .limit(1);
+
+    // Broadcast real-time message to all participants
+    if (senderInfo.length > 0) {
+      const realTimeMessage = {
+        id: message.id.toString(),
+        sender: senderInfo[0].display_name || senderInfo[0].username,
+        content: message.content,
+        timestamp: message.created_at.toISOString(),
+        type: 'received' // Will be adjusted on client side based on current user
+      };
+
+      // Broadcast to both sender and recipient
+      if (app.locals.broadcastNotificationToUser) {
+        // Send to recipient
+        app.locals.broadcastNotificationToUser(recipientId, {
+          type: 'new_message_realtime',
+          conversationId: conversationId,
+          message: realTimeMessage
+        });
+
+        // Send to sender (for multi-device sync)
+        app.locals.broadcastNotificationToUser(senderId, {
+          type: 'new_message_realtime',
+          conversationId: conversationId,
+          message: realTimeMessage
+        });
+      }
+    }
+
+    // Create notification for recipient
+    await NotificationService.notifyNewMessage(recipientId, senderId, content);
+
     console.log('Message sent successfully:', message.id);
     res.json({ message: 'Message sent successfully', messageId: message.id });
   } catch (error) {

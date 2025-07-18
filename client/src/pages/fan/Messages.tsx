@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNotificationWebSocket, NotificationWebSocket } from '@/contexts/NotificationContext';
 
 interface Creator {
   username: string;
@@ -33,9 +34,14 @@ interface Message {
 }
 
 export const Messages: React.FC = () => {
+  const [pushPermission, setPushPermission] = useState(Notification.permission);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<NotificationWebSocket | null>(null);
+  const wsServiceRef = useRef<NotificationWebSocket | null>(null);
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { createConnection } = useNotificationWebSocket();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,6 +62,60 @@ export const Messages: React.FC = () => {
       fetchMessages(selectedConversation.id);
     }
   }, [selectedConversation]);
+
+  // Initialize WebSocket connection and push notifications
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Check browser push notification permission
+    if ('Notification' in window) {
+      setPushPermission(Notification.permission);
+    }
+
+    // Create WebSocket connection for real-time messages
+    const wsService = createConnection(
+      (notification) => {
+        // Handle notifications
+        console.log('Received notification:', notification);
+      },
+      (messageData) => {
+        // Handle real-time messages
+        console.log('Received real-time message:', messageData);
+
+        if (messageData.type === 'new_message_realtime' && selectedConversation) {
+          // Check if the message is for the current conversation
+          if (messageData.conversationId === selectedConversation.id) {
+            // Adjust message type based on current user
+            const adjustedMessage = {
+              ...messageData.message,
+              type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+            };
+
+            // Add message to current messages
+            setMessages(prev => {
+              // Check if message already exists to avoid duplicates
+              const exists = prev.some(msg => msg.id === adjustedMessage.id);
+              if (!exists) {
+                return [...prev, adjustedMessage];
+              }
+              return prev;
+            });
+          }
+
+          // Refresh conversations to update last message
+          fetchConversations();
+        }
+      }
+    );
+
+    wsServiceRef.current = wsService;
+
+    return () => {
+      if (wsServiceRef.current) {
+        wsServiceRef.current.disconnect();
+      }
+    };
+  }, [user?.id, selectedConversation, createConnection]);
 
   const fetchConversations = async () => {
     try {
@@ -116,11 +176,11 @@ export const Messages: React.FC = () => {
           content,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to send message');
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -129,12 +189,12 @@ export const Messages: React.FC = () => {
       if (selectedConversation) {
         fetchMessages(selectedConversation.id);
       }
-      
+
       setNewMessage('');
-      
+
       // Refresh conversations to update last message
       fetchConversations();
-      
+
       toast({
         title: "Message sent",
         description: "Your message has been sent successfully.",

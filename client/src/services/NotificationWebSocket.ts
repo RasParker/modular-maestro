@@ -15,6 +15,7 @@ export class NotificationWebSocket {
   private ws: WebSocket | null = null;
   private userId: number | null = null;
   private onNotificationCallback: ((notification: WebSocketNotification) => void) | null = null;
+  private onMessageCallback: ((messageData: any) => void) | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000; // Start with 1 second
@@ -56,6 +57,9 @@ export class NotificationWebSocket {
           } else if (data.type === 'new_notification' && this.onNotificationCallback) {
             console.log('Received real-time notification:', data.notification);
             this.onNotificationCallback(data.notification);
+          } else if (data.type === 'new_message_realtime' && this.onMessageCallback) {
+            console.log('Received real-time message:', data);
+            this.onMessageCallback(data);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
@@ -99,6 +103,10 @@ export class NotificationWebSocket {
     this.onNotificationCallback = callback;
   }
 
+  public onMessage(callback: (messageData: any) => void) {
+    this.onMessageCallback = callback;
+  }
+
   public isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
   }
@@ -109,6 +117,7 @@ export class NotificationWebSocket {
       this.ws = null;
     }
     this.onNotificationCallback = null;
+    this.onMessageCallback = null;
   }
 }
 
@@ -116,11 +125,17 @@ export class NotificationWebSocket {
 export const useNotificationWebSocket = () => {
   const { user } = useAuth();
   
-  const createConnection = (onNotification: (notification: WebSocketNotification) => void) => {
+  const createConnection = (
+    onNotification: (notification: WebSocketNotification) => void,
+    onMessage?: (messageData: any) => void
+  ) => {
     if (!user?.id) return null;
     
     const wsService = new NotificationWebSocket(user.id);
     wsService.onNotification(onNotification);
+    if (onMessage) {
+      wsService.onMessage(onMessage);
+    }
     return wsService;
   };
 
