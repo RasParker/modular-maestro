@@ -348,6 +348,36 @@ export const CreatorProfile: React.FC = () => {
     fetchUserSubscription();
   }, [user, creator, isOwnProfile]);
 
+  // Check if current user is subscribed to this creator
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user || !creator) {
+        setUserSubscription(null);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
+        if (response.ok) {
+          const subscription = await response.json();
+          // Only set subscription if it exists and is active
+          if (subscription && subscription.status === 'active') {
+            setUserSubscription(subscription);
+          } else {
+            setUserSubscription(null);
+          }
+        } else {
+          setUserSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        setUserSubscription(null);
+      }
+    };
+
+    checkSubscription();
+  }, [user, creator]);
+
   useEffect(() => {
     const fetchCreatorData = async () => {
       if (!username) return;

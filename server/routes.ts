@@ -749,7 +749,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creatorId = parseInt(req.params.creatorId);
 
       const subscription = await storage.getUserSubscriptionToCreator(userId, creatorId);
-      res.json(subscription || null);
+      
+      // Only return subscription if it exists and is active
+      if (subscription && subscription.status === 'active') {
+        res.json(subscription);
+      } else {
+        res.json(null);
+      }
     } catch (error) {
       console.error('Error checking subscription:', error);
       res.status(500).json({ error: "Failed to check subscription status" });
