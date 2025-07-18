@@ -36,7 +36,7 @@ interface Message {
 
 export const Messages: React.FC = () => {
   const [pushPermission, setPushPermission] = useState(Notification.permission);
-  const wsServiceRef = useRef<any>(null);
+  const wsRef = useRef<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -71,16 +71,17 @@ export const Messages: React.FC = () => {
     }
   }, [messages]);
 
-  // Initialize WebSocket connection - only once
+  // Initialize single WebSocket connection
   useEffect(() => {
-    if (!user?.id || wsServiceRef.current) return;
+    if (!user?.id || wsRef.current) return;
 
     // Check browser push notification permission
     if ('Notification' in window) {
       setPushPermission(Notification.permission);
     }
 
-    // Create single WebSocket connection
+    console.log('Creating single WebSocket connection');
+    
     const wsService = createConnection(
       (notification) => {
         console.log('Received notification:', notification);
@@ -110,16 +111,17 @@ export const Messages: React.FC = () => {
       }
     );
 
-    wsServiceRef.current = wsService;
+    wsRef.current = wsService;
 
-    // Cleanup on unmount
+    // Cleanup on unmount only
     return () => {
-      if (wsServiceRef.current) {
-        wsServiceRef.current.disconnect();
-        wsServiceRef.current = null;
+      console.log('Cleaning up WebSocket connection');
+      if (wsRef.current) {
+        wsRef.current.disconnect();
+        wsRef.current = null;
       }
     };
-  }, [user?.id, selectedConversation?.id]);
+  }, [user?.id]); // Only depend on user.id, not selectedConversation
 
   const fetchConversations = async (isInitialLoad = false) => {
     try {
