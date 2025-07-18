@@ -1150,13 +1150,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Return goals with current progress
       const goals = {
-        subscriberGoal: storedGoals?.subscriberGoal || 100,
+        subscriberGoal: storedGoals?.subscriberGoal || 30,
         revenueGoal: storedGoals?.revenueGoal || 1000,
-        postsGoal: storedGoals?.postsGoal || 10,
+        postsGoal: storedGoals?.postsGoal || 15,
         currentSubscribers: subscriberCount,
         currentRevenue: monthlyRevenue,
         currentPosts: postsThisMonth
       };
+
+      console.log('Returning goals:', goals);
 
       res.json(goals);
     } catch (error) {

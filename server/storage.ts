@@ -131,6 +131,16 @@ export interface IStorage {
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
   private inMemoryGoals = new Map<string, any>();
+
+  constructor() {
+    // Initialize with your specified goals for creator 1
+    this.inMemoryGoals.set('creator_goals_1', {
+      subscriberGoal: 30,
+      revenueGoal: 1000,
+      postsGoal: 15,
+      updated_at: new Date()
+    });
+  }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
@@ -846,10 +856,18 @@ export class DatabaseStorage implements IStorage {
       // In production, this would be stored in the database
       const goalsKey = `creator_goals_${creatorId}`;
       const storedGoals = this.inMemoryGoals.get(goalsKey);
-      return storedGoals || null;
+      return storedGoals || {
+        subscriberGoal: 30,
+        revenueGoal: 1000,
+        postsGoal: 15
+      };
     } catch (error) {
       console.error('Error getting creator goals:', error);
-      return null;
+      return {
+        subscriberGoal: 30,
+        revenueGoal: 1000,
+        postsGoal: 15
+      };
     }
   }
 

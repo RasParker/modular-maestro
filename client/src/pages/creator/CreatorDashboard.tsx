@@ -67,7 +67,9 @@ export const CreatorDashboard: React.FC = () => {
       if (!user) return null;
       const response = await fetch(`/api/creator/${user.id}/goals`);
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        console.log('Fetched goals data:', data);
+        return data;
       }
       return null;
     },
@@ -115,24 +117,6 @@ export const CreatorDashboard: React.FC = () => {
       }
 
       // Update monthly goals with current analytics data
-      if (goalsData) {
-        setMonthlyGoals({
-          subscriberGoal: goalsData.subscriberGoal || 0,
-          revenueGoal: goalsData.revenueGoal || 0,
-          postsGoal: goalsData.postsGoal || 0,
-          currentSubscribers: analyticsData.subscribers || 0,
-          currentRevenue: analyticsData.monthlyEarnings || 0,
-          currentPosts: analyticsData.postsThisMonth || 0
-        });
-      } else {
-        // Set current values even if goals fetch fails
-        setMonthlyGoals(prev => ({
-          ...prev,
-          currentSubscribers: analyticsData.subscribers || 0,
-          currentRevenue: analyticsData.monthlyEarnings || 0,
-          currentPosts: analyticsData.postsThisMonth || 0
-        }));
-      }
 
       // Fetch recent subscribers
       try {
@@ -167,7 +151,22 @@ export const CreatorDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchUserPosts();
-  }, [user, goalsData]);
+  }, [user]);
+
+  // Separate useEffect for goals data
+  useEffect(() => {
+    if (goalsData) {
+      console.log('Updating monthly goals with:', goalsData);
+      setMonthlyGoals({
+        subscriberGoal: goalsData.subscriberGoal || 30,
+        revenueGoal: goalsData.revenueGoal || 1000, 
+        postsGoal: goalsData.postsGoal || 15,
+        currentSubscribers: analytics.subscribers || 0,
+        currentRevenue: analytics.monthlyEarnings || 0,
+        currentPosts: analytics.postsThisMonth || 0
+      });
+    }
+  }, [goalsData, analytics]);
 
   // Refetch data when window gains focus (when user comes back from settings)
   useEffect(() => {
