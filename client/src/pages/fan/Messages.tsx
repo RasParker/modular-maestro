@@ -50,6 +50,7 @@ export const Messages: React.FC = () => {
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch conversations on component mount
   useEffect(() => {
@@ -62,6 +63,13 @@ export const Messages: React.FC = () => {
       fetchMessages(selectedConversation.id);
     }
   }, [selectedConversation]);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   // Initialize WebSocket connection and push notifications
   useEffect(() => {
@@ -82,9 +90,9 @@ export const Messages: React.FC = () => {
         // Handle real-time messages
         console.log('Received real-time message:', messageData);
 
-        if (messageData.type === 'new_message_realtime' && selectedConversation) {
+        if (messageData.type === 'new_message_realtime') {
           // Check if the message is for the current conversation
-          if (messageData.conversationId === selectedConversation.id) {
+          if (selectedConversation && messageData.conversationId === selectedConversation.id) {
             // Adjust message type based on current user
             const adjustedMessage = {
               ...messageData.message,
@@ -115,7 +123,7 @@ export const Messages: React.FC = () => {
         wsServiceRef.current.disconnect();
       }
     };
-  }, [user?.id, selectedConversation, createConnection]);
+  }, [user?.id, createConnection]); // Remove selectedConversation from dependencies
 
   const fetchConversations = async () => {
     try {
@@ -183,16 +191,23 @@ export const Messages: React.FC = () => {
 
       return response.json();
     },
-    onSuccess: (data) => {
-      // Instead of creating a new message object, just refetch the messages
-      // to get the most up-to-date data from the server
-      if (selectedConversation) {
-        fetchMessages(selectedConversation.id);
-      }
-
+    onSuccess: async (data) => {
       setNewMessage('');
 
-      // Refresh conversations to update last message
+      // Add the message immediately to the UI for better UX
+      if (selectedConversation && data) {
+        const newMessage = {
+          id: data.id,
+          content: data.content,
+          sender: user.display_name || user.username,
+          timestamp: data.timestamp || new Date().toISOString(),
+          type: 'sent' as const
+        };
+
+        setMessages(prev => [...prev, newMessage]);
+      }
+
+      // Refresh conversations to update last message in the background
       fetchConversations();
 
       toast({
@@ -411,6 +426,8 @@ export const Messages: React.FC = () => {
                         </div>
                       ))
                     )}
+                    <div ref={messagesEndRef} />
+                    )}
                   </div>
 
                   {/* Message Input */}
@@ -595,6 +612,8 @@ export const Messages: React.FC = () => {
                     </div>
                   </div>
                 ))
+              )}
+              <div ref={messagesEndRef} />
               )}
             </div>
 
