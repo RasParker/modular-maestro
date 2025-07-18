@@ -236,7 +236,7 @@ export const CreatorDashboard: React.FC = () => {
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Earnings</p>
                     <p className="text-xl sm:text-2xl font-bold text-foreground">GHS {analytics.totalEarnings.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">All time</p>
+                    <p className="text-xs text-success">All time</p>
                   </div>
                   <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
                 </div>
