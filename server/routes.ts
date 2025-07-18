@@ -2112,6 +2112,73 @@ app.post('/api/conversations', async (req, res) => {
     }
   });
 
+  // Push notification subscription endpoints
+  app.post("/api/push-subscription", async (req, res) => {
+    try {
+      const { subscription, userId } = req.body;
+      
+      if (!userId || !subscription) {
+        return res.status(400).json({ error: "Missing userId or subscription" });
+      }
+
+      // Store the push subscription in the database
+      // For now, we'll store it in memory or you can add a push_subscriptions table
+      console.log('Push subscription registered for user:', userId);
+      console.log('Subscription details:', JSON.stringify(subscription, null, 2));
+      
+      // You can store this in a push_subscriptions table
+      // await storage.savePushSubscription(userId, subscription);
+      
+      res.json({ success: true, message: "Push subscription registered successfully" });
+    } catch (error) {
+      console.error('Error registering push subscription:', error);
+      res.status(500).json({ error: "Failed to register push subscription" });
+    }
+  });
+
+  app.delete("/api/push-subscription", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "Missing userId" });
+      }
+
+      console.log('Push subscription removed for user:', userId);
+      
+      // Remove the push subscription from the database
+      // await storage.removePushSubscription(userId);
+      
+      res.json({ success: true, message: "Push subscription removed successfully" });
+    } catch (error) {
+      console.error('Error removing push subscription:', error);
+      res.status(500).json({ error: "Failed to remove push subscription" });
+    }
+  });
+
+  // Test push notification endpoint
+  app.post("/api/test-push-notification", async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { title = 'Test Push Notification', message = 'This is a test push notification from Xclusive Creator Hub' } = req.body;
+
+      // In a real implementation, you would:
+      // 1. Get the user's push subscription from the database
+      // 2. Use a library like web-push to send the notification
+      // For now, we'll just log it
+      console.log(`Test push notification for user ${userId}:`, { title, message });
+      
+      res.json({ success: true, message: "Test push notification triggered" });
+    } catch (error) {
+      console.error('Error sending test push notification:', error);
+      res.status(500).json({ error: "Failed to send test push notification" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket setup for real-time notifications

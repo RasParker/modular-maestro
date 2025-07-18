@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ export const FanSettings: React.FC = () => {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isPreferencesLoading, setIsPreferencesLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     username: user?.username || '',
     email: user?.email || '',
@@ -82,12 +81,12 @@ export const FanSettings: React.FC = () => {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       updateUser({ 
         username: formData.username,
         email: formData.email 
       });
-      
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
@@ -105,7 +104,7 @@ export const FanSettings: React.FC = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.newPassword !== formData.confirmPassword) {
       toast({
         title: "Password mismatch",
@@ -118,12 +117,12 @@ export const FanSettings: React.FC = () => {
     setIsPasswordLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Password changed",
         description: "Your password has been successfully updated.",
       });
-      
+
       setFormData(prev => ({
         ...prev,
         currentPassword: '',
@@ -167,7 +166,7 @@ export const FanSettings: React.FC = () => {
 
         // Clear user data and logout
         localStorage.clear();
-        
+
         // Redirect to home page after a brief delay
         setTimeout(() => {
           window.location.href = '/';
@@ -197,15 +196,15 @@ export const FanSettings: React.FC = () => {
     try {
       // API call to change email would go here
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       updateUser({ email: newEmail });
       setFormData(prev => ({ ...prev, email: newEmail }));
-      
+
       toast({
         title: "Email updated",
         description: "Your email address has been successfully updated.",
       });
-      
+
       setIsEmailChangeDialogOpen(false);
       setNewEmail('');
     } catch (error) {
@@ -222,7 +221,7 @@ export const FanSettings: React.FC = () => {
     if (file) {
       try {
         console.log('Uploading profile photo:', file.name);
-        
+
         // Validate file size (5MB limit)
         if (file.size > 5 * 1024 * 1024) {
           toast({
@@ -232,7 +231,7 @@ export const FanSettings: React.FC = () => {
           });
           return;
         }
-        
+
         // Create FormData to send the file
         const formData = new FormData();
         formData.append('profilePhoto', file);
@@ -352,7 +351,7 @@ export const FanSettings: React.FC = () => {
                             </label>
                           </div>
                         </div>
-                        
+
                         {/* Instructions */}
                         <div className="flex-1">
                           <p className="text-xs text-muted-foreground">
@@ -362,7 +361,7 @@ export const FanSettings: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <form onSubmit={handleProfileUpdate} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -383,7 +382,7 @@ export const FanSettings: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <Button type="submit" disabled={isProfileLoading}>
                       {isProfileLoading ? "Updating..." : "Update Profile"}
                     </Button>
@@ -412,9 +411,9 @@ export const FanSettings: React.FC = () => {
                         <option value="strict">Strict filtering</option>
                       </select>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Adult Content</Label>
@@ -429,9 +428,9 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Autoplay Videos</Label>
@@ -478,9 +477,9 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Push Notifications</Label>
@@ -495,40 +494,62 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Content Updates</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Get notified when creators you follow post new content
-                        </p>
-                      </div>
-                      <Switch
-                        checked={preferences.contentUpdates}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({ ...prev, contentUpdates: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Promotional Emails</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive emails about new features and promotions
-                        </p>
-                      </div>
-                      <Switch
-                        checked={preferences.promotionalEmails}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({ ...prev, promotionalEmails: checked }))
-                        }
-                      />
-                    </div>
+
+                    {preferences.pushNotifications && (
+                      <>
+                        <Separator />
+
+                        <div className="space-y-2">
+                          <Label>Test Push Notifications</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Send a test notification to verify everything is working
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('/api/test-push-notification', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    title: 'Test Notification',
+                                    message: 'This is a test push notification from your Fan Settings!'
+                                  }),
+                                });
+
+                                if (response.ok) {
+                                  // Show a browser notification as a test
+                                  if (Notification.permission === 'granted') {
+                                    new Notification('Test Notification', {
+                                      body: 'This is a test push notification from your Fan Settings!',
+                                      icon: '/favicon.ico'
+                                    });
+                                  }
+
+                                  toast({
+                                    title: "Test notification sent",
+                                    description: "Check your browser for the test notification.",
+                                  });
+                                } else {
+                                  throw new Error('Failed to send test notification');
+                                }
+                              } catch (error) {
+                                toast({
+                                  title: "Test failed",
+                                  description: "Failed to send test notification.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                          >
+                            Send Test Notification
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -561,9 +582,9 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="spendingLimit">Monthly Spending Limit (GHS)</Label>
                       <Input
@@ -579,9 +600,9 @@ export const FanSettings: React.FC = () => {
                         Set to 0 for no limit
                       </p>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Renewal Reminders</Label>
@@ -596,9 +617,9 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Payment Failure Notifications</Label>
@@ -676,9 +697,9 @@ export const FanSettings: React.FC = () => {
                         <option value="private">Private - Hidden</option>
                       </select>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Show in Search Results</Label>
@@ -693,9 +714,9 @@ export const FanSettings: React.FC = () => {
                         }
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <Label>Who can message you</Label>
                       <select 
@@ -708,9 +729,9 @@ export const FanSettings: React.FC = () => {
                         <option value="none">No one</option>
                       </select>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Show Activity Status</Label>
@@ -747,9 +768,9 @@ export const FanSettings: React.FC = () => {
                         Request Data Download
                       </Button>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <h4 className="font-medium">Blocked Creators</h4>
                       <p className="text-sm text-muted-foreground">
@@ -820,7 +841,7 @@ export const FanSettings: React.FC = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <Button type="submit" disabled={isPasswordLoading}>
                         {isPasswordLoading ? "Updating..." : "Change Password"}
                       </Button>
@@ -894,7 +915,7 @@ export const FanSettings: React.FC = () => {
                             Permanently delete your account and all data
                           </p>
                         </div>
-                        
+
                         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                           <AlertDialogTrigger asChild>
                             <Button variant="destructive">

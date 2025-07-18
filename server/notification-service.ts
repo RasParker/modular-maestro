@@ -3,18 +3,22 @@ import type { InsertNotification } from '@shared/schema';
 
 export class NotificationService {
   private static broadcastFunction: ((userId: number, notification: any) => void) | null = null;
+  private static pushFunction: ((userId: number, notification: any) => void) | null = null;
 
   static setBroadcastFunction(fn: (userId: number, notification: any) => void) {
     this.broadcastFunction = fn;
+  }
+
+  static setPushFunction(fn: (userId: number, notification: any) => void) {
+    this.pushFunction = fn;
   }
 
   static async createNotification(data: InsertNotification): Promise<void> {
     try {
       const notification = await storage.createNotification(data);
       
-      // Broadcast real-time notification if WebSocket is available
-      if (this.broadcastFunction && notification) {
-        this.broadcastFunction(data.user_id, {
+      if (notification) {
+        const notificationData = {
           id: notification.id,
           type: data.type,
           title: data.title,
@@ -23,7 +27,17 @@ export class NotificationService {
           action_url: data.action_url,
           time_ago: 'just now',
           created_at: new Date().toISOString()
-        });
+        };
+
+        // Broadcast real-time notification if WebSocket is available
+        if (this.broadcastFunction) {
+          this.broadcastFunction(data.user_id, notificationData);
+        }
+
+        // Send push notification if available
+        if (this.pushFunction) {
+          this.pushFunction(data.user_id, notificationData);
+        }
       }
     } catch (error) {
       console.error('Failed to create notification:', error);
