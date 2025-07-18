@@ -54,6 +54,10 @@ export const CreatorSettings: React.FC = () => {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
   const [commentsEnabled, setCommentsEnabled] = useState(true);
+  
+  // Privacy settings state
+  const [profileDiscoverable, setProfileDiscoverable] = useState(true);
+  const [activityStatusVisible, setActivityStatusVisible] = useState(false);
 
   // Monthly goals state
   const [monthlyGoals, setMonthlyGoals] = useState({
@@ -85,6 +89,8 @@ export const CreatorSettings: React.FC = () => {
         if (response.ok) {
           const userData = await response.json();
           setCommentsEnabled(userData.comments_enabled ?? true);
+          setProfileDiscoverable(userData.profile_discoverable ?? true);
+          setActivityStatusVisible(userData.activity_status_visible ?? false);
         }
       } catch (error) {
         console.error('Error loading user settings:', error);
@@ -228,6 +234,37 @@ export const CreatorSettings: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to save content settings. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSavePrivacySettings = async () => {
+    try {
+      const response = await fetch('/api/user/privacy-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profile_discoverable: profileDiscoverable,
+          activity_status_visible: activityStatusVisible,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Privacy settings saved",
+          description: "Your privacy settings have been updated successfully.",
+        });
+      } else {
+        throw new Error('Failed to save privacy settings');
+      }
+    } catch (error) {
+      console.error('Error saving privacy settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save privacy settings. Please try again.",
         variant: "destructive",
       });
     }
@@ -1115,14 +1152,68 @@ export const CreatorSettings: React.FC = () => {
                             <Label htmlFor="profileVisibility">Profile Discovery</Label>
                             <p className="text-sm text-muted-foreground">Allow your profile to appear in search results</p>
                           </div>
-                          <Switch id="profileVisibility" defaultChecked />
+                          <Switch 
+                            id="profileVisibility" 
+                            checked={profileDiscoverable}
+                            onCheckedChange={async (checked) => {
+                              setProfileDiscoverable(checked);
+                              // Auto-save the setting
+                              try {
+                                const response = await fetch('/api/user/privacy-settings', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    profile_discoverable: checked,
+                                  }),
+                                });
+
+                                if (response.ok) {
+                                  toast({
+                                    title: "Profile Discovery updated",
+                                    description: checked ? "Your profile will appear in search results" : "Your profile is now hidden from search results",
+                                  });
+                                }
+                              } catch (error) {
+                                console.error('Error saving profile discovery setting:', error);
+                              }
+                            }}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div>
                             <Label htmlFor="activityStatus">Show Activity Status</Label>
                             <p className="text-sm text-muted-foreground">Let others see when you're online</p>
                           </div>
-                          <Switch id="activityStatus" />
+                          <Switch 
+                            id="activityStatus" 
+                            checked={activityStatusVisible}
+                            onCheckedChange={async (checked) => {
+                              setActivityStatusVisible(checked);
+                              // Auto-save the setting
+                              try {
+                                const response = await fetch('/api/user/privacy-settings', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    activity_status_visible: checked,
+                                  }),
+                                });
+
+                                if (response.ok) {
+                                  toast({
+                                    title: "Activity Status updated",
+                                    description: checked ? "Others can see when you're online" : "Your online status is now hidden",
+                                  });
+                                }
+                              } catch (error) {
+                                console.error('Error saving activity status setting:', error);
+                              }
+                            }}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div>

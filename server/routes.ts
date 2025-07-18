@@ -1422,6 +1422,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userData = await db
         .select({
           comments_enabled: users.comments_enabled,
+          profile_discoverable: users.profile_discoverable,
+          activity_status_visible: users.activity_status_visible,
         })
         .from(users)
         .where(eq(users.id, userId))
@@ -1459,6 +1461,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error saving content settings:', error);
       res.status(500).json({ error: 'Failed to save content settings' });
+    }
+  });
+
+  // Privacy settings endpoint
+  app.post('/api/user/privacy-settings', async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const userId = req.session.userId;
+      const { profile_discoverable, activity_status_visible } = req.body;
+
+      const updateData: any = { updated_at: new Date() };
+      
+      if (profile_discoverable !== undefined) {
+        updateData.profile_discoverable = profile_discoverable;
+      }
+      
+      if (activity_status_visible !== undefined) {
+        updateData.activity_status_visible = activity_status_visible;
+      }
+
+      await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, userId));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error saving privacy settings:', error);
+      res.status(500).json({ error: 'Failed to save privacy settings' });
     }
   });
 
