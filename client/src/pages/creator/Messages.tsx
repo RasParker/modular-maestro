@@ -51,11 +51,12 @@ export const Messages: React.FC = () => {
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [refreshingConversations, setRefreshingConversations] = useState(false);
   const [pushPermission, setPushPermission] = useState(Notification.permission); // Push notifications permission
 
   // Fetch conversations on component mount
   useEffect(() => {
-    fetchConversations();
+    fetchConversations(true);
   }, []);
 
   // Fetch messages when conversation is selected
@@ -105,7 +106,7 @@ export const Messages: React.FC = () => {
           }
 
           // Refresh conversations to update last message
-          fetchConversations();
+          // fetchConversations(); // Commented out to prevent blank screen
         }
       }
     );
@@ -119,9 +120,13 @@ export const Messages: React.FC = () => {
     };
   }, [user?.id, selectedConversation, createConnection]);
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (isInitialLoad = false) => {
     try {
-      setLoading(true);
+      if (isInitialLoad) {
+        setLoading(true);
+      } else {
+        setRefreshingConversations(true);
+      }
       const response = await fetch('/api/conversations');
       if (response.ok) {
         const data = await response.json();
@@ -141,7 +146,11 @@ export const Messages: React.FC = () => {
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      } else {
+        setRefreshingConversations(false);
+      }
     }
   };
 
@@ -195,7 +204,7 @@ export const Messages: React.FC = () => {
       setNewMessage('');
 
       // Refresh conversations to update last message
-      fetchConversations();
+      // fetchConversations(); // Commented out to prevent blank screen
 
       toast({
         title: "Message sent",
