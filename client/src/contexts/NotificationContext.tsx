@@ -53,7 +53,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         
         if (data.type === 'notification') {
           onNotification(data);
-        } else if (data.type === 'message') {
+        } else if (data.type === 'new_message_realtime') {
           onMessage(data);
         }
       } catch (error) {

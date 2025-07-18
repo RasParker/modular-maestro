@@ -91,6 +91,8 @@ export const Messages: React.FC = () => {
         console.log('Received real-time message:', messageData);
 
         if (messageData.type === 'new_message_realtime') {
+          console.log('Processing real-time message:', messageData);
+          
           // Check if the message is for the current conversation
           setMessages(prev => {
             // Get the current selected conversation from state
