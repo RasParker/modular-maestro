@@ -92,23 +92,24 @@ export const Messages: React.FC = () => {
 
         if (messageData.type === 'new_message_realtime') {
           // Check if the message is for the current conversation
-          if (selectedConversation && messageData.conversationId === selectedConversation.id) {
-            // Adjust message type based on current user
-            const adjustedMessage = {
-              ...messageData.message,
-              type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
-            };
+          setMessages(prev => {
+            // Get the current selected conversation from state
+            const currentConversationId = selectedConversation?.id;
+            if (currentConversationId && messageData.conversationId === currentConversationId) {
+              // Adjust message type based on current user
+              const adjustedMessage = {
+                ...messageData.message,
+                type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+              };
 
-            // Add message to current messages
-            setMessages(prev => {
               // Check if message already exists to avoid duplicates
               const exists = prev.some(msg => msg.id === adjustedMessage.id);
               if (!exists) {
                 return [...prev, adjustedMessage];
               }
-              return prev;
-            });
-          }
+            }
+            return prev;
+          });
 
           // Refresh conversations to update last message
           fetchConversations();
