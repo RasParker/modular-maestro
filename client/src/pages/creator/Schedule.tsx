@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
@@ -68,7 +69,7 @@ export const Schedule: React.FC = () => {
 
           console.log('Schedule - All posts received:', allPosts);
           console.log('Schedule - Posts array length:', allPosts.length);
-          
+
           // Filter for scheduled and draft posts and transform data
           const scheduledAndDraftPosts = allPosts
             .filter((post: any) => {
@@ -79,7 +80,7 @@ export const Schedule: React.FC = () => {
             })
             .map((post: any) => {
               console.log(`Processing post ${post.id}:`, post);
-              
+
               // For scheduled posts, use scheduledFor if available
               let displayDate;
               let displayTime;
@@ -114,7 +115,7 @@ export const Schedule: React.FC = () => {
                 thumbnail: post.mediaPreview,
                 scheduledFor: post.scheduledFor
               };
-              
+
               console.log(`Transformed post ${post.id}:`, transformedPost);
               return transformedPost;
             });
@@ -295,15 +296,17 @@ export const Schedule: React.FC = () => {
               {/* Posts List - Mobile-Optimized */}
               <div className="space-y-4">
                 {scheduledPosts.length > 0 ? (
-                  scheduledPosts.map((post) => (
-                    <ContentScheduleCard
-                      key={post.id}
-                      {...post}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onPublish={handlePublish}
-                    />
-                  ))
+                  <ScrollArea className="h-[400px]">
+                    {scheduledPosts.map((post) => (
+                      <ContentScheduleCard
+                        key={post.id}
+                        {...post}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onPublish={handlePublish}
+                      />
+                    ))}
+                  </ScrollArea>
                 ) : (
                   <Card className="bg-gradient-card border-border/50">
                     <CardContent className="flex flex-col items-center justify-center py-12">
