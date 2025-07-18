@@ -864,8 +864,7 @@ export class DatabaseStorage implements IStorage {
       });
       console.log(`Saved goals for creator ${creatorId}:`, goals);
     } catch (error) {
-      ```python
-console.error('Error saving creator goals:', error);
+      console.error('Error saving creator goals:', error);
       throw error;
     }
   }
