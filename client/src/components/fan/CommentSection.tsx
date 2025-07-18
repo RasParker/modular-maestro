@@ -428,7 +428,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   return (
     <div className="w-full bg-background">
       {/* Add Comment - Instagram style */}
-      <div className="px-3 py-3 border-b border-border/30"></div>
+      <div className="px-3 py-3 border-b border-border/30">
         <div className="flex gap-3">
           <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={user?.avatar} alt={user?.username} />
