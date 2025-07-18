@@ -35,7 +35,9 @@ interface Message {
 }
 
 export const Messages: React.FC = () => {
-  const [pushPermission, setPushPermission] = useState(Notification.permission);
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();

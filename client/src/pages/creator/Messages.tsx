@@ -52,7 +52,9 @@ export const Messages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [refreshingConversations, setRefreshingConversations] = useState(false);
-  const [pushPermission, setPushPermission] = useState(Notification.permission); // Push notifications permission
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  ); // Push notifications permission
 
   // Fetch conversations on component mount
   useEffect(() => {
