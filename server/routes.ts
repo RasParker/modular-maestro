@@ -200,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Username already exists" });
         }
       } catch (error) {
-        console.log('Username check error (user probably doesn\'t exist):', error);
+        console.log('Username check error (user probably doesn't exist):', error);
       }
 
       // Create the user
@@ -749,11 +749,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const creatorId = parseInt(req.params.creatorId);
 
       console.log(`Checking subscription API: user ${userId} to creator ${creatorId}`);
-      
+
       const subscription = await storage.getUserSubscriptionToCreator(userId, creatorId);
-      
+
       console.log('Found subscription:', subscription);
-      
+
       // Only return subscription if it exists and is active
       if (subscription && subscription.status === 'active') {
         console.log(`✓ Active subscription found: ${subscription.id}`);
@@ -857,7 +857,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subscriptions = await db
         .select({
           id: subscriptionsTable.id,
-          status: subscriptionsTable.status,
+          ```text
+status: subscriptionsTable.status,
           current_period_end: subscriptionsTable.next_billing_date,
           created_at: subscriptionsTable.created_at,
           auto_renew: subscriptionsTable.auto_renew,
@@ -1477,11 +1478,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { profile_discoverable, activity_status_visible } = req.body;
 
       const updateData: any = { updated_at: new Date() };
-      
+
       if (profile_discoverable !== undefined) {
         updateData.profile_discoverable = profile_discoverable;
       }
-      
+
       if (activity_status_visible !== undefined) {
         updateData.activity_status_visible = activity_status_visible;
       }
@@ -2292,7 +2293,7 @@ app.post('/api/conversations', async (req, res) => {
   app.post("/api/push-subscription", async (req, res) => {
     try {
       const { subscription, userId } = req.body;
-      
+
       if (!userId || !subscription) {
         return res.status(400).json({ error: "Missing userId or subscription" });
       }
@@ -2301,10 +2302,10 @@ app.post('/api/conversations', async (req, res) => {
       // For now, we'll store it in memory or you can add a push_subscriptions table
       console.log('Push subscription registered for user:', userId);
       console.log('Subscription details:', JSON.stringify(subscription, null, 2));
-      
+
       // You can store this in a push_subscriptions table
       // await storage.savePushSubscription(userId, subscription);
-      
+
       res.json({ success: true, message: "Push subscription registered successfully" });
     } catch (error) {
       console.error('Error registering push subscription:', error);
@@ -2315,16 +2316,16 @@ app.post('/api/conversations', async (req, res) => {
   app.delete("/api/push-subscription", async (req, res) => {
     try {
       const { userId } = req.body;
-      
+
       if (!userId) {
         return res.status(400).json({ error: "Missing userId" });
       }
 
       console.log('Push subscription removed for user:', userId);
-      
+
       // Remove the push subscription from the database
       // await storage.removePushSubscription(userId);
-      
+
       res.json({ success: true, message: "Push subscription removed successfully" });
     } catch (error) {
       console.error('Error removing push subscription:', error);
@@ -2347,7 +2348,7 @@ app.post('/api/conversations', async (req, res) => {
       // 2. Use a library like web-push to send the notification
       // For now, we'll just log it
       console.log(`Test push notification for user ${userId}:`, { title, message });
-      
+
       res.json({ success: true, message: "Test push notification triggered" });
     } catch (error) {
       console.error('Error sending test push notification:', error);
@@ -2425,7 +2426,7 @@ app.post('/api/conversations', async (req, res) => {
         // Remove user entry if no more connections
         if (activeConnections.get(userId)!.size === 0) {
           activeConnections.delete(userId);
-          
+
           // Update user's offline status in the database
           try {
             await db.update(users)
@@ -2503,3 +2504,50 @@ function formatTimeAgo(date: Date): string {
 
   return date.toLocaleDateString();
 }
+
+  // Get user by username
+  app.get('/api/users/username/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+
+      // Decode the username parameter
+      const decodedUsername = decodeURIComponent(username);
+
+      console.log('Looking for user with username:', decodedUsername);
+
+      const user = await db.select().from(users).where(eq(users.username, decodedUsername)).limit(1);
+
+      if (user.length === 0) {
+        console.log('User not found:', decodedUsername);
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      console.log('Found user:', user[0]);
+      res.json(user[0]);
+    } catch (error) {
+      console.error('Error fetching user by username:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get user online status
+  app.get('/api/users/:userId/online-status', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+
+      const user = await db.select({
+        is_online: users.is_online,
+        last_seen: users.last_seen,
+        activity_status_visible: users.activity_status_visible
+      }).from(users).where(eq(users.id, userId)).limit(1);
+
+      if (user.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json(user[0]);
+    } catch (error) {
+      console.error('Error fetching user online status:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
