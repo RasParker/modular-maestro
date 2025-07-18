@@ -63,7 +63,7 @@ const CREATORS = [
     username: 'techguru',
     display_name: 'Tech Guru',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    cover: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop',
+    cover: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop',
     bio: 'Technology reviews and programming tutorials',
     category: 'Tech',
     subscribers: 3250,
@@ -79,7 +79,7 @@ const CREATORS = [
     username: 'cookingstar',
     display_name: 'Cooking Star',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-    cover: 'https://images.unsplash.com/photo-1556909114-b6c75d1fea83?w=400&h=200&fit=crop',
+    cover: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=200&fit=crop',
     bio: 'Chef sharing exclusive recipes and cooking techniques',
     category: 'Cooking',
     subscribers: 2150,
@@ -335,11 +335,20 @@ export const Explore: React.FC = () => {
             return (
               <Card key={creator.id} className="overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group">
                 <div className="relative">
-                  <img
-                    src={creator.cover}
-                    alt={creator.display_name}
-                    className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                  {creator.cover ? (
+                    <img
+                      src={creator.cover}
+                      alt={creator.display_name}
+                      className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-full h-32 bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 ${creator.cover ? 'hidden' : ''}`}>
+                    <Image className="w-8 h-8 text-muted-foreground" />
+                  </div>
                   <div className="absolute -bottom-6 left-4">
                     <Avatar className="w-12 h-12 border-2 border-background">
                       <AvatarImage src={creator.avatar} alt={creator.username} />
