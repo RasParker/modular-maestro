@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNotificationWebSocket, NotificationWebSocket } from '@/contexts/NotificationWebSocket'; // Import the WebSocket context
+import { useNotificationWebSocket, NotificationWebSocket } from '@/contexts/NotificationContext';
 
 interface Fan {
   username: string;

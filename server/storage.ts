@@ -178,9 +178,14 @@ export class DatabaseStorage implements IStorage {
       const [user] = await db
         .insert(users)
         .values({
-          ...insertUser,
+          username: insertUser.username,
+          email: insertUser.email,
           password: hashedPassword,
-          social_links: insertUser.social_links || undefined,
+          role: insertUser.role,
+          display_name: insertUser.display_name,
+          bio: insertUser.bio,
+          cover_image: insertUser.cover_image,
+          social_links: insertUser.social_links || null,
         })
         .returning();
 
@@ -254,29 +259,25 @@ export class DatabaseStorage implements IStorage {
     const [post] = await db
       .insert(posts)
       .values({
-        ...insertPost,
-        media_urls: insertPost.media_urls || []
+        creator_id: insertPost.creator_id,
+        title: insertPost.title,
+        content: insertPost.content,
+        media_urls: insertPost.media_urls || [],
+        media_type: insertPost.media_type,
+        tier: insertPost.tier,
       })
       .returning();
     return post;
   }
 
   async updatePost(id: number, updates: Partial<Post>): Promise<Post | undefined> {
-    const [post] = await db
-      .update(posts)
-      .set({ ...updates, updated_at: new Date() })
-      .where(eq(posts.id, id))
-      .returning();
-    return post || undefined;
-  }
-
-  async updatePost(id: number, updates: Partial<typeof posts.$inferInsert>) {
     try {
-      const [post] = await db.update(posts)
-        .set(updates)
+      const [post] = await db
+        .update(posts)
+        .set({ ...updates, updated_at: new Date() })
         .where(eq(posts.id, id))
         .returning();
-      return post;
+      return post || undefined;
     } catch (error) {
       console.error('Error updating post:', error);
       throw error;
@@ -409,8 +410,12 @@ export class DatabaseStorage implements IStorage {
       const [newTier] = await db
         .insert(subscription_tiers)
         .values({
-          ...tier,
-          benefits: tier.benefits || []
+          creator_id: tier.creator_id,
+          name: tier.name,
+          description: tier.description,
+          price: tier.price,
+          currency: tier.currency,
+          benefits: tier.benefits || [],
         })
         .returning();
       console.log('Subscription tier created successfully:', newTier);
@@ -565,7 +570,7 @@ export class DatabaseStorage implements IStorage {
           id: subscriptions.id,
           status: subscriptions.status,
           created_at: subscriptions.created_at,
-          current_period_end: subscriptions.current_period_end,
+          current_period_end: subscriptions.ends_at,
           auto_renew: subscriptions.auto_renew,
           fan_id: subscriptions.fan_id,
           tier_id: subscriptions.tier_id,
@@ -1096,7 +1101,17 @@ export class DatabaseStorage implements IStorage {
   async createNotification(notification: InsertNotification): Promise<Notification> {
     const [newNotification] = await db
       .insert(notifications)
-      .values(notification)
+      .values({
+        user_id: notification.user_id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        action_url: notification.action_url,
+        actor_id: notification.actor_id,
+        entity_type: notification.entity_type,
+        entity_id: notification.entity_id,
+        metadata: notification.metadata,
+      })
       .returning();
 
     return newNotification;
