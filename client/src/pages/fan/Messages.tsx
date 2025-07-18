@@ -55,8 +55,10 @@ export const Messages: React.FC = () => {
   // Fetch conversations on component mount
   useEffect(() => {
     console.log('Messages component mounted');
-    fetchConversations(true);
-  }, []);
+    if (user) {
+      fetchConversations(true);
+    }
+  }, [user]);
 
   // Fetch messages when conversation is selected
   useEffect(() => {
@@ -130,7 +132,9 @@ export const Messages: React.FC = () => {
         setRefreshingConversations(true);
       }
       
-      const response = await fetch('/api/conversations');
+      const response = await fetch('/api/conversations', {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         console.log('Fetched conversations:', data);
@@ -140,7 +144,12 @@ export const Messages: React.FC = () => {
           setSelectedConversation(data[0]);
         }
       } else {
-        console.error('Failed to fetch conversations');
+        console.error('Failed to fetch conversations, status:', response.status);
+        if (response.status === 401) {
+          // User is not authenticated, redirect to login
+          window.location.href = '/';
+          return;
+        }
         toast({
           title: "Error",
           description: "Failed to load conversations. Please try again.",
@@ -167,7 +176,9 @@ export const Messages: React.FC = () => {
     try {
       console.log('Fetching messages for conversation:', conversationId);
       setMessagesLoading(true);
-      const response = await fetch(`/api/conversations/${conversationId}/messages`);
+      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         console.log('Fetched messages:', data);
@@ -199,6 +210,7 @@ export const Messages: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           content,
         }),
@@ -284,7 +296,7 @@ export const Messages: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-screen">

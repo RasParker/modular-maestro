@@ -56,8 +56,10 @@ export const Messages: React.FC = () => {
 
   // Fetch conversations on component mount
   useEffect(() => {
-    fetchConversations(true);
-  }, []);
+    if (user) {
+      fetchConversations(true);
+    }
+  }, [user]);
 
   // Fetch messages when conversation is selected
   useEffect(() => {
@@ -127,7 +129,9 @@ export const Messages: React.FC = () => {
       } else {
         setRefreshingConversations(true);
       }
-      const response = await fetch('/api/conversations');
+      const response = await fetch('/api/conversations', {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         setConversations(data);
@@ -157,7 +161,9 @@ export const Messages: React.FC = () => {
   const fetchMessages = async (conversationId: string) => {
     try {
       setMessagesLoading(true);
-      const response = await fetch(`/api/conversations/${conversationId}/messages`);
+      const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         setMessages(data);
@@ -183,6 +189,7 @@ export const Messages: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           content,
         }),
@@ -263,7 +270,7 @@ export const Messages: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-screen">
