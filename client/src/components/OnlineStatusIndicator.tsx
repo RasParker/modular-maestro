@@ -81,7 +81,7 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   if (dotOnly) {
     if (onlineStatus?.is_online) {
       return (
-        <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-lg ring-1 ring-green-500/30`} />
+        <div className={`${getSizeClasses()} rounded-full bg-green-500 border-3 border-white shadow-lg ring-2 ring-green-500/50 relative z-30`} />
       );
     }
     // Don't show anything for offline users in dot-only mode

@@ -867,8 +867,7 @@ export const CreatorProfile: React.FC = () => {
         })
       });
 
-      if (response.ok) {
-        const updatedPost = await response.json();
+      if (response.ok) {        const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
           post.id === editingPost.id 
             ? { ...post, title: editCaption, content: editCaption }
@@ -1111,12 +1110,12 @@ export const CreatorProfile: React.FC = () => {
                       {/* Post Header - Mobile Instagram style */}
                       <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="relative inline-block">
-                            <Avatar className="h-8 w-8">
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="h-8 w-8 relative z-10">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-0.5 -right-0.5">
+                            <div className="absolute -bottom-0.5 -right-0.5 z-20">
                               <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" isOwnProfile={isOwnProfile} />
                             </div>
                           </div>
