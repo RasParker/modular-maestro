@@ -868,6 +868,7 @@ export const CreatorProfile: React.FC = () => {
       });
 
       if (response.ok) {
+        ```
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
           post.id === editingPost.id 
@@ -1116,7 +1117,9 @@ export const CreatorProfile: React.FC = () => {
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" />
+                            <div className="absolute -bottom-0.5 -right-0.5">
+                              <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" isOwnProfile={isOwnProfile} />
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 flex-1">
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
