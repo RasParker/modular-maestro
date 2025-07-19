@@ -20,7 +20,7 @@ export const CreatorSettings: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { updateUser } = useAuth();
-  
+
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const defaultTab = urlParams.get('tab') || 'profile';
@@ -54,7 +54,7 @@ export const CreatorSettings: React.FC = () => {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
   const [commentsEnabled, setCommentsEnabled] = useState(true);
-  
+
   // Privacy settings state
   const [profileDiscoverable, setProfileDiscoverable] = useState(true);
   const [activityStatusVisible, setActivityStatusVisible] = useState(false);
@@ -189,7 +189,7 @@ export const CreatorSettings: React.FC = () => {
       if (response.ok) {
         // Invalidate the goals cache so the dashboard refetches
         await queryClient.invalidateQueries({ queryKey: ['creator', 1, 'goals'] });
-        
+
         toast({
           title: "Monthly goals saved",
           description: "Your monthly goals have been updated successfully.",
@@ -253,6 +253,9 @@ export const CreatorSettings: React.FC = () => {
       });
 
       if (response.ok) {
+        // Invalidate the online status query to update the OnlineStatusIndicator component
+        await queryClient.invalidateQueries({ queryKey: ['onlineStatus'] });
+
         toast({
           title: "Privacy settings saved",
           description: "Your privacy settings have been updated successfully.",
@@ -649,7 +652,7 @@ export const CreatorSettings: React.FC = () => {
                               <span className="text-sm text-muted-foreground">Cover Photo Preview</span>
                             </div>
                           )}
-                          
+
                           {/* Cover Photo Upload Indicator */}
                           <div className="absolute top-2 right-2 w-8 h-8 bg-background/80 backdrop-blur-sm rounded-full border-2 border-border flex items-center justify-center cursor-pointer hover:bg-background/90 transition-colors">
                             <input
@@ -668,7 +671,7 @@ export const CreatorSettings: React.FC = () => {
                             </label>
                           </div>
                         </div>
-                        
+
                         {/* Profile Photo Overlayed on Cover Photo */}
                         <div className="absolute bottom-4 left-6">
                           <div className="relative">
@@ -705,7 +708,7 @@ export const CreatorSettings: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Instructions */}
                       <div className="mt-16 space-y-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
@@ -1204,6 +1207,8 @@ export const CreatorSettings: React.FC = () => {
                                 });
 
                                 if (response.ok) {
+                                    // Invalidate the online status query to update the OnlineStatusIndicator component
+                                    await queryClient.invalidateQueries({ queryKey: ['onlineStatus'] });
                                   toast({
                                     title: "Activity Status updated",
                                     description: checked ? "Others can see when you're online" : "Your online status is now hidden",

@@ -16,6 +16,9 @@ interface OnlineStatus {
   activity_status_visible: boolean;
 }
 
+// Export the query key factory for cache invalidation
+export const getOnlineStatusQueryKey = (userId: number) => [`/api/users/${userId}/online-status`];
+
 export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({ 
   userId, 
   showLastSeen = false,
@@ -24,9 +27,9 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   isOwnProfile = false
 }) => {
   const { data: onlineStatus } = useQuery<OnlineStatus>({
-    queryKey: [`/api/users/${userId}/online-status`],
+    queryKey: getOnlineStatusQueryKey(userId),
     refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 25000, // Consider data stale after 25 seconds
+    staleTime: 5000, // Consider data stale after 5 seconds for quicker updates
   });
 
   // For own profile, respect their privacy setting. For others, also respect their privacy setting
