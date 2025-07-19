@@ -2008,18 +2008,27 @@ app.get('/api/conversations/:conversationId/messages', async (req, res) => {
     }
 
     // Get messages
-    const messages = await db
+    const rawMessages = await db
       .select({
         id: messagesTable.id,
         sender: usersTable.username,
         content: messagesTable.content,
         timestamp: messagesTable.created_at,
-        type: sql<'sent' | 'received'>`CASE WHEN ${messagesTable.sender_id} = ${currentUserId} THEN 'sent' ELSE 'received' END`.as('type'),
+        sender_id: messagesTable.sender_id,
       })
       .from(messagesTable)
       .leftJoin(usersTable, eq(messagesTable.sender_id, usersTable.id))
       .where(eq(messagesTable.conversation_id, conversationId))
       .orderBy(asc(messagesTable.created_at));
+
+    // Add type field based on sender comparison
+    const messages = rawMessages.map(message => ({
+      id: message.id,
+      sender: message.sender,
+      content: message.content,
+      timestamp: message.timestamp,
+      type: message.sender_id === currentUserId ? 'sent' as const : 'received' as const
+    }));
 
     console.log('Found messages:', messages.length);
     res.json(messages);
