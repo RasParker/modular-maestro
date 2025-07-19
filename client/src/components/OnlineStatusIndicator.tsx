@@ -29,13 +29,14 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
-  if (!onlineStatus?.activity_status_visible && !isOwnProfile) {
-    return null; // Don't show anything if user has disabled activity status, unless it's their own profile
+  // For own profile, respect their privacy setting. For others, also respect their privacy setting
+  if (!onlineStatus?.activity_status_visible) {
+    return null; // Don't show anything if user has disabled activity status
   }
 
   const formatLastSeen = (lastSeen: string | null) => {
     if (!lastSeen) return '';
-    
+
     const date = new Date(lastSeen);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -64,7 +65,7 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
           return 'w-4 h-4';
       }
     }
-    
+
     switch (size) {
       case 'sm':
         return 'w-2 h-2';
