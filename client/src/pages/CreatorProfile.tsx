@@ -955,7 +955,7 @@ export const CreatorProfile: React.FC = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <div className="relative">
+            <div className="relative inline-block">
               <Avatar className="w-24 h-24 border-4 border-background">
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
@@ -1111,7 +1111,7 @@ export const CreatorProfile: React.FC = () => {
                       {/* Post Header - Mobile Instagram style */}
                       <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="relative">
+                          <div className="relative inline-block">
                             <Avatar className="h-8 w-8">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>

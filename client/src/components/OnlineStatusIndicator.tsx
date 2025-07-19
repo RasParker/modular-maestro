@@ -53,13 +53,13 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
       // Larger dots for avatar status indicators
       switch (size) {
         case 'sm':
-          return 'w-3 h-3';
-        case 'md':
           return 'w-4 h-4';
-        case 'lg':
+        case 'md':
           return 'w-5 h-5';
+        case 'lg':
+          return 'w-6 h-6';
         default:
-          return 'w-3 h-3';
+          return 'w-4 h-4';
       }
     }
     
@@ -79,8 +79,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   if (dotOnly) {
     if (onlineStatus?.is_online) {
       return (
-        <div className="absolute bottom-0 right-0 transform translate-x-1 translate-y-1">
-          <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-background shadow-lg animate-pulse`} />
+        <div className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 z-10">
+          <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-lg ring-1 ring-black/10`} />
         </div>
       );
     }
