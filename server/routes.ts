@@ -1752,7 +1752,8 @@ app.get('/api/admin/commission-rate', async (req, res) => {
   });
 
   app.patch("/api/notifications/:id/read", async (req, res) => {
-    try {
+    ```text
+try {
       const userId = req.session.userId;
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
@@ -2496,6 +2497,47 @@ app.post('/api/conversations', async (req, res) => {
     } catch (error) {
       console.error('Error fetching user by username:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get user online status
+  app.get('/api/users/:userId/online-status', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+
+      const userData = await db
+        .select({
+          is_online: users.is_online,
+          last_seen: users.last_seen,
+          activity_status_visible: users.activity_status_visible,
+        })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userData.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const user = userData[0];
+        
+       // Check if user has allowed their activity status to be visible
+      if (!user.activity_status_visible) {
+        return res.json({
+          is_online: false,
+          last_seen: null,
+          activity_status_visible: false
+        });
+      }
+
+      res.json({
+        is_online: user.is_online,
+        last_seen: user.last_seen,
+        activity_status_visible: user.activity_status_visible
+      });
+    } catch (error) {
+      console.error('Error fetching user online status:', error);
+      res.status(500).json({ error: 'Failed to fetch online status' });
     }
   });
 
