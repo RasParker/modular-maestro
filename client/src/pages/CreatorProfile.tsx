@@ -954,13 +954,13 @@ export const CreatorProfile: React.FC = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <div className="relative inline-block">
+            <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-background">
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              {/* Online Status Dot Indicator */}
-              <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="lg" />
+              {/* Simple green dot - always visible for testing */}
+              <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
             </div>
 
             {/* Desktop Layout - Action buttons on the right */}
@@ -1110,14 +1110,13 @@ export const CreatorProfile: React.FC = () => {
                       {/* Post Header - Mobile Instagram style */}
                       <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="relative flex-shrink-0">
-                            <Avatar className="h-8 w-8 relative z-10">
+                          <div className="relative">
+                            <Avatar className="h-8 w-8">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-0.5 -right-0.5 z-20">
-                              <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" isOwnProfile={isOwnProfile} />
-                            </div>
+                            {/* Simple green dot for mobile */}
+                            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                           </div>
                           <div className="flex items-center gap-2 flex-1">
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
