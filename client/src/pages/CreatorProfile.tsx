@@ -654,6 +654,53 @@ export const CreatorProfile: React.FC = () => {
       userId: user?.id
     });
 
+    return hasAccess;se;
+    }
+
+    // If user has no active subscription to this creator, no access to premium content
+    if (!userSubscription || userSubscription.status !== 'active') {
+      console.log('Access denied: No active subscription', { 
+        userSubscription: userSubscription,
+        hasSubscription: !!userSubscription,
+        subscriptionStatus: userSubscription?.status
+      });
+      return false;
+    }
+
+    // Verify subscription is to this specific creator
+    if (userSubscription.creator_id !== creator?.id) {
+      console.log('Access denied: Subscription not for this creator', { 
+        subscriptionCreatorId: userSubscription.creator_id, 
+        currentCreatorId: creator?.id 
+      });
+      return false;
+    }
+
+    // Define tier hierarchy - higher tiers include lower tier content
+    const tierHierarchy = {
+      'supporter': 1,
+      'starter pump': 1,
+      'fan': 2,
+      'premium': 2,
+      'power gains': 2,
+      'superfan': 3,
+      'elite beast mode': 3
+    };
+
+    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
+    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1; // Default to tier 1 for premium content
+
+    const hasAccess = userTierLevel >= postTierLevel;
+    console.log('Tier access check:', { 
+      postTier, 
+      userTierLevel, 
+      postTierLevel, 
+      userTierName: userSubscription.tier_name,
+      hasAccess,
+      creatorId: creator?.id,
+      userId: user?.id
+    });
+
     return hasAccess;
   };
 
