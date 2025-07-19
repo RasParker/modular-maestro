@@ -867,7 +867,6 @@ export const CreatorProfile: React.FC = () => {
         })
       });
 
-```text
       if (response.ok) {
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
@@ -1441,7 +1440,7 @@ export const CreatorProfile: React.FC = () => {
                     <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-medium mb-2">No subscription tiers</h3>
                     <p className="text-muted-foreground text-sm">
-                      {isOwnProfile ? 'Create subscription tiers to start monetizing your content.' : `${creator?.display_name || creator?.username} hasn't created any subscription tiers yet.`}
+                      {isOwnProfile ? 'Create subscription tiers to start monetizing your content.' : (creator?.display_name || creator?.username) + " hasn't created any subscription tiers yet."}
                     </p>
                     {isOwnProfile && (
                       <Button variant="outline" size="sm" asChild className="mt-4">
@@ -1485,7 +1484,7 @@ export const CreatorProfile: React.FC = () => {
                     {/* Blurred background layer */}
                     <div 
                       className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                      style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
+                      style={{ backgroundImage: 'url(' + selectedContent.mediaPreview + ')' }}
                     />
                     {/* Main media content - Square container */}
                     <div className="relative z-10 w-full h-full">
