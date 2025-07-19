@@ -959,8 +959,10 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              {/* Simple green dot - always visible for testing */}
-              <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
+              {/* Status indicator that respects privacy settings */}
+              <div className="absolute bottom-1 right-1">
+                <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="lg" isOwnProfile={isOwnProfile} />
+              </div>
             </div>
 
             {/* Desktop Layout - Action buttons on the right */}
