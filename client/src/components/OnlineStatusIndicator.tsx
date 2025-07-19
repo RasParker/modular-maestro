@@ -6,6 +6,7 @@ interface OnlineStatusIndicatorProps {
   userId: number;
   showLastSeen?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  dotOnly?: boolean;
 }
 
 interface OnlineStatus {
@@ -17,7 +18,8 @@ interface OnlineStatus {
 export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({ 
   userId, 
   showLastSeen = false,
-  size = 'sm'
+  size = 'sm',
+  dotOnly = false
 }) => {
   const { data: onlineStatus } = useQuery<OnlineStatus>({
     queryKey: [`/api/users/${userId}/online-status`],
@@ -47,6 +49,20 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   };
 
   const getSizeClasses = () => {
+    if (dotOnly) {
+      // Larger dots for avatar status indicators
+      switch (size) {
+        case 'sm':
+          return 'w-3 h-3';
+        case 'md':
+          return 'w-4 h-4';
+        case 'lg':
+          return 'w-5 h-5';
+        default:
+          return 'w-3 h-3';
+      }
+    }
+    
     switch (size) {
       case 'sm':
         return 'w-2 h-2';
@@ -59,6 +75,20 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     }
   };
 
+  // Dot-only mode for avatar status indicators
+  if (dotOnly) {
+    if (onlineStatus?.is_online) {
+      return (
+        <div className="absolute bottom-0 right-0 transform translate-x-1 translate-y-1">
+          <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-background shadow-lg animate-pulse`} />
+        </div>
+      );
+    }
+    // Don't show anything for offline users in dot-only mode
+    return null;
+  }
+
+  // Regular mode with text
   if (onlineStatus?.is_online) {
     return (
       <div className="flex items-center gap-1">

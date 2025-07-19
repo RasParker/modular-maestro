@@ -313,3 +313,10 @@ Changelog:
   - ✅ Established proper client/server separation and security best practices
   - ✅ Completed comprehensive migration with all checklist items verified
   - ✅ Application now running successfully on port 5000 with full database functionality
+- July 19, 2025. Enhanced online status indicator implementation
+  - ✅ Implemented green dot status indicator on profile avatars similar to social media platforms
+  - ✅ Added dotOnly prop to OnlineStatusIndicator component for avatar-based status display
+  - ✅ Positioned status dots at bottom-right edge of avatars with border and shadow styling
+  - ✅ Applied status indicators to both large profile header avatar and smaller post avatars
+  - ✅ Enhanced status indicator sizing system with appropriate dot sizes for different avatar sizes
+  - ✅ Status indicators only show when user is online and has activity status visible in privacy settings

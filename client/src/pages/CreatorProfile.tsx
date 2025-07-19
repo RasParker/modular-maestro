@@ -955,10 +955,14 @@ export const CreatorProfile: React.FC = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-4">
-            <Avatar className="w-24 h-24 border-4 border-background">
-              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-              <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-24 h-24 border-4 border-background">
+                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              {/* Online Status Dot Indicator */}
+              <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="lg" />
+            </div>
 
             {/* Desktop Layout - Action buttons on the right */}
             <div className="hidden md:flex w-full items-end justify-between">
@@ -1107,10 +1111,13 @@ export const CreatorProfile: React.FC = () => {
                       {/* Post Header - Mobile Instagram style */}
                       <div className="flex items-center justify-between px-3 py-3">
                         <div className="flex items-center gap-3 flex-1">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
-                            <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
-                          </Avatar>
+                          <div className="relative">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
+                              <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" />
+                          </div>
                           <div className="flex items-center gap-2 flex-1">
                             <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
                             <span className="text-xs text-muted-foreground">
