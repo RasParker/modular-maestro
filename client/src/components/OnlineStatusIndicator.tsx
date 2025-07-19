@@ -29,8 +29,9 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
-  if (!onlineStatus?.activity_status_visible && !isOwnProfile) {
-    return null; // Don't show anything if user has disabled activity status, unless it's their own profile
+  // For own profile, always show status. For others, respect their privacy setting
+  if (!isOwnProfile && !onlineStatus?.activity_status_visible) {
+    return null; // Don't show anything if user has disabled activity status and it's not their own profile
   }
 
   const formatLastSeen = (lastSeen: string | null) => {
