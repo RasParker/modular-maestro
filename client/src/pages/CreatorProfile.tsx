@@ -961,7 +961,7 @@ export const CreatorProfile: React.FC = () => {
               </Avatar>
               {/* Minimalistic dot indicator on avatar edge */}
               <div className="absolute bottom-1 right-1">
-                <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="lg" isOwnProfile={isOwnProfile} />
+                <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="md" isOwnProfile={isOwnProfile} />
               </div>
             </div>
 
