@@ -868,7 +868,6 @@ export const CreatorProfile: React.FC = () => {
       });
 
       if (response.ok) {
-```tool_code
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
           post.id === editingPost.id 
@@ -942,7 +941,7 @@ export const CreatorProfile: React.FC = () => {
         <div className="h-48 md:h-64 overflow-hidden">
           {creator.cover ? (
             <img 
-              src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`} 
+              src={creator.cover.startsWith('/uploads/') ? creator.cover : '/uploads/' + creator.cover} 
               alt={creator.display_name}
               className="w-full h-full object-cover"
             />
@@ -958,7 +957,7 @@ export const CreatorProfile: React.FC = () => {
           <div className="max-w-4xl mx-auto flex items-end gap-4">
             <div className="relative inline-block">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               {/* Online Status Dot Indicator */}
@@ -1114,7 +1113,7 @@ export const CreatorProfile: React.FC = () => {
                         <div className="flex items-center gap-3 flex-1">
                           <div className="relative inline-block">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
                             <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="sm" />
@@ -1148,7 +1147,7 @@ export const CreatorProfile: React.FC = () => {
                         <div className="w-full">
                           {(() => {
                             const hasAccess = hasAccessToTier(post.tier);
-                            console.log(`🔒 Access check for post ${post.id} (tier: ${post.tier}):`, {
+                            console.log('Access check for post ' + post.id + ' (tier: ' + post.tier + '):', {
                               hasAccess,
                               isOwnProfile,
                               user: user?.id,
@@ -1178,7 +1177,7 @@ export const CreatorProfile: React.FC = () => {
                                 // Handle both string and array formats for media_urls
                                 const mediaUrls = Array.isArray(post.media_urls) ? Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls] : [];
                                 const mediaUrl = mediaUrls[0];
-                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : '/uploads/' + mediaUrl;
 
                                 return post.media_type === 'video' ? (
                                   <video 
@@ -1230,7 +1229,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
                                   onClick={() => {
                                     if (!user) {
-                                      window.location.href = `/login?redirect=/creator/${username}`;
+                                      window.location.href = '/login?redirect=/creator/' + username;
                                     } else {
                                       // Scroll to subscription tiers
                                       document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
@@ -1253,10 +1252,10 @@ export const CreatorProfile: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-10 w-10 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                className={'h-10 w-10 p-0 ' + (postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground')}
                                 onClick={() => handleLike(post.id)}
                               >
-                                <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                <Heart className={'w-7 h-7 ' + (postLikes[post.id]?.liked ? 'fill-current' : '')} />
                               </Button>
                               {(postLikes[post.id]?.count || post.likes_count || post.likes || 0) > 0 && (
                                 <span className="text-sm font-medium text-foreground">
@@ -1357,7 +1356,7 @@ export const CreatorProfile: React.FC = () => {
                       <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">No posts yet</h3>
                       <p className="text-muted-foreground text-sm">
-                        {isOwnProfile ? 'Start creating content to build your audience.' : `${creator.display_name} hasn't posted any content yet.`}
+                        {isOwnProfile ? 'Start creating content to build your audience.' : creator.display_name + " hasn't posted any content yet."}
                       </p>
                     </div>
                   </CardContent>
