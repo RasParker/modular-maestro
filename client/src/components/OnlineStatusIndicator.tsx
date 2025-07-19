@@ -34,6 +34,13 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     return null; // Don't show anything if user has disabled activity status and it's not their own profile
   }
 
+  // For own profile with dotOnly mode, always show the dot regardless of privacy settings
+  if (dotOnly && isOwnProfile && onlineStatus?.is_online) {
+    return (
+      <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-md ring-1 ring-green-500/30 absolute bottom-1 right-1 z-30`} />
+    );
+  }
+
   const formatLastSeen = (lastSeen: string | null) => {
     if (!lastSeen) return '';
     
