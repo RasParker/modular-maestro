@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,10 +13,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Save, Shield, User, Bell, CreditCard, Settings, Eye, Trash2, Camera } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { getOnlineStatusQueryKey } from '@/components/OnlineStatusIndicator';
 
 export const FanSettings: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isPreferencesLoading, setIsPreferencesLoading] = useState(false);
@@ -67,6 +70,67 @@ export const FanSettings: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEmailChangeDialogOpen, setIsEmailChangeDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState('');
+
+  // Load current user settings when component mounts
+  useEffect(() => {
+    const loadUserSettings = async () => {
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const settings = await response.json();
+          setPrivacySettings(prev => ({
+            ...prev,
+            showInSearch: settings.profile_discoverable,
+            showActivity: settings.activity_status_visible,
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading user settings:', error);
+      }
+    };
+
+    if (user?.id) {
+      loadUserSettings();
+    }
+  }, [user?.id]);
+
+  const handleSavePrivacySettings = async (settings: Partial<typeof privacySettings>) => {
+    try {
+      const response = await fetch('/api/user/privacy-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profile_discoverable: settings.showInSearch,
+          activity_status_visible: settings.showActivity,
+        }),
+      });
+
+      if (response.ok) {
+        // Invalidate the online status query for the current user to update the OnlineStatusIndicator component
+        if (user?.id) {
+          await queryClient.invalidateQueries({ 
+            queryKey: getOnlineStatusQueryKey(user.id) 
+          });
+        }
+
+        toast({
+          title: "Privacy settings saved",
+          description: "Your privacy settings have been updated successfully.",
+        });
+      } else {
+        throw new Error('Failed to save privacy settings');
+      }
+    } catch (error) {
+      console.error('Error saving privacy settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save privacy settings. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSave = () => {
     toast({
@@ -709,9 +773,11 @@ export const FanSettings: React.FC = () => {
                       </div>
                       <Switch
                         checked={privacySettings.showInSearch}
-                        onCheckedChange={(checked) => 
-                          setPrivacySettings(prev => ({ ...prev, showInSearch: checked }))
-                        }
+                        onCheckedChange={async (checked) => {
+                          const newSettings = { ...privacySettings, showInSearch: checked };
+                          setPrivacySettings(newSettings);
+                          await handleSavePrivacySettings(newSettings);
+                        }}
                       />
                     </div>
 
@@ -741,9 +807,11 @@ export const FanSettings: React.FC = () => {
                       </div>
                       <Switch
                         checked={privacySettings.showActivity}
-                        onCheckedChange={(checked) => 
-                          setPrivacySettings(prev => ({ ...prev, showActivity: checked }))
-                        }
+                        onCheckedChange={async (checked) => {
+                          const newSettings = { ...privacySettings, showActivity: checked };
+                          setPrivacySettings(newSettings);
+                          await handleSavePrivacySettings(newSettings);
+                        }}
                       />
                     </div>
                   </div>
