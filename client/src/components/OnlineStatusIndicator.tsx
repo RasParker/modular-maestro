@@ -29,16 +29,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
-  // For own profile, always show status. For others, respect their privacy setting
-  if (!isOwnProfile && !onlineStatus?.activity_status_visible) {
-    return null; // Don't show anything if user has disabled activity status and it's not their own profile
-  }
-
-  // For own profile with dotOnly mode, always show the dot regardless of privacy settings
-  if (dotOnly && isOwnProfile && onlineStatus?.is_online) {
-    return (
-      <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-md ring-1 ring-green-500/30 absolute bottom-1 right-1 z-30`} />
-    );
+  if (!onlineStatus?.activity_status_visible && !isOwnProfile) {
+    return null; // Don't show anything if user has disabled activity status, unless it's their own profile
   }
 
   const formatLastSeen = (lastSeen: string | null) => {
@@ -60,16 +52,16 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
 
   const getSizeClasses = () => {
     if (dotOnly) {
-      // Smaller dots for avatar status indicators
+      // Larger dots for avatar status indicators
       switch (size) {
         case 'sm':
-          return 'w-3 h-3';
-        case 'md':
-          return 'w-3.5 h-3.5';
-        case 'lg':
           return 'w-4 h-4';
+        case 'md':
+          return 'w-5 h-5';
+        case 'lg':
+          return 'w-6 h-6';
         default:
-          return 'w-3 h-3';
+          return 'w-4 h-4';
       }
     }
     
@@ -89,7 +81,7 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   if (dotOnly) {
     if (onlineStatus?.is_online) {
       return (
-        <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-md ring-1 ring-green-500/30 relative z-30`} />
+        <div className={`${getSizeClasses()} rounded-full bg-green-500 border-3 border-white shadow-lg ring-2 ring-green-500/50 relative z-30`} />
       );
     }
     // Don't show anything for offline users in dot-only mode
