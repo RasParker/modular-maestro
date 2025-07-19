@@ -868,7 +868,6 @@ export const CreatorProfile: React.FC = () => {
       });
 
       if (response.ok) {
-        ```
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
           post.id === editingPost.id 
