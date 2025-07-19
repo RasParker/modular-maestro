@@ -7,6 +7,7 @@ interface OnlineStatusIndicatorProps {
   showLastSeen?: boolean;
   size?: 'sm' | 'md' | 'lg';
   dotOnly?: boolean;
+  isOwnProfile?: boolean;
 }
 
 interface OnlineStatus {
@@ -19,7 +20,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   userId, 
   showLastSeen = false,
   size = 'sm',
-  dotOnly = false
+  dotOnly = false,
+  isOwnProfile = false
 }) => {
   const { data: onlineStatus } = useQuery<OnlineStatus>({
     queryKey: [`/api/users/${userId}/online-status`],
@@ -27,8 +29,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
-  if (!onlineStatus?.activity_status_visible) {
-    return null; // Don't show anything if user has disabled activity status
+  if (!onlineStatus?.activity_status_visible && !isOwnProfile) {
+    return null; // Don't show anything if user has disabled activity status, unless it's their own profile
   }
 
   const formatLastSeen = (lastSeen: string | null) => {

@@ -867,6 +867,7 @@ export const CreatorProfile: React.FC = () => {
         })
       });
 
+```text
       if (response.ok) {
         const updatedPost = await response.json();
         setUserPosts(prev => prev.map(post => 
@@ -978,7 +979,7 @@ export const CreatorProfile: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-muted-foreground">@{creator.username}</p>
-                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
+                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Users className="w-4 h-4" />
@@ -1038,7 +1039,7 @@ export const CreatorProfile: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-muted-foreground">@{creator.username}</p>
-                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
+                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
