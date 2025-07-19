@@ -26,14 +26,20 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   dotOnly = false,
   isOwnProfile = false
 }) => {
-  const { data: onlineStatus } = useQuery<OnlineStatus>({
+  const { data: onlineStatus, error, isLoading } = useQuery<OnlineStatus>({
     queryKey: getOnlineStatusQueryKey(userId),
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${userId}/online-status`);
+      if (!response.ok) throw new Error('Failed to fetch online status');
+      return response.json();
+    },
     refetchInterval: 30000, // Refetch every 30 seconds
     staleTime: 5000, // Consider data stale after 5 seconds for quicker updates
+    enabled: !!userId, // Only run query if userId is provided
   });
 
   // Debug logging to see what data we're getting
-  console.log(`OnlineStatusIndicator for user ${userId}:`, onlineStatus);
+  console.log(`OnlineStatusIndicator for user ${userId}:`, { onlineStatus, error, isLoading, queryKey: getOnlineStatusQueryKey(userId) });
 
   // For own profile, respect their privacy setting. For others, also respect their privacy setting
   if (!onlineStatus?.activity_status_visible) {
