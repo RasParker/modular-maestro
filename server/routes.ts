@@ -2014,7 +2014,7 @@ app.get('/api/conversations/:conversationId/messages', async (req, res) => {
         sender: usersTable.username,
         content: messagesTable.content,
         timestamp: messagesTable.created_at,
-        type: sql<'sent' | 'received'>`CASE WHEN ${messagesTable.sender_id} = ${currentUserId} THEN 'sent' ELSE 'received' END`,
+        type: sql<'sent' | 'received'>`CASE WHEN ${messagesTable.sender_id} = ${currentUserId} THEN 'sent' ELSE 'received' END`.as('type'),
       })
       .from(messagesTable)
       .leftJoin(usersTable, eq(messagesTable.sender_id, usersTable.id))
