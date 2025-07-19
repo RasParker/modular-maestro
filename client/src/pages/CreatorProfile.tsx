@@ -959,7 +959,7 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              {/* Simple green dot on avatar border - only show when online */}
+              {/* Green dot indicator for online status */}
               {creator.is_online && creator.activity_status_visible && (
                 <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-lg"></div>
               )}
@@ -1117,7 +1117,7 @@ export const CreatorProfile: React.FC = () => {
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : null} alt={creator.username} />
                               <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
-                            {/* Simple green dot for mobile - only show when online */}
+                            {/* Green dot indicator for mobile */}
                             {creator.is_online && creator.activity_status_visible && (
                               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                             )}
