@@ -61,20 +61,7 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   };
 
   const getSizeClasses = () => {
-    if (dotOnly) {
-      // Larger dots for avatar status indicators
-      switch (size) {
-        case 'sm':
-          return 'w-4 h-4';
-        case 'md':
-          return 'w-5 h-5';
-        case 'lg':
-          return 'w-6 h-6';
-        default:
-          return 'w-4 h-4';
-      }
-    }
-
+    // Use same sizes for both dotOnly and text indicators
     switch (size) {
       case 'sm':
         return 'w-2 h-2';
