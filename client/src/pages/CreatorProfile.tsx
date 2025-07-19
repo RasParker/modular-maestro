@@ -960,9 +960,9 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               {/* Minimalistic dot indicator on avatar edge */}
-              <div className="absolute bottom-1 right-1">
+              <div className="absolute -bottom-1 -right-1">
                 <OnlineStatusIndicator userId={creator.id} dotOnly={true} size="md" isOwnProfile={isOwnProfile} />
-              </div>
+              </div>v>
             </div>
 
             {/* Desktop Layout - Action buttons on the right */}
