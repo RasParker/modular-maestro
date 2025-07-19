@@ -113,7 +113,7 @@ const MOCK_CREATORS = {
 };
 
 export const CreatorProfile: React.FC = () => {
-
+  
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -364,7 +364,7 @@ export const CreatorProfile: React.FC = () => {
         if (response.ok) {
           const subscription = await response.json();
           console.log('Subscription API response:', subscription);
-
+          
           // Only set subscription if it exists, is active, and is for this creator
           if (subscription && 
               subscription.status === 'active' && 
@@ -819,7 +819,7 @@ export const CreatorProfile: React.FC = () => {
       if (response.ok) {
         const subscription = await response.json();
         console.log('💬 Fresh subscription check for messaging:', subscription);
-
+        
         if (subscription && subscription.status === 'active' && subscription.creator_id === creator.id) {
           console.log('✅ Subscription confirmed for messaging');
           setUserSubscription(subscription);
@@ -1175,7 +1175,7 @@ export const CreatorProfile: React.FC = () => {
                             >
                               {(() => {
                                 // Handle both string and array formats for media_urls
-                                const mediaUrls = Array.isArray(post.media_urls) ? Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls] : [];
+                                const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
                                 const mediaUrl = mediaUrls[0];
                                 const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
 

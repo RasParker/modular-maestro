@@ -23,32 +23,12 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
 }) => {
   const { data: onlineStatus } = useQuery<OnlineStatus>({
     queryKey: [`/api/users/${userId}/online-status`],
-    queryFn: async () => {
-      const response = await fetch(`/api/users/${userId}/online-status`);
-      if (!response.ok) {
-        // If the API endpoint doesn't exist, fall back to user data
-        const userResponse = await fetch(`/api/users/${userId}`);
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          return {
-            is_online: userData.is_online || true,
-            last_seen: userData.last_seen || null,
-            activity_status_visible: userData.activity_status_visible !== false // Default to true
-          };
-        }
-        throw new Error('Failed to fetch online status');
-      }
-      return response.json();
-    },
     refetchInterval: 30000, // Refetch every 30 seconds
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
-  console.log('OnlineStatusIndicator data:', { userId, onlineStatus, dotOnly, size });
-
-  // For development/testing, show the indicator if no data or if activity_status_visible is not explicitly false
-  if (onlineStatus && onlineStatus.activity_status_visible === false) {
-    return null; // Don't show anything if user has explicitly disabled activity status
+  if (!onlineStatus?.activity_status_visible) {
+    return null; // Don't show anything if user has disabled activity status
   }
 
   const formatLastSeen = (lastSeen: string | null) => {
@@ -99,8 +79,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   if (dotOnly) {
     if (onlineStatus?.is_online) {
       return (
-        <div className="absolute bottom-0 right-0 transform -translate-x-1 -translate-y-1 z-20">
-          <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-lg`} />
+        <div className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 z-10">
+          <div className={`${getSizeClasses()} rounded-full bg-green-500 border-2 border-white shadow-lg ring-1 ring-black/10`} />
         </div>
       );
     }
