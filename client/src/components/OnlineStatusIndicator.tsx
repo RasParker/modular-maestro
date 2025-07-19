@@ -38,12 +38,8 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
     enabled: !!userId, // Only run query if userId is provided
   });
 
-  // Debug logging to see what data we're getting
-  console.log(`OnlineStatusIndicator for user ${userId}:`, { onlineStatus, error, isLoading, queryKey: getOnlineStatusQueryKey(userId) });
-
   // For own profile, respect their privacy setting. For others, also respect their privacy setting
   if (!onlineStatus?.activity_status_visible) {
-    console.log(`Not showing status for user ${userId} - activity_status_visible: ${onlineStatus?.activity_status_visible}`);
     return null; // Don't show anything if user has disabled activity status
   }
 
