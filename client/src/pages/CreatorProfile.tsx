@@ -114,7 +114,7 @@ const MOCK_CREATORS = {
 
 export const CreatorProfile: React.FC = () => {
 
-  const { username } = useParams<{ username: string }>();
+  const { username, id: postId } = useParams<{ username?: string; id?: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -150,6 +150,55 @@ export const CreatorProfile: React.FC = () => {
 
   // Define isOwnProfile early to avoid initialization issues
   const isOwnProfile = user?.username === username;
+
+  // Handle post-specific routing
+  useEffect(() => {
+    const fetchPostAndCreator = async () => {
+      if (!postId) return;
+
+      try {
+        setLoading(true);
+        // Fetch the specific post
+        const postResponse = await fetch(`/api/posts/${postId}`);
+        if (postResponse.ok) {
+          const post = await postResponse.json();
+          
+          // Fetch the creator of this post
+          const creatorResponse = await fetch(`/api/users/${post.creator_id}`);
+          if (creatorResponse.ok) {
+            const creatorData = await creatorResponse.json();
+            
+            // Set creator data
+            setCreator({
+              ...creatorData,
+              display_name: creatorData.display_name || creatorData.username,
+              avatar: creatorData.avatar || null,
+              cover: creatorData.cover_image || null,
+              bio: creatorData.bio || null,
+              subscribers: creatorData.total_subscribers || 0,
+              tiers: []
+            });
+
+            // Set the specific post as userPosts
+            setUserPosts([post]);
+            
+            // Initialize like status if user is logged in
+            if (user) {
+              await fetchLikeStatuses([post], user.id);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching post and creator:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (postId) {
+      fetchPostAndCreator();
+    }
+  }, [postId, user?.id]);
 
   // Function to fetch user's posts from database
   const fetchUserPosts = async (userId: string | number) => {
@@ -403,7 +452,7 @@ export const CreatorProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchCreatorData = async () => {
-      if (!username) return;
+      if (!username || postId) return; // Don't fetch creator data if we're in post-specific mode
 
       try {
         setLoading(true);

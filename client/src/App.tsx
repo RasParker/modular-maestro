@@ -64,6 +64,9 @@ function App() {
 
               {/* Public Creator Profile Route - Must be accessible to everyone */}
               <Route path="/creator/:username" element={<CreatorProfile />} />
+              
+              {/* Public Post Viewing Route - Must be accessible to everyone */}
+              <Route path="/creator/posts/:id" element={<CreatorProfile />} />
 
               {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
