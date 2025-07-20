@@ -320,8 +320,8 @@ export const FanDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-0">
-                      {recentActivity.map((activity) => (
+                    <div className="max-h-80 overflow-y-auto space-y-0 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+                      {recentActivity.slice(0, 10).map((activity) => (
                         <div key={activity.id} className="px-6 py-3 hover:bg-background/50 transition-colors border-b border-border/20 last:border-b-0">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
@@ -338,6 +338,13 @@ export const FanDashboard: React.FC = () => {
                           </div>
                         </div>
                       ))}
+                      {recentActivity.length > 10 && (
+                        <div className="px-6 py-3 text-center border-t border-border/20 bg-muted/10">
+                          <p className="text-xs text-muted-foreground">
+                            Showing 10 of {recentActivity.length} activities
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div className="px-6 py-3 bg-muted/20">
                       <Button variant="ghost" size="sm" className="w-full text-muted-foreground" asChild>

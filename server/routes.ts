@@ -920,6 +920,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/fan/:fanId/recent-activity', async (req, res) => {
     try {
       const fanId = parseInt(req.params.fanId);
+      const limit = parseInt(req.query.limit as string) || 20; // Default to 20, increased from 10
+      const offset = parseInt(req.query.offset as string) || 0;
 
       // Get subscribed creators
       const subscribedCreators = await db
@@ -933,12 +935,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ));
 
       if (subscribedCreators.length === 0) {
-        return res.json([]);
+        return res.json({ activities: [], total: 0, hasMore: false });
       }
 
       const creatorIds = subscribedCreators.map(sub => sub.creator_id);
 
-      // Get recent posts from subscribed creators
+      // Get total count for pagination
+      const totalCountResult = await db
+        .select({ count: count() })
+        .from(postsTable)
+        .where(and(
+          inArray(postsTable.creator_id, creatorIds),
+          eq(postsTable.status, 'published')
+        ));
+
+      const totalCount = totalCountResult[0]?.count || 0;
+
+      // Get recent posts from subscribed creators with pagination
       const recentPosts = await db
         .select({
           id: postsTable.id,
@@ -960,10 +973,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(postsTable.status, 'published')
         ))
         .orderBy(desc(postsTable.created_at))
-        .limit(10);
+        .limit(limit)
+        .offset(offset);
 
       // Format the activity data
-      const activity = recentPosts.map(post => ({
+      const activities = recentPosts.map(post => ({
         id: post.id.toString(),
         type: 'new_post',
         creator: post.creator.display_name || post.creator.username,
@@ -972,7 +986,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         avatar: post.creator.avatar || '/placeholder.svg'
     }));
 
-    res.json(activity);
+    // For backward compatibility, return just the array if no pagination params
+    if (!req.query.limit && !req.query.offset) {
+      return res.json(activities.slice(0, 10)); // Keep original behavior for dashboard
+    }
+
+    res.json({
+      activities,
+      total: totalCount,
+      hasMore: offset + limit < totalCount,
+      limit,
+      offset
+    });
   } catch (error) {
     console.error('Error fetching recent activity:', error);
     res.status(500).json({ error: 'Failed to fetch recent activity' });
