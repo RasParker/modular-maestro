@@ -96,7 +96,7 @@ export const Messages: React.FC = () => {
               if (currentConversationId && messageData.conversationId === currentConversationId) {
                 const adjustedMessage = {
                   ...messageData.message,
-                  type: messageData.message.sender === (user.display_name || user.username) ? 'sent' : 'received'
+                  type: messageData.message.sender === (user.username) ? 'sent' : 'received'
                 };
 
                 const exists = prev.some(msg => msg.id === adjustedMessage.id);
@@ -233,7 +233,7 @@ export const Messages: React.FC = () => {
         const newMsg = {
           id: data?.id || Date.now().toString(),
           content: data?.content || messageContent,
-          sender: user.display_name || user.username,
+          sender: user.username,
           timestamp: data?.timestamp || new Date().toISOString(),
           type: 'sent' as const
         };

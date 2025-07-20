@@ -117,8 +117,15 @@ export const NotificationBell: React.FC = () => {
 
       // Show browser push notification if permission granted
       if (Notification.permission === 'granted' && document.hidden) {
+        // Ensure body is a string - if message is an object, extract the content or convert to string
+        const body = typeof notification.message === 'string' 
+          ? notification.message 
+          : typeof notification.message === 'object' && notification.message?.content
+            ? notification.message.content
+            : String(notification.message || '');
+            
         new Notification(notification.title, {
-          body: notification.message,
+          body: body,
           icon: '/favicon.ico',
           badge: '/favicon.ico',
           tag: `notification-${notification.id}`,
@@ -129,9 +136,16 @@ export const NotificationBell: React.FC = () => {
 
       // Show toast notification if user is on the page
       if (!document.hidden) {
+        // Ensure description is a string - if message is an object, extract the content or convert to string
+        const description = typeof notification.message === 'string' 
+          ? notification.message 
+          : typeof notification.message === 'object' && notification.message?.content
+            ? notification.message.content
+            : String(notification.message || '');
+            
         toast({
           title: notification.title,
-          description: notification.message,
+          description: description,
           duration: 4000,
         });
       }
