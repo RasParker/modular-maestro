@@ -8,9 +8,10 @@ import MemoryStore from "memorystore";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { storage } from "./storage";
+import { storage } from './storage';
 import { NotificationService } from './notification-service';
-import { insertUserSchema, insertPostSchema, insertCommentSchema, insertSubscriptionTierSchema, insertSubscriptionSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
+import type { InsertUser, InsertPost, InsertSubscription, InsertSubscriptionTier, InsertComment, InsertNotification, User } from '@shared/schema';
+import { insertUserSchema, insertPostSchema, insertSubscriptionSchema, insertSubscriptionTierSchema, insertCommentSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable, conversations as conversationsTable, messages as messagesTable } from '../shared/schema';
 import { eq, desc, and, gte, lte, count, sum, sql, inArray, asc, like, or, isNull, gt, lt } from 'drizzle-orm';
@@ -855,8 +856,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Validated data:', validatedData);
 
       // Check if user already has active subscription to this creator
-      const existingSubscription = await storage.getUserSubscriptionToCreator(
-        validatedData.fan_id,
+      const existingSubscription = await storage.getUserSubscriptionTo```python
+//
+      validatedData.fan_id,
         validatedData.creator_id
       );
 
@@ -879,6 +881,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error('Error updating creator subscriber count:', error);
         // Don't fail the subscription creation if count update fails
+      }
+      
+      // Notify creator of new subscriber
+      try {
+          await NotificationService.notifyNewSubscriber(
+              validatedData.creator_id,
+              validatedData.fan_id
+          );
+          console.log(`Sent notification to creator ${validatedData.creator_id} for new subscriber ${validatedData.fan_id}`);
+      } catch (notificationError) {
+          console.error('Failed to send new subscriber notification:', notificationError);
+          // Don't fail the subscription creation if notification fails
       }
 
       res.json(subscription);
@@ -1724,7 +1738,9 @@ app.get('/api/admin/platform-settings', async (req, res) => {
   } catch (error: any) {
     console.error('Error fetching platform settings:', error);
     res.status(500).json({ 
-      success: false, 
+      ```python
+// One line analysis: The code adds a notification for new subscribers in the subscription creation route, leveraging the existing NotificationService.
+success: false, 
       message: error.message || 'Failed to fetch platform settings' 
     });
   }
