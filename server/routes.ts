@@ -609,12 +609,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const post = await storage.getPost(postId);
         
         if (post && post.creator_id !== userId) { // Don't notify if creator likes their own post
-          await NotificationService.notifyPostLike(
-            post.creator_id, 
-            userId, 
-            postId, 
-            post.title || post.content || 'your post'
-          );
+          console.log(`Sending like notification to creator ${post.creator_id} for post ${postId} from user ${userId}`);
+          try {
+            await NotificationService.notifyPostLike(
+              post.creator_id, 
+              userId, 
+              postId, 
+              post.title || post.content || 'your post'
+            );
+            console.log('Like notification sent successfully');
+          } catch (notificationError) {
+            console.error('Failed to send like notification:', notificationError);
+          }
+        } else if (post && post.creator_id === userId) {
+          console.log('Skipping notification - creator liked their own post');
+        } else {
+          console.log('Post not found for like notification');
         }
       }
       

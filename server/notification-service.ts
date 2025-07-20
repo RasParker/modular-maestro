@@ -165,21 +165,35 @@ export class NotificationService {
   }
 
   static async notifyPostLike(creatorId: number, likerId: number, postId: number, postTitle: string): Promise<void> {
-    const liker = await storage.getUser(likerId);
-    if (!liker) return;
-
-    await this.createNotification({
-      user_id: creatorId,
-      type: 'like',
-      title: 'New Like',
-      message: `${liker.display_name || liker.username} liked your post "${postTitle}"`,
-      action_url: `/creator/posts/${postId}`,
-      actor_id: likerId,
-      entity_type: 'post',
-      entity_id: postId,
-      metadata: {
-        post_title: postTitle
+    try {
+      console.log(`Creating like notification: creator=${creatorId}, liker=${likerId}, post=${postId}`);
+      
+      const liker = await storage.getUser(likerId);
+      if (!liker) {
+        console.log('Liker not found, skipping notification');
+        return;
       }
-    });
+
+      console.log(`Liker found: ${liker.username}`);
+
+      await this.createNotification({
+        user_id: creatorId,
+        type: 'like',
+        title: 'New Like',
+        message: `${liker.display_name || liker.username} liked your post "${postTitle}"`,
+        action_url: `/creator/posts/${postId}`,
+        actor_id: likerId,
+        entity_type: 'post',
+        entity_id: postId,
+        metadata: {
+          post_title: postTitle
+        }
+      });
+
+      console.log('Like notification created successfully');
+    } catch (error) {
+      console.error('Error in notifyPostLike:', error);
+      throw error;
+    }
   }
 }
