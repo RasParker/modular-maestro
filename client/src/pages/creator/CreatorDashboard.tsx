@@ -26,12 +26,15 @@ import {
   MessageSquare,
   Image,
   Video,
-  Clock,
-  CreditCard,
-  Activity,
-  Star
+  Clock
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+
+// Analytics data will be fetched from API
+
+
+
+// Tier breakdown will be fetched from API
 
 export const CreatorDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -76,13 +79,13 @@ export const CreatorDashboard: React.FC = () => {
 
   const fetchUserPosts = async () => {
     if (!user) return;
-
+    
     try {
       const response = await fetch(`/api/creator/${user.id}/content`);
       if (response.ok) {
         const posts = await response.json();
         console.log('Fetched user content:', posts);
-
+        
 
         // Filter for scheduled content - check for both status and scheduled_for date
         const scheduled = posts.filter((post: any) => 
@@ -113,6 +116,8 @@ export const CreatorDashboard: React.FC = () => {
           postsThisMonth: analyticsData.postsThisMonth || 0
         });
       }
+
+      // Update monthly goals with current analytics data
 
       // Fetch recent subscribers
       try {
@@ -255,10 +260,12 @@ export const CreatorDashboard: React.FC = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-4 sm:space-y-6">
-            {/* Your Subscriptions - Center aligned title */}
+            <QuickActionsGrid />
+
+            {/* Subscription Tiers Performance */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader className="text-center">
-                <CardTitle className="text-base sm:text-xl">Your Subscriptions</CardTitle>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-xl">Subscription Tiers Performance</CardTitle>
                 <CardDescription className="text-sm">Revenue breakdown by tier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -295,137 +302,433 @@ export const CreatorDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Quick Actions - Center aligned title and button text */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader className="text-center">
-                <CardTitle className="text-base sm:text-xl">Quick Actions</CardTitle>
-                <CardDescription className="text-sm">Manage your content and grow your audience</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <Button asChild className="h-16 flex-col gap-2">
-                    <Link to="/creator/upload" className="text-center">
-                      <FileText className="w-5 h-5" />
-                      <span className="text-xs">Create Post</span>
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild className="h-16 flex-col gap-2">
-                    <Link to="/creator/manage-content" className="text-center">
-                      <Calendar className="w-5 h-5" />
-                      <span className="text-xs">Schedule Content</span>
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild className="h-16 flex-col gap-2">
-                    <Link to="/creator/analytics" className="text-center">
-                      <BarChart3 className="w-5 h-5" />
-                      <span className="text-xs">View Analytics</span>
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild className="h-16 flex-col gap-2">
-                    <Link to="/creator/subscribers" className="text-center">
-                      <Users className="w-5 h-5" />
-                      <span className="text-xs">Subscribers</span>
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Info - Center aligned title */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader className="text-center">
-                <CardTitle className="text-base sm:text-xl flex items-center justify-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Payment Info
-                </CardTitle>
-                <CardDescription className="text-sm">Your earnings and payment details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-background/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">This Month</p>
-                    <p className="text-2xl font-bold text-foreground">GHS {analytics.monthlyEarnings.toLocaleString()}</p>
+            {/* Two-Column Layout for Scheduled Content and Recent Posts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Scheduled Content */}
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base sm:text-lg">Scheduled Content</CardTitle>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/creator/manage-content">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Manage
+                      </Link>
+                    </Button>
                   </div>
-                  <div className="text-center p-4 bg-background/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Total Earned</p>
-                    <p className="text-2xl font-bold text-foreground">GHS {analytics.totalEarnings.toLocaleString()}</p>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/creator/earnings">View Detailed Earnings</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity - Center aligned title */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader className="text-center">
-                <CardTitle className="text-base sm:text-xl flex items-center justify-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  Recent Activity
-                </CardTitle>
-                <CardDescription className="text-sm">Latest updates from your content</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {userPosts.length > 0 ? (
-                  <div className="space-y-4">
-                    {userPosts.slice(0, 3).map((post) => (
-                      <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
-                        <div className="flex-shrink-0">
-                          {post.media_urls && post.media_urls.length > 0 ? (
-                            (() => {
-                              const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
-                                ? post.media_urls[0] 
-                                : `/uploads/${post.media_urls[0]}`;
-
-                              return post.media_type === 'video' ? (
-                                <video
-                                  src={mediaUrl}
-                                  className="w-12 h-12 object-cover rounded-lg"
-                                  muted
-                                  preload="metadata"
-                                />
+                </CardHeader>
+                <CardContent>
+                  {scheduledContent.length > 0 ? (
+                    scheduledContent.length > 2 ? (
+                      <div>
+                        <ScrollArea className="h-[200px] w-full">
+                          <div className="space-y-4 pr-4">
+                            {scheduledContent.map((content) => (
+                              <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                                <div className="flex-shrink-0">
+                                  {content.media_urls && content.media_urls.length > 0 ? (
+                                    (() => {
+                                      // Construct full URL - add /uploads/ prefix if not present
+                                      const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
+                                        ? content.media_urls[0] 
+                                        : `/uploads/${content.media_urls[0]}`;
+                                      
+                                      return content.media_type === 'video' ? (
+                                        <video
+                                          src={mediaUrl}
+                                          className="w-16 h-16 object-cover rounded-lg"
+                                          muted
+                                          preload="metadata"
+                                          onError={(e) => {
+                                            // Hide video and show fallback icon
+                                            const target = e.target as HTMLVideoElement;
+                                            target.style.display = 'none';
+                                            const parent = target.parentElement;
+                                            if (parent) {
+                                              parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                            }
+                                          }}
+                                        />
+                                      ) : (
+                                        <img
+                                          src={mediaUrl}
+                                          alt={content.title || 'Scheduled Post'}
+                                          className="w-16 h-16 object-cover rounded-lg"
+                                          onError={(e) => {
+                                            // Hide image and show fallback icon
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = 'none';
+                                            const parent = target.parentElement;
+                                            if (parent) {
+                                              parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                            }
+                                          }}
+                                        />
+                                      );
+                                    })()
+                                  ) : (
+                                    <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                      {content.media_type === 'image' ? (
+                                        <Image className="w-6 h-6 text-muted-foreground" />
+                                      ) : content.media_type === 'video' ? (
+                                        <Video className="w-6 h-6 text-muted-foreground" />
+                                      ) : (
+                                        <FileText className="w-6 h-6 text-muted-foreground" />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-sm truncate">{content.content || content.title || 'Untitled Post'}</h4>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="outline" className="text-xs">{content.tier}</Badge>
+                                    <span className="text-xs text-muted-foreground">
+                                      {content.scheduled_for 
+                                        ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                        : 'Scheduled'
+                                      }
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-4 mt-2">
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Clock className="w-3 h-3" />
+                                      <span>{content.status === 'scheduled' ? 'Pending' : 'Draft'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Calendar className="w-3 h-3" />
+                                      <span>
+                                        {content.scheduled_for 
+                                          ? new Date(content.scheduled_for) > new Date() 
+                                            ? 'Future' 
+                                            : 'Ready'
+                                          : 'Not Set'
+                                        }
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      {content.media_type === 'image' ? (
+                                        <Image className="w-3 h-3" />
+                                      ) : content.media_type === 'video' ? (
+                                        <Video className="w-3 h-3" />
+                                      ) : (
+                                        <FileText className="w-3 h-3" />
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {scheduledContent.slice(0, 2).map((content) => (
+                          <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                            <div className="flex-shrink-0">
+                              {content.media_urls && content.media_urls.length > 0 ? (
+                                (() => {
+                                  // Construct full URL - add /uploads/ prefix if not present
+                                  const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
+                                    ? content.media_urls[0] 
+                                    : `/uploads/${content.media_urls[0]}`;
+                                  
+                                  return content.media_type === 'video' ? (
+                                    <video
+                                      src={mediaUrl}
+                                      className="w-16 h-16 object-cover rounded-lg"
+                                      muted
+                                      preload="metadata"
+                                      onError={(e) => {
+                                        // Hide video and show fallback icon
+                                        const target = e.target as HTMLVideoElement;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                        }
+                                      }}
+                                    />
+                                  ) : (
+                                    <img
+                                      src={mediaUrl}
+                                      alt={content.title || 'Scheduled Post'}
+                                      className="w-16 h-16 object-cover rounded-lg"
+                                      onError={(e) => {
+                                        // Hide image and show fallback icon
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                        }
+                                      }}
+                                    />
+                                  );
+                                })()
                               ) : (
-                                <img
-                                  src={mediaUrl}
-                                  alt={post.title || 'Post'}
-                                  className="w-12 h-12 object-cover rounded-lg"
-                                />
-                              );
-                            })()
-                          ) : (
-                            <div className="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-muted-foreground" />
+                                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                  {content.media_type === 'image' ? (
+                                    <Image className="w-6 h-6 text-muted-foreground" />
+                                  ) : content.media_type === 'video' ? (
+                                    <Video className="w-6 h-6 text-muted-foreground" />
+                                  ) : (
+                                    <FileText className="w-6 h-6 text-muted-foreground" />
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
-                          <div className="flex items-center gap-4 mt-1">
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Eye className="w-3 h-3" />
-                              <span>{post.views || 0}</span>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm truncate">{content.content || content.title || 'Untitled Post'}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">{content.tier}</Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {content.scheduled_for 
+                                    ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                    : 'Scheduled'
+                                  }
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4 mt-2">
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{content.status === 'scheduled' ? 'Pending' : 'Draft'}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Calendar className="w-3 h-3" />
+                                  <span>
+                                    {content.scheduled_for 
+                                      ? new Date(content.scheduled_for) > new Date() 
+                                        ? 'Future' 
+                                        : 'Ready'
+                                      : 'Not Set'
+                                    }
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  {content.media_type === 'image' ? (
+                                    <Image className="w-3 h-3" />
+                                  ) : content.media_type === 'video' ? (
+                                    <Video className="w-3 h-3" />
+                                  ) : (
+                                    <FileText className="w-3 h-3" />
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Heart className="w-3 h-3" />
-                              <span>{post.likes || 0}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  ) : (
+                    <div className="text-center py-6">
+                      <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No scheduled content</p>
+                      <p className="text-xs text-muted-foreground mb-4">Schedule posts to publish them automatically at your chosen time</p>
+                      <Button variant="outline" size="sm" className="mt-2" asChild>
+                        <Link to="/creator/upload">Create Content</Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recent Posts */}
+              <Card className="bg-gradient-card border-border/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base sm:text-lg">Recent Posts</CardTitle>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/creator/manage-content">
+                        View All
+                      </Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {userPosts.length > 0 ? (
+                    userPosts.length > 2 ? (
+                      <ScrollArea className="h-[200px] w-full">
+                        <div className="space-y-4 pr-4">
+                          {userPosts.map((post) => (
+                        <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                          <div className="flex-shrink-0">
+                            {post.media_urls && post.media_urls.length > 0 ? (
+                              (() => {
+                                // Construct full URL - add /uploads/ prefix if not present
+                                const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
+                                  ? post.media_urls[0] 
+                                  : `/uploads/${post.media_urls[0]}`;
+                                
+                                return post.media_type === 'video' ? (
+                                  <video
+                                    src={mediaUrl}
+                                    className="w-16 h-16 object-cover rounded-lg"
+                                    muted
+                                    preload="metadata"
+                                    onError={(e) => {
+                                      // Hide video and show fallback icon
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <img
+                                    src={mediaUrl}
+                                    alt={post.title || 'Post'}
+                                    className="w-16 h-16 object-cover rounded-lg"
+                                    onError={(e) => {
+                                      // Hide image and show fallback icon
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                      }
+                                    }}
+                                  />
+                                );
+                              })()
+                            ) : (
+                              <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                {post.media_type === 'image' ? (
+                                  <Image className="w-6 h-6 text-muted-foreground" />
+                                ) : post.media_type === 'video' ? (
+                                  <Video className="w-6 h-6 text-muted-foreground" />
+                                ) : (
+                                  <FileText className="w-6 h-6 text-muted-foreground" />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">{post.tier}</Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Eye className="w-3 h-3" />
+                                <span>{post.views || post.views_count || 0}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Heart className="w-3 h-3" />
+                                <span>{post.likes || post.likes_count || 0}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MessageSquare className="w-3 h-3" />
+                                <span>{post.comments || post.comments_count || 0}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    ) : (
+                      <div className="space-y-4">
+                        {userPosts.map((post) => (
+                          <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                            <div className="flex-shrink-0">
+                              {post.media_urls && post.media_urls.length > 0 ? (
+                                (() => {
+                                  // Construct full URL - add /uploads/ prefix if not present
+                                  const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
+                                    ? post.media_urls[0] 
+                                    : `/uploads/${post.media_urls[0]}`;
+                                  
+                                  return post.media_type === 'video' ? (
+                                    <video
+                                      src={mediaUrl}
+                                      className="w-16 h-16 object-cover rounded-lg"
+                                      muted
+                                      preload="metadata"
+                                      onError={(e) => {
+                                        // Hide video and show fallback icon
+                                        const target = e.target as HTMLVideoElement;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                        }
+                                      }}
+                                    />
+                                  ) : (
+                                    <img
+                                      src={mediaUrl}
+                                      alt={post.title || 'Post'}
+                                      className="w-16 h-16 object-cover rounded-lg"
+                                      onError={(e) => {
+                                        // Hide image and show fallback icon
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                        }
+                                      }}
+                                    />
+                                  );
+                                })()
+                              ) : (
+                                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                  {post.media_type === 'image' ? (
+                                    <Image className="w-6 h-6 text-muted-foreground" />
+                                  ) : post.media_type === 'video' ? (
+                                    <Video className="w-6 h-6 text-muted-foreground" />
+                                  ) : (
+                                    <FileText className="w-6 h-6 text-muted-foreground" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">{post.tier}</Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4 mt-2">
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || post.views_count || 0}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Heart className="w-3 h-3" />
+                                  <span>{post.likes || post.likes_count || 0}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments || post.comments_count || 0}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Activity className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No recent activity</p>
-                    <Button variant="outline" size="sm" className="mt-2" asChild>
-                      <Link to="/creator/upload">Create Your First Post</Link>
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    )
+                  ) : (
+                    <div className="text-center py-6">
+                      <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No posts yet</p>
+                      <Button variant="outline" size="sm" className="mt-2" asChild>
+                        <Link to="/creator/upload">Create Post</Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
           </div>
 
           {/* Sidebar */}
@@ -520,31 +823,6 @@ export const CreatorDashboard: React.FC = () => {
                     <span>{monthlyGoals.currentPosts} / {monthlyGoals.postsGoal}</span>
                   </div>
                   <Progress value={(monthlyGoals.currentPosts / monthlyGoals.postsGoal) * 100} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recommended for You - Center aligned title */}
-            <Card className="bg-gradient-card border-border/50">
-              <CardHeader className="text-center">
-                <CardTitle className="text-base sm:text-lg flex items-center justify-center gap-2">
-                  <Star className="w-5 h-5" />
-                  Recommended for You
-                </CardTitle>
-                <CardDescription className="text-sm">Tips to grow your audience</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="p-3 bg-background/50 rounded-lg">
-                  <p className="text-sm font-medium">Upload consistently</p>
-                  <p className="text-xs text-muted-foreground">Regular posting helps build audience engagement</p>
-                </div>
-                <div className="p-3 bg-background/50 rounded-lg">
-                  <p className="text-sm font-medium">Engage with subscribers</p>
-                  <p className="text-xs text-muted-foreground">Respond to comments and messages</p>
-                </div>
-                <div className="p-3 bg-background/50 rounded-lg">
-                  <p className="text-sm font-medium">Create tier content</p>
-                  <p className="text-xs text-muted-foreground">Offer exclusive content for different tiers</p>
                 </div>
               </CardContent>
             </Card>
