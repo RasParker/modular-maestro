@@ -603,8 +603,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId } = req.body;
 
       const success = await storage.likePost(postId, userId);
+      
+      if (success) {
+        // Get post details for notification
+        const post = await storage.getPost(postId);
+        
+        if (post && post.creator_id !== userId) { // Don't notify if creator likes their own post
+          await NotificationService.notifyPostLike(
+            post.creator_id, 
+            userId, 
+            postId, 
+            post.title || post.content || 'your post'
+          );
+        }
+      }
+      
       res.json({ success });
     } catch (error) {
+      console.error('Error liking post:', error);
       res.status(500).json({ error: "Failed to like post" });
     }
   });
