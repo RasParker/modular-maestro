@@ -51,7 +51,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const data = JSON.parse(event.data);
         console.log('WebSocket message received:', data);
         
-        if (data.type === 'notification') {
+        if (data.type === 'new_notification') {
+          onNotification(data.notification);
+        } else if (data.type === 'notification') {
           onNotification(data);
         } else if (data.type === 'new_message_realtime') {
           onMessage(data);
