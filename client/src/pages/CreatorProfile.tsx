@@ -401,43 +401,68 @@ export const CreatorProfile: React.FC = () => {
 
   // Check if current user is subscribed to this creator
   useEffect(() => {
-    // Reset subscription state immediately when user or creator changes
+    // CRITICAL: Reset subscription state immediately when user or creator changes
+    console.log('🔄 Resetting subscription state for user/creator change:', {
+      userId: user?.id,
+      creatorId: creator?.id,
+      isOwnProfile
+    });
     setUserSubscription(null);
 
     const checkSubscription = async () => {
       if (!user || !creator || isOwnProfile) {
+        console.log('⏭️ Skipping subscription check:', { 
+          hasUser: !!user, 
+          hasCreator: !!creator, 
+          isOwnProfile 
+        });
         setUserSubscription(null);
         return;
       }
 
       try {
-        console.log(`Checking subscription for user ${user.id} to creator ${creator.id}`);
+        console.log(`🔍 Checking subscription for user ${user.id} to creator ${creator.id}`);
         const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
+        
         if (response.ok) {
           const subscription = await response.json();
-          console.log('Subscription API response:', subscription);
+          console.log('📋 Subscription API response:', subscription);
 
-          // Only set subscription if it exists, is active, and is for this creator
+          // STRICT validation: Only set subscription if it exists, is active, and is for this creator
           if (subscription && 
               subscription.status === 'active' && 
-              subscription.creator_id === creator.id) {
+              subscription.creator_id === creator.id &&
+              subscription.fan_id === user.id) {
             setUserSubscription(subscription);
-            console.log(`✓ User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
+            console.log(`✅ Valid active subscription found:`, {
+              userId: user.id,
+              creatorId: creator.id,
+              tierName: subscription.tier_name,
+              status: subscription.status
+            });
           } else {
             setUserSubscription(null);
-            console.log(`✗ User ${user.id} has no active subscription to creator ${creator.id}`);
+            console.log(`❌ Invalid subscription - setting to null:`, {
+              hasSubscription: !!subscription,
+              status: subscription?.status,
+              creatorMatch: subscription?.creator_id === creator.id,
+              fanMatch: subscription?.fan_id === user.id,
+              userId: user.id,
+              creatorId: creator.id
+            });
           }
         } else {
           setUserSubscription(null);
-          console.log(`✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})`);
+          console.log(`❌ No subscription API response (${response.status}) - setting to null`);
         }
       } catch (error) {
-        console.error('Error checking subscription:', error);
+        console.error('❌ Error checking subscription:', error);
         setUserSubscription(null);
       }
     };
 
-    checkSubscription();
+    // Add small delay to ensure state reset is processed
+    const timeoutId = setTimeout(checkSubscription, 100);
 
     // Listen for subscription changes
     const handleSubscriptionChange = (event: CustomEvent) => {
@@ -449,6 +474,7 @@ export const CreatorProfile: React.FC = () => {
 
     window.addEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
     };
   }, [user?.id, creator?.id, isOwnProfile]);
@@ -672,41 +698,47 @@ export const CreatorProfile: React.FC = () => {
 
   // Check if user has access to content based on subscription tier
   const hasAccessToTier = (postTier: string): boolean => {
+    console.log('🔍 Access check starting:', {
+      postTier,
+      isOwnProfile,
+      userId: user?.id,
+      creatorId: creator?.id,
+      userSubscription: userSubscription ? {
+        status: userSubscription.status,
+        creator_id: userSubscription.creator_id,
+        tier_name: userSubscription.tier_name
+      } : null
+    });
+
     // Own profile - can see all content
     if (isOwnProfile) {
-      console.log('Access granted: Own profile');
+      console.log('✅ Access granted: Own profile');
       return true;
     }
 
     // Public content - everyone can see
     if (postTier === 'public') {
-      console.log('Access granted: Public content');
+      console.log('✅ Access granted: Public content');
       return true;
     }
 
     // If user is not logged in, no access to premium content
     if (!user) {
-      console.log('Access denied: User not logged in');
+      console.log('❌ Access denied: User not logged in');
       return false;
     }
 
-    // If user has no active subscription to this creator, no access to premium content
-    if (!userSubscription || userSubscription.status !== 'active') {
-      console.log('Access denied: No active subscription', { 
-        userSubscription: userSubscription,
+    // CRITICAL CHECK: If user has no active subscription to this creator, no access to premium content
+    if (!userSubscription || 
+        userSubscription.status !== 'active' || 
+        userSubscription.creator_id !== creator?.id) {
+      console.log('❌ Access denied: Invalid or missing subscription', { 
         hasSubscription: !!userSubscription,
         subscriptionStatus: userSubscription?.status,
+        subscriptionCreatorId: userSubscription?.creator_id,
+        currentCreatorId: creator?.id,
         userId: user?.id,
-        creatorId: creator?.id
-      });
-      return false;
-    }
-
-    // Verify subscription is to this specific creator
-    if (userSubscription.creator_id !== creator?.id) {
-      console.log('Access denied: Subscription not for this creator', { 
-        subscriptionCreatorId: userSubscription.creator_id, 
-        currentCreatorId: creator?.id 
+        postTier
       });
       return false;
     }
@@ -726,14 +758,14 @@ export const CreatorProfile: React.FC = () => {
     const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1; // Default to tier 1 for premium content
 
     const hasAccess = userTierLevel >= postTierLevel;
-    console.log('Tier access check:', { 
+    console.log('🎯 Tier access result:', { 
       postTier, 
       userTierLevel, 
       postTierLevel, 
       userTierName: userSubscription.tier_name,
       hasAccess,
-      creatorId: creator?.id,
-      userId: user?.id
+      userId: user?.id,
+      creatorId: creator?.id
     });
 
     return hasAccess;
