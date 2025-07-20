@@ -10,7 +10,7 @@ import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, Lock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -162,12 +162,12 @@ export const CreatorProfile: React.FC = () => {
         const postResponse = await fetch(`/api/posts/${postId}`);
         if (postResponse.ok) {
           const post = await postResponse.json();
-          
+
           // Fetch the creator of this post
           const creatorResponse = await fetch(`/api/users/${post.creator_id}`);
           if (creatorResponse.ok) {
             const creatorData = await creatorResponse.json();
-            
+
             // Set creator data
             setCreator({
               ...creatorData,
@@ -181,7 +181,7 @@ export const CreatorProfile: React.FC = () => {
 
             // Set the specific post as userPosts
             setUserPosts([post]);
-            
+
             // Initialize like status if user is logged in
             if (user) {
               await fetchLikeStatuses([post], user.id);
@@ -520,6 +520,33 @@ export const CreatorProfile: React.FC = () => {
     fetchCreatorData();
   }, [username, user?.username, profilePhotoUrl, coverPhotoUrl, displayName, bio, customTiers]); // Include necessary dependencies
 
+  useEffect(() => {
+    const fetchUserSubscription = async () => {
+      if (!user?.id || !creator?.id) {
+        console.log('Skipping subscription fetch:', { userId: user?.id, creatorId: creator?.id });
+        return;
+      }
+
+      try {
+        console.log('Checking subscription API: user', user.id, 'to creator', creator.id);
+        const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
+        if (response.ok) {
+          const subscription = await response.json();
+          console.log('Found subscription:', subscription);
+          setUserSubscription(subscription);
+        } else {
+          console.log('✗ No active subscription found - Response status:', response.status);
+          setUserSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user subscription:', error);
+        setUserSubscription(null);
+      }
+    };
+
+    fetchUserSubscription();
+  }, [user?.id, creator?.id]);
+
   const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
@@ -833,8 +860,7 @@ export const CreatorProfile: React.FC = () => {
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: "Failed to start conversation. Please try again.",
+        title: "Error",description: "Failed to start conversation. Please try again.",
         variant: "destructive"
       });
     }
@@ -1246,7 +1272,7 @@ export const CreatorProfile: React.FC = () => {
                                     className="w-full aspect-square object-cover"
                                   onError={(e) => {
                                       const target = e.target as HTMLImageElement;
-                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LmwzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                       target.className = "w-full aspect-square object-cover opacity-50";
                                     }}
                                   />
@@ -1272,6 +1298,8 @@ export const CreatorProfile: React.FC = () => {
                                   {post.tier === 'supporter' ? 'Supporter' : 
                                    post.tier === 'fan' ? 'Fan' : 
                                    post.tier === 'premium' ? 'Premium' : 
+                                   post.tier === 'power gains' ? 'Power Gains' :
+                                   post.tier === 'elite beast mode' ? 'Elite Beast Mode' :
                                    post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
                                 </h3>
                                 <p className="text-sm text-muted-foreground mb-3">
