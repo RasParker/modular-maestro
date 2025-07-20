@@ -61,7 +61,7 @@ export const Notifications: React.FC = () => {
 
   // Fetch notifications
   const { data: notifications = [], isLoading } = useQuery<Notification[]>({
-    queryKey: ['notifications', 'all'],
+    queryKey: ['notifications', 'list'],
     queryFn: async () => {
       const response = await fetch('/api/notifications');
       if (!response.ok) throw new Error('Failed to fetch notifications');
@@ -80,7 +80,7 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
     },
   });
@@ -95,7 +95,7 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
       toast({
         title: "Success",
@@ -114,7 +114,7 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
       toast({
         title: "Success",
