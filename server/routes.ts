@@ -856,9 +856,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Validated data:', validatedData);
 
       // Check if user already has active subscription to this creator
-      const existingSubscription = await storage.getUserSubscriptionTo```python
-//
-      validatedData.fan_id,
+      const existingSubscription = await storage.getUserSubscriptionToCreator(
+        validatedData.fan_id,
         validatedData.creator_id
       );
 
@@ -1738,9 +1737,7 @@ app.get('/api/admin/platform-settings', async (req, res) => {
   } catch (error: any) {
     console.error('Error fetching platform settings:', error);
     res.status(500).json({ 
-      ```python
-// One line analysis: The code adds a notification for new subscribers in the subscription creation route, leveraging the existing NotificationService.
-success: false, 
+      success: false, 
       message: error.message || 'Failed to fetch platform settings' 
     });
   }

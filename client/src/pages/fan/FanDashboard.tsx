@@ -68,10 +68,13 @@ export const FanDashboard: React.FC = () => {
 
       try {
         const response = await fetch(`/api/fan/${user.id}/recent-activity`);
-        if (!response.ok) {
+        if (response.ok) {
           const data = await response.json();
           // Handle the correct response structure: {activities: [], total: 0, hasMore: false}
           setRecentActivity(Array.isArray(data) ? data : (data.activities || []));
+        } else {
+          // If response is not ok, set empty array
+          setRecentActivity([]);
         }
       } catch (err) {
         console.error('Error fetching recent activity:', err);
