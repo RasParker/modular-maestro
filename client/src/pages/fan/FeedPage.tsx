@@ -716,7 +716,7 @@ export const FeedPage: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[85vh] max-h-[85vh] aspect-square p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
@@ -733,26 +733,49 @@ export const FeedPage: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Square container that fills the entire modal */}
+              {/* Full container for content */}
               <div className="relative w-full h-full overflow-hidden">
                 {/* Blurred background */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center blur-md scale-110"
-                  style={{
-                    backgroundImage: `url(${selectedContent.thumbnail})`,
-                  }}
-                />
+                {selectedContent.thumbnail && (
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center blur-md scale-110"
+                    style={{
+                      backgroundImage: `url(${selectedContent.thumbnail})`,
+                    }}
+                  />
+                )}
                 
-                {/* Main Media with object-contain */}
-                <img 
-                  src={selectedContent.thumbnail} 
-                  alt={`${selectedContent.creator.display_name}'s post`}
-                  className="relative z-10 w-full h-full object-contain"
-                  style={{ objectFit: 'contain' }}
-                />
+                {/* Main Media with object-contain - full display */}
+                {selectedContent.thumbnail ? (
+                  selectedContent.type === 'video' ? (
+                    <video 
+                      src={selectedContent.thumbnail} 
+                      className="relative z-10 w-full h-full object-contain"
+                      controls
+                      autoPlay
+                      muted
+                      style={{ objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <img 
+                      src={selectedContent.thumbnail} 
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="relative z-10 w-full h-full object-contain"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  )
+                ) : (
+                  <div className="relative z-10 w-full h-full flex items-center justify-center">
+                    <div className="text-center px-6 text-white">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+                        {getTypeIcon(selectedContent.type)}
+                      </div>
+                      <h3 className="font-semibold text-xl mb-4">{selectedContent.content}</h3>
+                      <p className="text-sm text-white/70">Text post</p>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              
             </div>
           )}
         </DialogContent>
