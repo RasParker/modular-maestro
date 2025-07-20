@@ -97,11 +97,11 @@ export const NotificationBell: React.FC = () => {
     // Create WebSocket connection
     const handleNewNotification = (notification: WebSocketNotification) => {
       setHasNewNotification(true);
-      
+
       // Update React Query cache
       queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
-      
+
       // Show browser push notification if permission granted
       if (Notification.permission === 'granted' && document.hidden) {
         new Notification(notification.title, {
@@ -113,7 +113,7 @@ export const NotificationBell: React.FC = () => {
           silent: false
         });
       }
-      
+
       // Show toast notification if user is on the page
       if (!document.hidden) {
         toast({
@@ -170,7 +170,7 @@ export const NotificationBell: React.FC = () => {
       try {
         const permission = await Notification.requestPermission();
         setPushPermission(permission);
-        
+
         if (permission === 'granted') {
           toast({
             title: "Push Notifications Enabled",
@@ -264,7 +264,7 @@ export const NotificationBell: React.FC = () => {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="p-0">
             <div className="max-h-80 overflow-y-auto">
               {isLoading ? (
@@ -298,7 +298,7 @@ export const NotificationBell: React.FC = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="p-3 border-t bg-muted/30 space-y-2">
               {pushPermission === 'default' && (
                 <Button 
@@ -344,7 +344,7 @@ const NotificationContent: React.FC<NotificationContentProps> = ({ notification,
         </div>
       )}
     </div>
-    
+
     <div className="flex-1 min-w-0">
       <div className="flex items-center justify-between">
         <p className="font-medium text-sm text-foreground truncate">
