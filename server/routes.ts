@@ -426,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newPost = await db.insert(posts).values(postData).returning();
 
       console.log('Post created successfully:', newPost[0].id);
-      
+
       // If post is published, notify all subscribers
       if (postData.status === 'published') {
         try {
@@ -438,9 +438,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               eq(subscriptions.creator_id, parseInt(creator_id)),
               eq(subscriptions.status, 'active')
             ));
-          
+
           const subscriberIds = subscribersResult.map(sub => sub.fan_id);
-          
+
           if (subscriberIds.length > 0) {
             await NotificationService.notifyNewPost(
               parseInt(creator_id),
@@ -455,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Don't fail the post creation if notifications fail
         }
       }
-      
+
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
@@ -603,11 +603,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId } = req.body;
 
       const success = await storage.likePost(postId, userId);
-      
+
       if (success) {
         // Get post details for notification
         const post = await storage.getPost(postId);
-        
+
         if (post && post.creator_id !== userId) { // Don't notify if creator likes their own post
           console.log(`Sending like notification to creator ${post.creator_id} for post ${postId} from user ${userId}`);
           try {
@@ -627,7 +627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('Post not found for like notification');
         }
       }
-      
+
       res.json({ success });
     } catch (error) {
       console.error('Error liking post:', error);
@@ -2583,6 +2583,96 @@ app.post('/api/conversations', async (req, res) => {
     } catch (error) {
       console.error('Error fetching user by username:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Helper function to format time ago
+  function formatTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return 'just now';
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return diffInMinutes + " minute" + (diffInMinutes === 1 ? '' : 's') + " ago";
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return diffInHours + " hour" + (diffInHours === 1 ? '' : 's') + " ago";
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return diffInDays + " day" + (diffInDays === 1 ? '' : 's') + " ago";
+    }
+
+    return date.toLocaleDateString();
+  }
+
+  // Applying debugging logs to the notification and unread-count endpoints.
+  // Add debugging logs to notification endpoints
+  app.get('/api/notifications', async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      console.log('Fetching notifications for user:', userId);
+
+      if (!userId) {
+        console.log('No user ID found in request');
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 20;
+      const notifications = await storage.getNotifications(userId, limit);
+      console.log('Found notifications:', notifications?.length || 0);
+
+      // Enrich notifications with actor data
+      const enrichedNotifications = await Promise.all(
+        notifications.map(async (notification) => {
+          let actor = null;
+          if (notification.actor_id) {
+            actor = await storage.getUser(notification.actor_id);
+          }
+
+          return {
+            ...notification,
+            actor: actor ? {
+              id: actor.id,
+              username: actor.username,
+              display_name: actor.display_name,
+              avatar: actor.avatar
+            } : null,
+            time_ago: formatTimeAgo(notification.created_at)
+          };
+        })
+      );
+      res.json(enrichedNotifications || []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+  });
+
+  // Add debugging to unread count endpoint
+  app.get('/api/notifications/unread-count', async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      console.log('Fetching unread count for user:', userId);
+
+      if (!userId) {
+        console.log('No user ID found for unread count');
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const count = await storage.getUnreadNotificationCount(userId);
+      console.log('Unread notification count:', count);
+      res.json({ count: count || 0 });
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+      res.status(500).json({ error: 'Failed to fetch unread count' });
     }
   });
 

@@ -61,7 +61,12 @@ export const Notifications: React.FC = () => {
 
   // Fetch notifications
   const { data: notifications = [], isLoading } = useQuery<Notification[]>({
-    queryKey: ['/api/notifications'],
+    queryKey: ['notifications', 'all'],
+    queryFn: async () => {
+      const response = await fetch('/api/notifications');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      return response.json();
+    },
     refetchInterval: 30000,
   });
 
@@ -75,8 +80,8 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
     },
   });
 
@@ -90,8 +95,8 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
       toast({
         title: "Success",
         description: "All notifications marked as read",
@@ -109,8 +114,8 @@ export const Notifications: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
       toast({
         title: "Success",
         description: "Notification deleted",

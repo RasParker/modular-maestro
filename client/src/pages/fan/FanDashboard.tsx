@@ -321,7 +321,9 @@ export const FanDashboard: React.FC = () => {
                 ) : (
                   <>
                     <div className="max-h-80 overflow-y-auto space-y-0 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-                      {(Array.isArray(recentActivity) ? recentActivity : []).slice(0, 5).map((activity, index) => (
+                      {(Array.isArray(recentActivity) ? recentActivity : [])
+                      .slice(0, 5)
+                      .map((activity, index) => (
                         <div key={activity.id} className="px-6 py-3 hover:bg-background/50 transition-colors border-b border-border/20 last:border-b-0">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
