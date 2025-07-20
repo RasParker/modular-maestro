@@ -141,8 +141,18 @@ export const Messages: React.FC = () => {
         const data = await response.json();
         console.log('Fetched conversations:', data);
         setConversations(data);
-        // Auto-select first conversation if available
-        if (data.length > 0 && !selectedConversation) {
+        
+        // Check if there's a specific conversation to auto-select from chat initiation
+        const autoSelectId = sessionStorage.getItem('autoSelectConversationId');
+        if (autoSelectId) {
+          const targetConversation = data.find(conv => conv.id === autoSelectId);
+          if (targetConversation) {
+            console.log('Auto-selecting conversation:', targetConversation);
+            setSelectedConversation(targetConversation);
+            sessionStorage.removeItem('autoSelectConversationId'); // Clean up
+          }
+        } else if (data.length > 0 && !selectedConversation) {
+          // Auto-select first conversation if no specific one requested
           setSelectedConversation(data[0]);
         }
       } else {

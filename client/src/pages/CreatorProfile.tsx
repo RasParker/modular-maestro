@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -118,6 +118,7 @@ export const CreatorProfile: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
     () => localStorage.getItem('profilePhotoUrl')
   );
@@ -579,7 +580,7 @@ export const CreatorProfile: React.FC = () => {
   const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
@@ -881,19 +882,17 @@ export const CreatorProfile: React.FC = () => {
       // Store the conversation ID in sessionStorage so Messages component can auto-select it
       sessionStorage.setItem('autoSelectConversationId', data.conversationId.toString());
 
+      // Invalidate conversations query to refresh the list immediately
+      queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
+
       // Show success message
       toast({
         title: "Chat started!",
         description: `You can now message ${creator?.display_name}.`,
       });
 
-      // Wait a moment to ensure conversation is created, then navigate
-      setTimeout(() => {
-        // Invalidate conversations query to refresh the list
-        queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
-        // Navigate to messages page
-        window.location.href = '/fan/messages';
-      }, 500);
+      // Navigate immediately using React Router (no page reload)
+      navigate('/fan/messages');
     },
     onError: (error) => {
       toast({
@@ -906,7 +905,7 @@ export const CreatorProfile: React.FC = () => {
   const handleChatClick = async () => {
     if (!user) {
       // Redirect to login if not authenticated
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
@@ -1347,7 +1346,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
                                   onClick={() => {
                                     if (!user) {
-                                      window.location.href = '/login?redirect=/creator/' + username;
+                                      navigate('/login?redirect=/creator/' + username);
                                     } else {
                                       // Scroll to subscription tiers
                                       document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
