@@ -98,6 +98,15 @@ export const NotificationBell: React.FC = () => {
     },
   });
 
+  // Set hasNewNotification based on unread count
+  useEffect(() => {
+    if (unreadData?.count && unreadData.count > 0) {
+      setHasNewNotification(true);
+    } else {
+      setHasNewNotification(false);
+    }
+  }, [unreadData?.count]);
+
   // Initialize WebSocket connection and push notifications
   useEffect(() => {
     if (!user?.id) return;
@@ -178,12 +187,12 @@ export const NotificationBell: React.FC = () => {
     };
   }, [isOpen]);
 
-  // Clear new notification indicator when dropdown opens
+  // Clear new notification indicator when dropdown opens and there are no unread notifications
   useEffect(() => {
-    if (isOpen && hasNewNotification) {
+    if (isOpen && hasNewNotification && (!unreadData?.count || unreadData.count === 0)) {
       setTimeout(() => setHasNewNotification(false), 1000);
     }
-  }, [isOpen, hasNewNotification]);
+  }, [isOpen, hasNewNotification, unreadData?.count]);
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.read) {
@@ -249,12 +258,12 @@ export const NotificationBell: React.FC = () => {
         ) : (
           <Bell className="h-5 w-5" />
         )}
-        {unreadData?.count > 0 && (
+        {unreadData?.count && unreadData.count > 0 && (
           <Badge
             variant="destructive"
             className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
           >
-            {unreadData?.count > 99 ? '99+' : unreadData?.count}
+            {unreadData.count > 99 ? '99+' : unreadData.count}
           </Badge>
         )}
       </Button>
@@ -265,7 +274,7 @@ export const NotificationBell: React.FC = () => {
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Notifications</CardTitle>
               <div className="flex items-center gap-2">
-                {unreadData?.count > 0 && (
+                {unreadData?.count && unreadData.count > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
