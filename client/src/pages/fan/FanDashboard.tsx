@@ -72,7 +72,8 @@ export const FanDashboard: React.FC = () => {
           throw new Error('Failed to fetch recent activity');
         }
         const data = await response.json();
-        setRecentActivity(data);
+        // Handle the correct response structure: {activities: [], total: 0, hasMore: false}
+        setRecentActivity(Array.isArray(data) ? data : (data.activities || []));
       } catch (err) {
         console.error('Error fetching recent activity:', err);
         // Don't set error state for activity, just use empty array
