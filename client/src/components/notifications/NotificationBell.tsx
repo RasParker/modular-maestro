@@ -243,9 +243,6 @@ export const NotificationBell: React.FC = () => {
             {unreadData?.count > 99 ? '99+' : unreadData?.count}
           </Badge>
         )}
-        {wsRef.current && (
-          <div className="absolute top-0 right-0 h-2 w-2 bg-green-500 rounded-full" />
-        )}
       </Button>
 
       {isOpen && (
