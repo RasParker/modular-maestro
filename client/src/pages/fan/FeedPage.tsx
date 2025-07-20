@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, Loader2 } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, FileText, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -287,13 +287,13 @@ export const FeedPage: React.FC = () => {
           const transformedPosts = posts.map((post: any) => ({
             id: post.id.toString(),
             creator: {
-              username: post.username || 'Unknown',
-              display_name: post.username || 'Unknown',
-              avatar: post.avatar || ''
+              username: post.creator_username || post.username || 'Unknown',
+              display_name: post.creator_display_name || post.display_name || post.username || 'Unknown',
+              avatar: post.creator_avatar || post.avatar || ''
             },
             content: post.content || post.title || '',
-            type: post.media_type || 'image',
-            tier: post.tier || 'public',
+            type: post.media_type || 'post',
+            tier: post.tier_name || post.tier || 'public',
             thumbnail: post.media_urls && post.media_urls.length > 0 
               ? `/uploads/${post.media_urls[0]}` 
               : '',
@@ -424,13 +424,16 @@ export const FeedPage: React.FC = () => {
   const getTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'image':
-        return <Image className="w-4 h-4" />;
+        return <Image className="w-4 h-4 text-white" />;
       case 'video':
-        return <Video className="w-4 h-4" />;
+        return <Video className="w-4 h-4 text-white" />;
       case 'audio':
-        return <Music className="w-4 h-4" />;
+        return <Music className="w-4 h-4 text-white" />;
+      case 'text':
+      case 'post':
+        return <FileText className="w-4 h-4 text-white" />;
       default:
-        return <Image className="w-4 h-4" />;
+        return <FileText className="w-4 h-4 text-white" />;
     }
   };
 
@@ -562,11 +565,24 @@ export const FeedPage: React.FC = () => {
                     }
                   }}
                 >
-                  <img 
-                    src={post.thumbnail} 
-                    alt={`${post.creator.display_name}'s post`}
-                    className="w-full aspect-[16/10] object-cover"
-                  />
+                  {post.thumbnail ? (
+                    <img 
+                      src={post.thumbnail} 
+                      alt={`${post.creator.display_name}'s post`}
+                      className="w-full aspect-[16/10] object-cover"
+                    />
+                  ) : (
+                    // Text post fallback with gradient background
+                    <div className="w-full aspect-[16/10] bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center">
+                      <div className="text-center px-6">
+                        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center">
+                          {getTypeIcon(post.type)}
+                        </div>
+                        <h3 className="font-semibold text-lg mb-2 line-clamp-2">{post.content}</h3>
+                        <p className="text-sm text-muted-foreground">Tap to read full post</p>
+                      </div>
+                    </div>
+                  )}
                   {/* Content type overlay - smaller for mobile */}
                   <div className="absolute top-2 left-2 z-20">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
