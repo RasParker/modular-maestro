@@ -426,6 +426,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newPost = await db.insert(posts).values(postData).returning();
 
       console.log('Post created successfully:', newPost[0].id);
+      
+      // If post is published, notify all subscribers
+      if (postData.status === 'published') {
+        try {
+          // Get all subscribers for this creator
+          const subscribersResult = await db
+            .select({ fan_id: subscriptions.fan_id })
+            .from(subscriptions)
+            .where(and(
+              eq(subscriptions.creator_id, parseInt(creator_id)),
+              eq(subscriptions.status, 'active')
+            ));
+          
+          const subscriberIds = subscribersResult.map(sub => sub.fan_id);
+          
+          if (subscriberIds.length > 0) {
+            await NotificationService.notifyNewPost(
+              parseInt(creator_id),
+              subscriberIds,
+              newPost[0].title,
+              newPost[0].id
+            );
+            console.log(`Sent notifications to ${subscriberIds.length} subscribers for new post`);
+          }
+        } catch (notificationError) {
+          console.error('Failed to send notifications for new post:', notificationError);
+          // Don't fail the post creation if notifications fail
+        }
+      }
+      
       res.json(newPost[0]);
     } catch (error) {
       console.error('Error creating post:', error);
