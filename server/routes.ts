@@ -241,6 +241,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Session verification endpoint
+  app.get("/api/auth/verify", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Return user data from session
+      res.json({ user: req.session.user });
+    } catch (error) {
+      console.error('Session verification error:', error);
+      res.status(500).json({ error: "Failed to verify session" });
+    }
+  });
+
+  // Logout endpoint
+  app.post("/api/auth/logout", async (req, res) => {
+    try {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+          return res.status(500).json({ error: "Failed to logout" });
+        }
+        res.json({ success: true });
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({ error: "Failed to logout" });
+    }
+  });
+
   // User routes (more specific routes first)
   app.get("/api/users/username/:username", async (req, res) => {
     try {

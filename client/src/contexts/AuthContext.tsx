@@ -55,12 +55,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('xclusive_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Check for stored user session and verify with server
+    const verifySession = async () => {
+      const storedUser = localStorage.getItem('xclusive_user');
+      if (storedUser) {
+        try {
+          // Verify session with server
+          const response = await fetch('/api/auth/verify', {
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user);
+          } else {
+            // Session expired or invalid, clear local storage
+            console.log('Session expired, clearing local storage');
+            localStorage.removeItem('xclusive_user');
+            setUser(null);
+          }
+        } catch (error) {
+          console.error('Session verification failed:', error);
+          // Clear local storage on error
+          localStorage.removeItem('xclusive_user');
+          setUser(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    verifySession();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -128,9 +152,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('xclusive_user');
+  const logout = async () => {
+    try {
+      // Call server logout endpoint
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Server logout failed:', error);
+    } finally {
+      // Always clear client state
+      setUser(null);
+      localStorage.removeItem('xclusive_user');
+    }
   };
 
   const updateUser = (updates: Partial<User>) => {
