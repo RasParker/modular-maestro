@@ -364,7 +364,7 @@ const NotificationContent: React.FC<NotificationContentProps> = ({ notification,
           <div className="h-2 w-2 bg-primary rounded-full flex-shrink-0 ml-2" />
         )}
       </div>
-      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+      <p className="text-xs text-muted-foreground mt-1 truncate">
         {notification.message}
       </p>
       <p className="text-xs text-muted-foreground mt-1">
