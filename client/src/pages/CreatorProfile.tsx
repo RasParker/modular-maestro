@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { BioDisplay } from '@/lib/text-utils';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
@@ -1098,16 +1099,33 @@ export const CreatorProfile: React.FC = () => {
                 </div>
               </div>
               {isOwnProfile ? (
-                <div className="flex items-center gap-2 pb-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
-                  </Button>
+                <div className="flex items-center gap-1 pb-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                          <Link to="/creator/settings">
+                            <Settings className="w-5 h-5" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit Profile</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                          <Link to="/creator/upload">
+                            <Plus className="w-5 h-5" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Create Post</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 pb-2">
@@ -1157,16 +1175,33 @@ export const CreatorProfile: React.FC = () => {
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
               {isOwnProfile && (
-                <div className="flex items-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
-                  </Button>
+                <div className="flex items-center gap-1 mt-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                          <Link to="/creator/settings">
+                            <Settings className="w-5 h-5" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit Profile</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                          <Link to="/creator/upload">
+                            <Plus className="w-5 h-5" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Create Post</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               )}
             </div>
