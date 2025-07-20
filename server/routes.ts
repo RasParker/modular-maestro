@@ -688,8 +688,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId } = req.body;
 
       const success = await storage.likeComment(commentId, userId);
+
+      if (success) {
+        // Get comment details for notification
+        const comment = await storage.getComment(commentId);
+        
+        if (comment && comment.user_id !== userId) { // Don't notify if user likes their own comment
+          // Get the post details to include in notification
+          const post = await storage.getPost(comment.post_id);
+          
+          if (post) {
+            console.log(`Sending comment like notification to comment author ${comment.user_id} for comment ${commentId} from user ${userId}`);
+            try {
+              await NotificationService.notifyCommentLike(
+                comment.user_id,
+                userId,
+                commentId,
+                comment.post_id,
+                post.title || post.content || 'a post'
+              );
+              console.log('Comment like notification sent successfully');
+            } catch (notificationError) {
+              console.error('Failed to send comment like notification:', notificationError);
+            }
+          }
+        } else if (comment && comment.user_id === userId) {
+          console.log('Skipping notification - user liked their own comment');
+        } else {
+          console.log('Comment not found for like notification');
+        }
+      }
+
       res.json({ success });
     } catch (error) {
+      console.error('Error liking comment:', error);
       res.status(500).json({ error: "Failed to like comment" });
     }
   });

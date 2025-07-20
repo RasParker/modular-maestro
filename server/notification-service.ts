@@ -101,6 +101,39 @@ export class NotificationService {
     });
   }
 
+  static async notifyCommentLike(commentAuthorId: number, likerId: number, commentId: number, postId: number, postTitle: string): Promise<void> {
+    try {
+      console.log(`Creating comment like notification: comment_author=${commentAuthorId}, liker=${likerId}, comment=${commentId}`);
+      
+      const liker = await storage.getUser(likerId);
+      if (!liker) {
+        console.log('Liker not found, skipping notification');
+        return;
+      }
+
+      console.log(`Liker found: ${liker.username}`);
+
+      await this.createNotification({
+        user_id: commentAuthorId,
+        type: 'comment_like',
+        title: 'Comment Liked',
+        message: `${liker.display_name || liker.username} liked your comment on "${postTitle}"`,
+        action_url: `/creator/posts/${postId}`,
+        actor_id: likerId,
+        entity_type: 'comment',
+        entity_id: commentId,
+        metadata: {
+          post_title: postTitle
+        }
+      });
+
+      console.log('Comment like notification created successfully');
+    } catch (error) {
+      console.error('Error in notifyCommentLike:', error);
+      throw error;
+    }
+  }
+
   static async notifyNewPost(creatorId: number, subscriberIds: number[], postTitle: string, postId: number): Promise<void> {
     const creator = await storage.getUser(creatorId);
     if (!creator) return;
