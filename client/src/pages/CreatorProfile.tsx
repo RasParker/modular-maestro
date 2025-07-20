@@ -401,6 +401,9 @@ export const CreatorProfile: React.FC = () => {
 
   // Check if current user is subscribed to this creator
   useEffect(() => {
+    // Reset subscription state immediately when user or creator changes
+    setUserSubscription(null);
+
     const checkSubscription = async () => {
       if (!user || !creator || isOwnProfile) {
         setUserSubscription(null);
@@ -448,7 +451,7 @@ export const CreatorProfile: React.FC = () => {
     return () => {
       window.removeEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
     };
-  }, [user, creator, isOwnProfile]);
+  }, [user?.id, creator?.id, isOwnProfile]);
 
   useEffect(() => {
     const fetchCreatorData = async () => {
@@ -692,7 +695,9 @@ export const CreatorProfile: React.FC = () => {
       console.log('Access denied: No active subscription', { 
         userSubscription: userSubscription,
         hasSubscription: !!userSubscription,
-        subscriptionStatus: userSubscription?.status
+        subscriptionStatus: userSubscription?.status,
+        userId: user?.id,
+        creatorId: creator?.id
       });
       return false;
     }
