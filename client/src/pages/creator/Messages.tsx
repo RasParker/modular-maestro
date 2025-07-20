@@ -204,16 +204,20 @@ export const Messages: React.FC = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      // Instead of creating a new message object, just refetch the messages
-      // to get the most up-to-date data from the server
-      if (selectedConversation) {
-        fetchMessages(selectedConversation.id);
+      // Add the message immediately to the UI for better UX
+      if (selectedConversation && data && user) {
+        const newMessage = {
+          id: data.id || Date.now().toString(),
+          content: data.content || newMessage.trim(),
+          sender: user.display_name || user.username,
+          timestamp: data.timestamp || new Date().toISOString(),
+          type: 'sent' as const
+        };
+
+        setMessages(prev => [...prev, newMessage]);
       }
 
       setNewMessage('');
-
-      // Refresh conversations to update last message
-      // fetchConversations(); // Commented out to prevent blank screen
 
       toast({
         title: "Message sent",

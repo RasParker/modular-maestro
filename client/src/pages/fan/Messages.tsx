@@ -226,19 +226,20 @@ export const Messages: React.FC = () => {
     },
     onSuccess: async (data) => {
       console.log('Message sent successfully:', data);
+      const messageContent = newMessage.trim();
       setNewMessage('');
 
       // Add the message immediately to the UI for better UX
-      if (selectedConversation && data) {
-        const newMessage = {
-          id: data.id,
-          content: data.content,
+      if (selectedConversation && user) {
+        const newMsg = {
+          id: data?.id || Date.now().toString(),
+          content: data?.content || messageContent,
           sender: user.display_name || user.username,
-          timestamp: data.timestamp || new Date().toISOString(),
+          timestamp: data?.timestamp || new Date().toISOString(),
           type: 'sent' as const
         };
 
-        setMessages(prev => [...prev, newMessage]);
+        setMessages(prev => [...prev, newMsg]);
       }
 
       toast({
