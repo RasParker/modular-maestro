@@ -590,6 +590,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } : null
       };
 
+      // Send notification to post creator
+      const post = await storage.getPost(postId);
+      if (post && post.creator_id !== comment.user_id) { // Don't notify if creator comments on their own post
+        console.log(`Sending comment notification to creator ${post.creator_id} for post ${postId} from user ${comment.user_id}`);
+        try {
+          await NotificationService.notifyNewComment(
+            post.creator_id,
+            comment.user_id,
+            postId,
+            post.title || post.content || 'your post',
+            comment.content
+          );
+          console.log('Comment notification sent successfully');
+        } catch (notificationError) {
+          console.error('Failed to send comment notification:', notificationError);
+        }
+      } else if (post && post.creator_id === comment.user_id) {
+        console.log('Skipping notification - creator commented on their own post');
+      } else {
+        console.log('Post not found for comment notification');
+      }
+
       res.json(commentWithUser);
     } catch (error) {
       console.error('Create comment error:', error);
