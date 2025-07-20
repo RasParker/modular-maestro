@@ -78,7 +78,7 @@ export const Messages: React.FC = () => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    if (!user?.id || wsConnectionRef.current) return;
+    if (!user?.id) return;
 
     console.log('Initializing WebSocket connection for Messages');
     
@@ -123,7 +123,7 @@ export const Messages: React.FC = () => {
         wsConnectionRef.current = null;
       }
     };
-  }, [user?.id, selectedConversation, createConnection]);
+  }, [user?.id, createConnection]);
 
   const fetchConversations = async (isInitialLoad = false) => {
     try {
@@ -227,8 +227,7 @@ export const Messages: React.FC = () => {
     onSuccess: async (data) => {
       console.log('Message sent successfully:', data);
       const messageContent = newMessage.trim();
-      setNewMessage('');
-
+      
       // Add the message immediately to the UI for better UX
       if (selectedConversation && user) {
         const newMsg = {
@@ -241,6 +240,9 @@ export const Messages: React.FC = () => {
 
         setMessages(prev => [...prev, newMsg]);
       }
+
+      // Clear input after successfully adding message to UI
+      setNewMessage('');
 
       toast({
         title: "Message sent",
