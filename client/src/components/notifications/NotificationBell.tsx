@@ -246,7 +246,7 @@ export const NotificationBell: React.FC = () => {
       </Button>
 
       {isOpen && (
-        <Card className="fixed top-16 left-1/2 -translate-x-1/2 w-80 sm:w-96 sm:absolute sm:top-12 sm:left-auto sm:translate-x-0 sm:right-0 max-w-[calc(100vw-2rem)] max-h-96 shadow-lg border z-50 bg-background">
+        <Card className="fixed top-16 left-1/2 -translate-x-1/2 w-80 sm:w-96 sm:absolute sm:top-12 sm:left-auto sm:translate-x-0 sm:right-0 max-w-[calc(100vw-2rem)] shadow-lg border z-50 bg-background flex flex-col max-h-96">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Notifications</CardTitle>
@@ -275,8 +275,8 @@ export const NotificationBell: React.FC = () => {
             </div>
           </CardHeader>
 
-          <CardContent className="p-0">
-            <div className="max-h-80 overflow-y-auto">
+          <CardContent className="p-0 flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto">
               {notificationsLoading ? (
                 <div className="p-4 text-center text-muted-foreground">
                   Loading notifications...
@@ -309,7 +309,7 @@ export const NotificationBell: React.FC = () => {
               )}
             </div>
 
-            <div className="p-3 border-t bg-muted/30 space-y-2">
+            <div className="p-3 border-t bg-muted/50 space-y-2 flex-shrink-0">
               {pushPermission === 'default' && (
                 <Button 
                   variant="outline" 
