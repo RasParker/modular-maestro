@@ -204,20 +204,22 @@ export const Messages: React.FC = () => {
       return response.json();
     },
     onSuccess: (data) => {
+      // Store the message content before clearing the input
+      const messageContent = newMessage.trim();
+      setNewMessage('');
+
       // Add the message immediately to the UI for better UX
-      if (selectedConversation && data && user) {
-        const newMessage = {
-          id: data.id || Date.now().toString(),
-          content: data.content || newMessage.trim(),
+      if (selectedConversation && user) {
+        const newMsg = {
+          id: data?.id || Date.now().toString(),
+          content: data?.content || messageContent,
           sender: user.display_name || user.username,
-          timestamp: data.timestamp || new Date().toISOString(),
+          timestamp: data?.timestamp || new Date().toISOString(),
           type: 'sent' as const
         };
 
-        setMessages(prev => [...prev, newMessage]);
+        setMessages(prev => [...prev, newMsg]);
       }
-
-      setNewMessage('');
 
       toast({
         title: "Message sent",
