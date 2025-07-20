@@ -942,14 +942,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const tier = await storage.getSubscriptionTier(validatedData.tier_id);
           const tierName = tier?.name || 'unknown';
           
+          console.log(`Creating new subscriber notification: creator=${validatedData.creator_id}, fan=${validatedData.fan_id}, tier=${tierName}`);
+          
           await NotificationService.notifyNewSubscriber(
               validatedData.creator_id,
               validatedData.fan_id,
               tierName
           );
-          console.log(`Sent notification to creator ${validatedData.creator_id} for new subscriber ${validatedData.fan_id}`);
+          console.log(`✅ Sent notification to creator ${validatedData.creator_id} for new subscriber ${validatedData.fan_id} (${tierName} tier)`);
       } catch (notificationError) {
-          console.error('Failed to send new subscriber notification:', notificationError);
+          console.error('❌ Failed to send new subscriber notification:', notificationError);
           // Don't fail the subscription creation if notification fails
       }
 
@@ -2528,6 +2530,33 @@ app.post('/api/conversations', async (req, res) => {
     } catch (error) {
       console.error('Error sending test push notification:', error);
       res.status(500).json({ error: "Failed to send test push notification" });
+    }
+  });
+
+  // Test subscription notification endpoint
+  app.post("/api/test-subscription-notification", async (req, res) => {
+    try {
+      const { creatorId, fanId, tierName = 'Test Tier' } = req.body;
+
+      if (!creatorId || !fanId) {
+        return res.status(400).json({ error: "creatorId and fanId are required" });
+      }
+
+      console.log(`Testing subscription notification: creator=${creatorId}, fan=${fanId}, tier=${tierName}`);
+
+      await NotificationService.notifyNewSubscriber(
+        parseInt(creatorId),
+        parseInt(fanId),
+        tierName
+      );
+
+      res.json({ 
+        success: true, 
+        message: `Test subscription notification sent to creator ${creatorId} for fan ${fanId}` 
+      });
+    } catch (error) {
+      console.error('Error sending test subscription notification:', error);
+      res.status(500).json({ error: "Failed to send test subscription notification" });
     }
   });
 

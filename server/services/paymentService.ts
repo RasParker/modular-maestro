@@ -240,6 +240,22 @@ export class PaymentService {
         processed_at: new Date(paymentData.paid_at)
       });
 
+      // Notify creator of new subscriber
+      try {
+        const { NotificationService } = require('../notification-service');
+        console.log(`Creating new subscriber notification via payment: creator=${tier.creator_id}, fan=${fanId}, tier=${tier.name}`);
+        
+        await NotificationService.notifyNewSubscriber(
+          tier.creator_id,
+          parseInt(fanId),
+          tier.name
+        );
+        console.log(`✅ Payment flow: Sent notification to creator ${tier.creator_id} for new subscriber ${fanId} (${tier.name} tier)`);
+      } catch (notificationError) {
+        console.error('❌ Payment flow: Failed to send new subscriber notification:', notificationError);
+        // Don't fail the payment processing if notification fails
+      }
+
       console.log(`Subscription created successfully for fan ${fanId} to tier ${tierId}`);
     } catch (error) {
       console.error('Error processing successful payment:', error);
