@@ -42,17 +42,30 @@ export const NotificationBell: React.FC = () => {
   const { user } = useAuth();
   const { createConnection } = useNotificationWebSocket();
 
-  // Fetch unread count
-  const { data: unreadCount = 0 } = useQuery<{ count: number }>({
-    queryKey: ['/api/notifications/unread-count'],
-    refetchInterval: 30000, // Refetch every 30 seconds
+  // Fetch notifications
+  const { data: notifications = [], isLoading: notificationsLoading } = useQuery<Notification[]>({
+    queryKey: ['notifications', 'list'],
+    queryFn: async () => {
+      const response = await fetch('/api/notifications?limit=5');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      const data = await response.json();
+      console.log('Fetched notifications:', data);
+      return Array.isArray(data) ? data : [];
+    },
+    refetchInterval: 10000, // Poll more frequently for testing
   });
 
-  // Fetch notifications when dropdown is open
-  const { data: notifications = [], isLoading } = useQuery<Notification[]>({
-    queryKey: ['/api/notifications'],
-    enabled: isOpen,
-    refetchInterval: isOpen ? 10000 : false, // Refetch every 10 seconds when open
+  // Fetch unread count
+  const { data: unreadData, isLoading: countLoading } = useQuery<{ count: number }>({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: async () => {
+      const response = await fetch('/api/notifications/unread-count');
+      if (!response.ok) throw new Error('Failed to fetch unread count');
+      const data = await response.json();
+      console.log('Fetched unread count:', data);
+      return data;
+    },
+    refetchInterval: 10000, // Poll more frequently for testing
   });
 
   // Mark notification as read
@@ -267,7 +280,7 @@ export const NotificationBell: React.FC = () => {
 
           <CardContent className="p-0">
             <div className="max-h-80 overflow-y-auto">
-              {isLoading ? (
+              {notificationsLoading ? (
                 <div className="p-4 text-center text-muted-foreground">
                   Loading notifications...
                 </div>

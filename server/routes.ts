@@ -884,9 +884,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Notify creator of new subscriber
       try {
+          // Get tier name for the notification
+          const tier = await storage.getSubscriptionTier(validatedData.tier_id);
+          const tierName = tier?.name || 'unknown';
+          
           await NotificationService.notifyNewSubscriber(
               validatedData.creator_id,
-              validatedData.fan_id
+              validatedData.fan_id,
+              tierName
           );
           console.log(`Sent notification to creator ${validatedData.creator_id} for new subscriber ${validatedData.fan_id}`);
       } catch (notificationError) {

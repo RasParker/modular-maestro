@@ -45,20 +45,22 @@ export class NotificationService {
   }
 
   // Notification generators for different events
-  static async notifyNewSubscriber(creatorId: number, fanId: number, tierName: string): Promise<void> {
+  static async notifyNewSubscriber(creatorId: number, fanId: number, tierName?: string): Promise<void> {
     const fan = await storage.getUser(fanId);
     if (!fan) return;
+
+    const tierText = tierName ? ` to your ${tierName} tier` : '';
 
     await this.createNotification({
       user_id: creatorId,
       type: 'new_subscriber',
       title: 'New Subscriber!',
-      message: `${fan.display_name || fan.username} subscribed to your ${tierName} tier`,
+      message: `${fan.display_name || fan.username} subscribed${tierText}`,
       action_url: '/creator/subscribers',
       actor_id: fanId,
       entity_type: 'subscription',
       metadata: {
-        tier_name: tierName
+        tier_name: tierName || 'unknown'
       }
     });
   }
