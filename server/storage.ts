@@ -509,6 +509,20 @@ export class DatabaseStorage implements IStorage {
       .where(eq(subscriptions.id, id))
       .returning();
 
+    if (subscription && subscription.status === 'cancelled') {
+      // Update creator's subscriber count
+      await db
+        .update(users)
+        .set({ 
+          total_subscribers: sql`${users.total_subscribers} - 1`,
+          updated_at: new Date()
+        })
+        .where(eq(users.id, subscription.creator_id));
+
+      return true;
+    }
+    return false;
+
     if (subscription) {
       // Update creator's subscriber count
       await db

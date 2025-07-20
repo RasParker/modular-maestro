@@ -55,33 +55,79 @@ export const ManageSubscriptions: React.FC = () => {
     fetchSubscriptions();
   }, [user]);
 
-  const handlePauseResume = (subscriptionId: number) => {
-    setSubscriptions(subscriptions.map(sub => 
-      sub.id === subscriptionId 
-        ? { 
-            ...sub, 
-            status: sub.status === 'active' ? 'paused' : 'active',
-            auto_renew: sub.status === 'paused'
-          }
-        : sub
-    ));
-
+  const handlePauseResume = async (subscriptionId: number) => {
     const subscription = subscriptions.find(sub => sub.id === subscriptionId);
-    toast({
-      title: subscription?.status === 'active' ? "Subscription paused" : "Subscription resumed",
-      description: subscription?.status === 'active' 
-        ? "Your subscription has been paused and will not renew." 
-        : "Your subscription has been resumed.",
-    });
+    const newStatus = subscription?.status === 'active' ? 'paused' : 'active';
+    
+    try {
+      const response = await fetch(`/api/subscriptions/${subscriptionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          auto_renew: newStatus === 'active'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update subscription');
+      }
+
+      // Update local state only after successful API call
+      setSubscriptions(subscriptions.map(sub => 
+        sub.id === subscriptionId 
+          ? { 
+              ...sub, 
+              status: newStatus,
+              auto_renew: newStatus === 'active'
+            }
+          : sub
+      ));
+
+      toast({
+        title: newStatus === 'paused' ? "Subscription paused" : "Subscription resumed",
+        description: newStatus === 'paused' 
+          ? "Your subscription has been paused and will not renew." 
+          : "Your subscription has been resumed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleCancel = (subscriptionId: number) => {
-    setSubscriptions(subscriptions.filter(sub => sub.id !== subscriptionId));
-    toast({
-      title: "Subscription cancelled",
-      description: "Your subscription has been cancelled successfully.",
-      variant: "destructive",
-    });
+  const handleCancel = async (subscriptionId: number) => {
+    try {
+      const response = await fetch(`/api/subscriptions/${subscriptionId}/cancel`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel subscription');
+      }
+
+      // Remove from local state only after successful API call
+      setSubscriptions(subscriptions.filter(sub => sub.id !== subscriptionId));
+      toast({
+        title: "Subscription cancelled",
+        description: "Your subscription has been cancelled successfully.",
+        variant: "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const totalMonthlySpend = subscriptions

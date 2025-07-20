@@ -916,6 +916,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cancel subscription endpoint
+  app.put("/api/subscriptions/:subscriptionId/cancel", async (req, res) => {
+    try {
+      const subscriptionId = parseInt(req.params.subscriptionId);
+      const success = await storage.cancelSubscription(subscriptionId);
+
+      if (!success) {
+        return res.status(404).json({ error: "Subscription not found" });
+      }
+
+      res.json({ message: "Subscription cancelled successfully" });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      res.status(500).json({ error: "Failed to cancel subscription" });
+    }
+  });
+
   // Get fan subscriptions
   app.get('/api/subscriptions/fan/:fanId', async (req, res) => {
     try {
