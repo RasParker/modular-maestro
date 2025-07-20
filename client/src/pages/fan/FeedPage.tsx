@@ -434,6 +434,25 @@ export const FeedPage: React.FC = () => {
     }
   };
 
+  const getTierColor = (tier: string) => {
+    switch (tier.toLowerCase()) {
+      case 'public':
+        return 'outline';
+      case 'supporter':
+      case 'starter pump':
+        return 'secondary';
+      case 'fan':
+      case 'power gains':
+        return 'secondary';
+      case 'premium':
+      case 'superfan':
+      case 'elite beast mode':
+        return 'default';
+      default:
+        return 'outline';
+    }
+  };
+
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -517,8 +536,16 @@ export const FeedPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
-                  {post.tier}
+                <Badge variant={getTierColor(post.tier)} className="text-xs px-1 py-0 h-4">
+                  {post.tier === 'public' ? 'Free' : 
+                   post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                   post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                   post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                   post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                   post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                   post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                   post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                   post.tier}
                 </Badge>
               </div>
               {/* Post Media - Full width mobile Instagram style */}
