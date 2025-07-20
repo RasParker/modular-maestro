@@ -940,18 +940,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const creatorIds = subscribedCreators.map(sub => sub.creator_id);
 
-      // Get total count for pagination
+      // Data retention policy: Only show activity from the last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      // Get total count for pagination (within 30-day window)
       const totalCountResult = await db
         .select({ count: count() })
         .from(postsTable)
         .where(and(
           inArray(postsTable.creator_id, creatorIds),
-          eq(postsTable.status, 'published')
+          eq(postsTable.status, 'published'),
+          gte(postsTable.created_at, thirtyDaysAgo)
         ));
 
       const totalCount = totalCountResult[0]?.count || 0;
 
-      // Get recent posts from subscribed creators with pagination
+      // Get recent posts from subscribed creators with pagination (last 30 days only)
       const recentPosts = await db
         .select({
           id: postsTable.id,
@@ -970,7 +975,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .innerJoin(usersTable, eq(postsTable.creator_id, usersTable.id))
         .where(and(
           inArray(postsTable.creator_id, creatorIds),
-          eq(postsTable.status, 'published')
+          eq(postsTable.status, 'published'),
+          gte(postsTable.created_at, thirtyDaysAgo)
         ))
         .orderBy(desc(postsTable.created_at))
         .limit(limit)
