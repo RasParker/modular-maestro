@@ -860,7 +860,6 @@ export const CreatorProfile: React.FC = () => {
     ));
   };
 
-  ```text
   const handleShare = (postId: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
     toast({
