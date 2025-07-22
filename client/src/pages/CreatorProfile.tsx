@@ -1098,7 +1098,6 @@ export const CreatorProfile: React.FC = () => {
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
               </div>
-              )}
             </div>
 
             {/* Mobile Layout - Profile info only */}
