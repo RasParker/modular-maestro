@@ -366,13 +366,13 @@ export const ManageContent: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={!!viewingContent} onOpenChange={(open) => !open && closeModal()}>
-        <DialogContent className="max-w-[95vh] max-h-[95vh] p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{viewingContent?.type} Content</DialogTitle>
             <DialogDescription>View content</DialogDescription>
           </DialogHeader>
           {viewingContent && (
-            <div className="relative bg-black">
+            <div className="relative w-screen h-screen bg-black">
               {/* Back Arrow Button */}
               <Button
                 variant="ghost"
@@ -383,48 +383,36 @@ export const ManageContent: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Full screen container that fills the entire modal */}
-              <div className="relative w-full h-[95vh] overflow-hidden">
-                {/* Blurred background */}
-                {viewingContent.mediaPreview && (
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center blur-md scale-110"
-                    style={{
-                      backgroundImage: `url(${viewingContent.mediaPreview})`,
-                    }}
+              {/* Content container that fills entire screen */}
+              {viewingContent.mediaPreview ? (
+                viewingContent.type === 'Video' ? (
+                  <video 
+                    src={viewingContent.mediaPreview}
+                    className="w-full h-full"
+                    controls
+                    autoPlay
+                    muted
+                    style={{ objectFit: 'contain' }}
                   />
-                )}
-                
-                {/* Main Media with proper full display */}
-                {viewingContent.mediaPreview ? (
-                  <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    {viewingContent.type === 'Video' ? (
-                      <video 
-                        src={viewingContent.mediaPreview}
-                        className="w-full h-full object-contain"
-                        controls
-                        autoPlay
-                        muted
-                      />
-                    ) : (
-                      <img 
-                        src={viewingContent.mediaPreview}
-                        alt={viewingContent.caption}
-                        className="w-full h-full object-contain"
-                      />
-                    )}
-                  </div>
                 ) : (
-                  <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    <div className="text-center text-white">
-                      {getTypeIcon(viewingContent.type)}
-                      <p className="mt-2">{viewingContent.type} Content</p>
+                  <img 
+                    src={viewingContent.mediaPreview}
+                    alt={viewingContent.caption}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                )
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center px-6 text-white">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+                      <FileText className="w-8 h-8" />
                     </div>
+                    <h3 className="font-semibold text-xl mb-4">{viewingContent.caption}</h3>
+                    <p className="text-sm text-white/70">Text post</p>
                   </div>
-                )}
-
-                {/* Clean content view - no overlays */}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

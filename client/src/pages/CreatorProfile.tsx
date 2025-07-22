@@ -426,7 +426,7 @@ export const CreatorProfile: React.FC = () => {
       try {
         console.log(`🔍 Checking subscription for user ${user.id} to creator ${creator.id}`);
         const response = await fetch(`/api/subscriptions/user/${user.id}/creator/${creator.id}`);
-        
+
         if (response.ok) {
           const subscription = await response.json();
           console.log('📋 Subscription API response:', subscription);
@@ -753,7 +753,6 @@ export const CreatorProfile: React.FC = () => {
       'fan': 2,
       'premium': 2,
       'power gains': 2,
-      'superfan': 3,
       'elite beast mode': 3
     };
 
@@ -861,6 +860,7 @@ export const CreatorProfile: React.FC = () => {
     ));
   };
 
+  ```text
   const handleShare = (postId: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
     toast({
@@ -1817,13 +1817,13 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[95vh] max-h-[95vh] p-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
-            <DialogDescription>View content</DialogDescription>
+            <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
           </DialogHeader>
           {selectedContent && (
-            <div className="relative bg-black">
+            <div className="relative w-screen h-screen bg-black">
               {/* Back Arrow Button */}
               <Button
                 variant="ghost"
@@ -1834,45 +1834,31 @@ export const CreatorProfile: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Use AspectRatio component like the postcard */}
-              <AspectRatio ratio={1} className="overflow-hidden">
-                {selectedContent.mediaPreview ? (
-                  <div className="relative w-full h-full">
-                    {/* Blurred background layer */}
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
-                      style={{ backgroundImage: 'url(' + selectedContent.mediaPreview + ')' }}
-                    />
-                    {/* Main media content - Square container */}
-                    <div className="relative z-10 w-full h-full">
-                      {selectedContent.type === 'Video' ? (
-                        <video 
-                          src={selectedContent.mediaPreview} 
-                          className="w-full h-full object-contain"
-                          controls
-                          autoPlay
-                          muted
-                        />
-                      ) : (
-                        <img 
-                          src={selectedContent.mediaPreview} 
-                          alt={selectedContent.caption}
-                          className="w-full h-full object-contain"
-                        />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full bg-gradient-primary/10">
-                    <div className="text-center text-white">
-                      {getTypeIcon(selectedContent.type)}
-                      <p className="mt-2">{selectedContent.type} Content</p>
-                    </div>
-                  </div>
-                )}
-              </AspectRatio>
+              {/* Content container that fills entire screen */}
+              {(() => {
+                // Handle both string and array formats for media_urls
+                const mediaUrls = Array.isArray(selectedContent.media_urls) ? selectedContent.media_urls : [selectedContent.media_urls];
+                const mediaUrl = mediaUrls[0];
+                const fullUrl = mediaUrl?.startsWith('http') ? mediaUrl : '/uploads/' + mediaUrl;
 
-              {/* Clean content view - no overlays */}
+                return selectedContent.media_type === 'video' ? (
+                  <video 
+                    src={fullUrl}
+                    className="w-full h-full"
+                    controls
+                    autoPlay
+                    muted
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : (
+                  <img 
+                    src={fullUrl}
+                    alt={selectedContent.title}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                );
+              })()}
             </div>
           )}
         </DialogContent>
