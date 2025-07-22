@@ -1469,7 +1469,7 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="mb-6">
                 <Tabs value={activePostTab} onValueChange={setActivePostTab} className="space-y-4">
-                  <TabsList className="grid w-full grid-cols-3 mb-4 py-2">
+                  <TabsList className="grid w-full grid-cols-3 mb-4 pb-2">
                     <TabsTrigger value="all" className="text-sm py-2">
                       All
                       <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
