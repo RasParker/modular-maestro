@@ -1074,7 +1074,7 @@ export const CreatorProfile: React.FC = () => {
               </Avatar>
               {/* Online status dot positioned on avatar border line - matching postcard implementation */}
               {creator.is_online && creator.activity_status_visible && (
-                <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
+                <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
               )}
             </div>
 
