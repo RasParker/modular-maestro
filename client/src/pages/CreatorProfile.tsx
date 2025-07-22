@@ -1922,8 +1922,8 @@ export const CreatorProfile: React.FC = () => {
                         </div>
                       )}
                     </div>
-                          ))}
-                        </div>
+                        ))}
+                      </div>
                       ) : (
                         <Card className="bg-gradient-card border-border/50">
                           <CardContent className="p-6">
@@ -1939,7 +1939,6 @@ export const CreatorProfile: React.FC = () => {
                       )}
                     </TabsContent>
                   </Tabs>
-                )}
               </div>
             </div>
           </div>
