@@ -1098,19 +1098,6 @@ export const CreatorProfile: React.FC = () => {
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
               </div>
-              {!isOwnProfile && (
-                <div className="flex items-center gap-2 pb-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                    className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
-                    title="Start conversation"
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                  </Button>
-                </div>
               )}
             </div>
 
@@ -1123,18 +1110,6 @@ export const CreatorProfile: React.FC = () => {
                     <Star className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
-                )}
-                {!isOwnProfile && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                    className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors ml-auto"
-                    title="Start conversation"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -1193,6 +1168,70 @@ export const CreatorProfile: React.FC = () => {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Create Post</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          {!isOwnProfile && (
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleChatClick}
+                      disabled={initiateChatMutation.isPending}
+                      className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
+                    >
+                      <MessageSquare className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Start conversation</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // TODO: Implement favorite functionality
+                        toast({
+                          title: "Coming soon",
+                          description: "Favorite feature will be available soon!",
+                        });
+                      }}
+                      className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
+                    >
+                      <Heart className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add to favorites</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/creator/${creator.username}`);
+                        toast({
+                          title: "Link copied",
+                          description: "Creator profile link has been copied to your clipboard.",
+                        });
+                      }}
+                      className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
+                    >
+                      <Share2 className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Share profile</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
