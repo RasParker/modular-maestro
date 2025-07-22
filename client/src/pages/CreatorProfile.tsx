@@ -1100,15 +1100,112 @@ export const CreatorProfile: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile Layout - Profile info only */}
+            {/* Mobile Layout - Profile info with action icons */}
             <div className="md:hidden flex-1 pb-2">
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
-                {creator.verified && (
-                  <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                    <Star className="w-3 h-3 mr-1" />
-                    Verified
-                  </Badge>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                  {creator.verified && (
+                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                      <Star className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                {/* Mobile Action Icons */}
+                {isOwnProfile && (
+                  <div className="flex items-center gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors">
+                            <Link to="/creator/settings">
+                              <Settings className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit Profile</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors">
+                            <Link to="/creator/upload">
+                              <Plus className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Create Post</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                )}
+                {!isOwnProfile && (
+                  <div className="flex items-center gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleChatClick}
+                            disabled={initiateChatMutation.isPending}
+                            className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Start conversation</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              // TODO: Implement favorite functionality
+                              toast({
+                                title: "Coming soon",
+                                description: "Favorite feature will be available soon!",
+                              });
+                            }}
+                            className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors"
+                          >
+                            <Heart className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Add to favorites</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/creator/${creator.username}`);
+                              toast({
+                                title: "Link copied",
+                                description: "Creator profile link has been copied to your clipboard.",
+                              });
+                            }}
+                            className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Share profile</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -1142,8 +1239,9 @@ export const CreatorProfile: React.FC = () => {
               );
             })()}
           </div>
+          {/* Desktop Action Icons - hidden on mobile */}
           {isOwnProfile && (
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="hidden md:flex items-center gap-1 flex-shrink-0">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -1173,7 +1271,7 @@ export const CreatorProfile: React.FC = () => {
             </div>
           )}
           {!isOwnProfile && (
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="hidden md:flex items-center gap-1 flex-shrink-0">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
