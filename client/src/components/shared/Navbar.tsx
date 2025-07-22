@@ -12,7 +12,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/contexts/AuthContext';
-import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { LogOut, Settings, User, Crown, Shield, Menu, X, Home, Compass, LayoutDashboard, UserCircle } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -135,21 +134,15 @@ export const Navbar: React.FC = () => {
                       <div className="mt-6 px-6">
                         <div className="border-t pt-6">
                           <div className="flex items-center space-x-3 mb-4">
-                            <div className="relative">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage 
-                                  src={user.avatar ? (user.avatar.startsWith('http') || user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} 
-                                  alt={user.username} 
-                                />
-                                <AvatarFallback className="bg-primary text-primary-foreground">
-                                  {user.username.charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              {/* Online status dot positioned on avatar edge */}
-                              <div className="absolute -bottom-0.5 -right-0.5">
-                                <OnlineStatusIndicator userId={Number(user.id)} dotOnly size="sm" />
-                              </div>
-                            </div>
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage 
+                                src={user.avatar ? (user.avatar.startsWith('http') || user.avatar.startsWith('/uploads/') ? user.avatar : `/uploads/${user.avatar}`) : undefined} 
+                                alt={user.username} 
+                              />
+                              <AvatarFallback className="bg-primary text-primary-foreground">
+                                {user.username.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
                             <div>
                               <p className="font-medium text-sm">{user.username}</p>
                               <p className="text-xs text-muted-foreground capitalize flex items-center gap-1">
@@ -215,10 +208,6 @@ export const Navbar: React.FC = () => {
                           {user.username.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      {/* Online status dot positioned on avatar edge */}
-                      <div className="absolute -bottom-0.5 -right-0.5">
-                        <OnlineStatusIndicator userId={Number(user.id)} dotOnly size="sm" />
-                      </div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
