@@ -187,7 +187,7 @@ export const CreatorProfile: React.FC = () => {
 
             // Initialize like status if user is logged in
             if (user) {
-              await fetchLikeStatuses([post], user.id);
+              await fetchLikeStatuses([post], parseInt(user.id.toString()));
             }
           }
         }
@@ -219,12 +219,12 @@ export const CreatorProfile: React.FC = () => {
         const filteredPosts = await response.json();
 
         // Sort posts by creation date (newest first)
-        filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        filteredPosts.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
 
         // Initialize like status for current user
         if (user) {
-          await fetchLikeStatuses(filteredPosts, user.id);
+          await fetchLikeStatuses(filteredPosts, parseInt(user.id.toString()));
         }
 
         console.log('Fetched user posts:', filteredPosts);
@@ -325,7 +325,7 @@ export const CreatorProfile: React.FC = () => {
                 const newDisplayName = localStorage.getItem('displayName');
                 const newBio = localStorage.getItem('bio');
 
-                setCreator(prev => prev ? {
+                setCreator((prev: any) => prev ? {
                   ...prev,
                   display_name: (newDisplayName && newDisplayName.trim()) || userData.display_name || userData.username,
                   avatar: (newProfilePhotoUrl && newProfilePhotoUrl.trim()) || userData.avatar || prev.avatar,
@@ -747,7 +747,7 @@ export const CreatorProfile: React.FC = () => {
     }
 
     // Define tier hierarchy - higher tiers include lower tier content
-    const tierHierarchy = {
+    const tierHierarchy: Record<string, number> = {
       'supporter': 1,
       'starter pump': 1,
       'fan': 2,
@@ -756,7 +756,7 @@ export const CreatorProfile: React.FC = () => {
       'elite beast mode': 3
     };
 
-    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
+    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase() || ''] || 0;
     const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1; // Default to tier 1 for premium content
 
     const hasAccess = userTierLevel >= postTierLevel;
@@ -1347,7 +1347,7 @@ export const CreatorProfile: React.FC = () => {
               <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
               {creator.tiers && creator.tiers.length > 0 ? (
-                creator.tiers.map((tier) => (
+                creator.tiers.map((tier: any) => (
                   <Card key={tier.id} className="bg-gradient-card border-border/50">
                     <CardContent className="p-0">
                       {/* Mobile View - Collapsible */}
@@ -1410,7 +1410,7 @@ export const CreatorProfile: React.FC = () => {
                                     );
                                   }
 
-                                  return benefits.map((benefit, index) => (
+                                  return benefits.map((benefit: any, index: number) => (
                                     <li key={index} className="flex items-center gap-2 text-sm">
                                       <Check className="w-4 h-4 text-accent" />
                                       <span>{benefit}</span>
@@ -1726,7 +1726,7 @@ export const CreatorProfile: React.FC = () => {
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers && creator.tiers.length > 0 ? (
-              creator.tiers.map((tier) => (
+              creator.tiers.map((tier: any) => (
                 <Card key={tier.id} className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -1769,7 +1769,7 @@ export const CreatorProfile: React.FC = () => {
                             );
                           }
 
-                          return benefits.map((benefit, index) => (
+                          return benefits.map((benefit: any, index: number) => (
                             <li key={index} className="flex items-center gap-2 text-sm">
                               <Check className="w-4 h-4 text-accent" />
                               <span>{benefit}</span>
