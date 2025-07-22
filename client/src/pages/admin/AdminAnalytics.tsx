@@ -3,14 +3,12 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Navbar } from '@/components/shared/Navbar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ArrowLeft, BarChart3, TrendingUp, Users, DollarSign, Crown, Activity } from 'lucide-react';
 
 export const AdminAnalytics: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -220,6 +218,6 @@ export const AdminAnalytics: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };

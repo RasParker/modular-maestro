@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Navbar } from '@/components/shared/Navbar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ArrowLeft, Flag, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -111,9 +111,7 @@ export const Reports: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button variant="outline" asChild className="mb-4">
@@ -265,6 +263,6 @@ export const Reports: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AppLayout>
   );
 };
