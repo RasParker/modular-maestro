@@ -113,7 +113,7 @@ export const Explore: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
+  
   const [realCreators, setRealCreators] = useState<any[]>([]);
   const [allCreators, setAllCreators] = useState<any[]>([]);
 
@@ -245,27 +245,7 @@ export const Explore: React.FC = () => {
     }
   };
 
-  const toggleBioExpansion = (creatorId: string) => {
-    setExpandedBios(prev => ({
-      ...prev,
-      [creatorId]: !prev[creatorId]
-    }));
-  };
-
-  const truncateText = (text: string) => {
-    const words = text.split(' ');
-    const wordsPerLine = 10; // Conservative estimate for card width
-    const maxWords = 2 * wordsPerLine; // Exactly 2 lines
-
-    if (words.length <= maxWords) {
-      return { truncated: text, needsExpansion: false };
-    }
-
-    return {
-      truncated: words.slice(0, maxWords).join(' '),
-      needsExpansion: true
-    };
-  };
+  
 
   const filteredCreators = allCreators.filter(creator => {
     const matchesSearch = creator.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -331,7 +311,6 @@ export const Explore: React.FC = () => {
         {/* Creators Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCreators.map((creator) => {
-            const { truncated, needsExpansion } = truncateText(creator.bio);
             return (
               <Card key={creator.id} className="overflow-hidden bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group">
                 <div className="relative">
@@ -373,19 +352,8 @@ export const Explore: React.FC = () => {
                       <p className="text-sm text-muted-foreground">@{creator.username}</p>
                     </div>
 
-                    <p className="text-sm text-muted-foreground">
-                      {needsExpansion && !expandedBios[creator.id]
-                        ? truncated
-                        : creator.bio}
-                      {needsExpansion && (
-                        <Button
-                          variant="link"
-                          size="sm"
-                          onClick={() => toggleBioExpansion(creator.id)}
-                        >
-                          {expandedBios[creator.id] ? 'Read less' : 'Read more'}
-                        </Button>
-                      )}
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-tight max-h-[2.4em] overflow-hidden">
+                      {creator.bio}
                     </p>
 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

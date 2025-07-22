@@ -1361,7 +1361,7 @@ export const CreatorProfile: React.FC = () => {
                               </div>
                               <div className="flex items-center gap-3 flex-shrink-0">
                                 <div className="text-right">
-                                  <div className="text-lg font-bold text-accent">GHS {tier.price}</div>
+                                  <div className="text-base font-bold text-accent">GHS {tier.price}</div>
                                   <div className="text-xs text-muted-foreground">per month</div>
                                 </div>
                                 <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -1491,17 +1491,6 @@ export const CreatorProfile: React.FC = () => {
                             </span>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
-                          {post.tier === 'public' ? 'Free' : 
-                           post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                           post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                           post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                           post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                           post.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                           post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                           post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                           post.tier}
-                        </Badge>
                       </div>
 
                       {/* Post Media - Full width mobile Instagram style */}
@@ -1745,7 +1734,7 @@ export const CreatorProfile: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold">{tier.name}</h3>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
+                          <div className="text-lg font-bold text-accent">GHS {tier.price}</div>
                           <div className="text-sm text-muted-foreground">per month</div>
                         </div>
                       </div>
