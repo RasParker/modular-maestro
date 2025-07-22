@@ -1073,7 +1073,7 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               {/* Online status dot positioned on avatar edge */}
-              <div className="absolute bottom-0.5 right-0.5">
+              <div className="absolute bottom-0 right-0">
                 <OnlineStatusIndicator userId={creator.id} dotOnly size="lg" />
               </div>
             </div>
