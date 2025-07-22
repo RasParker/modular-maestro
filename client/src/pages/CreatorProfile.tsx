@@ -1077,7 +1077,7 @@ export const CreatorProfile: React.FC = () => {
               )}
             </div>
 
-            {/* Desktop Layout - Action buttons on the right */}
+            {/* Desktop Layout - Profile info only */}
             <div className="hidden md:flex w-full items-end justify-between">
               <div className="flex-1 pb-2">
                 <div className="flex items-center gap-2 mb-1">
@@ -1098,36 +1098,7 @@ export const CreatorProfile: React.FC = () => {
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
               </div>
-              {isOwnProfile ? (
-                <div className="flex items-center gap-1 pb-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
-                          <Link to="/creator/settings">
-                            <Settings className="w-5 h-5" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Edit Profile</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
-                          <Link to="/creator/upload">
-                            <Plus className="w-5 h-5" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Create Post</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              ) : (
+              {!isOwnProfile && (
                 <div className="flex items-center gap-2 pb-2">
                   <Button
                     variant="ghost"
@@ -1143,7 +1114,7 @@ export const CreatorProfile: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile Layout - Action buttons below profile info */}
+            {/* Mobile Layout - Profile info only */}
             <div className="md:hidden flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
@@ -1174,36 +1145,6 @@ export const CreatorProfile: React.FC = () => {
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
-              {isOwnProfile && (
-                <div className="flex items-center gap-1 mt-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
-                          <Link to="/creator/settings">
-                            <Settings className="w-5 h-5" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Edit Profile</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
-                          <Link to="/creator/upload">
-                            <Plus className="w-5 h-5" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Create Post</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1228,16 +1169,34 @@ export const CreatorProfile: React.FC = () => {
             })()}
           </div>
           {isOwnProfile && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              asChild
-              className="p-1 h-auto flex-shrink-0"
-            >
-              <Link to="/creator/settings">
-                <Settings className="w-4 h-4" />
-              </Link>
-            </Button>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                      <Link to="/creator/settings">
+                        <Settings className="w-5 h-5" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit Profile</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors">
+                      <Link to="/creator/upload">
+                        <Plus className="w-5 h-5" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Create Post</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           )}
         </div>
       </div>
