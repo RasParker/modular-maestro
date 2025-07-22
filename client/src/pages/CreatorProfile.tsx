@@ -1343,6 +1343,126 @@ export const CreatorProfile: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Subscription Tiers - Mobile Only */}
+            <div className="lg:hidden space-y-4">
+              <h2 className="text-xl font-semibold">Subscription Tiers</h2>
+
+              {creator.tiers && creator.tiers.length > 0 ? (
+                creator.tiers.map((tier) => (
+                  <Card key={tier.id} className="bg-gradient-card border-border/50">
+                    <CardContent className="p-0">
+                      {/* Mobile View - Collapsible */}
+                      <Collapsible>
+                        <CollapsibleTrigger asChild>
+                          <div className="p-4 cursor-pointer hover:bg-accent/5 transition-colors">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-base font-semibold text-foreground">{tier.name}</h3>
+                              </div>
+                              <div className="flex items-center gap-3 flex-shrink-0">
+                                <div className="text-right">
+                                  <div className="text-lg font-bold text-accent">GHS {tier.price}</div>
+                                  <div className="text-xs text-muted-foreground">per month</div>
+                                </div>
+                                <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              </div>
+                            </div>
+                          </div>
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent>
+                          <div className="px-4 pb-4 space-y-4">
+                            {/* Full Description */}
+                            <div className="bg-muted/30 rounded-lg p-3">
+                              <p className="text-sm text-muted-foreground">
+                                {tier.description}
+                              </p>
+                            </div>
+
+                            {/* Benefits List */}
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium text-foreground">What's included:</h4>
+                              <ul className="space-y-2">
+                                {(() => {
+                                  let benefits = tier.benefits || [];
+
+                                  // Handle case where benefits might be a JSON string
+                                  if (typeof benefits === 'string') {
+                                    try {
+                                      benefits = JSON.parse(benefits);
+                                    } catch (e) {
+                                      console.warn('Failed to parse benefits JSON:', e);
+                                      benefits = [];
+                                    }
+                                  }
+
+                                  // Ensure benefits is an array - handle null, undefined, or other non-array types
+                                  if (!benefits || !Array.isArray(benefits)) {
+                                    benefits = [];
+                                  }
+
+                                  // If no benefits, show a default message
+                                  if (benefits.length === 0) {
+                                    return (
+                                      <li className="flex items-center gap-2 text-sm">
+                                        <Check className="w-4 h-4 text-accent" />
+                                        <span>Access to exclusive content</span>
+                                      </li>
+                                    );
+                                  }
+
+                                  return benefits.map((benefit, index) => (
+                                    <li key={index} className="flex items-center gap-2 text-sm">
+                                      <Check className="w-4 h-4 text-accent" />
+                                      <span>{benefit}</span>
+                                    </li>
+                                  ));
+                                })()}
+                              </ul>
+                            </div>
+
+                            {/* Subscribe Button */}
+                            <Button 
+                              variant="premium" 
+                              className="w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSubscribe(tier.id);
+                              }}
+                            >
+                              Subscribe
+                            </Button>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="text-center py-4">
+                      <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No subscription tiers</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {isOwnProfile ? 'Create subscription tiers to start monetizing your content.' : (creator?.display_name || creator?.username) + " hasn't created any subscription tiers yet."}
+                      </p>
+                      {isOwnProfile && (
+                        <Button variant="outline" size="sm" asChild className="mt-4">
+                          <Link to="/creator/tiers">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create Tiers
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Content Separator */}
+            <div className="lg:hidden border-t border-border/50 my-8"></div>
 
             {/* Recent Posts Preview */}
             <div>
@@ -1613,162 +1733,71 @@ export const CreatorProfile: React.FC = () => {
             </div>
           </div>
 
-          {/* Subscription Tiers */}
-          <div id="subscription-tiers" className="space-y-4">
+          {/* Subscription Tiers - Desktop Only */}
+          <div id="subscription-tiers" className="hidden lg:block space-y-4">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers && creator.tiers.length > 0 ? (
               creator.tiers.map((tier) => (
                 <Card key={tier.id} className="bg-gradient-card border-border/50">
-                  <CardContent className="p-0">
-                    {/* Desktop View - Always expanded */}
-                    <div className="hidden sm:block p-6">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold">{tier.name}</h3>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
-                            <div className="text-sm text-muted-foreground">per month</div>
-                          </div>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">{tier.name}</h3>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
+                          <div className="text-sm text-muted-foreground">per month</div>
                         </div>
+                      </div>
 
-                        <p className="text-sm text-muted-foreground">{tier.description}</p>
+                      <p className="text-sm text-muted-foreground">{tier.description}</p>
 
-                        <ul className="space-y-2">
-                          {(() => {
-                            let benefits = tier.benefits || [];
+                      <ul className="space-y-2">
+                        {(() => {
+                          let benefits = tier.benefits || [];
 
-                            // Handle case where benefits might be a JSON string
-                            if (typeof benefits === 'string') {
-                              try {
-                                benefits = JSON.parse(benefits);
-                              } catch (e) {
-                                console.warn('Failed to parse benefits JSON:', e);
-                                benefits = [];
-                              }
-                            }
-
-                            // Ensure benefits is an array - handle null, undefined, or other non-array types
-                            if (!benefits || !Array.isArray(benefits)) {
+                          // Handle case where benefits might be a JSON string
+                          if (typeof benefits === 'string') {
+                            try {
+                              benefits = JSON.parse(benefits);
+                            } catch (e) {
+                              console.warn('Failed to parse benefits JSON:', e);
                               benefits = [];
                             }
+                          }
 
-                            // If no benefits, show a default message
-                            if (benefits.length === 0) {
-                              return (
-                                <li className="flex items-center gap-2 text-sm">
-                                  <Check className="w-4 h-4 text-accent" />
-                                  <span>Access to exclusive content</span>
-                                </li>
-                              );
-                            }
+                          // Ensure benefits is an array - handle null, undefined, or other non-array types
+                          if (!benefits || !Array.isArray(benefits)) {
+                            benefits = [];
+                          }
 
-                            return benefits.map((benefit, index) => (
-                              <li key={index} className="flex items-center gap-2 text-sm">
+                          // If no benefits, show a default message
+                          if (benefits.length === 0) {
+                            return (
+                              <li className="flex items-center gap-2 text-sm">
                                 <Check className="w-4 h-4 text-accent" />
-                                <span>{benefit}</span>
+                                <span>Access to exclusive content</span>
                               </li>
-                            ));
-                          })()}
-                        </ul>
+                            );
+                          }
 
-                        <Button 
-                          variant="premium" 
-                          className="w-full"
-                          onClick={() => handleSubscribe(tier.id)}
-                        >
-                          Subscribe
-                        </Button>
-                      </div>
+                          return benefits.map((benefit, index) => (
+                            <li key={index} className="flex items-center gap-2 text-sm">
+                              <Check className="w-4 h-4 text-accent" />
+                              <span>{benefit}</span>
+                            </li>
+                          ));
+                        })()}
+                      </ul>
+
+                      <Button 
+                        variant="premium" 
+                        className="w-full"
+                        onClick={() => handleSubscribe(tier.id)}
+                      >
+                        Subscribe
+                      </Button>
                     </div>
-
-                    {/* Mobile View - Collapsible */}
-                    <Collapsible className="sm:hidden">
-                      <CollapsibleTrigger asChild>
-                        <div className="p-4 cursor-pointer hover:bg-accent/5 transition-colors">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-base font-semibold text-foreground">{tier.name}</h3>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {tier.description}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <div className="text-right">
-                                <div className="text-lg font-bold text-accent">GHS {tier.price}</div>
-                                <div className="text-xs text-muted-foreground">per month</div>
-                              </div>
-                              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                        </div>
-                      </CollapsibleTrigger>
-
-                      <CollapsibleContent>
-                        <div className="px-4 pb-4 space-y-4">
-                          {/* Full Description */}
-                          <div className="bg-muted/30 rounded-lg p-3">
-                            <p className="text-sm text-muted-foreground">
-                              {tier.description}
-                            </p>
-                          </div>
-
-                          {/* Benefits List */}
-                          <div className="space-y-2">
-                            <h4 className="text-sm font-medium text-foreground">What's included:</h4>
-                            <ul className="space-y-2">
-                              {(() => {
-                                let benefits = tier.benefits || [];
-
-                                // Handle case where benefits might be a JSON string
-                                if (typeof benefits === 'string') {
-                                  try {
-                                    benefits = JSON.parse(benefits);
-                                  } catch (e) {
-                                    console.warn('Failed to parse benefits JSON:', e);
-                                    benefits = [];
-                                  }
-                                }
-
-                                // Ensure benefits is an array - handle null, undefined, or other non-array types
-                                if (!benefits || !Array.isArray(benefits)) {
-                                  benefits = [];
-                                }
-
-                                // If no benefits, show a default message
-                                if (benefits.length === 0) {
-                                  return (
-                                    <li className="flex items-center gap-2 text-sm">
-                                      <Check className="w-4 h-4 text-accent" />
-                                      <span>Access to exclusive content</span>
-                                    </li>
-                                  );
-                                }
-
-                                return benefits.map((benefit, index) => (
-                                  <li key={index} className="flex items-center gap-2 text-sm">
-                                    <Check className="w-4 h-4 text-accent" />
-                                    <span>{benefit}</span>
-                                  </li>
-                                ));
-                              })()}
-                            </ul>
-                          </div>
-
-                          {/* Subscribe Button */}
-                          <Button 
-                            variant="premium" 
-                            className="w-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSubscribe(tier.id);
-                            }}
-                          >
-                            Subscribe
-                          </Button>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
                   </CardContent>
                 </Card>
               ))
