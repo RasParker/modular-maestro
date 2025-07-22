@@ -10,12 +10,13 @@ import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, Lock } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, Lock, ChevronDown } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { BioDisplay } from '@/lib/text-utils';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
@@ -1619,64 +1620,155 @@ export const CreatorProfile: React.FC = () => {
             {creator.tiers && creator.tiers.length > 0 ? (
               creator.tiers.map((tier) => (
                 <Card key={tier.id} className="bg-gradient-card border-border/50">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">{tier.name}</h3>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
-                          <div className="text-sm text-muted-foreground">per month</div>
+                  <CardContent className="p-0">
+                    {/* Desktop View - Always expanded */}
+                    <div className="hidden sm:block p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold">{tier.name}</h3>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
+                            <div className="text-sm text-muted-foreground">per month</div>
+                          </div>
                         </div>
-                      </div>
 
-                      <p className="text-sm text-muted-foreground">{tier.description}</p>
+                        <p className="text-sm text-muted-foreground">{tier.description}</p>
 
-                      <ul className="space-y-2">
-                        {(() => {
-                          let benefits = tier.benefits || [];
+                        <ul className="space-y-2">
+                          {(() => {
+                            let benefits = tier.benefits || [];
 
-                          // Handle case where benefits might be a JSON string
-                          if (typeof benefits === 'string') {
-                            try {
-                              benefits = JSON.parse(benefits);
-                            } catch (e) {
-                              console.warn('Failed to parse benefits JSON:', e);
+                            // Handle case where benefits might be a JSON string
+                            if (typeof benefits === 'string') {
+                              try {
+                                benefits = JSON.parse(benefits);
+                              } catch (e) {
+                                console.warn('Failed to parse benefits JSON:', e);
+                                benefits = [];
+                              }
+                            }
+
+                            // Ensure benefits is an array - handle null, undefined, or other non-array types
+                            if (!benefits || !Array.isArray(benefits)) {
                               benefits = [];
                             }
-                          }
 
-                          // Ensure benefits is an array - handle null, undefined, or other non-array types
-                          if (!benefits || !Array.isArray(benefits)) {
-                            benefits = [];
-                          }
+                            // If no benefits, show a default message
+                            if (benefits.length === 0) {
+                              return (
+                                <li className="flex items-center gap-2 text-sm">
+                                  <Check className="w-4 h-4 text-accent" />
+                                  <span>Access to exclusive content</span>
+                                </li>
+                              );
+                            }
 
-                          // If no benefits, show a default message
-                          if (benefits.length === 0) {
-                            return (
-                              <li className="flex items-center gap-2 text-sm">
+                            return benefits.map((benefit, index) => (
+                              <li key={index} className="flex items-center gap-2 text-sm">
                                 <Check className="w-4 h-4 text-accent" />
-                                <span>Access to exclusive content</span>
+                                <span>{benefit}</span>
                               </li>
-                            );
-                          }
+                            ));
+                          })()}
+                        </ul>
 
-                          return benefits.map((benefit, index) => (
-                            <li key={index} className="flex items-center gap-2 text-sm">
-                              <Check className="w-4 h-4 text-accent" />
-                              <span>{benefit}</span>
-                            </li>
-                          ));
-                        })()}
-                      </ul>
-
-                      <Button 
-                        variant="premium" 
-                        className="w-full"
-                        onClick={() => handleSubscribe(tier.id)}
-                      >
-                        Subscribe
-                      </Button>
+                        <Button 
+                          variant="premium" 
+                          className="w-full"
+                          onClick={() => handleSubscribe(tier.id)}
+                        >
+                          Subscribe
+                        </Button>
+                      </div>
                     </div>
+
+                    {/* Mobile View - Collapsible */}
+                    <Collapsible className="sm:hidden">
+                      <CollapsibleTrigger asChild>
+                        <div className="p-4 cursor-pointer hover:bg-accent/5 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-base font-semibold text-foreground">{tier.name}</h3>
+                              <p className="text-sm text-muted-foreground truncate">
+                                {tier.description}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-accent">GHS {tier.price}</div>
+                                <div className="text-xs text-muted-foreground">per month</div>
+                              </div>
+                              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <div className="px-4 pb-4 space-y-4">
+                          {/* Full Description */}
+                          <div className="bg-muted/30 rounded-lg p-3">
+                            <p className="text-sm text-muted-foreground">
+                              {tier.description}
+                            </p>
+                          </div>
+
+                          {/* Benefits List */}
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium text-foreground">What's included:</h4>
+                            <ul className="space-y-2">
+                              {(() => {
+                                let benefits = tier.benefits || [];
+
+                                // Handle case where benefits might be a JSON string
+                                if (typeof benefits === 'string') {
+                                  try {
+                                    benefits = JSON.parse(benefits);
+                                  } catch (e) {
+                                    console.warn('Failed to parse benefits JSON:', e);
+                                    benefits = [];
+                                  }
+                                }
+
+                                // Ensure benefits is an array - handle null, undefined, or other non-array types
+                                if (!benefits || !Array.isArray(benefits)) {
+                                  benefits = [];
+                                }
+
+                                // If no benefits, show a default message
+                                if (benefits.length === 0) {
+                                  return (
+                                    <li className="flex items-center gap-2 text-sm">
+                                      <Check className="w-4 h-4 text-accent" />
+                                      <span>Access to exclusive content</span>
+                                    </li>
+                                  );
+                                }
+
+                                return benefits.map((benefit, index) => (
+                                  <li key={index} className="flex items-center gap-2 text-sm">
+                                    <Check className="w-4 h-4 text-accent" />
+                                    <span>{benefit}</span>
+                                  </li>
+                                ));
+                              })()}
+                            </ul>
+                          </div>
+
+                          {/* Subscribe Button */}
+                          <Button 
+                            variant="premium" 
+                            className="w-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSubscribe(tier.id);
+                            }}
+                          >
+                            Subscribe
+                          </Button>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </CardContent>
                 </Card>
               ))
