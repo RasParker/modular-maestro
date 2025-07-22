@@ -1081,7 +1081,7 @@ export const CreatorProfile: React.FC = () => {
             <div className="hidden md:flex w-full items-end justify-between">
               <div className="flex-1 pb-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                  <h1 className="text-2xl font-medium text-foreground">{creator?.display_name || creator?.username}</h1>
                   {creator.verified && (
                     <Badge variant="secondary" className="bg-accent text-accent-foreground">
                       <Star className="w-3 h-3 mr-1" />
@@ -1090,10 +1090,10 @@ export const CreatorProfile: React.FC = () => {
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-muted-foreground">@{creator.username}</p>
+                  <p className="text-white text-sm">@{creator.username}</p>
                   <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                <div className="flex items-center gap-2 text-sm text-white mt-1">
                   <Users className="w-4 h-4" />
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
@@ -1103,7 +1103,7 @@ export const CreatorProfile: React.FC = () => {
             {/* Mobile Layout - Profile info with action icons */}
             <div className="md:hidden flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                <h1 className="text-2xl font-medium text-foreground">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     <Star className="w-3 h-3 mr-1" />
@@ -1113,7 +1113,7 @@ export const CreatorProfile: React.FC = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <p className="text-muted-foreground">@{creator.username}</p>
+                  <p className="text-white text-sm">@{creator.username}</p>
                   <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
                 </div>
                 {/* Mobile Action Icons - positioned lower */}
@@ -1212,7 +1212,7 @@ export const CreatorProfile: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+              <div className="flex items-center gap-2 text-sm text-white mt-1">
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
@@ -1223,7 +1223,7 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Bio Section */}
       <div className="max-w-4xl mx-auto px-6 py-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
