@@ -1102,17 +1102,21 @@ export const CreatorProfile: React.FC = () => {
 
             {/* Mobile Layout - Profile info with action icons */}
             <div className="md:hidden flex-1 pb-2">
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                {creator.verified && (
+                  <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                    <Star className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
-                  {creator.verified && (
-                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                      <Star className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
+                  <p className="text-muted-foreground">@{creator.username}</p>
+                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
                 </div>
-                {/* Mobile Action Icons */}
+                {/* Mobile Action Icons - positioned lower */}
                 {isOwnProfile && (
                   <div className="flex items-center gap-1">
                     <TooltipProvider>
@@ -1207,10 +1211,6 @@ export const CreatorProfile: React.FC = () => {
                     </TooltipProvider>
                   </div>
                 )}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-muted-foreground">@{creator.username}</p>
-                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" isOwnProfile={isOwnProfile} />
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
