@@ -862,7 +862,8 @@ export const CreatorProfile: React.FC = () => {
     setSelectedContent(modalData);
     setIsModalOpen(true);
   };  const closeModal = () => {
-    setIsModalOpen(false);
+    setIsModalOpen(```python
+false);
     setSelectedContent(null);
     setExpandedModalCaption(false);
   };
@@ -1622,10 +1623,6 @@ export const CreatorProfile: React.FC = () => {
                                   </span>
                                 </div>
                               </div>
-                              {/* Tier badge */}
-                              <Badge variant={post.tier === 'public' ? 'outline' : 'secondary'} className="text-xs">
-                                {post.tier === 'public' ? 'Free' : 'Premium'}
-                              </Badge>
                             </div>
 
                             {/* Post Media - Full width mobile Instagram style */}
@@ -1669,7 +1666,7 @@ export const CreatorProfile: React.FC = () => {
                                           className="w-full aspect-square object-cover"
                                           onError={(e) => {
                                             const target = e.target as HTMLImageElement;
-                                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIiHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnMzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnMzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                             target.className = "w-full aspect-square object-cover opacity-50";
                                           }}
                                         />
@@ -1693,8 +1690,8 @@ export const CreatorProfile: React.FC = () => {
                                       </div>
                                       <h3 className="text-base font-medium text-foreground mb-2">
                                         {post.tier === 'supporter' ? 'Supporter' : 
-                                         post.tier === 'fan' ? 'Fan' : 
-                                         post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'fan' ? 'Fan' : ```python
+ post.tier === 'premium' ? 'Premium' : 
                                          post.tier === 'power gains' ? 'Power Gains' :
                                          post.tier === 'elite beast mode' ? 'Elite Beast Mode' :
                                          post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
@@ -2240,8 +2237,6 @@ export const CreatorProfile: React.FC = () => {
                           )}
                         </div>
 
-
-
                         {/* Post Caption - Mobile Instagram style */}
                         {(post.content || post.title) && (
                           <div className="mb-1">
@@ -2414,7 +2409,8 @@ export const CreatorProfile: React.FC = () => {
               {/* Content container that fills entire screen */}
               {(() => {
                 // Handle both string and array formats for media_urls
-                const mediaUrls = Array.isArray(selectedContent.media_urls) ? selectedContent.media_urls : [selectedContent.media_urls];
+                const mediaUrls = Array.isArray(selectedContent.media```python
+_urls) ? selectedContent.media_urls : [selectedContent.media_urls];
                 const mediaUrl = mediaUrls[0];
                 const fullUrl = mediaUrl?.startsWith('http') ? mediaUrl : '/uploads/' + mediaUrl;
 

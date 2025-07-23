@@ -129,12 +129,9 @@ export const ContentCard: React.FC<ContentCardProps> = ({
       <CardContent className="p-3">
         {/* Content Preview - Profile style layout */}
         <div className="space-y-3">
-          {/* Header - Badges and date at top of card */}
+          {/* Header - Tier badge and date at top of card */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
-                {status}
-              </Badge>
               <Badge variant="outline" className="text-xs px-2 py-0 h-5">
                 {tier}
               </Badge>
