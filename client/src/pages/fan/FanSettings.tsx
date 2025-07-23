@@ -356,8 +356,8 @@ export const FanSettings: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="space-y-6">
             {/* Tab Navigation */}
             <div className="flex flex-wrap gap-2 mb-6">
               <Button
@@ -1080,8 +1080,8 @@ export const FanSettings: React.FC = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
-        </div>
+          </div>
+        </Tabs>
       </div>
 
       {/* Email Change Dialog */}

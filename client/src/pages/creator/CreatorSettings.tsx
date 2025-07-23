@@ -24,7 +24,7 @@ export const CreatorSettings: React.FC = () => {
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const defaultTab = urlParams.get('tab') || 'profile';
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showCurrentPassword, setShowNewPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
@@ -617,6 +617,7 @@ export const CreatorSettings: React.FC = () => {
           </div>
 
           <div className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Tab Navigation */}
             <div className="flex flex-wrap gap-2 mb-6">
               <Button
@@ -788,7 +789,7 @@ export const CreatorSettings: React.FC = () => {
             )}
 
             {activeTab === 'content' && (
-              <TabsContent value="content" className="space-y-6">
+              
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Content Settings</CardTitle>
@@ -856,11 +857,11 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              
             )}
 
             {activeTab === 'goals' && (
-              <TabsContent value="goals" className="space-y-6">
+              
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Monthly Goals</CardTitle>
@@ -948,11 +949,11 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              
             )}
 
             {activeTab === 'payouts' && (
-              <TabsContent value="payouts" className="space-y-6">
+              
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Payout Settings</CardTitle>
@@ -976,7 +977,7 @@ export const CreatorSettings: React.FC = () => {
                         <SelectContent>
                           <SelectItem value="mtn-momo">MTN Mobile Money</SelectItem>
                           <SelectItem value="vodafone-cash">Vodafone Cash</SelectItem>
-                          <SelectItem value="airteltigo-money">AirtelTigo Money</SelectItem>
+                          <SelectItem value`"airteltigo-money">AirtelTigo Money</SelectItem>
                           <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
                           <SelectItem value="paystack">Paystack</SelectItem>
                         </SelectContent>
@@ -1084,11 +1085,11 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              
             )}
 
             {activeTab === 'security' && (
-              <TabsContent value="security" className="space-y-6">
+              
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -1347,9 +1348,9 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              
             )}
-          </div>
+          </Tabs>
         </div>
       </div>
 
