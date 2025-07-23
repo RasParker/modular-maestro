@@ -581,52 +581,123 @@ export const CreatorProfile: React.FC = () => {
     fetchUserSubscription();
   }, [user?.id, creator?.id]);
 
-  const handleSubscribe = async (tierId: string) => {
+  const handleSubscribe = async () => {
     if (!user) {
-      // Redirect to login with return path
-      navigate(`/login?redirect=/creator/${username}`);
+      toast({
+        title: "Login required",
+        description: "Please log in to subscribe to creators",
+        variant: "destructive",
+      });
       return;
     }
 
-    // Find the selected tier
-    const tier = creator.tiers.find((t: any) => t.id === tierId);
-    if (tier) {
+    // Navigate to payment modal with creator ID
+    navigate(`/fan/payment?creatorId=${creator.id}&tier=basic`);
+  };
+
+  const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
       try {
-        // Create subscription directly for development/testing
-        const response = await fetch('/api/subscriptions', {
+        console.log('Uploading profile photo:', file.name);
+
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: "Please select an image smaller than 5MB.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Create FormData to send the file
+        const formData = new FormData();
+        formData.append('profilePhoto', file);
+
+        // Upload to backend
+        const response = await fetch('/api/upload/profile-photo', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fan_id: user.id,
-            creator_id: creator.id,
-            tier_id: tier.id,
-            status: 'active',
-            auto_renew: true,
-            started_at: new Date().toISOString(),
-            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-          })
+          body: formData,
         });
 
-        if (response.ok) {
-          toast({
-            title: "Successfully subscribed!",
-            description: `You're now subscribed to ${creator.display_name}'s ${tier.name} tier.`,
-          });
-        } else {
-          const errorData = await response.json();
-          toast({
-            title: "Subscription failed",
-            description: errorData.error || "Failed to create subscription. Please try again.",
-            variant: "destructive"
-          });
+        if (!response.ok) {
+          throw new Error('Upload failed');
         }
-      } catch (error) {
+
+        const result = await response.json();
+        console.log('Upload result:', result);
+
+        // Update the creator data
+        setCreator(prev => ({ ...prev, avatar: result.url }));
+
         toast({
-          title: "Error",
-          description: "Failed to create subscription. Please try again.",
-          variant: "destructive"
+          title: "Profile photo updated",
+          description: "Your profile photo has been updated successfully.",
+        });
+
+        // Refresh the page to show the updated photo
+        window.location.reload();
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload profile photo. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleCoverPhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        console.log('Uploading cover photo:', file.name);
+
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: "Please select an image smaller than 5MB.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Create FormData to send the file
+        const formData = new FormData();
+        formData.append('coverPhoto', file);
+
+        // Upload to backend
+        const response = await fetch('/api/upload/cover-photo', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        console.log('Upload result:', result);
+
+        // Update the creator data
+        setCreator(prev => ({ ...prev, cover_image: result.url }));
+
+        toast({
+          title: "Cover photo updated",
+          description: "Your cover photo has been updated successfully.",
+        });
+
+        // Refresh the page to show the updated photo
+        window.location.reload();
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload cover photo. Please try again.",
+          variant: "destructive",
         });
       }
     }
@@ -790,9 +861,7 @@ export const CreatorProfile: React.FC = () => {
     };
     setSelectedContent(modalData);
     setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
+  };  const closeModal = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
     setExpandedModalCaption(false);
@@ -1060,15 +1129,21 @@ export const CreatorProfile: React.FC = () => {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center relative group">
-              {isOwnProfile ? (
-                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <div className="w-12 h-12 rounded-full bg-background/80 flex items-center justify-center">
-                    <Camera className="w-6 h-6" />
-                  </div>
-                  <span className="text-sm font-medium">Add Cover Photo</span>
+              {/* Cover Photo Placeholder for Own Profile */}
+              {isOwnProfile && !creator.cover_image && (
+                <div className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-background/10 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverPhotoUpload}
+                    className="hidden"
+                    id="cover-upload-main"
+                  />
+                  <label htmlFor="cover-upload-main" className="cursor-pointer flex items-center gap-2 text-muted-foreground">
+                    <Image className="w-8 h-8" />
+                    <span className="text-lg font-medium">Add Cover Photo</span>
+                  </label>
                 </div>
-              ) : (
-                <span className="text-muted-foreground">No cover photo</span>
               )}
             </div>
           )}
@@ -1081,12 +1156,23 @@ export const CreatorProfile: React.FC = () => {
               <Avatar className="w-24 h-24 border-4 border-background">
                 {creator.avatar ? (
                   <AvatarImage src={creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar} alt={creator.username} />
-                ) : isOwnProfile ? (
-                  <div className="w-full h-full bg-background flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-muted-foreground" />
-                  </div>
                 ) : (
-                  <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                  /* Profile photo placeholder/upload for own profile when no avatar */
+                  isOwnProfile && !creator.avatar && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full cursor-pointer hover:bg-background/90 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePhotoUpload}
+                        className="hidden"
+                        id="profile-upload-main"
+                      />
+                      <label htmlFor="profile-upload-main" className="cursor-pointer flex flex-col items-center gap-1">
+                        <Camera className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground font-medium">Add Photo</span>
+                      </label>
+                    </div>
+                  )
                 )}
                 {!creator.avatar && !isOwnProfile && (
                   <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
@@ -1095,15 +1181,6 @@ export const CreatorProfile: React.FC = () => {
               {/* Online status dot positioned on avatar border line - matching postcard implementation */}
               {creator.is_online && creator.activity_status_visible && (
                 <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
-              )}
-              {/* Add photo indicator for own profile when no avatar */}
-              {isOwnProfile && !creator.avatar && (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
-                  <div className="flex flex-col items-center gap-1">
-                    <Camera className="w-6 h-6 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground font-medium">Add Photo</span>
-                  </div>
-                </div>
               )}
             </div>
 
@@ -1454,10 +1531,7 @@ export const CreatorProfile: React.FC = () => {
                             <Button 
                               variant="premium" 
                               className="w-full"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSubscribe(tier.id);
-                              }}
+                              onClick={() => handleSubscribe()}
                             >
                               Subscribe
                             </Button>
@@ -1612,7 +1686,7 @@ export const CreatorProfile: React.FC = () => {
                                           className="w-full aspect-square object-cover"
                                           onError={(e) => {
                                             const target = e.target as HTMLImageElement;
-                                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LmwzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIiHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnMzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                             target.className = "w-full aspect-square object-cover opacity-50";
                                           }}
                                         />
@@ -1849,7 +1923,7 @@ export const CreatorProfile: React.FC = () => {
                                         className="w-full aspect-square object-cover"
                                         onError={(e) => {
                                           const target = e.target as HTMLImageElement;
-                                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LmwzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnMzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                           target.className = "w-full aspect-square object-cover opacity-50";
                                         }}
                                       />
@@ -2065,7 +2139,7 @@ export const CreatorProfile: React.FC = () => {
                                     className="w-full aspect-square object-cover"
                                   onError={(e) => {
                                       const target = e.target as HTMLImageElement;
-                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LmwzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnMzLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                       target.className = "w-full aspect-square object-cover opacity-50";
                                     }}
                                   />
@@ -2302,7 +2376,7 @@ export const CreatorProfile: React.FC = () => {
                       <Button 
                         variant="premium" 
                         className="w-full"
-                        onClick={() => handleSubscribe(tier.id)}
+                        onClick={() => handleSubscribe()}
                       >
                         Subscribe
                       </Button>
