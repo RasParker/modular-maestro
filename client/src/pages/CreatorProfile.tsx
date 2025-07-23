@@ -629,7 +629,7 @@ export const CreatorProfile: React.FC = () => {
         console.log('Upload result:', result);
 
         // Update the creator data
-        setCreator(prev => ({ ...prev, avatar: result.url }));
+        setCreator((prev: any) => ({ ...prev, avatar: result.url }));
 
         toast({
           title: "Profile photo updated",
@@ -683,7 +683,7 @@ export const CreatorProfile: React.FC = () => {
         console.log('Upload result:', result);
 
         // Update the creator data
-        setCreator(prev => ({ ...prev, cover_image: result.url }));
+        setCreator((prev: any) => ({ ...prev, cover_image: result.url }));
 
         toast({
           title: "Cover photo updated",
@@ -861,9 +861,10 @@ export const CreatorProfile: React.FC = () => {
     };
     setSelectedContent(modalData);
     setIsModalOpen(true);
-  };  const closeModal = () => {
-    setIsModalOpen(```python
-false);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
     setSelectedContent(null);
     setExpandedModalCaption(false);
   };
@@ -1690,8 +1691,8 @@ false);
                                       </div>
                                       <h3 className="text-base font-medium text-foreground mb-2">
                                         {post.tier === 'supporter' ? 'Supporter' : 
-                                         post.tier === 'fan' ? 'Fan' : ```python
- post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
                                          post.tier === 'power gains' ? 'Power Gains' :
                                          post.tier === 'elite beast mode' ? 'Elite Beast Mode' :
                                          post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
@@ -2409,8 +2410,7 @@ false);
               {/* Content container that fills entire screen */}
               {(() => {
                 // Handle both string and array formats for media_urls
-                const mediaUrls = Array.isArray(selectedContent.media```python
-_urls) ? selectedContent.media_urls : [selectedContent.media_urls];
+                const mediaUrls = Array.isArray(selectedContent.media_urls) ? selectedContent.media_urls : [selectedContent.media_urls];
                 const mediaUrl = mediaUrls[0];
                 const fullUrl = mediaUrl?.startsWith('http') ? mediaUrl : '/uploads/' + mediaUrl;
 
