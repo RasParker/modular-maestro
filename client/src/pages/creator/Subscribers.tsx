@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SubscriberCard } from '@/components/subscribers/SubscriberCard';
 import { SubscriberFilters } from '@/components/subscribers/SubscriberFilters';
 import { SubscriberEmptyState } from '@/components/subscribers/SubscriberEmptyState';
-import { SubscriberStats } from '@/components/subscribers/SubscriberStats';
+
 
 export const Subscribers: React.FC = () => {
   const { toast } = useToast();
@@ -185,11 +185,49 @@ export const Subscribers: React.FC = () => {
         ) : (
           <>
             {/* Stats */}
-            <SubscriberStats 
-              totalCount={subscribers.length}
-              activeCount={activeCount}
-              recentCount={recentCount}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Subscribers</p>
+                      <p className="text-xl sm:text-2xl font-bold text-foreground">
+                        {subscribers.length}
+                      </p>
+                    </div>
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active</p>
+                      <p className="text-xl sm:text-2xl font-bold text-foreground">
+                        {activeCount}
+                      </p>
+                    </div>
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-card border-border/50">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground">This Month</p>
+                      <p className="text-xl sm:text-2xl font-bold text-foreground">
+                        {recentCount}
+                      </p>
+                    </div>
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
             <TabsList className="mb-6">
