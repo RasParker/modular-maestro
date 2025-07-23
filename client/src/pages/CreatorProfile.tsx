@@ -1587,9 +1587,9 @@ export const CreatorProfile: React.FC = () => {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="all" className="space-y-0">
+                  <TabsContent value="all" className="space-y-0 -mx-6">
                     {userPosts.length > 0 ? (
-                      <div className="space-y-0 -mx-4">
+                      <div className="space-y-0">
                         {userPosts.map((post) => (
                           <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
                             {/* Post Header - Mobile Instagram style */}
@@ -1826,9 +1826,9 @@ export const CreatorProfile: React.FC = () => {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="free" className="space-y-0">
+                  <TabsContent value="free" className="space-y-0 -mx-6">
                     {userPosts.filter(post => post.tier === 'public').length > 0 ? (
-                      <div className="space-y-0 -mx-4">
+                      <div className="space-y-0">
                         {userPosts.filter(post => post.tier === 'public').map((post) => (
                           <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
                             {/* Post Header - Mobile Instagram style */}
@@ -2026,9 +2026,9 @@ export const CreatorProfile: React.FC = () => {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="premium" className="space-y-0">
+                  <TabsContent value="premium" className="space-y-0 -mx-6">
                     {userPosts.filter(post => post.tier !== 'public').length > 0 ? (
-                <div className="space-y-0 -mx-4">
+                      <div className="space-y-0">
                         {userPosts.filter(post => post.tier !== 'public').map((post) => (
                     <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
                       {/* Post Header - Mobile Instagram style */}
