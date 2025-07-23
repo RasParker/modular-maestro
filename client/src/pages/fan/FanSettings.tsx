@@ -70,6 +70,7 @@ export const FanSettings: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEmailChangeDialogOpen, setIsEmailChangeDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState('');
+  const [activeTab, setActiveTab] = useState('profile');
 
   // Load current user settings when component mounts
   useEffect(() => {
@@ -356,14 +357,60 @@ export const FanSettings: React.FC = () => {
         </div>
 
         <div className="space-y-6">
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="notifications">Alerts</TabsTrigger>
-              <TabsTrigger value="subscriptions">Subs</TabsTrigger>
-              <TabsTrigger value="privacy">Privacy</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            {/* Simple horizontal tab bar */}
+            <div className="flex border-b border-border/30">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'profile'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => setActiveTab('notifications')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'notifications'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Alerts
+              </button>
+              <button
+                onClick={() => setActiveTab('subscriptions')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'subscriptions'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Subs
+              </button>
+              <button
+                onClick={() => setActiveTab('privacy')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'privacy'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Privacy
+              </button>
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'security'
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Security
+              </button>
+            </div>
 
             <TabsContent value="profile" className="space-y-6">
               <Card className="bg-gradient-card border-border/50">

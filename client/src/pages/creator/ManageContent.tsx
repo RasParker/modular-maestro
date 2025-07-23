@@ -53,6 +53,7 @@ export const ManageContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [viewingContent, setViewingContent] = useState<ContentItem | null>(null);
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
+  const [activeTab, setActiveTab] = useState('published');
 
   // Fetch user's posts
   useEffect(() => {
@@ -143,6 +144,10 @@ export const ManageContent: React.FC = () => {
   const publishedContent = content.filter(item => item.status === 'Published');
   const scheduledContent = content.filter(item => item.status === 'Scheduled');
   const draftContent = content.filter(item => item.status === 'Draft');
+  
+  const publishedPosts = content.filter(item => item.status === 'Published');
+  const scheduledPosts = content.filter(item => item.status === 'Scheduled');
+  const draftPosts = content.filter(item => item.status === 'Draft');
 
   const handleEdit = (contentId: string) => {
     navigate(`/creator/edit-post/${contentId}`);
@@ -261,21 +266,49 @@ export const ManageContent: React.FC = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <Tabs defaultValue="published" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="published" className="flex items-center gap-2">
-                Published
-                <Badge variant="secondary">{publishedContent.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="scheduled" className="flex items-center gap-2">
-                Scheduled
-                <Badge variant="secondary">{scheduledContent.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="drafts" className="flex items-center gap-2">
-                Drafts
-                <Badge variant="secondary">{draftContent.length}</Badge>
-              </TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Simple horizontal tab bar */}
+          <div className="flex border-b border-border/30">
+            <button
+              onClick={() => setActiveTab('published')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'published'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Published
+              <span className="ml-2 text-xs opacity-70">
+                {publishedPosts.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('drafts')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'drafts'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Drafts
+              <span className="ml-2 text-xs opacity-70">
+                {draftPosts.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('scheduled')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'scheduled'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Scheduled
+              <span className="ml-2 text-xs opacity-70">
+                {scheduledPosts.length}
+              </span>
+            </button>
+          </div>
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (

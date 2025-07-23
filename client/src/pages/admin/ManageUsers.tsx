@@ -9,6 +9,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ArrowLeft, Search, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 interface User {
   id: string;
@@ -29,6 +30,7 @@ export const ManageUsers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     fetchUsers();
@@ -168,6 +170,50 @@ export const ManageUsers: React.FC = () => {
             <CardDescription className="text-sm">Manage user accounts and permissions</CardDescription>
           </CardHeader>
           <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Simple horizontal tab bar */}
+          <div className="flex border-b border-border/30">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'all'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              All Users
+              <span className="ml-2 text-xs opacity-70">
+                {filteredUsers.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('creators')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'creators'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Creators
+              <span className="ml-2 text-xs opacity-70">
+                {filteredUsers.filter(user => user.role === 'creator').length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('fans')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'fans'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Fans
+              <span className="ml-2 text-xs opacity-70">
+                {filteredUsers.filter(user => user.role === 'fan').length}
+              </span>
+            </button>
+          </div>
+
             {loading ? (
               <div className="flex justify-center py-8">
                 <LoadingSpinner />
@@ -189,6 +235,7 @@ export const ManageUsers: React.FC = () => {
                 )}
               </div>
             )}
+            </Tabs>
           </CardContent>
         </Card>
       </div>

@@ -33,6 +33,8 @@ export const ManageSubscriptions: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('active');
+  const [paymentHistory, setPaymentHistory] = useState([]); // Placeholder for payment history data
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -58,7 +60,7 @@ export const ManageSubscriptions: React.FC = () => {
   const handlePauseResume = async (subscriptionId: number) => {
     const subscription = subscriptions.find(sub => sub.id === subscriptionId);
     const newStatus = subscription?.status === 'active' ? 'paused' : 'active';
-    
+
     try {
       const response = await fetch(`/api/subscriptions/${subscriptionId}`, {
         method: 'PUT',
@@ -196,56 +198,100 @@ export const ManageSubscriptions: React.FC = () => {
 
         {/* Subscriptions List */}
         <div className="space-y-4 sm:space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-semibold">
-              Your Subscriptions ({loading ? '...' : subscriptions.length})
-            </h2>
+          {/* Tab Bar */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Simple horizontal tab bar */}
+          <div className="flex border-b border-border/30">
+            <button
+              onClick={() => setActiveTab('active')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'active'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Active Subscriptions
+              <span className="ml-2 text-xs opacity-70">
+                {subscriptions.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'history'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Payment History
+              <span className="ml-2 text-xs opacity-70">
+                {paymentHistory.length}
+              </span>
+            </button>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <LoadingSpinner />
-            </div>
-          ) : error ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Error loading subscriptions: {error}</p>
-            </div>
-          ) : subscriptions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No active subscriptions yet.</p>
-              <Button variant="premium" className="mt-4" asChild>
-                <Link to="/explore">Discover Creators</Link>
-              </Button>
-            </div>
-          ) : (
-            subscriptions.map((subscription) => {
-              // Transform the subscription data to match SubscriptionCard expectations
-              const transformedSubscription = {
-                id: subscription.id.toString(),
-                creator: {
-                  username: subscription.creator.username,
-                  display_name: subscription.creator.display_name || subscription.creator.username,
-                  avatar: subscription.creator.avatar || '',
-                  category: 'General' // Default category since it's not in our API data
-                },
-                tier: subscription.tier.name,
-                price: parseFloat(subscription.tier.price.toString()),
-                status: subscription.status,
-                next_billing: new Date(subscription.current_period_end).toLocaleDateString(),
-                joined: new Date(subscription.created_at).toLocaleDateString(),
-                auto_renew: subscription.auto_renew
-              };
+          {activeTab === 'active' && (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Your Subscriptions ({loading ? '...' : subscriptions.length})
+                </h2>
+              </div>
 
-              return (
-                <SubscriptionCard
-                  key={subscription.id}
-                  subscription={transformedSubscription}
-                  onPauseResume={(id) => handlePauseResume(parseInt(id))}
-                  onCancel={(id) => handleCancel(parseInt(id))}
-                />
-              );
-            })
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : error ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Error loading subscriptions: {error}</p>
+                </div>
+              ) : subscriptions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No active subscriptions yet.</p>
+                  <Button variant="premium" className="mt-4" asChild>
+                    <Link to="/explore">Discover Creators</Link>
+                  </Button>
+                </div>
+              ) : (
+                subscriptions.map((subscription) => {
+                  // Transform the subscription data to match SubscriptionCard expectations
+                  const transformedSubscription = {
+                    id: subscription.id.toString(),
+                    creator: {
+                      username: subscription.creator.username,
+                      display_name: subscription.creator.display_name || subscription.creator.username,
+                      avatar: subscription.creator.avatar || '',
+                      category: 'General' // Default category since it's not in our API data
+                    },
+                    tier: subscription.tier.name,
+                    price: parseFloat(subscription.tier.price.toString()),
+                    status: subscription.status,
+                    next_billing: new Date(subscription.current_period_end).toLocaleDateString(),
+                    joined: new Date(subscription.created_at).toLocaleDateString(),
+                    auto_renew: subscription.auto_renew
+                  };
+
+                  return (
+                    <SubscriptionCard
+                      key={subscription.id}
+                      subscription={transformedSubscription}
+                      onPauseResume={(id) => handlePauseResume(parseInt(id))}
+                      onCancel={(id) => handleCancel(parseInt(id))}
+                    />
+                  );
+                })
+              )}
+            </>
           )}
+
+          {activeTab === 'history' && (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Payment history will be displayed here.</p>
+              {/* Implement payment history component/logic here */}
+            </div>
+          )}
+        </Tabs>
         </div>
       </div>
     </AppLayout>

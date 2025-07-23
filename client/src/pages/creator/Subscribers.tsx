@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,7 +63,7 @@ export const Subscribers: React.FC = () => {
       subscriber.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       subscriber.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+
     setFilteredSubscribers(filtered);
     toast({
       title: "Search completed",
@@ -74,14 +73,14 @@ export const Subscribers: React.FC = () => {
 
   const handleFilter = (tier: string) => {
     setSelectedTier(tier);
-    
+
     if (tier === 'all') {
       setFilteredSubscribers(subscribers);
     } else {
       const filtered = subscribers.filter(subscriber => subscriber.tier_name === tier);
       setFilteredSubscribers(filtered);
     }
-    
+
     toast({
       title: "Filter applied",
       description: tier === 'all' ? "Showing all subscribers" : `Filtered by ${tier}`,

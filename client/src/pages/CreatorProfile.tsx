@@ -10,7 +10,7 @@ import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, Lock, ChevronDown } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, Lock, ChevronDown, Camera } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -1059,8 +1059,17 @@ export const CreatorProfile: React.FC = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
-              <span className="text-muted-foreground">No cover photo</span>
+            <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center relative group">
+              {isOwnProfile ? (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <div className="w-12 h-12 rounded-full bg-background/80 flex items-center justify-center">
+                    <Camera className="w-6 h-6" />
+                  </div>
+                  <span className="text-sm font-medium">Add Cover Photo</span>
+                </div>
+              ) : (
+                <span className="text-muted-foreground">No cover photo</span>
+              )}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
@@ -1070,12 +1079,31 @@ export const CreatorProfile: React.FC = () => {
           <div className="max-w-4xl mx-auto flex items-end gap-4">
             <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar) : undefined} alt={creator.username} />
-                <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                {creator.avatar ? (
+                  <AvatarImage src={creator.avatar.startsWith('/uploads/') ? creator.avatar : '/uploads/' + creator.avatar} alt={creator.username} />
+                ) : isOwnProfile ? (
+                  <div className="w-full h-full bg-background flex items-center justify-center">
+                    <Camera className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                ) : (
+                  <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                )}
+                {!creator.avatar && !isOwnProfile && (
+                  <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                )}
               </Avatar>
               {/* Online status dot positioned on avatar border line - matching postcard implementation */}
               {creator.is_online && creator.activity_status_visible && (
                 <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
+              )}
+              {/* Add photo indicator for own profile when no avatar */}
+              {isOwnProfile && !creator.avatar && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+                  <div className="flex flex-col items-center gap-1">
+                    <Camera className="w-6 h-6 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground font-medium">Add Photo</span>
+                  </div>
+                </div>
               )}
             </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,12 +46,12 @@ export const Analytics: React.FC = () => {
         const subscribersResponse = await fetch(`/api/creators/${user.id}/subscribers`);
         if (subscribersResponse.ok) {
           const subscribersData = await subscribersResponse.json();
-          
+
           // Calculate monthly growth from subscriber data
           const currentDate = new Date();
           const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                          'July', 'August', 'September', 'October', 'November', 'December'];
-          
+
           const monthlyGrowth = [];
           for (let i = 2; i >= 0; i--) {
             const targetMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
@@ -62,13 +61,13 @@ export const Analytics: React.FC = () => {
               return subDate.getMonth() === targetMonth.getMonth() && 
                      subDate.getFullYear() === targetMonth.getFullYear();
             }).length;
-            
+
             monthlyGrowth.push({
               month: monthName,
               subscribers: monthlySubscribers
             });
           }
-          
+
           setSubscriberGrowth(monthlyGrowth);
         }
 
@@ -181,7 +180,7 @@ export const Analytics: React.FC = () => {
                   const engagement = post.likes_count + post.comments_count;
                   const maxEngagement = Math.max(...topPosts.map(p => p.likes_count + p.comments_count), 1);
                   const percentage = Math.round((engagement / maxEngagement) * 100);
-                  
+
                   return (
                     <div key={post.id} className="space-y-2">
                       <div className="flex justify-between items-center">
