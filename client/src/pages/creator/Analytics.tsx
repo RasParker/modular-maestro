@@ -20,6 +20,7 @@ export const Analytics: React.FC = () => {
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [subscriberGrowth, setSubscriberGrowth] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview'); // Add state for active tab
 
   useEffect(() => {
     const fetchAnalyticsData = async () => {
@@ -112,6 +113,38 @@ export const Analytics: React.FC = () => {
           <p className="text-muted-foreground">
             Track your performance and growth
           </p>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === 'overview' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('overview')}
+          >
+            Overview
+          </Button>
+          <Button
+            variant={activeTab === 'subscribers' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('subscribers')}
+          >
+            Subscribers
+          </Button>
+          <Button
+            variant={activeTab === 'content' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('content')}
+          >
+            Content
+          </Button>
+          <Button
+            variant={activeTab === 'earnings' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('earnings')}
+          >
+            Earnings
+          </Button>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

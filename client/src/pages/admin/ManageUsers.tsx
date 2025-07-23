@@ -103,6 +103,18 @@ export const ManageUsers: React.FC = () => {
     }
   };
 
+    const getCreators = () => {
+        return users.filter(user => user.role === 'creator');
+    };
+
+    const getFans = () => {
+        return users.filter(user => user.role === 'fan');
+    };
+
+    const getBannedUsers = () => {
+        return users.filter(user => user.status === 'suspended');
+    };
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -171,48 +183,49 @@ export const ManageUsers: React.FC = () => {
           </CardHeader>
           <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Simple horizontal tab bar */}
-          <div className="flex border-b border-border/30">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'all'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              All Users
-              <span className="ml-2 text-xs opacity-70">
-                {filteredUsers.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('creators')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'creators'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Creators
-              <span className="ml-2 text-xs opacity-70">
-                {filteredUsers.filter(user => user.role === 'creator').length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('fans')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'fans'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Fans
-              <span className="ml-2 text-xs opacity-70">
-                {filteredUsers.filter(user => user.role === 'fan').length}
-              </span>
-            </button>
-          </div>
+          {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('all')}
+          >
+            All Users
+            <span className="ml-2 text-xs opacity-70">
+              {users.length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'creators' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('creators')}
+          >
+            Creators
+            <span className="ml-2 text-xs opacity-70">
+              {getCreators().length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'fans' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('fans')}
+          >
+            Fans
+            <span className="ml-2 text-xs opacity-70">
+              {getFans().length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'banned' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('banned')}
+          >
+            Banned
+            <span className="ml-2 text-xs opacity-70">
+              {getBannedUsers().length}
+            </span>
+          </Button>
+        </div>
 
             {loading ? (
               <div className="flex justify-center py-8">

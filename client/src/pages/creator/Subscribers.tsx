@@ -22,6 +22,7 @@ export const Subscribers: React.FC = () => {
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [filteredSubscribers, setFilteredSubscribers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('all'); // Added activeTab state
 
   // Fetch real subscriber data
   useEffect(() => {
@@ -140,6 +141,15 @@ export const Subscribers: React.FC = () => {
     });
   };
 
+   const getNewSubscribers = () => {
+    return subscribers.filter(s => new Date(s.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+  };
+
+  const getTopSubscribers = () => {
+    // Replace with actual logic to determine top subscribers
+    return subscribers.slice(0, 5);
+  };
+
   // Calculate stats
   const activeCount = subscribers.filter(s => s.status === 'active').length;
   const recentCount = subscribers.filter(s => new Date(s.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length;
@@ -179,6 +189,39 @@ export const Subscribers: React.FC = () => {
               activeCount={activeCount}
               recentCount={recentCount}
             />
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('all')}
+          >
+            All Subscribers
+            <span className="ml-2 text-xs opacity-70">
+              {subscribers.length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'new' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('new')}
+          >
+            New This Month
+            <span className="ml-2 text-xs opacity-70">
+              {getNewSubscribers().length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'top' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('top')}
+          >
+            Top Supporters
+            <span className="ml-2 text-xs opacity-70">
+              {getTopSubscribers().length}
+            </span>
+          </Button>
+        </div>
 
         {/* Filters */}
         <div className="mb-6">

@@ -8,6 +8,7 @@ import { ArrowLeft, Heart, CreditCard, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface Subscription {
   id: number;
@@ -136,6 +137,11 @@ export const ManageSubscriptions: React.FC = () => {
     .filter(sub => sub.status === 'active')
     .reduce((sum, sub) => sum + parseFloat(sub.tier.price.toString()), 0);
 
+    const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
+    const expiredSubscriptions = subscriptions.filter(sub => sub.status === 'expired');
+    const cancelledSubscriptions = subscriptions.filter(sub => sub.status === 'cancelled');
+
+
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -200,35 +206,29 @@ export const ManageSubscriptions: React.FC = () => {
         <div className="space-y-4 sm:space-y-6">
           {/* Tab Bar */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Simple horizontal tab bar */}
-          <div className="flex border-b border-border/30">
-            <button
-              onClick={() => setActiveTab('active')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'active'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Active Subscriptions
-              <span className="ml-2 text-xs opacity-70">
-                {subscriptions.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'history'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Payment History
-              <span className="ml-2 text-xs opacity-70">
-                {paymentHistory.length}
-              </span>
-            </button>
-          </div>
+          {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === 'active' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('active')}
+          >
+            Active Subscriptions
+            <span className="ml-2 text-xs opacity-70">
+              {activeSubscriptions.length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'history' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('history')}
+          >
+            Payment History
+            <span className="ml-2 text-xs opacity-70">
+              {paymentHistory.length}
+            </span>
+          </Button>
+        </div>
 
           {activeTab === 'active' && (
             <>

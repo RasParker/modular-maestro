@@ -358,58 +358,43 @@ export const FanSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Simple horizontal tab bar */}
-            <div className="flex border-b border-border/30">
-              <button
+            {/* Tab Navigation */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button
+                variant={activeTab === 'profile' ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setActiveTab('profile')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'profile'
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
               >
                 Profile
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === 'notifications' ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setActiveTab('notifications')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'notifications'
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
               >
                 Alerts
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === 'subscriptions' ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setActiveTab('subscriptions')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'subscriptions'
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
               >
                 Subs
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === 'privacy' ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setActiveTab('privacy')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'privacy'
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
               >
                 Privacy
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === 'security' ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setActiveTab('security')}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'security'
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
               >
                 Security
-              </button>
+              </Button>
             </div>
 
             <TabsContent value="profile" className="space-y-6">

@@ -144,7 +144,7 @@ export const ManageContent: React.FC = () => {
   const publishedContent = content.filter(item => item.status === 'Published');
   const scheduledContent = content.filter(item => item.status === 'Scheduled');
   const draftContent = content.filter(item => item.status === 'Draft');
-  
+
   const publishedPosts = content.filter(item => item.status === 'Published');
   const scheduledPosts = content.filter(item => item.status === 'Scheduled');
   const draftPosts = content.filter(item => item.status === 'Draft');
@@ -267,48 +267,39 @@ export const ManageContent: React.FC = () => {
           </div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Simple horizontal tab bar */}
-          <div className="flex border-b border-border/30">
-            <button
-              onClick={() => setActiveTab('published')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'published'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Published
-              <span className="ml-2 text-xs opacity-70">
-                {publishedPosts.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('drafts')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'drafts'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Drafts
-              <span className="ml-2 text-xs opacity-70">
-                {draftPosts.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('scheduled')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'scheduled'
-                  ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Scheduled
-              <span className="ml-2 text-xs opacity-70">
-                {scheduledPosts.length}
-              </span>
-            </button>
-          </div>
+          {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={activeTab === 'published' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('published')}
+          >
+            Published
+            <span className="ml-2 text-xs opacity-70">
+              {publishedPosts.length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'scheduled' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('scheduled')}
+          >
+            Scheduled
+            <span className="ml-2 text-xs opacity-70">
+              {scheduledPosts.length}
+            </span>
+          </Button>
+          <Button
+            variant={activeTab === 'drafts' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('drafts')}
+          >
+            Drafts
+            <span className="ml-2 text-xs opacity-70">
+              {draftPosts.length}
+            </span>
+          </Button>
+        </div>
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (

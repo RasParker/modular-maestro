@@ -1563,47 +1563,38 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="mb-6">
                 <Tabs value={activePostTab} onValueChange={setActivePostTab} className="space-y-4">
-                  {/* Simple horizontal tab bar */}
-                  <div className="flex border-b border-border/30">
-                    <button
+                  {/* Button-style tab bar matching Explore page design */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <Button
+                      variant={activePostTab === 'all' ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => setActivePostTab('all')}
-                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                        activePostTab === 'all'
-                          ? 'border-foreground text-foreground'
-                          : 'border-transparent text-muted-foreground hover:text-foreground'
-                      }`}
                     >
                       All
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.length}
                       </span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant={activePostTab === 'free' ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => setActivePostTab('free')}
-                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                        activePostTab === 'free'
-                          ? 'border-foreground text-foreground'
-                          : 'border-transparent text-muted-foreground hover:text-foreground'
-                      }`}
                     >
                       Free
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier === 'public').length}
                       </span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant={activePostTab === 'premium' ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => setActivePostTab('premium')}
-                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                        activePostTab === 'premium'
-                          ? 'border-foreground text-foreground'
-                          : 'border-transparent text-muted-foreground hover:text-foreground'
-                      }`}
                     >
                       Premium
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier !== 'public').length}
                       </span>
-                    </button>
+                    </Button>
                   </div>
 
                   <TabsContent value="all" className="space-y-0">

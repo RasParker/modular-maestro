@@ -24,7 +24,7 @@ export const CreatorSettings: React.FC = () => {
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const defaultTab = urlParams.get('tab') || 'profile';
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showCurrentPassword, setShowNewPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
@@ -591,6 +591,9 @@ export const CreatorSettings: React.FC = () => {
     }
   };
 
+  // New state for active tab
+  const [activeTab, setActiveTab] = useState('profile');
+
   return (
     <>
       <div className="min-h-screen bg-background">
@@ -617,16 +620,47 @@ export const CreatorSettings: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <Tabs defaultValue={defaultTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="content">Content</TabsTrigger>
-                <TabsTrigger value="goals">Goals</TabsTrigger>
-                <TabsTrigger value="payouts">Payouts</TabsTrigger>
-                <TabsTrigger value="security">Security</TabsTrigger>
-              </TabsList>
+            {/* Tab Navigation */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button
+                variant={activeTab === 'profile' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('profile')}
+              >
+                Profile
+              </Button>
+              <Button
+                variant={activeTab === 'content' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('content')}
+              >
+                Content
+              </Button>
+              <Button
+                variant={activeTab === 'goals' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('goals')}
+              >
+                Goals
+              </Button>
+               <Button
+                variant={activeTab === 'payouts' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('payouts')}
+              >
+                Payouts
+              </Button>
+              <Button
+                variant={activeTab === 'security' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('security')}
+              >
+                Security
+              </Button>
+            </div>
 
-              <TabsContent value="profile" className="space-y-6">
+            {activeTab === 'profile' && (
+              <div className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Profile Information</CardTitle>
@@ -753,8 +787,10 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </div>
+            )}
 
+            {activeTab === 'content' && (
               <TabsContent value="content" className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -824,7 +860,9 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+            )}
 
+            {activeTab === 'goals' && (
               <TabsContent value="goals" className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -914,7 +952,9 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+            )}
 
+            {activeTab === 'payouts' && (
               <TabsContent value="payouts" className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -1048,7 +1088,9 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+            )}
 
+            {activeTab === 'security' && (
               <TabsContent value="security" className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -1309,7 +1351,7 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
+            )}
           </div>
         </div>
       </div>
