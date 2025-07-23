@@ -1565,39 +1565,27 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="mb-6">
                 <Tabs value={activePostTab} onValueChange={setActivePostTab} className="space-y-4">
-                  {/* Button-style tab bar matching Explore page design */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Button
-                      variant={activePostTab === 'all' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActivePostTab('all')}
-                    >
+                  {/* Tab Navigation - matching creator settings style */}
+                  <TabsList className="mb-6">
+                    <TabsTrigger value="all">
                       All
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.length}
                       </span>
-                    </Button>
-                    <Button
-                      variant={activePostTab === 'free' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActivePostTab('free')}
-                    >
+                    </TabsTrigger>
+                    <TabsTrigger value="free">
                       Free
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier === 'public').length}
                       </span>
-                    </Button>
-                    <Button
-                      variant={activePostTab === 'premium' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActivePostTab('premium')}
-                    >
+                    </TabsTrigger>
+                    <TabsTrigger value="premium">
                       Premium
                       <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier !== 'public').length}
                       </span>
-                    </Button>
-                  </div>
+                    </TabsTrigger>
+                  </TabsList>
 
                   <TabsContent value="all" className="space-y-0">
                     {userPosts.length > 0 ? (
@@ -2296,7 +2284,7 @@ export const CreatorProfile: React.FC = () => {
           </div>
 
           {/* Subscription Tiers - Desktop Only */}
-          <div id="subscription-tiers" className="hidden lg:block space-y-4">
+          <div id="subscription-tiers" className="hidden lg:block space-y-4 lg:self-start">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers && creator.tiers.length > 0 ? (
