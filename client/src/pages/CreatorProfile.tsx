@@ -2406,7 +2406,6 @@ export const CreatorProfile: React.FC = () => {
                   <video 
                     src={fullUrl}
                     className="w-full h-full"
-```python
                     controls
                     autoPlay
                     muted

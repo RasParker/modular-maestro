@@ -185,7 +185,7 @@ export class DatabaseStorage implements IStorage {
           display_name: insertUser.display_name,
           bio: insertUser.bio,
           cover_image: insertUser.cover_image,
-          social_links: insertUser.social_links || null,
+          social_links: insertUser.social_links as any || null,
         })
         .returning();
 
@@ -262,7 +262,7 @@ export class DatabaseStorage implements IStorage {
         creator_id: insertPost.creator_id,
         title: insertPost.title,
         content: insertPost.content,
-        media_urls: insertPost.media_urls || [],
+        media_urls: insertPost.media_urls as string[] || [],
         media_type: insertPost.media_type,
         tier: insertPost.tier,
       })
@@ -415,7 +415,7 @@ export class DatabaseStorage implements IStorage {
           description: tier.description,
           price: tier.price,
           currency: tier.currency,
-          benefits: tier.benefits || [],
+          benefits: tier.benefits as string[] || [],
         })
         .returning();
       console.log('Subscription tier created successfully:', newTier);
@@ -1110,7 +1110,7 @@ export class DatabaseStorage implements IStorage {
         actor_id: notification.actor_id,
         entity_type: notification.entity_type,
         entity_id: notification.entity_id,
-        metadata: notification.metadata,
+        metadata: notification.metadata as any,
       })
       .returning();
 
