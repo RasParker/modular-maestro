@@ -24,7 +24,7 @@ export const CreatorSettings: React.FC = () => {
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const defaultTab = urlParams.get('tab') || 'profile';
-  const [showCurrentPassword, setShowNewPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
@@ -592,8 +592,7 @@ export const CreatorSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
-    <>
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <Button variant="outline" asChild className="mb-4">
@@ -619,45 +618,25 @@ export const CreatorSettings: React.FC = () => {
           <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <Button
-                variant={activeTab === 'profile' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('profile')}
-              >
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Profile
-              </Button>
-              <Button
-                variant={activeTab === 'content' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('content')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="content" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Content
-              </Button>
-              <Button
-                variant={activeTab === 'goals' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('goals')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="goals" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Goals
-              </Button>
-               <Button
-                variant={activeTab === 'payouts' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('payouts')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="payouts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Payouts
-              </Button>
-              <Button
-                variant={activeTab === 'security' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('security')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Security
-              </Button>
-            </div>
+              </TabsTrigger>
+            </TabsList>
 
-            {activeTab === 'profile' && (
+            <TabsContent value="profile" className="space-y-6">
               <div className="space-y-6">
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -786,9 +765,9 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
-            )}
+            </TabsContent>
 
-            {activeTab === 'content' && (
+            <TabsContent value="content" className="space-y-6">
               
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -857,10 +836,9 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              
-            )}
+            </TabsContent>
 
-            {activeTab === 'goals' && (
+            <TabsContent value="goals" className="space-y-6">
               
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -949,10 +927,9 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              
-            )}
+            </TabsContent>
 
-            {activeTab === 'payouts' && (
+            <TabsContent value="payouts" className="space-y-6">
               
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -977,7 +954,7 @@ export const CreatorSettings: React.FC = () => {
                         <SelectContent>
                           <SelectItem value="mtn-momo">MTN Mobile Money</SelectItem>
                           <SelectItem value="vodafone-cash">Vodafone Cash</SelectItem>
-                          <SelectItem value`"airteltigo-money">AirtelTigo Money</SelectItem>
+                          <SelectItem value="airteltigo-money">AirtelTigo Money</SelectItem>
                           <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
                           <SelectItem value="paystack">Paystack</SelectItem>
                         </SelectContent>
@@ -1086,9 +1063,9 @@ export const CreatorSettings: React.FC = () => {
                   </CardContent>
                 </Card>
               
-            )}
+</TabsContent>
 
-            {activeTab === 'security' && (
+            <TabsContent value="security" className="space-y-6">
               
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
@@ -1348,8 +1325,7 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              
-            )}
+            </TabsContent>
           </Tabs>
         </div>
       </div>
@@ -1442,6 +1418,6 @@ export const CreatorSettings: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 };
