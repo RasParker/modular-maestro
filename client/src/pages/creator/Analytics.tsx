@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
+import { TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { ArrowLeft, TrendingUp, Users, DollarSign, Eye, Heart } from 'lucide-react';
 
@@ -116,36 +117,20 @@ export const Analytics: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={activeTab === 'overview' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('overview')}
-          >
-            Overview
-          </Button>
-          <Button
-            variant={activeTab === 'subscribers' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('subscribers')}
-          >
-            Subscribers
-          </Button>
-          <Button
-            variant={activeTab === 'content' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('content')}
-          >
-            Content
-          </Button>
-          <Button
-            variant={activeTab === 'earnings' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('earnings')}
-          >
-            Earnings
-          </Button>
-        </div>
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="content" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Content
+              </TabsTrigger>
+              <TabsTrigger value="audience" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Audience
+              </TabsTrigger>
+              <TabsTrigger value="revenue" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Revenue
+              </TabsTrigger>
+            </TabsList>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gradient-card border-border/50">

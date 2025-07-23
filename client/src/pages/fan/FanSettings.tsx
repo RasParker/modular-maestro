@@ -359,43 +359,23 @@ export const FanSettings: React.FC = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="space-y-6">
             {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <Button
-                variant={activeTab === 'profile' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('profile')}
-              >
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Profile
-              </Button>
-              <Button
-                variant={activeTab === 'notifications' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('notifications')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Alerts
-              </Button>
-              <Button
-                variant={activeTab === 'subscriptions' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('subscriptions')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Subs
-              </Button>
-              <Button
-                variant={activeTab === 'privacy' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('privacy')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="privacy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Privacy
-              </Button>
-              <Button
-                variant={activeTab === 'security' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab('security')}
-              >
+              </TabsTrigger>
+              <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Security
-              </Button>
-            </div>
+              </TabsTrigger>
+            </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
               <Card className="bg-gradient-card border-border/50">

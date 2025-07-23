@@ -184,48 +184,32 @@ export const ManageUsers: React.FC = () => {
           <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={activeTab === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('all')}
-          >
-            All Users
-            <span className="ml-2 text-xs opacity-70">
-              {users.length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'creators' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('creators')}
-          >
-            Creators
-            <span className="ml-2 text-xs opacity-70">
-              {getCreators().length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'fans' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('fans')}
-          >
-            Fans
-            <span className="ml-2 text-xs opacity-70">
-              {getFans().length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'banned' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('banned')}
-          >
-            Banned
-            <span className="ml-2 text-xs opacity-70">
-              {getBannedUsers().length}
-            </span>
-          </Button>
-        </div>
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                All Users
+                <span className="ml-2 text-xs opacity-70">
+                  {users.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="creators" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Creators
+                <span className="ml-2 text-xs opacity-70">
+                  {getCreators().length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="fans" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Fans
+                <span className="ml-2 text-xs opacity-70">
+                  {getFans().length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="banned" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Banned
+                <span className="ml-2 text-xs opacity-70">
+                  {getBannedUsers().length}
+                </span>
+              </TabsTrigger>
+            </TabsList>
 
             {loading ? (
               <div className="flex justify-center py-8">

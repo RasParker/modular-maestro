@@ -207,28 +207,20 @@ export const ManageSubscriptions: React.FC = () => {
           {/* Tab Bar */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={activeTab === 'active' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('active')}
-          >
-            Active Subscriptions
-            <span className="ml-2 text-xs opacity-70">
-              {activeSubscriptions.length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'history' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('history')}
-          >
-            Payment History
-            <span className="ml-2 text-xs opacity-70">
-              {paymentHistory.length}
-            </span>
-          </Button>
-        </div>
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="active" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Active Subscriptions
+                <span className="ml-2 text-xs opacity-70">
+                  {activeSubscriptions.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="history" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Payment History
+                <span className="ml-2 text-xs opacity-70">
+                  {paymentHistory.length}
+                </span>
+              </TabsTrigger>
+            </TabsList>
 
           {activeTab === 'active' && (
             <>

@@ -268,38 +268,26 @@ export const ManageContent: React.FC = () => {
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={activeTab === 'published' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('published')}
-          >
-            Published
-            <span className="ml-2 text-xs opacity-70">
-              {publishedPosts.length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'scheduled' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('scheduled')}
-          >
-            Scheduled
-            <span className="ml-2 text-xs opacity-70">
-              {scheduledPosts.length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'drafts' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('drafts')}
-          >
-            Drafts
-            <span className="ml-2 text-xs opacity-70">
-              {draftPosts.length}
-            </span>
-          </Button>
-        </div>
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="published" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Published
+                <span className="ml-2 text-xs opacity-70">
+                  {publishedPosts.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="scheduled" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Scheduled
+                <span className="ml-2 text-xs opacity-70">
+                  {scheduledPosts.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="drafts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Drafts
+                <span className="ml-2 text-xs opacity-70">
+                  {draftPosts.length}
+                </span>
+              </TabsTrigger>
+            </TabsList>
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (

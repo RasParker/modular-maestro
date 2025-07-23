@@ -189,39 +189,28 @@ export const Subscribers: React.FC = () => {
               activeCount={activeCount}
               recentCount={recentCount}
             />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Button
-            variant={activeTab === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('all')}
-          >
-            All Subscribers
-            <span className="ml-2 text-xs opacity-70">
-              {subscribers.length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'new' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('new')}
-          >
-            New This Month
-            <span className="ml-2 text-xs opacity-70">
-              {getNewSubscribers().length}
-            </span>
-          </Button>
-          <Button
-            variant={activeTab === 'top' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('top')}
-          >
-            Top Supporters
-            <span className="ml-2 text-xs opacity-70">
-              {getTopSubscribers().length}
-            </span>
-          </Button>
-        </div>
+            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
+              <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                All Subscribers
+                <span className="ml-2 text-xs opacity-70">
+                  {subscribers.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="new" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                New This Month
+                <span className="ml-2 text-xs opacity-70">
+                  {getNewSubscribers().length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="top" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Top Supporters
+                <span className="ml-2 text-xs opacity-70">
+                  {getTopSubscribers().length}
+                </span>
+              </TabsTrigger>
+            </TabsList>
 
         {/* Filters */}
         <div className="mb-6">
@@ -273,6 +262,7 @@ export const Subscribers: React.FC = () => {
         </Card>
           </>
         )}
+        </Tabs>
       </div>
     </div>
   );
