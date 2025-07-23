@@ -8,7 +8,7 @@ import { ArrowLeft, Heart, CreditCard, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Subscription {
   id: number;
@@ -266,7 +266,7 @@ export const ManageSubscriptions: React.FC = () => {
                     },
                     tier: subscription.tier.name,
                     price: parseFloat(subscription.tier.price.toString()),
-                    status: subscription.status,
+                    status: subscription.status as 'active' | 'paused',
                     next_billing: new Date(subscription.current_period_end).toLocaleDateString(),
                     joined: new Date(subscription.created_at).toLocaleDateString(),
                     auto_renew: subscription.auto_renew

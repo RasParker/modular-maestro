@@ -24,7 +24,7 @@ export const CreatorSettings: React.FC = () => {
   // Get the tab from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const defaultTab = urlParams.get('tab') || 'profile';
-  const [showCurrentPassword, setShowNewPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mtn-momo');
@@ -513,7 +513,7 @@ export const CreatorSettings: React.FC = () => {
         setLocalStorageItem('coverPhotoUrl', result.url);
 
         // Update the user context with the new cover photo
-        updateUser({ cover_photo: result.url });
+        updateUser({ avatar: result.url } as any);
 
         // Dispatch custom event to trigger reactivity
         window.dispatchEvent(new CustomEvent('localStorageChange', {
@@ -571,11 +571,8 @@ export const CreatorSettings: React.FC = () => {
 
       // Update the user context with the latest profile data
       updateUser({ 
-        display_name: displayName.trim() || null,
-        bio: bio.trim() || null,
-        avatar: profilePhotoUrl || null,
-        cover_photo: coverPhotoUrl || null
-      });
+        avatar: profilePhotoUrl || undefined
+      } as any);
 
       toast({
         title: "Profile updated",
