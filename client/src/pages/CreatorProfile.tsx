@@ -1131,19 +1131,15 @@ export const CreatorProfile: React.FC = () => {
             <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center relative group">
               {/* Cover Photo Placeholder for Own Profile */}
               {isOwnProfile && !creator.cover_image && (
-                <div className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-background/10 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCoverPhotoUpload}
-                    className="hidden"
-                    id="cover-upload-main"
-                  />
-                  <label htmlFor="cover-upload-main" className="cursor-pointer flex items-center gap-2 text-muted-foreground">
+                <Link 
+                  to="/creator/settings" 
+                  className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-background/10 transition-colors"
+                >
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Image className="w-8 h-8" />
                     <span className="text-lg font-medium">Add Cover Photo</span>
-                  </label>
-                </div>
+                  </div>
+                </Link>
               )}
             </div>
           )}
@@ -1159,19 +1155,15 @@ export const CreatorProfile: React.FC = () => {
                 ) : (
                   /* Profile photo placeholder/upload for own profile when no avatar */
                   isOwnProfile && !creator.avatar && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full cursor-pointer hover:bg-background/90 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfilePhotoUpload}
-                        className="hidden"
-                        id="profile-upload-main"
-                      />
-                      <label htmlFor="profile-upload-main" className="cursor-pointer flex flex-col items-center gap-1">
+                    <Link 
+                      to="/creator/settings" 
+                      className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full cursor-pointer hover:bg-background/90 transition-colors"
+                    >
+                      <div className="flex flex-col items-center gap-1">
                         <Camera className="w-6 h-6 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground font-medium">Add Photo</span>
-                      </label>
-                    </div>
+                      </div>
+                    </Link>
                   )
                 )}
                 {!creator.avatar && !isOwnProfile && (
