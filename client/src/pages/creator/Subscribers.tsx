@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 import { ArrowLeft, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -260,9 +261,9 @@ export const Subscribers: React.FC = () => {
             )}
           </CardContent>
         </Card>
+        </Tabs>
           </>
         )}
-        </Tabs>
       </div>
     </div>
   );
