@@ -618,20 +618,20 @@ export const CreatorSettings: React.FC = () => {
           <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="profile">
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="content">
                 Content
               </TabsTrigger>
-              <TabsTrigger value="goals" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="goals">
                 Goals
               </TabsTrigger>
-              <TabsTrigger value="payouts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="payouts">
                 Payouts
               </TabsTrigger>
-              <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="security">
                 Security
               </TabsTrigger>
             </TabsList>

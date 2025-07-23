@@ -207,14 +207,14 @@ export const ManageSubscriptions: React.FC = () => {
           {/* Tab Bar */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="active" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="active">
                 Active Subscriptions
                 <span className="ml-2 text-xs opacity-70">
                   {activeSubscriptions.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="history">
                 Payment History
                 <span className="ml-2 text-xs opacity-70">
                   {paymentHistory.length}

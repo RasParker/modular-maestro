@@ -184,26 +184,26 @@ export const ManageUsers: React.FC = () => {
           <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="all">
                 All Users
                 <span className="ml-2 text-xs opacity-70">
                   {users.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="creators" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="creators">
                 Creators
                 <span className="ml-2 text-xs opacity-70">
                   {getCreators().length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="fans" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="fans">
                 Fans
                 <span className="ml-2 text-xs opacity-70">
                   {getFans().length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="banned" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="banned">
                 Banned
                 <span className="ml-2 text-xs opacity-70">
                   {getBannedUsers().length}

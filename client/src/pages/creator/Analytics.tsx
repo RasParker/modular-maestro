@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 import { ArrowLeft, TrendingUp, Users, DollarSign, Eye, Heart } from 'lucide-react';
 
@@ -117,17 +117,18 @@ export const Analytics: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+        <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="mb-6">
+              <TabsTrigger value="overview">
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="content">
                 Content
               </TabsTrigger>
-              <TabsTrigger value="audience" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="audience">
                 Audience
               </TabsTrigger>
-              <TabsTrigger value="revenue" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="revenue">
                 Revenue
               </TabsTrigger>
             </TabsList>
@@ -242,6 +243,7 @@ export const Analytics: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+        </Tabs>
       </div>
     </div>
   );

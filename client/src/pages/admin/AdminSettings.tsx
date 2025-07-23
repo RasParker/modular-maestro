@@ -152,11 +152,11 @@ export const AdminSettings: React.FC = () => {
 
         <div className="space-y-6">
           <Tabs defaultValue="platform" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 h-auto bg-transparent">
-              <TabsTrigger value="platform" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Platform</TabsTrigger>
-              <TabsTrigger value="moderation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Content</TabsTrigger>
-              <TabsTrigger value="email" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Email</TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Users</TabsTrigger>
+            <TabsList>
+              <TabsTrigger value="platform">Platform</TabsTrigger>
+              <TabsTrigger value="moderation">Content</TabsTrigger>
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
             </TabsList>
 
             <TabsContent value="platform" className="space-y-6">

@@ -268,20 +268,20 @@ export const ManageContent: React.FC = () => {
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="published" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="published">
                 Published
                 <span className="ml-2 text-xs opacity-70">
                   {publishedPosts.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="scheduled" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="scheduled">
                 Scheduled
                 <span className="ml-2 text-xs opacity-70">
                   {scheduledPosts.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="drafts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="drafts">
                 Drafts
                 <span className="ml-2 text-xs opacity-70">
                   {draftPosts.length}

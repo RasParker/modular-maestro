@@ -192,20 +192,20 @@ export const Subscribers: React.FC = () => {
             />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="all">
                 All Subscribers
                 <span className="ml-2 text-xs opacity-70">
                   {subscribers.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="new" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="new">
                 New This Month
                 <span className="ml-2 text-xs opacity-70">
                   {getNewSubscribers().length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="top" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="top">
                 Top Supporters
                 <span className="ml-2 text-xs opacity-70">
                   {getTopSubscribers().length}

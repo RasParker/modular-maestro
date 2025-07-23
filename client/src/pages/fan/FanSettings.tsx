@@ -112,7 +112,7 @@ export const FanSettings: React.FC = () => {
         // Invalidate the online status query for the current user to update the OnlineStatusIndicator component
         if (user?.id) {
           await queryClient.invalidateQueries({ 
-            queryKey: getOnlineStatusQueryKey(user.id) 
+            queryKey: getOnlineStatusQueryKey(Number(user.id)) 
           });
         }
 
@@ -359,20 +359,20 @@ export const FanSettings: React.FC = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="space-y-6">
             {/* Tab Navigation */}
-            <TabsList className="flex flex-wrap gap-2 mb-6 h-auto bg-transparent">
-              <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsList className="mb-6">
+              <TabsTrigger value="profile">
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="notifications">
                 Alerts
               </TabsTrigger>
-              <TabsTrigger value="subscriptions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="subscriptions">
                 Subs
               </TabsTrigger>
-              <TabsTrigger value="privacy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="privacy">
                 Privacy
               </TabsTrigger>
-              <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger value="security">
                 Security
               </TabsTrigger>
             </TabsList>
