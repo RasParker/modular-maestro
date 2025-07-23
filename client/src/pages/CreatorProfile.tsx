@@ -1469,26 +1469,48 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="mb-6">
                 <Tabs value={activePostTab} onValueChange={setActivePostTab} className="space-y-4">
-                  <TabsList className="grid w-full grid-cols-3 mb-4 pb-2">
-                    <TabsTrigger value="all" className="text-sm py-2">
+                  {/* Simple horizontal tab bar */}
+                  <div className="flex border-b border-border/30">
+                    <button
+                      onClick={() => setActivePostTab('all')}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        activePostTab === 'all'
+                          ? 'border-foreground text-foreground'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
                       All
-                      <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                      <span className="ml-2 text-xs opacity-70">
                         {userPosts.length}
                       </span>
-                    </TabsTrigger>
-                    <TabsTrigger value="free" className="text-sm py-2">
+                    </button>
+                    <button
+                      onClick={() => setActivePostTab('free')}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        activePostTab === 'free'
+                          ? 'border-foreground text-foreground'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
                       Free
-                      <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                      <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier === 'public').length}
                       </span>
-                    </TabsTrigger>
-                    <TabsTrigger value="premium" className="text-sm py-2">
+                    </button>
+                    <button
+                      onClick={() => setActivePostTab('premium')}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        activePostTab === 'premium'
+                          ? 'border-foreground text-foreground'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
                       Premium
-                      <span className="ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                      <span className="ml-2 text-xs opacity-70">
                         {userPosts.filter(p => p.tier !== 'public').length}
                       </span>
-                    </TabsTrigger>
-                  </TabsList>
+                    </button>
+                  </div>
 
                   <TabsContent value="all" className="space-y-0">
                     {userPosts.length > 0 ? (
