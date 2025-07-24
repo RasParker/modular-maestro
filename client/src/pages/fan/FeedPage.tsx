@@ -472,34 +472,89 @@ export const FeedPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Feed Container - Vertical scrolling feed similar to TikTok/Instagram Reels */}
-      <div className="feed-container flex flex-col items-center mx-auto max-w-lg">
+    <EdgeToEdgeContainer>
+      {/* Hero Section - Full Width */}
+      <div className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b border-border">
+        <EdgeToEdgeContainer maxWidth="4xl" enablePadding enableTopPadding>
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+              Your Feed
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Latest content from creators you follow
+            </p>
+          </div>
+        </EdgeToEdgeContainer>
+      </div>
+
+      {/* Feed Content */}
+      <EdgeToEdgeContainer maxWidth="4xl" enablePadding className="py-6 sm:py-8">
         {loading ? (
-          <div className="space-y-4 w-full">
+          <div className="space-y-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="media-post bg-muted animate-pulse">
-                <div className="w-full h-full rounded-lg"></div>
-              </div>
+              <Card key={i} className="bg-gradient-card border-border/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-muted rounded-full animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="w-32 h-4 bg-muted rounded animate-pulse"></div>
+                      <div className="w-24 h-3 bg-muted rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="w-full h-48 bg-muted rounded-lg animate-pulse mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="w-full h-4 bg-muted rounded animate-pulse"></div>
+                    <div className="w-3/4 h-4 bg-muted rounded animate-pulse"></div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : feed.length === 0 ? (
-          <div className="text-center py-12 text-white">
-            <Calendar className="w-16 h-16 text-white/60 mx-auto mb-4" />
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
-            <p className="text-white/60 mb-6">
+            <p className="text-muted-foreground mb-6">
               Follow some creators to see their content in your feed
             </p>
-            <Button asChild variant="outline" className="text-white border-white">
+            <Button asChild>
               <Link to="/explore">Discover Creators</Link>
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 w-full">
+          <div className="space-y-0 -mx-4">
             {feed.map((post) => (
-              <div key={post.id} className="media-post">
+              <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
+                {/* Post Header - Mobile Instagram style */}
+              <div className="flex items-center justify-between px-3 py-3">
+                <div className="flex items-center gap-3 flex-1">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                    <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex items-center gap-2 flex-1">
+                    <p className="font-semibold text-foreground text-sm">{post.creator.display_name}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {getTimeAgo(post.posted)}
+                    </span>
+                  </div>
+                </div>
+                <Badge variant={getTierColor(post.tier)} className="text-xs px-1 py-0 h-4">
+                  {post.tier === 'public' ? 'Free' : 
+                   post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                   post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                   post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                   post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                   post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                   post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                   post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                   post.tier}
+                </Badge>
+              </div>
+              {/* Post Media - 9:16 aspect ratio, no overlay */}
+              <div className="w-full">
                 <div 
-                  className="relative cursor-pointer active:opacity-90 transition-opacity h-full w-full"
+                  className="relative cursor-pointer active:opacity-90 transition-opacity"
                   onClick={() => handleThumbnailClick(post)}
                   role="button"
                   tabIndex={0}
@@ -514,7 +569,7 @@ export const FeedPage: React.FC = () => {
                     <img 
                       src={post.thumbnail} 
                       alt={`${post.creator.display_name}'s post`}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full aspect-[9/16] object-cover"
                     />
                   ) : (
                     // Use placeholder image for demo purposes as requested in prompt
@@ -524,160 +579,125 @@ export const FeedPage: React.FC = () => {
                            post.id === '3' ? 'https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3' :
                            `https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                       alt={`${post.creator.display_name}'s post`}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full aspect-[9/16] object-cover"
                     />
                   )}
-                  
-                  {/* Post Overlay - TikTok/Instagram style overlay */}
-                  <div className="post-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent rounded-lg">
-                    {/* Creator info overlay - bottom left */}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <Avatar className="h-10 w-10 border-2 border-white">
-                          <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                          <AvatarFallback className="text-black">{post.creator.display_name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <p className="font-semibold text-white text-sm drop-shadow-lg">
-                            @{post.creator.username}
-                          </p>
-                          <span className="text-xs text-white/80 drop-shadow-lg">
-                            {getTimeAgo(post.posted)}
-                          </span>
-                        </div>
-                        <Badge 
-                          variant="secondary" 
-                          className="text-xs px-2 py-1 bg-white/20 backdrop-blur-sm text-white border-white/30"
-                        >
-                          {post.tier === 'public' ? 'Free' : 
-                           post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                           post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                           post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                           post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                           post.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                           post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                           post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                           post.tier}
-                        </Badge>
-                      </div>
-                      
-                      {/* Caption with readability text shadow */}
-                      <div className="mb-3">
-                        {(() => {
-                          const { truncated, needsExpansion } = truncateText(post.content, 2);
-                          const isExpanded = expandedCaptions[post.id];
-                          
-                          return (
-                            <p className="text-sm leading-relaxed text-white drop-shadow-lg">
-                              {isExpanded ? post.content : (
-                                <>
-                                  {truncated}
-                                  {needsExpansion && !isExpanded && (
-                                    <>
-                                      {'... '}
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleCaptionExpansion(post.id);
-                                        }}
-                                        className="text-white/80 hover:text-white font-normal underline"
-                                      >
-                                        more
-                                      </button>
-                                    </>
-                                  )}
-                                </>
-                              )}
-                              {isExpanded && needsExpansion && (
-                                <>
-                                  {' '}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleCaptionExpansion(post.id);
-                                    }}
-                                    className="text-white/80 hover:text-white font-normal underline"
-                                  >
-                                    less
-                                  </button>
-                                </>
-                              )}
-                            </p>
-                          );
-                        })()}
-                      </div>
+                  {/* Content type overlay - smaller for mobile */}
+                  <div className="absolute top-2 left-2 z-20">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
+                      {getTypeIcon(post.type)}
                     </div>
-                    
-                    {/* Action buttons - right side TikTok style */}
-                    <div className="absolute bottom-4 right-4 flex flex-col gap-4">
-                      <div className="flex flex-col items-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 ${post.liked ? 'text-red-500' : 'text-white'}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLike(post.id);
-                          }}
-                        >
-                          <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
-                        </Button>
-                        <span className="text-xs font-medium text-white drop-shadow-lg mt-1">
-                          {post.likes}
-                        </span>
-                      </div>
-                      
-                      <div className="flex flex-col items-center">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCommentClick(post.id);
-                          }}
-                        >
-                          <MessageSquare className="w-6 h-6" />
-                        </Button>
-                        <span className="text-xs font-medium text-white drop-shadow-lg mt-1">
-                          {post.comments}
-                        </span>
-                      </div>
-                      
-                      <div className="flex flex-col items-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(post.id);
-                          }}
-                        >
-                          <Share2 className="w-6 h-6" />
-                        </Button>
-                      </div>
+                  </div>
+                </div>
+              </div>
+                
+              {/* Action Buttons - Mobile Instagram style with inline stats */}
+              <div className="px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`h-8 w-8 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                        onClick={() => handleLike(post.id)}
+                      >
+                        <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
+                      </Button>
+                      <span className="text-sm font-medium text-foreground">
+                        {post.likes}
+                      </span>
                     </div>
-                    
-                    {/* Content type overlay - top left */}
-                    <div className="absolute top-4 left-4 z-20">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm border border-white/30">
-                        {getTypeIcon(post.type)}
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-muted-foreground"
+                        onClick={() => handleCommentClick(post.id)}
+                      >
+                        <MessageSquare className="w-6 h-6" />
+                      </Button>
+                      <span className="text-sm font-medium text-foreground">
+                        {post.comments}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-muted-foreground"
+                        onClick={() => handleShare(post.id)}
+                      >
+                        <Share2 className="w-6 h-6" />
+                      </Button>
                     </div>
                   </div>
                 </div>
                 
-                {/* Comments Section - appears below post when expanded */}
-                {showComments[post.id] && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg mt-2 p-4 border border-white/20">
+                {/* Post Caption - Mobile Instagram style */}
+                <div className="mb-1">
+                  {(() => {
+                    const { truncated, needsExpansion } = truncateText(post.content);
+                    const isExpanded = expandedCaptions[post.id];
+                    
+                    return (
+                      <p className="text-sm leading-relaxed text-foreground">
+                        {isExpanded ? post.content : (
+                          <>
+                            {truncated}
+                            {needsExpansion && !isExpanded && (
+                              <>
+                                {'... '}
+                                <button
+                                  onClick={() => toggleCaptionExpansion(post.id)}
+                                  className="text-muted-foreground hover:text-foreground font-normal"
+                                >
+                                  more
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+                        {isExpanded && needsExpansion && (
+                          <>
+                            {' '}
+                            <button
+                              onClick={() => toggleCaptionExpansion(post.id)}
+                              className="text-muted-foreground hover:text-foreground font-normal"
+                            >
+                              less
+                            </button>
+                          </>
+                        )}
+                      </p>
+                    );
+                  })()}
+                </div>
+                
+                {/* View comments link */}
+                {post.comments > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 text-muted-foreground text-sm font-normal"
+                    onClick={() => handleCommentClick(post.id)}
+                  >
+                    View all {post.comments} comments
+                  </Button>
+                )}
+              </div>
+              {/* Comments Section - Mobile optimized */}
+              {showComments[post.id] && (
+                <div className="px-3 pb-3 border-t border-border/30 mx-3">
+                  <div className="pt-3">
                     <CommentSection
                       postId={post.id}
                       initialComments={post.initialComments || []}
                       onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
                     />
                   </div>
-                )}
+                </div>
+              )}
               </div>
             ))}
           </div>
@@ -685,13 +705,13 @@ export const FeedPage: React.FC = () => {
 
         {/* Load More */}
         {!loading && feed.length > 0 && (
-          <div className="text-center mt-8 mb-8">
-            <Button variant="outline" className="text-white border-white bg-white/10 backdrop-blur-sm">
+          <div className="text-center mt-8">
+            <Button variant="outline">
               Load More Posts
             </Button>
           </div>
         )}
-      </div>
+      </EdgeToEdgeContainer>
 
       {/* Instagram-style Content Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -732,20 +752,156 @@ export const FeedPage: React.FC = () => {
                   />
                 )
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-center px-6 text-white">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
-                      {getTypeIcon(selectedContent.type)}
+                selectedContent.id === '1' ? (
+                  <img 
+                    src="https://placehold.co/1080x1920/E63946/FFFFFF?text=Creator+Post+1"
+                    alt={`${selectedContent.creator.display_name}'s post`}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : selectedContent.id === '2' ? (
+                  <img 
+                    src="https://placehold.co/1080x1920/457B9D/FFFFFF?text=Creator+Post+2"
+                    alt={`${selectedContent.creator.display_name}'s post`}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : selectedContent.id === '3' ? (
+                  <img 
+                    src="https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3"
+                    alt={`${selectedContent.creator.display_name}'s post`}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : (
+                  <img 
+                    src={`https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${selectedContent.id}`}
+                    alt={`${selectedContent.creator.display_name}'s post`}
+                    className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
+                  />
+                )
+              )}
+
+              {/* Post Overlay - TikTok/Instagram style overlay for modal */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
+                {/* Creator info overlay - bottom left */}
+                <div className="absolute bottom-4 left-4 right-4 pointer-events-auto">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Avatar className="h-12 w-12 border-2 border-white">
+                      <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
+                      <AvatarFallback className="text-black">{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white text-base drop-shadow-lg">
+                        @{selectedContent.creator.username}
+                      </p>
+                      <span className="text-sm text-white/80 drop-shadow-lg">
+                        {getTimeAgo(selectedContent.posted)}
+                      </span>
                     </div>
-                    <h3 className="font-semibold text-xl mb-4">{selectedContent.content}</h3>
-                    <p className="text-sm text-white/70">Text post</p>
+                    <Badge 
+                      variant="secondary" 
+                      className="text-sm px-3 py-1 bg-white/20 backdrop-blur-sm text-white border-white/30"
+                    >
+                      {selectedContent.tier === 'public' ? 'Free' : 
+                       selectedContent.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                       selectedContent.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                       selectedContent.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                       selectedContent.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                       selectedContent.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                       selectedContent.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                       selectedContent.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                       selectedContent.tier}
+                    </Badge>
+                  </div>
+                  
+                  {/* Caption with readability text shadow */}
+                  <div className="mb-3">
+                    {(() => {
+                      const { truncated, needsExpansion } = truncateText(selectedContent.content, 3);
+                      
+                      return (
+                        <p className="text-base leading-relaxed text-white drop-shadow-lg">
+                          {expandedModalCaption ? selectedContent.content : (
+                            <>
+                              {truncated}
+                              {needsExpansion && !expandedModalCaption && (
+                                <>
+                                  {'... '}
+                                  <button
+                                    onClick={() => setExpandedModalCaption(true)}
+                                    className="text-white/80 hover:text-white font-normal underline"
+                                  >
+                                    more
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
+                          {expandedModalCaption && needsExpansion && (
+                            <>
+                              {' '}
+                              <button
+                                onClick={() => setExpandedModalCaption(false)}
+                                className="text-white/80 hover:text-white font-normal underline"
+                              >
+                                less
+                              </button>
+                            </>
+                          )}
+                        </p>
+                      );
+                    })()}
                   </div>
                 </div>
-              )}
+                
+                {/* Action buttons - right side TikTok style */}
+                <div className="absolute bottom-4 right-4 flex flex-col gap-4 pointer-events-auto">
+                  <div className="flex flex-col items-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
+                      onClick={() => handleLike(selectedContent.id)}
+                    >
+                      <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                    </Button>
+                    <span className="text-sm font-medium text-white drop-shadow-lg mt-1">
+                      {selectedContent.likes}
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-col items-center">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                      onClick={() => handleCommentClick(selectedContent.id)}
+                    >
+                      <MessageSquare className="w-7 h-7" />
+                    </Button>
+                    <span className="text-sm font-medium text-white drop-shadow-lg mt-1">
+                      {selectedContent.comments}
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-col items-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                      onClick={() => handleShare(selectedContent.id)}
+                    >
+                      <Share2 className="w-7 h-7" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </EdgeToEdgeContainer>
   );
 };
