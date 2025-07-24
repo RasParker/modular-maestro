@@ -20,9 +20,9 @@ export async function initializeDatabase() {
   } catch (error) {
     console.error('Error initializing database:', error);
     console.error('Full error details:', {
-      message: error?.message || 'Unknown error',
-      stack: error?.stack || 'No stack trace available',
-      name: error?.name || 'Unknown error type'
+      message: (error as any)?.message || 'Unknown error',
+      stack: (error as any)?.stack || 'No stack trace available',
+      name: (error as any)?.name || 'Unknown error type'
     });
     
     // Instead of throwing and crashing the app, log the error and continue

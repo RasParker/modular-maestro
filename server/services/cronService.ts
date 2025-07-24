@@ -1,5 +1,5 @@
 
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { payoutService } from './payoutService';
 import { db } from '../db';
 import { posts } from '../../shared/schema';
@@ -22,7 +22,6 @@ export class CronService {
         console.error('Error in scheduled monthly payout processing:', error);
       }
     }, {
-      scheduled: false,
       timezone: 'Africa/Accra' // Ghana timezone
     });
 
@@ -39,7 +38,6 @@ export class CronService {
         console.error('Error in weekly payout status check:', error);
       }
     }, {
-      scheduled: false,
       timezone: 'Africa/Accra'
     });
 
@@ -54,7 +52,6 @@ export class CronService {
         console.error('Error in scheduled post publishing:', error);
       }
     }, {
-      scheduled: false,
       timezone: 'Africa/Accra'
     });
 
