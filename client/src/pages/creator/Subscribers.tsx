@@ -228,6 +228,7 @@ export const Subscribers: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+        <div className="pb-safe">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
             <TabsList className="mb-6">
@@ -300,6 +301,7 @@ export const Subscribers: React.FC = () => {
           </CardContent>
         </Card>
         </Tabs>
+        </div>
           </>
         )}
       </div>
