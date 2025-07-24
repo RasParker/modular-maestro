@@ -840,8 +840,8 @@ export const FeedPage: React.FC = () => {
 
                 {/* Post Overlay - TikTok/Instagram style overlay for modal */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
-                  {/* Creator info overlay - bottom left */}
-                  <div className="absolute bottom-4 left-4 right-16 pointer-events-auto">
+                  {/* Creator info overlay - bottom left - moved up */}
+                  <div className="absolute bottom-16 left-4 right-16 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-3">
                       <Avatar className="h-10 w-10 border-2 border-white">
                         <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
@@ -897,8 +897,8 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Action buttons - right side TikTok style */}
-                  <div className="absolute bottom-4 right-4 flex flex-col gap-4 pointer-events-auto">
+                  {/* Action buttons - right side TikTok style - moved up */}
+                  <div className="absolute bottom-16 right-4 flex flex-col gap-4 pointer-events-auto">
                     <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
@@ -956,23 +956,24 @@ export const FeedPage: React.FC = () => {
       <Sheet open={showBottomSheet} onOpenChange={setShowBottomSheet}>
         <SheetContent 
           side="bottom" 
-          className="h-[75vh] p-0 border-t-8 border-gray-300 rounded-t-xl bg-white dark:bg-gray-900"
+          className="h-[75vh] p-0 border-t-8 border-gray-300 rounded-t-xl bg-background flex flex-col"
         >
-          <SheetHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <SheetHeader className="px-4 py-3 border-b border-border bg-background">
             <div className="flex items-center justify-center">
-              <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mb-2"></div>
+              <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mb-2"></div>
             </div>
-            <SheetTitle className="text-center text-lg font-semibold">
+            <SheetTitle className="text-center text-lg font-semibold text-foreground">
               Comments
             </SheetTitle>
           </SheetHeader>
           
-          <div className="flex-1 overflow-y-auto px-4">
+          <div className="flex-1 overflow-y-auto bg-background">
             {selectedContent && (
               <CommentSection
                 postId={selectedContent.id}
                 initialComments={selectedContent.initialComments || []}
                 onCommentCountChange={(count) => handleCommentCountChange(selectedContent.id, count)}
+                isBottomSheet={true}
               />
             )}
           </div>

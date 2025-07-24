@@ -27,6 +27,7 @@ interface CommentSectionProps {
   initialComments: Comment[];
   onCommentCountChange: (count: number) => void;
   creatorId?: string;
+  isBottomSheet?: boolean;
 }
 
 // Separate component for reply input to avoid cursor jumping
@@ -98,7 +99,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   postId,
   initialComments,
   onCommentCountChange,
-  creatorId
+  creatorId,
+  isBottomSheet = false
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -420,6 +422,118 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         <div className="px-2 py-8 text-center text-muted-foreground">
           <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Comments are disabled for this creator's posts.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isBottomSheet) {
+    return (
+      <div className="w-full h-full bg-background flex flex-col">
+        {/* Comments Header */}
+        {comments.length > 0 && (
+          <div className="px-4 py-3 border-b border-border/20 bg-background">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">
+                {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'popular')}
+                  className="text-xs bg-background border border-border/30 rounded px-2 py-1 text-muted-foreground"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="popular">Most liked</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Comments List - Instagram style */}
+        <div className="flex-1 overflow-y-auto px-4 bg-background">
+          {comments.length > 0 ? (
+            <div className="divide-y divide-border/20">
+              {displayedComments.map((comment) => (
+                <CommentItem key={comment.id} comment={comment} />
+              ))}
+
+              {/* Load More Comments */}
+              {comments.length > 5 && !showAllComments && (
+                <div className="py-4 text-center border-t border-border/20">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllComments(true)}
+                    className="text-muted-foreground hover:text-foreground text-sm font-medium"
+                  >
+                    <ChevronDown className="w-4 h-4 mr-1" />
+                    View {comments.length - 5} more comments
+                  </Button>
+                </div>
+              )}
+
+              {showAllComments && comments.length > 5 && (
+                <div className="py-4 text-center border-t border-border/20">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllComments(false)}
+                    className="text-muted-foreground hover:text-foreground text-sm font-medium"
+                  >
+                    <ChevronUp className="w-4 h-4 mr-1" />
+                    Show fewer comments
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">
+              <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No comments yet. Be the first to comment!</p>
+            </div>
+          )}
+        </div>
+
+        {/* Add Comment - Instagram style - Fixed at bottom */}
+        <div className="px-4 py-3 border-t border-border/30 bg-background">
+          <div className="flex gap-2">
+            <Avatar className="h-8 w-8 flex-shrink-0">
+              <AvatarImage src={user?.avatar} alt={user?.username} />
+              <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 flex gap-1">
+              <Textarea
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="min-h-[40px] max-h-[120px] resize-none border-border/20 focus:border-primary/40 text-sm bg-background"
+                style={{ 
+                  direction: 'ltr', 
+                  textAlign: 'left',
+                  unicodeBidi: 'normal',
+                  writingMode: 'horizontal-tb',
+                  textOrientation: 'mixed'
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handleAddComment();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleAddComment}
+                disabled={!newComment.trim()}
+                size="sm"
+                className="h-[40px] px-3"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
