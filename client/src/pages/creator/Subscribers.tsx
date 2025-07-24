@@ -233,7 +233,7 @@ export const Subscribers: React.FC = () => {
         {/* Tab Navigation */}
             <TabsList className="mb-6">
               <TabsTrigger value="all">
-                All Subscribers
+                All Subs
                 <span className="ml-2 text-xs opacity-70">
                   {subscribers.length}
                 </span>
