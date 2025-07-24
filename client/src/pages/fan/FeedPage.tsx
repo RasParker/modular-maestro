@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, FileText, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -273,6 +274,7 @@ export const FeedPage: React.FC = () => {
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   // Fetch real posts from API
   useEffect(() => {
@@ -372,6 +374,10 @@ export const FeedPage: React.FC = () => {
     }));
   };
 
+  const handleModalCommentClick = () => {
+    setShowBottomSheet(true);
+  };
+
   const handleCommentCountChange = (postId: string, newCount: number) => {
     setFeed(prev => prev.map(post => 
       post.id === postId 
@@ -396,6 +402,7 @@ export const FeedPage: React.FC = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
     setExpandedModalCaption(false);
+    setShowBottomSheet(false);
   };
 
   const toggleCaptionExpansion = (postId: string) => {
@@ -713,7 +720,7 @@ export const FeedPage: React.FC = () => {
         )}
       </EdgeToEdgeContainer>
 
-      {/* Instagram-style Content Modal */}
+      {/* Instagram-style Content Modal with 9:16 aspect ratio */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
@@ -721,7 +728,7 @@ export const FeedPage: React.FC = () => {
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
           </DialogHeader>
           {selectedContent && (
-            <div className="relative w-screen h-screen bg-black">
+            <div className="relative w-screen h-screen bg-black flex items-center justify-center">
               {/* Back Arrow Button */}
               <Button
                 variant="ghost"
@@ -732,77 +739,75 @@ export const FeedPage: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Content container that fills entire screen */}
-              {selectedContent.thumbnail ? (
-                selectedContent.type === 'video' ? (
-                  <video 
-                    src={selectedContent.thumbnail} 
-                    className="w-full h-full"
-                    controls
-                    autoPlay
-                    muted
-                    style={{ objectFit: 'contain' }}
-                  />
+              {/* Content container with 9:16 aspect ratio centered */}
+              <div className="relative w-full max-w-sm h-full max-h-[100vh] aspect-[9/16] bg-black">
+                {selectedContent.thumbnail ? (
+                  selectedContent.type === 'video' ? (
+                    <video 
+                      src={selectedContent.thumbnail} 
+                      className="w-full h-full object-cover"
+                      controls
+                      autoPlay
+                      muted
+                    />
+                  ) : (
+                    <img 
+                      src={selectedContent.thumbnail} 
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
-                  <img 
-                    src={selectedContent.thumbnail} 
-                    alt={`${selectedContent.creator.display_name}'s post`}
-                    className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
-                  />
-                )
-              ) : (
-                selectedContent.id === '1' ? (
-                  <img 
-                    src="https://placehold.co/1080x1920/E63946/FFFFFF?text=Creator+Post+1"
-                    alt={`${selectedContent.creator.display_name}'s post`}
-                    className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
-                  />
-                ) : selectedContent.id === '2' ? (
-                  <img 
-                    src="https://placehold.co/1080x1920/457B9D/FFFFFF?text=Creator+Post+2"
-                    alt={`${selectedContent.creator.display_name}'s post`}
-                    className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
-                  />
-                ) : selectedContent.id === '3' ? (
-                  <img 
-                    src="https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3"
-                    alt={`${selectedContent.creator.display_name}'s post`}
-                    className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
-                  />
-                ) : (
-                  <img 
-                    src={`https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${selectedContent.id}`}
-                    alt={`${selectedContent.creator.display_name}'s post`}
-                    className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
-                  />
-                )
-              )}
+                  selectedContent.id === '1' ? (
+                    <img 
+                      src="https://placehold.co/1080x1920/E63946/FFFFFF?text=Creator+Post+1"
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : selectedContent.id === '2' ? (
+                    <img 
+                      src="https://placehold.co/1080x1920/457B9D/FFFFFF?text=Creator+Post+2"
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : selectedContent.id === '3' ? (
+                    <img 
+                      src="https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3"
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img 
+                      src={`https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${selectedContent.id}`}
+                      alt={`${selectedContent.creator.display_name}'s post`}
+                      className="w-full h-full object-cover"
+                    />
+                  )
+                )}
 
-              {/* Post Overlay - TikTok/Instagram style overlay for modal */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
-                {/* Creator info overlay - bottom left */}
-                <div className="absolute bottom-4 left-4 right-4 pointer-events-auto">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-12 w-12 border-2 border-white">
-                      <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
-                      <AvatarFallback className="text-black">{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-semibold text-white text-base drop-shadow-lg">
-                        @{selectedContent.creator.username}
-                      </p>
-                      <span className="text-sm text-white/80 drop-shadow-lg">
-                        {getTimeAgo(selectedContent.posted)}
-                      </span>
+                {/* Post Overlay - TikTok/Instagram style overlay for modal */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
+                  {/* Creator info overlay - bottom left */}
+                  <div className="absolute bottom-4 left-4 right-16 pointer-events-auto">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Avatar className="h-10 w-10 border-2 border-white">
+                        <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
+                        <AvatarFallback className="text-black">{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-white text-sm drop-shadow-lg">
+                          @{selectedContent.creator.username}
+                        </p>
+                        <span className="text-xs text-white/80 drop-shadow-lg">
+                          {getTimeAgo(selectedContent.posted)}
+                        </span>
+                      </div>
                     </div>
+                    
+                    {/* Tier badge */}
                     <Badge 
                       variant="secondary" 
-                      className="text-sm px-3 py-1 bg-white/20 backdrop-blur-sm text-white border-white/30"
+                      className="text-xs px-2 py-1 bg-white/20 backdrop-blur-sm text-white border-white/30 mb-2"
                     >
                       {selectedContent.tier === 'public' ? 'Free' : 
                        selectedContent.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
@@ -814,87 +819,87 @@ export const FeedPage: React.FC = () => {
                        selectedContent.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
                        selectedContent.tier}
                     </Badge>
+                    
+                    {/* Caption with readability text shadow */}
+                    <div className="mb-3">
+                      {(() => {
+                        const { truncated, needsExpansion } = truncateText(selectedContent.content, 2);
+                        
+                        return (
+                          <p className="text-sm leading-relaxed text-white drop-shadow-lg">
+                            {expandedModalCaption ? selectedContent.content : (
+                              <>
+                                {truncated}
+                                {needsExpansion && !expandedModalCaption && (
+                                  <>
+                                    {'... '}
+                                    <button
+                                      onClick={() => setExpandedModalCaption(true)}
+                                      className="text-white/80 hover:text-white font-normal underline"
+                                    >
+                                      more
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                            {expandedModalCaption && needsExpansion && (
+                              <>
+                                {' '}
+                                <button
+                                  onClick={() => setExpandedModalCaption(false)}
+                                  className="text-white/80 hover:text-white font-normal underline"
+                                >
+                                  less
+                                </button>
+                              </>
+                            )}
+                          </p>
+                        );
+                      })()}
+                    </div>
                   </div>
                   
-                  {/* Caption with readability text shadow */}
-                  <div className="mb-3">
-                    {(() => {
-                      const { truncated, needsExpansion } = truncateText(selectedContent.content, 3);
-                      
-                      return (
-                        <p className="text-base leading-relaxed text-white drop-shadow-lg">
-                          {expandedModalCaption ? selectedContent.content : (
-                            <>
-                              {truncated}
-                              {needsExpansion && !expandedModalCaption && (
-                                <>
-                                  {'... '}
-                                  <button
-                                    onClick={() => setExpandedModalCaption(true)}
-                                    className="text-white/80 hover:text-white font-normal underline"
-                                  >
-                                    more
-                                  </button>
-                                </>
-                              )}
-                            </>
-                          )}
-                          {expandedModalCaption && needsExpansion && (
-                            <>
-                              {' '}
-                              <button
-                                onClick={() => setExpandedModalCaption(false)}
-                                className="text-white/80 hover:text-white font-normal underline"
-                              >
-                                less
-                              </button>
-                            </>
-                          )}
-                        </p>
-                      );
-                    })()}
-                  </div>
-                </div>
-                
-                {/* Action buttons - right side TikTok style */}
-                <div className="absolute bottom-4 right-4 flex flex-col gap-4 pointer-events-auto">
-                  <div className="flex flex-col items-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
-                      onClick={() => handleLike(selectedContent.id)}
-                    >
-                      <Heart className={`w-7 h-7 ${selectedContent.liked ? 'fill-current' : ''}`} />
-                    </Button>
-                    <span className="text-sm font-medium text-white drop-shadow-lg mt-1">
-                      {selectedContent.likes}
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
-                      onClick={() => handleCommentClick(selectedContent.id)}
-                    >
-                      <MessageSquare className="w-7 h-7" />
-                    </Button>
-                    <span className="text-sm font-medium text-white drop-shadow-lg mt-1">
-                      {selectedContent.comments}
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-14 w-14 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
-                      onClick={() => handleShare(selectedContent.id)}
-                    >
-                      <Share2 className="w-7 h-7" />
-                    </Button>
+                  {/* Action buttons - right side TikTok style */}
+                  <div className="absolute bottom-4 right-4 flex flex-col gap-4 pointer-events-auto">
+                    <div className="flex flex-col items-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
+                        onClick={() => handleLike(selectedContent.id)}
+                      >
+                        <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                      </Button>
+                      <span className="text-xs font-medium text-white drop-shadow-lg mt-1">
+                        {selectedContent.likes}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                        onClick={handleModalCommentClick}
+                      >
+                        <MessageSquare className="w-6 h-6" />
+                      </Button>
+                      <span className="text-xs font-medium text-white drop-shadow-lg mt-1">
+                        {selectedContent.comments}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                        onClick={() => handleShare(selectedContent.id)}
+                      >
+                        <Share2 className="w-6 h-6" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -902,6 +907,33 @@ export const FeedPage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Instagram-style Bottom Sheet Comment Section */}
+      <Sheet open={showBottomSheet} onOpenChange={setShowBottomSheet}>
+        <SheetContent 
+          side="bottom" 
+          className="h-[75vh] p-0 border-t-8 border-gray-300 rounded-t-xl bg-white dark:bg-gray-900"
+        >
+          <SheetHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center">
+              <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mb-2"></div>
+            </div>
+            <SheetTitle className="text-center text-lg font-semibold">
+              Comments
+            </SheetTitle>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto px-4">
+            {selectedContent && (
+              <CommentSection
+                postId={selectedContent.id}
+                initialComments={selectedContent.initialComments || []}
+                onCommentCountChange={(count) => handleCommentCountChange(selectedContent.id, count)}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </EdgeToEdgeContainer>
   );
 };
