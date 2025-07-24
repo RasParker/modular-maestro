@@ -48,13 +48,13 @@ const ReplyInput: React.FC<{
   };
 
   return (
-    <div className="mt-3 px-3 animate-in slide-in-from-top-1 duration-200">
-      <div className="flex gap-3">
+    <div className="mt-3 px-2 animate-in slide-in-from-top-1 duration-200">
+      <div className="flex gap-2">
         <Avatar className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0">
           <AvatarImage src={userAvatar} alt={currentUserName} />
           <AvatarFallback className="text-xs">{currentUserName?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
-        <div className="flex-1 flex gap-2">
+        <div className="flex-1 flex gap-1">
           <Textarea
             placeholder={`Reply to ${username}...`}
             value={replyText}
@@ -75,7 +75,7 @@ const ReplyInput: React.FC<{
               size="sm"
               onClick={handleSubmit}
               disabled={!replyText.trim()}
-              className="h-8 w-8 p-0"
+              className="h-8 w-7 p-0"
             >
               <Send className="w-3 h-3" />
             </Button>
@@ -83,7 +83,7 @@ const ReplyInput: React.FC<{
               size="sm"
               variant="ghost"
               onClick={onCancel}
-              className="h-8 w-8 p-0 text-muted-foreground"
+              className="h-8 w-7 p-0 text-muted-foreground"
             >
               ✕
             </Button>
@@ -417,7 +417,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   if (!commentsEnabled) {
     return (
       <div className="w-full bg-background">
-        <div className="px-3 py-8 text-center text-muted-foreground">
+        <div className="px-2 py-8 text-center text-muted-foreground">
           <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Comments are disabled for this creator's posts.</p>
         </div>
@@ -428,13 +428,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   return (
     <div className="w-full bg-background">
       {/* Add Comment - Instagram style */}
-      <div className="px-3 py-3 border-b border-border/30">
-        <div className="flex gap-3">
+      <div className="px-2 py-3 border-b border-border/30">
+        <div className="flex gap-2">
           <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={user?.avatar} alt={user?.username} />
             <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="flex-1 flex gap-2">
+          <div className="flex-1 flex gap-1">
             <Textarea
               placeholder="Add a comment..."
               value={newComment}
@@ -457,7 +457,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               onClick={handleAddComment}
               disabled={!newComment.trim()}
               size="sm"
-              className="h-[60px] px-4"
+              className="h-[60px] px-3"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -467,7 +467,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
       {/* Comments Header */}
       {comments.length > 0 && (
-        <div className="px-3 py-3 border-b border-border/20 bg-background/50">
+        <div className="px-2 py-3 border-b border-border/20 bg-background/50">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">
               {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
@@ -497,7 +497,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
           {/* Load More Comments */}
           {comments.length > 5 && !showAllComments && (
-            <div className="px-3 py-4 text-center border-t border-border/20">
+            <div className="px-2 py-4 text-center border-t border-border/20">
               <Button
                 variant="ghost"
                 size="sm"
@@ -511,7 +511,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           )}
 
           {showAllComments && comments.length > 5 && (
-            <div className="px-3 py-4 text-center border-t border-border/20">
+            <div className="px-2 py-4 text-center border-t border-border/20">
               <Button
                 variant="ghost"
                 size="sm"
@@ -525,7 +525,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           )}
         </div>
       ) : (
-        <div className="px-3 py-8 text-center text-muted-foreground">
+        <div className="px-2 py-8 text-center text-muted-foreground">
           <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">No comments yet. Be the first to comment!</p>
         </div>
