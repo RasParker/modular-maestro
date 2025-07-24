@@ -231,7 +231,7 @@ export const Subscribers: React.FC = () => {
         <div className="pb-safe">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         {/* Tab Navigation */}
-            <TabsList className="mb-6">
+            <TabsList className="mb-6 px-4 sm:px-6">
               <TabsTrigger value="all">
                 All Subscribers
                 <span className="ml-2 text-xs opacity-70">
