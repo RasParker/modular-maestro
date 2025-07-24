@@ -580,7 +580,7 @@ export const FeedPage: React.FC = () => {
                    post.tier}
                 </Badge>
               </div>
-              {/* Post Media - 9:16 aspect ratio, no overlay */}
+              {/* Post Media - Responsive aspect ratio */}
               <div className="w-full">
                 <div 
                   className="relative cursor-pointer active:opacity-90 transition-opacity"
@@ -598,7 +598,7 @@ export const FeedPage: React.FC = () => {
                     <img 
                       src={post.thumbnail} 
                       alt={`${post.creator.display_name}'s post`}
-                      className="w-full aspect-[9/16] object-cover"
+                      className="w-full aspect-[9/16] sm:aspect-[4/5] md:aspect-[1/1] object-cover"
                     />
                   ) : (
                     // Use placeholder image for demo purposes as requested in prompt
@@ -608,7 +608,7 @@ export const FeedPage: React.FC = () => {
                            post.id === '3' ? 'https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3' :
                            `https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                       alt={`${post.creator.display_name}'s post`}
-                      className="w-full aspect-[9/16] object-cover"
+                      className="w-full aspect-[9/16] sm:aspect-[4/5] md:aspect-[1/1] object-cover"
                     />
                   )}
                   {/* Content type overlay - smaller for mobile */}
@@ -742,16 +742,16 @@ export const FeedPage: React.FC = () => {
         )}
       </EdgeToEdgeContainer>
 
-      {/* Instagram-style Content Modal with true 9:16 aspect ratio and swipe navigation */}
+      {/* Instagram-style Content Modal with responsive design */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-full max-h-full w-full h-full p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-full max-h-full w-full h-full p-0 m-0 overflow-hidden border-0 [&>button]:hidden sm:max-w-5xl sm:max-h-[95vh] sm:w-auto sm:h-auto sm:rounded-lg">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
           </DialogHeader>
           {selectedContent && (
             <div 
-              className="relative w-full h-full bg-black"
+              className="relative w-full h-full bg-black sm:flex sm:h-[90vh] sm:max-h-[800px] sm:rounded-lg sm:overflow-hidden"
               onTouchStart={(e) => {
                 const touch = e.touches[0];
                 const startY = touch.clientY;
@@ -784,14 +784,14 @@ export const FeedPage: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10 sm:text-gray-600 sm:hover:bg-gray-100/10"
                 onClick={closeModal}
               >
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Content container with true 9:16 aspect ratio - full screen */}
-              <div className="relative w-full h-full bg-black">
+              {/* Mobile: Full screen content */}
+              <div className="relative w-full h-full bg-black sm:hidden">
                 {selectedContent.thumbnail ? (
                   selectedContent.type === 'video' ? (
                     <video 
@@ -838,10 +838,10 @@ export const FeedPage: React.FC = () => {
                   )
                 )}
 
-                {/* Post Overlay - TikTok/Instagram style overlay for modal */}
+                {/* Mobile overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
                   {/* Creator info overlay - bottom left - moved up */}
-                  <div className="absolute bottom-16 left-4 right-16 pointer-events-auto">
+                  <div className="absolute bottom-20 left-4 right-16 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-3">
                       <Avatar className="h-10 w-10 border-2 border-white">
                         <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
@@ -857,7 +857,7 @@ export const FeedPage: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Caption with readability text shadow */}
+                    {/* Caption */}
                     <div className="mb-3">
                       {(() => {
                         const { truncated, needsExpansion } = truncateText(selectedContent.content, 2);
@@ -897,8 +897,8 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Action buttons - right side TikTok style - moved up */}
-                  <div className="absolute bottom-16 right-4 flex flex-col gap-4 pointer-events-auto">
+                  {/* Action buttons - right side */}
+                  <div className="absolute bottom-20 right-4 flex flex-col gap-4 pointer-events-auto">
                     <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
@@ -938,13 +938,137 @@ export const FeedPage: React.FC = () => {
                       </Button>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  {/* Swipe indicators */}
-                  {selectedIndex > 0 && (
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                      <div className="text-white/50 text-xs">Swipe up for next</div>
+              {/* Desktop: Two-panel Instagram-style layout */}
+              <div className="hidden sm:flex w-full h-full">
+                {/* Left panel - Content */}
+                <div className="flex-1 bg-black flex items-center justify-center">
+                  <div className="relative w-full h-full max-w-md mx-auto">
+                    {selectedContent.thumbnail ? (
+                      selectedContent.type === 'video' ? (
+                        <video 
+                          key={selectedContent.id}
+                          src={selectedContent.thumbnail} 
+                          className="w-full h-full object-contain"
+                          controls
+                          autoPlay
+                          muted
+                          loop
+                        />
+                      ) : (
+                        <img 
+                          src={selectedContent.thumbnail} 
+                          alt={`${selectedContent.creator.display_name}'s post`}
+                          className="w-full h-full object-contain"
+                        />
+                      )
+                    ) : (
+                      selectedContent.id === '1' ? (
+                        <img 
+                          src="https://placehold.co/1080x1920/E63946/FFFFFF?text=Creator+Post+1"
+                          alt={`${selectedContent.creator.display_name}'s post`}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : selectedContent.id === '2' ? (
+                        <img 
+                          src="https://placehold.co/1080x1920/457B9D/FFFFFF?text=Creator+Post+2"
+                          alt={`${selectedContent.creator.display_name}'s post`}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : selectedContent.id === '3' ? (
+                        <img 
+                          src="https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3"
+                          alt={`${selectedContent.creator.display_name}'s post`}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <img 
+                          src={`https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${selectedContent.id}`}
+                          alt={`${selectedContent.creator.display_name}'s post`}
+                          className="w-full h-full object-contain"
+                        />
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Right panel - Post info and comments */}
+                <div className="w-96 bg-background border-l border-border flex flex-col">
+                  {/* Post header */}
+                  <div className="px-4 py-3 border-b border-border">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
+                        <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground text-sm">
+                          @{selectedContent.creator.username}
+                        </p>
+                        <span className="text-xs text-muted-foreground">
+                          {getTimeAgo(selectedContent.posted)}
+                        </span>
+                      </div>
                     </div>
-                  )}
+                    
+                    {/* Caption */}
+                    <div className="mt-3">
+                      <p className="text-sm leading-relaxed text-foreground">
+                        {selectedContent.content}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="px-4 py-3 border-b border-border">
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`h-8 w-8 p-0 ${selectedContent.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                          onClick={() => handleLike(selectedContent.id)}
+                        >
+                          <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
+                        </Button>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedContent.likes}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0 text-muted-foreground"
+                        >
+                          <MessageSquare className="w-6 h-6" />
+                        </Button>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedContent.comments}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-muted-foreground"
+                        onClick={() => handleShare(selectedContent.id)}
+                      >
+                        <Share2 className="w-6 h-6" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Comments section */}
+                  <div className="flex-1 overflow-hidden">
+                    <CommentSection
+                      postId={selectedContent.id}
+                      initialComments={selectedContent.initialComments || []}
+                      onCommentCountChange={(count) => handleCommentCountChange(selectedContent.id, count)}
+                      isBottomSheet={false}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -956,9 +1080,9 @@ export const FeedPage: React.FC = () => {
       <Sheet open={showBottomSheet} onOpenChange={setShowBottomSheet}>
         <SheetContent 
           side="bottom" 
-          className="h-[75vh] p-0 border-t-8 border-gray-300 rounded-t-xl bg-background flex flex-col"
+          className="h-[75vh] p-0 border-t-4 border-border/30 rounded-t-xl bg-background flex flex-col"
         >
-          <SheetHeader className="px-4 py-3 border-b border-border bg-background">
+          <SheetHeader className="px-4 py-3 border-b border-border/20 bg-background shrink-0">
             <div className="flex items-center justify-center">
               <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mb-2"></div>
             </div>

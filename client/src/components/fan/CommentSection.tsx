@@ -432,7 +432,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       <div className="w-full h-full bg-background flex flex-col">
         {/* Comments Header */}
         {comments.length > 0 && (
-          <div className="px-4 py-3 border-b border-border/20 bg-background">
+          <div className="px-4 py-3 border-b border-border/20 bg-background shrink-0">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
                 {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
@@ -499,7 +499,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         </div>
 
         {/* Add Comment - Instagram style - Fixed at bottom */}
-        <div className="px-4 py-3 border-t border-border/30 bg-background">
+        <div className="px-4 py-3 border-t border-border/30 bg-background shrink-0">
           <div className="flex gap-2">
             <Avatar className="h-8 w-8 flex-shrink-0">
               <AvatarImage src={user?.avatar} alt={user?.username} />
