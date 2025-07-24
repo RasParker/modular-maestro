@@ -274,6 +274,7 @@ export const FeedPage: React.FC = () => {
   const [expandedModalCaption, setExpandedModalCaption] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   // Fetch real posts from API
@@ -394,15 +395,36 @@ export const FeedPage: React.FC = () => {
   };
 
   const handleThumbnailClick = (post: any) => {
+    const index = feed.findIndex(p => p.id === post.id);
     setSelectedContent(post);
+    setSelectedIndex(index);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedContent(null);
+    setSelectedIndex(0);
     setExpandedModalCaption(false);
     setShowBottomSheet(false);
+  };
+
+  const handleSwipeUp = () => {
+    if (selectedIndex < feed.length - 1) {
+      const nextIndex = selectedIndex + 1;
+      setSelectedIndex(nextIndex);
+      setSelectedContent(feed[nextIndex]);
+      setExpandedModalCaption(false);
+    }
+  };
+
+  const handleSwipeDown = () => {
+    if (selectedIndex > 0) {
+      const prevIndex = selectedIndex - 1;
+      setSelectedIndex(prevIndex);
+      setSelectedContent(feed[prevIndex]);
+      setExpandedModalCaption(false);
+    }
   };
 
   const toggleCaptionExpansion = (postId: string) => {
@@ -720,15 +742,44 @@ export const FeedPage: React.FC = () => {
         )}
       </EdgeToEdgeContainer>
 
-      {/* Instagram-style Content Modal with 9:16 aspect ratio */}
+      {/* Instagram-style Content Modal with true 9:16 aspect ratio and swipe navigation */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-full max-h-full w-full h-full p-0 m-0 overflow-hidden border-0 [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>{selectedContent?.type} Content</DialogTitle>
             <DialogDescription>View content from {selectedContent?.creator?.display_name}</DialogDescription>
           </DialogHeader>
           {selectedContent && (
-            <div className="relative w-screen h-screen bg-black flex items-center justify-center">
+            <div 
+              className="relative w-full h-full bg-black"
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                const startY = touch.clientY;
+                
+                const handleTouchMove = (moveEvent: TouchEvent) => {
+                  const currentTouch = moveEvent.touches[0];
+                  const deltaY = startY - currentTouch.clientY;
+                  
+                  if (Math.abs(deltaY) > 50) {
+                    if (deltaY > 0) {
+                      handleSwipeUp();
+                    } else {
+                      handleSwipeDown();
+                    }
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  }
+                };
+                
+                const handleTouchEnd = () => {
+                  document.removeEventListener('touchmove', handleTouchMove);
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+                
+                document.addEventListener('touchmove', handleTouchMove);
+                document.addEventListener('touchend', handleTouchEnd);
+              }}
+            >
               {/* Back Arrow Button */}
               <Button
                 variant="ghost"
@@ -739,16 +790,18 @@ export const FeedPage: React.FC = () => {
                 <ArrowLeft className="w-7 h-7" />
               </Button>
 
-              {/* Content container with 9:16 aspect ratio centered */}
-              <div className="relative w-full max-w-sm h-full max-h-[100vh] aspect-[9/16] bg-black">
+              {/* Content container with true 9:16 aspect ratio - full screen */}
+              <div className="relative w-full h-full bg-black">
                 {selectedContent.thumbnail ? (
                   selectedContent.type === 'video' ? (
                     <video 
+                      key={selectedContent.id}
                       src={selectedContent.thumbnail} 
                       className="w-full h-full object-cover"
                       controls
                       autoPlay
                       muted
+                      loop
                     />
                   ) : (
                     <img 
@@ -803,22 +856,6 @@ export const FeedPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    
-                    {/* Tier badge */}
-                    <Badge 
-                      variant="secondary" 
-                      className="text-xs px-2 py-1 bg-white/20 backdrop-blur-sm text-white border-white/30 mb-2"
-                    >
-                      {selectedContent.tier === 'public' ? 'Free' : 
-                       selectedContent.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                       selectedContent.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                       selectedContent.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                       selectedContent.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                       selectedContent.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                       selectedContent.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                       selectedContent.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                       selectedContent.tier}
-                    </Badge>
                     
                     {/* Caption with readability text shadow */}
                     <div className="mb-3">
@@ -901,6 +938,13 @@ export const FeedPage: React.FC = () => {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Swipe indicators */}
+                  {selectedIndex > 0 && (
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                      <div className="text-white/50 text-xs">Swipe up for next</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
