@@ -456,13 +456,12 @@ export const VideoWatch: React.FC = () => {
                     <AvatarFallback>{post.creator_username?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</p>
-                    <p className="text-sm text-muted-foreground">@{post.creator_username}</p>
+                    <p className="font-medium text-foreground mb-1">{post.creator_display_name || post.creator_username}</p>
+                    <h1 className="text-base font-medium text-foreground">
+                      {post.content}
+                    </h1>
                   </div>
                 </div>
-                <h1 className="text-xl font-bold text-foreground mb-2">
-                  {post.content}
-                </h1>
               </div>
 
               {/* View count and date */}
@@ -515,10 +514,10 @@ export const VideoWatch: React.FC = () => {
                   return (
                     <div 
                       key={video.id} 
-                      className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 transition-colors flex gap-3"
+                      className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 transition-colors"
                       onClick={() => handleVideoCardClick(video.id)}
                     >
-                      <div className="relative w-40 aspect-video bg-black rounded-lg overflow-hidden shrink-0">
+                      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-2">
                         {video.media_type === 'video' ? (
                           <video
                             src={videoFullUrl}
@@ -540,7 +539,7 @@ export const VideoWatch: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-1">
+                      <div className="space-y-1">
                         <h4 className="text-sm font-medium text-foreground line-clamp-2">
                           {video.title || video.content}
                         </h4>
