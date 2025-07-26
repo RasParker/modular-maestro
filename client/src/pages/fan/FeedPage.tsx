@@ -607,7 +607,7 @@ export const FeedPage: React.FC = () => {
             </Button>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 p-4">
             {feed.map((post) => (
               <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                 {/* Thumbnail */}
@@ -688,13 +688,15 @@ export const FeedPage: React.FC = () => {
                     <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                       {post.content || post.title || 'Untitled Post'}
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {post.creator.display_name}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <span>{post.views} views</span>
-                      <span>•</span>
-                      <span>{getTimeAgo(post.posted)}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground truncate">
+                        {post.creator.display_name}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                        <span>{post.views} views</span>
+                        <span>•</span>
+                        <span>{getTimeAgo(post.posted)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -703,7 +705,7 @@ export const FeedPage: React.FC = () => {
           </div>
         ) : (
           /* Single View */
-          <div className="space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             {feed.map((post) => (
               <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
                 <CardContent className="p-4">
