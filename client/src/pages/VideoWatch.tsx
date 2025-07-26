@@ -241,6 +241,11 @@ export const VideoWatch: React.FC = () => {
       {/* Content Wrapper - Scrollable area below video */}
       <div className="content-wrapper bg-background">
         <div className="px-4 py-4">
+          {/* Video Title */}
+          <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">
+            {post.title || post.content}
+          </h1>
+
           {/* View count and date */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
