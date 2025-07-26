@@ -99,7 +99,7 @@ export const VideoWatch: React.FC = () => {
       }
 
       setLiked(!liked);
-      setPost(prev => ({
+      setPost((prev: any) => ({
         ...prev,
         likes_count: liked ? prev.likes_count - 1 : prev.likes_count + 1
       }));
@@ -324,7 +324,7 @@ export const VideoWatch: React.FC = () => {
                       className="cursor-pointer hover:bg-muted/50 transition-colors border-b border-border/20 last:border-b-0"
                       onClick={() => handleVideoCardClick(video.id)}
                     >
-                      <div className="py-3"></div>
+                      <div className="py-3">
                         <div className="relative w-full aspect-video bg-black overflow-hidden mb-3">
                           {video.media_type === 'video' ? (
                             <video
@@ -403,7 +403,7 @@ export const VideoWatch: React.FC = () => {
               <CommentSection
                 postId={post.id.toString()}
                 initialComments={[]}
-                onCommentCountChange={(count) => setPost(prev => ({ ...prev, comments_count: count }))}
+                onCommentCountChange={(count) => setPost((prev: any) => ({ ...prev, comments_count: count }))}
                 isBottomSheet={true}
               />
             </div>
@@ -500,7 +500,7 @@ export const VideoWatch: React.FC = () => {
               <CommentSection
                 postId={post.id.toString()}
                 initialComments={[]}
-                onCommentCountChange={(count) => setPost(prev => ({ ...prev, comments_count: count }))}
+                onCommentCountChange={(count) => setPost((prev: any) => ({ ...prev, comments_count: count }))}
                 isBottomSheet={false}
               />
             </div>
