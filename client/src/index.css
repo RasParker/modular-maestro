@@ -381,17 +381,22 @@
   /* Desktop video watch page styles */
   @media (min-width: 769px) {
     .video-watch-desktop {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     
     .video-watch-main {
-      max-width: 720px;
+      max-width: 960px;
     }
     
     .video-watch-sidebar {
-      width: 320px;
+      width: 280px;
     }
+  }
+
+  /* Custom width utility */
+  .w-70 {
+    width: 17.5rem; /* 280px */
   }
 
   /* Line clamp utility for video titles */

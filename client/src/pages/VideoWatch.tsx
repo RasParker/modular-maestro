@@ -412,9 +412,9 @@ export const VideoWatch: React.FC = () => {
       {/* Desktop Layout */}
       <div className="hidden md:flex min-h-screen bg-background">
         <div className="flex-1 flex justify-center">
-          <div className="max-w-4xl w-full flex gap-6 p-6">
+          <div className="max-w-6xl w-full flex gap-6 p-6">
             {/* Main Content */}
-            <div className="flex-1 max-w-2xl">
+            <div className="flex-1 max-w-4xl">
               {/* Back Button */}
               <Button
                 variant="ghost"
@@ -504,7 +504,7 @@ export const VideoWatch: React.FC = () => {
             </div>
 
             {/* Sidebar - Next Videos */}
-            <div className="w-80 space-y-4">
+            <div className="w-70 space-y-4">
               <h3 className="text-lg font-semibold">Up next</h3>
               <div className="space-y-3">
                 {nextVideos.map((video) => {
