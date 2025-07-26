@@ -32,16 +32,19 @@ export const Login: React.FC = () => {
         description: "You have successfully logged in.",
       });
       
-      // Get the user after login to determine redirect path
-      const storedUser = localStorage.getItem('xclusive_user');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        const redirectPath = from || 
-          (user.role === 'admin' ? '/admin/dashboard' : 
-           user.role === 'creator' ? '/creator/dashboard' : 
-           '/fan/dashboard');
-        navigate(redirectPath, { replace: true });
-      }
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        // Get the user after login to determine redirect path
+        const storedUser = localStorage.getItem('xclusive_user');
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          const redirectPath = from || 
+            (user.role === 'admin' ? '/admin/dashboard' : 
+             user.role === 'creator' ? '/creator/dashboard' : 
+             '/fan/dashboard');
+          navigate(redirectPath, { replace: true });
+        }
+      }, 100);
     } catch (error) {
       toast({
         title: "Login failed",

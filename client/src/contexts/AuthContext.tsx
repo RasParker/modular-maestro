@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const response = await fetch('/api/auth/verify', {
             credentials: 'include'
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             setUser(data.user);
@@ -88,42 +88,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
-      
+
       if (!response.ok) {
-        const error = await response.json();
-        if (error.suspended) {
-          throw new Error(error.error || 'Your account has been suspended.');
-        }
-        throw new Error(error.error || 'Login failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
       }
-      
+
       const data = await response.json();
-      const user = {
-        ...data.user,
-        id: data.user.id.toString() // Convert to string for compatibility
-      };
-      
-      setUser(user);
-      localStorage.setItem('xclusive_user', JSON.stringify(user));
-    } catch (error) {
-      throw error;
-    } finally {
+
+      // Store user and token
+      localStorage.setItem('xclusive_user', JSON.stringify(data.user));
+      localStorage.setItem('xclusive_token', data.token);
+
+      setUser(data.user);
       setIsLoading(false);
+    } catch (error) {
+      console.error('Login error:', error);
+      setIsLoading(false);
+      throw error;
     }
   };
 
   const signup = async (email: string, password: string, username: string, role: 'fan' | 'creator') => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -131,18 +127,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         credentials: 'include',
         body: JSON.stringify({ email, password, username, role })
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Registration failed');
       }
-      
+
       const data = await response.json();
       const user = {
         ...data.user,
         id: data.user.id.toString() // Convert to string for compatibility
       };
-      
+
       setUser(user);
       localStorage.setItem('xclusive_user', JSON.stringify(user));
     } catch (error) {
