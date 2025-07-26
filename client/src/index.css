@@ -422,7 +422,18 @@
     display: none;
   }
 
-  /* Feed Card Layout */
+  /* YouTube-style Grid Card Layout */
+  .youtube-grid-card {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+  }
+
+  .youtube-grid-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Feed Card Layout (kept for compatibility) */
   .feed-card {
     display: flex;
     flex-direction: column;

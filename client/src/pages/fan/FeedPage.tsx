@@ -609,32 +609,36 @@ export const FeedPage: React.FC = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
             {feed.map((post) => (
-              <div key={post.id} className="feed-card">
+              <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                 {/* Thumbnail */}
-                <div 
-                  className="feed-card-thumbnail cursor-pointer"
-                  onClick={() => handleThumbnailClick(post)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleThumbnailClick(post);
-                    }
-                  }}
-                >
+                <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-3">
                   {post.thumbnail ? (
                     post.type === 'video' ? (
-                      <img 
-                        src={post.thumbnail} 
-                        alt={`${post.creator.display_name}'s video`}
+                      <video
+                        src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
                         className="w-full h-full object-cover"
+                        muted
+                        preload="metadata"
+                        onError={(e) => {
+                          const target = e.target as HTMLVideoElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                              <div class="text-white text-xs">Video unavailable</div>
+                            </div>`;
+                          }
+                        }}
                       />
                     ) : (
                       <img 
-                        src={post.thumbnail} 
+                        src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
                         alt={`${post.creator.display_name}'s post`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                        }}
                       />
                     )
                   ) : (
@@ -648,46 +652,49 @@ export const FeedPage: React.FC = () => {
                     />
                   )}
 
-                  {/* Content type overlay */}
-                  <div className="absolute top-2 left-2">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                      {getTypeIcon(post.type)}
+                  {/* Play button overlay for videos */}
+                  {post.type === 'video' && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 bg-black/70 rounded-full flex items-center justify-center">
+                        <Video className="w-6 h-6 text-white" fill="white" />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Duration overlay for videos */}
                   {post.type === 'video' && (
                     <div className="absolute bottom-2 right-2">
-                      <div className="px-1 py-0.5 bg-black/60 rounded text-white text-xs">
+                      <div className="px-2 py-1 bg-black/80 rounded text-white text-xs font-medium">
                         {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                       </div>
                     </div>
                   )}
+
+                  {/* Content type badge */}
+                  <div className="absolute top-2 left-2">
+                    <Badge variant={getTierColor(post.tier)} className="text-xs">
+                      {post.tier === 'public' ? 'Free' : post.tier}
+                    </Badge>
+                  </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="feed-card-content">
-                  <div className="flex items-start gap-2">
-                    <Avatar className="h-6 w-6 flex-shrink-0">
-                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                      <AvatarFallback className="text-xs">{post.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="feed-card-title">
-                        {post.content || post.title || 'Untitled Post'}
-                      </h3>
-                      <p className="feed-card-meta">
-                        <span>{post.creator.display_name}</span>
-                        <span>•</span>
-                        <span>{post.views} views</span>
-                        <span>•</span>
-                        <span>{getTimeAgo(post.posted)}</span>
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
-                          {post.tier === 'public' ? 'Free' : post.tier}
-                        </Badge>
-                      </div>
+                {/* YouTube-style content below thumbnail */}
+                <div className="flex gap-3">
+                  <Avatar className="h-9 w-9 flex-shrink-0">
+                    <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                    <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                      {post.content || post.title || 'Untitled Post'}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {post.creator.display_name}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span>{post.views} views</span>
+                      <span>•</span>
+                      <span>{getTimeAgo(post.posted)}</span>
                     </div>
                   </div>
                 </div>
@@ -699,23 +706,98 @@ export const FeedPage: React.FC = () => {
           <div className="space-y-6">
             {feed.map((post) => (
               <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
-                <CardContent className="p-0">
-                  {/* Creator Header */}
-                  <div className="p-4 pb-0">
-                    <div className="flex items-center gap-3 mb-4">
+                <CardContent className="p-4">
+                  {/* Media Content */}
+                  <div 
+                    className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
+                    onClick={() => handleThumbnailClick(post)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleThumbnailClick(post);
+                      }
+                    }}
+                  >
+                    {post.thumbnail ? (
+                      post.type === 'video' ? (
+                        <video
+                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          className="w-full h-full object-cover"
+                          muted
+                          preload="metadata"
+                          onError={(e) => {
+                            const target = e.target as HTMLVideoElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                <div class="text-white text-sm">Video unavailable</div>
+                              </div>`;
+                            }
+                          }}
+                        />
+                      ) : (
+                        <img 
+                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          alt={`${post.creator.display_name}'s post`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                          }}
+                        />
+                      )
+                    ) : (
+                      <img 
+                        src={post.id === '1' ? 'https://placehold.co/1280x720/E63946/FFFFFF?text=Creator+Post+1' :
+                             post.id === '2' ? 'https://placehold.co/1280x720/457B9D/FFFFFF?text=Creator+Post+2' :
+                             post.id === '3' ? 'https://placehold.co/1280x720/1D3557/FFFFFF?text=Creator+Post+3' :
+                             `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                        alt={`${post.creator.display_name}'s post`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+
+                    {/* Play button for videos */}
+                    {post.type === 'video' && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
+                          <Video className="w-8 h-8 text-white" fill="white" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Duration overlay for videos */}
+                    {post.type === 'video' && (
+                      <div className="absolute bottom-4 right-4">
+                        <div className="px-2 py-1 bg-black/80 rounded text-white text-sm font-medium">
+                          {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tier badge */}
+                    <div className="absolute top-4 left-4">
+                      <Badge variant={getTierColor(post.tier)} className="text-sm">
+                        {post.tier === 'public' ? 'Free' : post.tier}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Creator Info and Content - Below thumbnail */}
+                  <div className="space-y-3">
+                    {/* Creator Header */}
+                    <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
                         <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">
-                            {post.creator.display_name}
-                          </h3>
-                          <Badge variant={getTierColor(post.tier)} className="text-xs">
-                            {post.tier === 'public' ? 'Free' : post.tier}
-                          </Badge>
-                        </div>
+                        <h3 className="font-semibold text-foreground">
+                          {post.creator.display_name}
+                        </h3>
                         <p className="text-sm text-muted-foreground">
                           @{post.creator.username} • {getTimeAgo(post.posted)}
                         </p>
@@ -723,7 +805,7 @@ export const FeedPage: React.FC = () => {
                     </div>
 
                     {/* Post Content/Caption */}
-                    <div className="mb-4">
+                    <div>
                       {(() => {
                         const { truncated, needsExpansion } = truncateText(post.content, 3);
                         return (
@@ -759,61 +841,6 @@ export const FeedPage: React.FC = () => {
                         );
                       })()}
                     </div>
-                  </div>
-
-                  {/* Media Content */}
-                  <div 
-                    className="relative aspect-video bg-black cursor-pointer"
-                    onClick={() => handleThumbnailClick(post)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleThumbnailClick(post);
-                      }
-                    }}
-                  >
-                    {post.thumbnail ? (
-                      post.type === 'video' ? (
-                        <img 
-                          src={post.thumbnail} 
-                          alt={`${post.creator.display_name}'s video`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <img 
-                          src={post.thumbnail} 
-                          alt={`${post.creator.display_name}'s post`}
-                          className="w-full h-full object-cover"
-                        />
-                      )
-                    ) : (
-                      <img 
-                        src={post.id === '1' ? 'https://placehold.co/1280x720/E63946/FFFFFF?text=Creator+Post+1' :
-                             post.id === '2' ? 'https://placehold.co/1280x720/457B9D/FFFFFF?text=Creator+Post+2' :
-                             post.id === '3' ? 'https://placehold.co/1280x720/1D3557/FFFFFF?text=Creator+Post+3' :
-                             `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
-                        alt={`${post.creator.display_name}'s post`}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-
-                    {/* Content type overlay */}
-                    <div className="absolute top-4 left-4">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
-                        {getTypeIcon(post.type)}
-                      </div>
-                    </div>
-
-                    {/* Duration overlay for videos */}
-                    {post.type === 'video' && (
-                      <div className="absolute bottom-4 right-4">
-                        <div className="px-2 py-1 bg-black/60 rounded text-white text-sm">
-                          {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Action Buttons */}
