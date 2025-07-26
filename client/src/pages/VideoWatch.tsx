@@ -349,8 +349,8 @@ export const VideoWatch: React.FC = () => {
 
                         <div className="flex gap-3 px-4">
                           <Avatar className="h-9 w-9 flex-shrink-0">
-                            <AvatarImage src={video.creator_avatar} alt={video.creator_username} />
-                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || 'U').charAt(0)}</AvatarFallback>
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
@@ -552,8 +552,8 @@ export const VideoWatch: React.FC = () => {
 
                         <div className="flex gap-3 px-4">
                           <Avatar className="h-9 w-9 flex-shrink-0">
-                            <AvatarImage src={video.creator_avatar} alt={video.creator_username} />
-                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || 'U').charAt(0)}</AvatarFallback>
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
@@ -561,7 +561,7 @@ export const VideoWatch: React.FC = () => {
                             </h4>
                             <div className="flex items-center justify-between gap-2">
                               <p className="text-xs text-muted-foreground truncate">
-                                {video.creator_display_name || video.creator_username}
+                                {video.creator_display_name || video.creator_username || video.display_name || video.username}
                               </p>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
                                 <span>{Math.floor(Math.random() * 500) + 100}K views</span>

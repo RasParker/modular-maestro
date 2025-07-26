@@ -438,10 +438,8 @@
   .feed-card {
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
     overflow: hidden;
     background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
     transition: all 0.2s ease;
   }
 
