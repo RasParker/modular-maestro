@@ -412,9 +412,9 @@ export const VideoWatch: React.FC = () => {
       {/* Desktop Layout */}
       <div className="hidden md:flex min-h-screen bg-background">
         <div className="flex-1 flex justify-center">
-          <div className="max-w-7xl w-full flex gap-6 p-6">
+          <div className="max-w-8xl w-full flex gap-6 p-6">
             {/* Main Content */}
-            <div className="flex-1 max-w-5xl">
+            <div className="flex-1 max-w-6xl">
               {/* Back Button */}
               <Button
                 variant="ghost"
