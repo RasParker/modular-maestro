@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,13 +26,13 @@ export const VideoWatch: React.FC = () => {
   useEffect(() => {
     const fetchPost = async () => {
       if (!id) return;
-      
+
       try {
         const response = await fetch(`/api/posts/${id}`);
         if (response.ok) {
           const postData = await response.json();
           setPost(postData);
-          
+
           // Check if user has liked this post
           if (user) {
             const likeResponse = await fetch(`/api/posts/${id}/like/${user.id}`);
@@ -126,7 +125,7 @@ export const VideoWatch: React.FC = () => {
   const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.target as HTMLVideoElement;
     const aspectRatio = video.videoWidth / video.videoHeight;
-    
+
     if (aspectRatio > 1) {
       setVideoAspectRatio('landscape');
       video.setAttribute('data-aspect-ratio', 'landscape');
@@ -297,7 +296,7 @@ export const VideoWatch: React.FC = () => {
               </div>
               <ChevronDown className="w-5 h-5 text-muted-foreground" />
             </div>
-            
+
             <div className="flex items-center gap-3 mt-3">
               <Avatar className="h-6 w-6">
                 <AvatarImage src={user?.avatar} alt={user?.username} />
@@ -315,7 +314,7 @@ export const VideoWatch: React.FC = () => {
             {nextVideos.map((video) => {
               const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;
               const videoFullUrl = videoMediaUrl?.startsWith('http') ? videoMediaUrl : `/uploads/${videoMediaUrl}`;
-              
+
               return (
                 <div 
                   key={video.id} 
@@ -343,7 +342,7 @@ export const VideoWatch: React.FC = () => {
                       {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                     </div>
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                       {video.title || video.content}
@@ -382,7 +381,7 @@ export const VideoWatch: React.FC = () => {
                 <X className="w-5 h-5" />
               </Button>
             </div>
-            
+
             {/* Sort Options */}
             <div className="flex items-center gap-3 mt-3">
               <Button variant="default" size="sm" className="rounded-full">
