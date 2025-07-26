@@ -573,7 +573,7 @@ export const FeedPage: React.FC = () => {
       </div>
 
       {/* Feed Content */}
-      <EdgeToEdgeContainer maxWidth="8xl" enablePadding className="py-6 sm:py-8">
+      <EdgeToEdgeContainer maxWidth="6xl" enablePadding className="py-4 sm:py-6">
         {loading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
@@ -607,10 +607,11 @@ export const FeedPage: React.FC = () => {
             </Button>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 p-4">
-            {feed.map((post) => (
-              <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
-                {/* Thumbnail */}
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 p-2 max-w-6xl mx-auto">
+              {feed.map((post) => (
+                <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
+                  {/* Thumbnail */}
                 <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-3">
                   {post.thumbnail ? (
                     post.type === 'video' ? (
@@ -702,6 +703,7 @@ export const FeedPage: React.FC = () => {
                 </div>
               </div>
             ))}
+            </div>
           </div>
         ) : (
           /* Single View */
