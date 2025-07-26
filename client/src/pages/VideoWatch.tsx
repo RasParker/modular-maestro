@@ -324,7 +324,7 @@ export const VideoWatch: React.FC = () => {
                       className="cursor-pointer hover:bg-muted/50 transition-colors border-b border-border/20 last:border-b-0"
                       onClick={() => handleVideoCardClick(video.id)}
                     >
-                      <div className="px-4 py-3">
+                      <div className="py-3"></div>
                         <div className="relative w-full aspect-video bg-black overflow-hidden mb-3">
                           {video.media_type === 'video' ? (
                             <video
