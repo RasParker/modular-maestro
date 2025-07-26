@@ -285,7 +285,7 @@ export const FeedPage: React.FC = () => {
         const response = await fetch('/api/posts');
         if (response.ok) {
           const posts = await response.json();
-          
+
           // Transform posts to match the expected format
           const transformedPosts = posts.map((post: any) => ({
             id: post.id.toString(),
@@ -307,7 +307,7 @@ export const FeedPage: React.FC = () => {
             liked: false, // Will be updated when user interactions are implemented
             initialComments: [] // Will be populated when comments are fetched
           }));
-          
+
           setFeed(transformedPosts);
         }
       } catch (error) {
@@ -327,11 +327,11 @@ export const FeedPage: React.FC = () => {
 
   const handleLike = async (postId: string) => {
     if (!user) return;
-    
+
     try {
       const currentPost = feed.find(post => post.id === postId);
       if (!currentPost) return;
-      
+
       if (currentPost.liked) {
         // Unlike the post
         await fetch(`/api/posts/${postId}/like`, {
@@ -351,7 +351,7 @@ export const FeedPage: React.FC = () => {
           body: JSON.stringify({ userId: user.id }),
         });
       }
-      
+
       // Update local state immediately for responsive UI
       setFeed(feed.map(post => 
         post.id === postId 
@@ -362,7 +362,7 @@ export const FeedPage: React.FC = () => {
             }
           : post
       ));
-      
+
     } catch (error) {
       console.error('Error liking post:', error);
     }
@@ -439,11 +439,11 @@ export const FeedPage: React.FC = () => {
     // Reserve space for "... Read more" by reducing available words
     const wordsPerLine = window.innerWidth < 640 ? 8 : 14; // Reduced to leave space for "Read more"
     const maxWords = maxLines * wordsPerLine;
-    
+
     if (words.length <= maxWords) {
       return { truncated: text, needsExpansion: false };
     }
-    
+
     return {
       truncated: words.slice(0, maxWords).join(' '),
       needsExpansion: true
@@ -492,7 +492,7 @@ export const FeedPage: React.FC = () => {
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInHours < 24) return `${diffInHours}h ago`;
@@ -618,8 +618,69 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                {(() => {
+                        const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                        const mediaUrl = mediaUrls[0];
+                        const fullUrl = mediaUrl?.startsWith('http') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                        if (post.media_type === 'video') {
+                          return (
+                            <div className="video-post-container w-full aspect-[9/16] bg-black rounded-lg overflow-hidden">
+                              <video
+                                src={fullUrl}
+                                className="w-full h-full"
+                                controls
+                                playsInline
+                                data-aspect-ratio="unknown"
+                                onLoadedMetadata={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  const aspectRatio = video.videoWidth / video.videoHeight;
+
+                                  if (aspectRatio > 1) {
+                                    // Landscape video
+                                    video.setAttribute('data-aspect-ratio', 'landscape');
+                                    video.style.objectFit = 'contain';
+                                  } else {
+                                    // Portrait video
+                                    video.setAttribute('data-aspect-ratio', 'portrait');
+                                    video.style.objectFit = 'cover';
+                                  }
+                                }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLVideoElement;
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-16 h-16 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>`;
+                                  }
+                                }}
+                              />
+                            </div>
+                          );
+                        } else if (post.media_type === 'image') {
+                          return (
+                            <img
+                              src={fullUrl}
+                              alt={post.title}
+                              className="w-full h-full object-cover rounded-lg"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-16 h-16 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                }
+                              }}
+                            />
+                          );
+                        } else {
+                          return (
+                            <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+<FileText className="w-16 h-16 text-muted-foreground" />
+                            </div>
+                          );
+                        }
+                      })()}
               </div>
-                
+
               {/* Action Buttons - Mobile Instagram style with inline stats */}
               <div className="px-3 py-2">
                 <div className="flex items-center justify-between">
@@ -662,13 +723,13 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Post Caption - Mobile Instagram style */}
                 <div className="mb-1">
                   {(() => {
                     const { truncated, needsExpansion } = truncateText(post.content);
                     const isExpanded = expandedCaptions[post.id];
-                    
+
                     return (
                       <p className="text-sm leading-relaxed text-foreground">
                         {isExpanded ? post.content : (
@@ -702,7 +763,7 @@ export const FeedPage: React.FC = () => {
                     );
                   })()}
                 </div>
-                
+
                 {/* View comments link */}
                 {post.comments > 0 && (
                   <Button
@@ -755,11 +816,11 @@ export const FeedPage: React.FC = () => {
               onTouchStart={(e) => {
                 const touch = e.touches[0];
                 const startY = touch.clientY;
-                
+
                 const handleTouchMove = (moveEvent: TouchEvent) => {
                   const currentTouch = moveEvent.touches[0];
                   const deltaY = startY - currentTouch.clientY;
-                  
+
                   if (Math.abs(deltaY) > 50) {
                     if (deltaY > 0) {
                       handleSwipeUp();
@@ -770,12 +831,12 @@ export const FeedPage: React.FC = () => {
                     document.removeEventListener('touchend', handleTouchEnd);
                   }
                 };
-                
+
                 const handleTouchEnd = () => {
                   document.removeEventListener('touchmove', handleTouchMove);
                   document.removeEventListener('touchend', handleTouchEnd);
                 };
-                
+
                 document.addEventListener('touchmove', handleTouchMove);
                 document.addEventListener('touchend', handleTouchEnd);
               }}
@@ -794,15 +855,31 @@ export const FeedPage: React.FC = () => {
               <div className="relative w-full h-full bg-black sm:hidden">
                 {selectedContent.thumbnail ? (
                   selectedContent.type === 'video' ? (
+                    <div className="w-full h-full bg-black flex items-center justify-center">
                     <video 
                       key={selectedContent.id}
                       src={selectedContent.thumbnail} 
-                      className="w-full h-full object-cover"
+                      className="max-w-full max-h-full"
                       controls
                       autoPlay
                       muted
                       loop
+                      onLoadedMetadata={(e) => {
+                        const video = e.target as HTMLVideoElement;
+                        const aspectRatio = video.videoWidth / video.videoHeight;
+
+                        if (aspectRatio > 1) {
+                          // Landscape video - fit width
+                          video.style.width = '100%';
+                          video.style.height = 'auto';
+                        } else {
+                          // Portrait video - fit height
+                          video.style.width = 'auto';
+                          video.style.height = '100%';
+                        }
+                      }}
                     />
+                    </div>
                   ) : (
                     <img 
                       src={selectedContent.thumbnail} 
@@ -856,12 +933,12 @@ export const FeedPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Caption */}
                     <div className="mb-3">
                       {(() => {
                         const { truncated, needsExpansion } = truncateText(selectedContent.content, 2);
-                        
+
                         return (
                           <p className="text-sm leading-relaxed text-white drop-shadow-lg">
                             {expandedModalCaption ? selectedContent.content : (
@@ -896,7 +973,7 @@ export const FeedPage: React.FC = () => {
                       })()}
                     </div>
                   </div>
-                  
+
                   {/* Action buttons - right side */}
                   <div className="absolute bottom-20 right-4 flex flex-col gap-4 pointer-events-auto">
                     <div className="flex flex-col items-center">
@@ -912,7 +989,7 @@ export const FeedPage: React.FC = () => {
                         {selectedContent.likes}
                       </span>
                     </div>
-                    
+
                     <div className="flex flex-col items-center">
                       <Button 
                         variant="ghost" 
@@ -926,7 +1003,7 @@ export const FeedPage: React.FC = () => {
                         {selectedContent.comments}
                       </span>
                     </div>
-                    
+
                     <div className="flex flex-col items-center">
                       <Button
                         variant="ghost"
@@ -946,17 +1023,33 @@ export const FeedPage: React.FC = () => {
                 {/* Left panel - Content */}
                 <div className="flex-1 bg-black flex items-center justify-center">
                   <div className="relative w-full h-full max-w-md mx-auto">
-                    {selectedContent.thumbnail ? (
+                  {selectedContent.thumbnail ? (
                       selectedContent.type === 'video' ? (
+                        <div className="w-full h-full bg-black flex items-center justify-center">
                         <video 
                           key={selectedContent.id}
                           src={selectedContent.thumbnail} 
-                          className="w-full h-full object-contain"
+                          className="max-w-full max-h-full"
                           controls
                           autoPlay
                           muted
                           loop
+                          onLoadedMetadata={(e) => {
+                            const video = e.target as HTMLVideoElement;
+                            const aspectRatio = video.videoWidth / video.videoHeight;
+
+                            if (aspectRatio > 1) {
+                              // Landscape video - fit width
+                              video.style.width = '100%';
+                              video.style.height = 'auto';
+                            } else {
+                              // Portrait video - fit height
+                              video.style.width = 'auto';
+                              video.style.height = '100%';
+                            }
+                          }}
                         />
+                        </div>
                       ) : (
                         <img 
                           src={selectedContent.thumbnail} 
@@ -1012,7 +1105,7 @@ export const FeedPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Caption */}
                     <div className="mt-3">
                       <p className="text-sm leading-relaxed text-foreground">
@@ -1090,7 +1183,7 @@ export const FeedPage: React.FC = () => {
               Comments
             </SheetTitle>
           </SheetHeader>
-          
+
           <div className="flex-1 overflow-y-auto bg-background">
             {selectedContent && (
               <CommentSection

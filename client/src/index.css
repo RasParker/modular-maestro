@@ -13,7 +13,7 @@
     line-height: 1.2;
     word-break: break-word;
   }
-  
+
   /* Extra strict mobile enforcement */
   @media (max-width: 768px) {
     .line-clamp-2 {
@@ -95,7 +95,7 @@
       max-width: 100vw;
       padding: 0 16px;
     }
-    
+
     .media-post {
       max-width: 100%;
     }
@@ -318,5 +318,28 @@
 
   .stats-icon {
     color: hsl(var(--primary));
+  }
+
+  .truncated-bio.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  /* Video aspect ratio handling */
+  .video-post-container {
+    position: relative;
+    background-color: #000;
+  }
+
+  .video-post-container video[data-aspect-ratio="portrait"] {
+    object-fit: cover;
+  }
+
+  .video-post-container video[data-aspect-ratio="landscape"] {
+    object-fit: contain;
+  }
+
+  .video-post-container video[data-aspect-ratio="unknown"] {
+    object-fit: cover;
   }
 }

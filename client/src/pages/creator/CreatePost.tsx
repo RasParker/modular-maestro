@@ -54,6 +54,8 @@ export const CreatePost: React.FC = () => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<'landscape' | 'portrait' | null>(null);
+  const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -134,6 +136,8 @@ export const CreatePost: React.FC = () => {
     setMediaFile(null);
     setMediaPreview(null);
     setMediaType(null);
+    setVideoAspectRatio(null);
+    setVideoDimensions(null);
   };
 
   const handleSubmit = async (data: FormData, action: 'draft' | 'schedule' | 'publish') => {
@@ -198,7 +202,7 @@ export const CreatePost: React.FC = () => {
 
           const uploadResult = await uploadResponse.json();
           uploadedMediaUrls = uploadResult.filename ? [uploadResult.filename] : [];
-          
+
           if (uploadedMediaUrls.length === 0) {
             throw new Error('Media upload did not return a valid filename');
           }

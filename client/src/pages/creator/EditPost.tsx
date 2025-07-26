@@ -63,6 +63,8 @@ export const EditPost: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [originalPost, setOriginalPost] = useState<any>(null);
   const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
+    const [videoAspectRatio, setVideoAspectRatio] = useState<'landscape' | 'portrait' | null>(null);
+  const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -257,6 +259,8 @@ export const EditPost: React.FC = () => {
     setMediaFile(null);
     setMediaPreview(null);
     setMediaType(null);
+        setVideoAspectRatio(null);
+        setVideoDimensions(null);
   };
 
   const handleSubmit = async (data: FormData) => {
@@ -341,6 +345,38 @@ export const EditPost: React.FC = () => {
     }
   };
 
+    const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setMediaFile(file);
+      const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+      setMediaType(fileType);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setMediaPreview(result);
+
+        // If it's a video, detect aspect ratio
+        if (fileType === 'video') {
+          const video = document.createElement('video');
+          video.src = result;
+          video.addEventListener('loadedmetadata', () => {
+            const aspectRatio = video.videoWidth / video.videoHeight;
+            setVideoDimensions({ width: video.videoWidth, height: video.videoHeight });
+
+            if (aspectRatio > 1) {
+              setVideoAspectRatio('landscape');
+            } else {
+              setVideoAspectRatio('portrait');
+            }
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -408,7 +444,7 @@ export const EditPost: React.FC = () => {
                       <Input
                         type="file"
                         accept=".jpg,.jpeg,.png,.gif,.mp4,.mov"
-                        onChange={handleFileUpload}
+                        onChange={handleMediaChange}
                         className="hidden"
                         id="media-upload"
                       />
