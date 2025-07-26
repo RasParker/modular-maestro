@@ -310,10 +310,10 @@ export const VideoWatch: React.FC = () => {
               </div>
             </div>
 
-            {/* Next Videos Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Up next</h3>
-              <div className="space-y-3">
+            {/* Next Videos Section - Edge-to-Edge */}
+            <div className="space-y-0 -mx-4">
+              <h3 className="text-lg font-semibold mb-4 px-4">Up next</h3>
+              <div className="space-y-0">
                 {nextVideos.map((video) => {
                   const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;
                   const videoFullUrl = videoMediaUrl?.startsWith('http') ? videoMediaUrl : `/uploads/${videoMediaUrl}`;
@@ -321,42 +321,44 @@ export const VideoWatch: React.FC = () => {
                   return (
                     <div 
                       key={video.id} 
-                      className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 transition-colors"
+                      className="cursor-pointer hover:bg-muted/50 transition-colors border-b border-border/20 last:border-b-0"
                       onClick={() => handleVideoCardClick(video.id)}
                     >
-                      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-3">
-                        {video.media_type === 'video' ? (
-                          <video
-                            src={videoFullUrl}
-                            className="w-full h-full object-cover"
-                            muted
-                          />
-                        ) : (
-                          <img
-                            src={videoFullUrl}
-                            alt={video.title}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Play className="w-6 h-6 text-white" fill="white" />
+                      <div className="px-4 py-3">
+                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-3">
+                          {video.media_type === 'video' ? (
+                            <video
+                              src={videoFullUrl}
+                              className="w-full h-full object-cover"
+                              muted
+                            />
+                          ) : (
+                            <img
+                              src={videoFullUrl}
+                              alt={video.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Play className="w-6 h-6 text-white" fill="white" />
+                          </div>
+                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                            {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                          </div>
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                          {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                        </div>
-                      </div>
 
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-foreground line-clamp-2">
-                          {video.title || video.content}
-                        </h4>
-                        <p className="text-xs text-muted-foreground">
-                          {video.creator_display_name || video.creator_username}
-                        </p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                          <span>•</span>
-                          <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-medium text-foreground line-clamp-2">
+                            {video.title || video.content}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {video.creator_display_name || video.creator_username}
+                          </p>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                            <span>•</span>
+                            <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -504,52 +506,54 @@ export const VideoWatch: React.FC = () => {
             </div>
 
             {/* Sidebar - Next Videos */}
-            <div className="w-70 space-y-4">
-              <h3 className="text-lg font-semibold">Up next</h3>
-              <div className="space-y-3">
-                {nextVideos.map((video) => {
+            <div className="w-70 space-y-0">
+              <h3 className="text-lg font-semibold mb-4 px-2">Up next</h3>
+              <div className="space-y-0 border border-border rounded-lg overflow-hidden">
+                {nextVideos.map((video, index) => {
                   const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;
                   const videoFullUrl = videoMediaUrl?.startsWith('http') ? videoMediaUrl : `/uploads/${videoMediaUrl}`;
 
                   return (
                     <div 
                       key={video.id} 
-                      className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 transition-colors"
+                      className={`cursor-pointer hover:bg-muted/50 transition-colors ${index !== nextVideos.length - 1 ? 'border-b border-border' : ''}`}
                       onClick={() => handleVideoCardClick(video.id)}
                     >
-                      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-2">
-                        {video.media_type === 'video' ? (
-                          <video
-                            src={videoFullUrl}
-                            className="w-full h-full object-cover"
-                            muted
-                          />
-                        ) : (
-                          <img
-                            src={videoFullUrl}
-                            alt={video.title}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Play className="w-4 h-4 text-white" fill="white" />
+                      <div className="p-3">
+                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-2">
+                          {video.media_type === 'video' ? (
+                            <video
+                              src={videoFullUrl}
+                              className="w-full h-full object-cover"
+                              muted
+                            />
+                          ) : (
+                            <img
+                              src={videoFullUrl}
+                              alt={video.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Play className="w-4 h-4 text-white" fill="white" />
+                          </div>
+                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                            {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                          </div>
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                          {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                        </div>
-                      </div>
 
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-foreground line-clamp-2">
-                          {video.title || video.content}
-                        </h4>
-                        <p className="text-xs text-muted-foreground">
-                          {video.creator_display_name || video.creator_username}
-                        </p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                          <span>•</span>
-                          <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-medium text-foreground line-clamp-2">
+                            {video.title || video.content}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {video.creator_display_name || video.creator_username}
+                          </p>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                            <span>•</span>
+                            <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                          </div>
                         </div>
                       </div>
                     </div>
