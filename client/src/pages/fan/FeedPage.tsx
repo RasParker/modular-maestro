@@ -596,9 +596,9 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Media Content - Edge to Edge */}
+                  {/* Media Content - Edge to Edge - YouTube 16:9 Style */}
                   <div 
-                    className="relative w-full aspect-square bg-black cursor-pointer"
+                    className="relative w-full aspect-video bg-black cursor-pointer"
                     onClick={() => handleThumbnailClick(post)}
                   >
                     {post.thumbnail ? (
@@ -641,89 +641,104 @@ export const FeedPage: React.FC = () => {
                       />
                     )}
 
-                    {/* Play button overlay for videos */}
+                    {/* Play button overlay for videos - YouTube style */}
                     {post.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                          <Video className="w-8 h-8 text-white" fill="white" />
+                        <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center backdrop-blur-sm">
+                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
                         </div>
                       </div>
                     )}
+
+                    {/* Duration Badge for videos */}
+                    {post.type === 'video' && (
+                      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                        {post.duration || '0:00'}
+                      </div>
+                    )}
+
+                    {/* Media Type Badge */}
+                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded px-2 py-1">
+                      {getTypeIcon(post.type)}
+                    </div>
                   </div>
 
-                  {/* Action Buttons and Content */}
+                  {/* YouTube-style Content Info */}
                   <div className="px-3 py-3">
-                    {/* Action Buttons Row */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`h-auto p-0 ${post.liked ? 'text-red-500' : 'text-foreground'}`}
+                    {/* Video Title */}
+                    <h3 className="font-medium text-foreground text-sm leading-snug line-clamp-2 mb-2">
+                      {post.title || post.content}
+                    </h3>
+
+                    {/* Video Stats */}
+                    <div className="flex items-center text-xs text-muted-foreground space-x-1 mb-3">
+                      <span>{post.views} views</span>
+                      <span>•</span>
+                      <span>{getTimeAgo(post.created_at)}</span>
+                    </div>
+
+                    {/* Action Buttons Row - YouTube Style */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <button
                           onClick={() => handleLike(post.id)}
+                          className={`flex items-center space-x-1 text-sm ${
+                            post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
+                          } transition-colors`}
                         >
-                          <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
-                        </Button>
+                          <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
+                          <span>{post.likes}</span>
+                        </button>
 
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-auto p-0 text-foreground"
-                          onClick={() => handleCommentClick(post.id)}
+                        <button 
+                          onClick={() => toggleComments(post.id)}
+                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
                         >
-                          <MessageSquare className="w-6 h-6" />
-                        </Button>
+                          <MessageCircle className="w-5 h-5" />
+                          <span>{post.comments}</span>
+                        </button>
 
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-auto p-0 text-foreground"
+                        <button 
                           onClick={() => handleShare(post.id)}
+                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-green-500 transition-colors"
                         >
-                          <Share2 className="w-6 h-6" />
-                        </Button>
+                          <Share className="w-5 h-5" />
+                        </button>
                       </div>
+
+                      {/* More Options */}
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
                     </div>
 
-                    {/* Likes Count */}
-                    <div className="text-sm font-semibold text-foreground mb-2">
-                      {post.likes} likes
-                    </div>
+                    {/* Description/Caption */}
+                    {post.content && post.content !== post.title && (
+                      <div className="mt-3 text-sm text-muted-foreground">
+                        {(() => {
+                          const { truncated, needsExpansion } = truncateText(post.content, 2);
+                          const isExpanded = expandedCaptions[post.id];
 
-                    {/* Caption */}
-                    <div className="text-sm text-foreground mb-2">
-                      <span className="font-semibold mr-2">{post.creator.display_name}</span>
-                      {(() => {
-                        const { truncated, needsExpansion } = truncateText(post.content, 2);
-                        const isExpanded = expandedCaptions[post.id];
-
-                        return (
-                          <>
-                            <span>
-                              {isExpanded || !needsExpansion ? post.content : truncated}
-                              {needsExpansion && !isExpanded && '...'}
-                            </span>
-                            {needsExpansion && (
-                              <button
-                                onClick={() => toggleCaptionExpansion(post.id)}
-                                className="text-muted-foreground ml-1 text-sm hover:underline"
-                              >
-                                {isExpanded ? 'Read less' : 'Read more'}
-                              </button>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    {/* View Comments Button */}
-                    {post.comments > 0 && (
-                      <button
-                        onClick={() => handleCommentClick(post.id)}
-                        className="text-sm text-muted-foreground hover:underline"
-                      >
-                        View all {post.comments} comments
-                      </button>
+                          return (
+                            <>
+                              <span>
+                                {isExpanded || !needsExpansion ? post.content : truncated}
+                                {needsExpansion && !isExpanded && '...'}
+                              </span>
+                              {needsExpansion && (
+                                <button
+                                  onClick={() => toggleCaptionExpansion(post.id)}
+                                  className="text-primary ml-1 text-sm hover:underline font-medium"
+                                >
+                                  {isExpanded ? 'Show less' : 'Show more'}
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
                     )}
 
                     {/* Comments Section */}
