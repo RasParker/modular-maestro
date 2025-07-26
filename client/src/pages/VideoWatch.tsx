@@ -347,7 +347,7 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-1 px-4">
                           <h4 className="text-sm font-medium text-foreground line-clamp-2">
                             {video.title || video.content}
                           </h4>
@@ -542,7 +542,7 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-1 px-4">
                           <h4 className="text-sm font-medium text-foreground line-clamp-2">
                             {video.title || video.content}
                           </h4>
