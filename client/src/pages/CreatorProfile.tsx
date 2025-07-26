@@ -420,31 +420,20 @@ export const CreatorProfile: React.FC = () => {
 
                         {/* Content */}
                         <div className="feed-card-content">
-                          <div className="flex items-start gap-3 mb-2">
-                            <Avatar className="w-8 h-8 flex-shrink-0">
+                          <div className="flex items-start gap-2">
+                            <Avatar className="h-6 w-6 flex-shrink-0">
                               <AvatarImage src={creator.avatar} alt={creator.display_name} />
-                              <AvatarFallback className="text-xs">
-                                {creator.display_name.charAt(0)}
-                              </AvatarFallback>
+                              <AvatarFallback className="text-xs">{creator.display_name.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <h3 className="feed-card-title">{post.title}</h3>
-                              <div className="feed-card-meta">
+                              <p className="feed-card-meta">
                                 <span>{creator.display_name}</span>
                                 <span>•</span>
-                                <span>{formatDate(post.created_at)}</span>
-                              </div>
-                              <div className="feed-card-meta mt-1">
-                                <span className="flex items-center gap-1">
-                                  <Eye className="w-3 h-3" />
-                                  {post.views_count.toLocaleString()} views
-                                </span>
+                                <span>{post.views_count.toLocaleString()} views</span>
                                 <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <Heart className="w-3 h-3" />
-                                  {post.likes_count}
-                                </span>
-                              </div>
+                                <span>{formatDate(post.created_at)}</span>
+                              </p>
                             </div>
                           </div>
                         </div>
