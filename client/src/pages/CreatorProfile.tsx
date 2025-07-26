@@ -193,12 +193,12 @@ export const CreatorProfile: React.FC = () => {
         const filteredPosts = await response.json();
 
         // Sort posts by creation date (newest first)
-        filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        filteredPosts.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         setUserPosts(filteredPosts);
 
         // Initialize like status for current user
         if (user) {
-          await fetchLikeStatuses(filteredPosts, user.id);
+          await fetchLikeStatuses(filteredPosts, Number(user.id));
         }
 
         console.log('Fetched user posts:', filteredPosts);
@@ -299,7 +299,7 @@ export const CreatorProfile: React.FC = () => {
                 const newDisplayName = localStorage.getItem('displayName');
                 const newBio = localStorage.getItem('bio');
 
-                setCreator(prev => prev ? {
+                setCreator((prev: any) => prev ? {
                   ...prev,
                   display_name: (newDisplayName && newDisplayName.trim()) || userData.display_name || userData.username,
                   avatar: (newProfilePhotoUrl && newProfilePhotoUrl.trim()) || userData.avatar || prev.avatar,
@@ -657,7 +657,7 @@ export const CreatorProfile: React.FC = () => {
     }
 
     // Define tier hierarchy - higher tiers include lower tier content
-    const tierHierarchy = {
+    const tierHierarchy: Record<string, number> = {
       'supporter': 1,
       'starter pump': 1,
       'fan': 2,
@@ -1129,7 +1129,8 @@ export const CreatorProfile: React.FC = () => {
             <div>
               <div className="mb-4"></div>
               {userPosts.length > 0 ? (
-                /* Mobile: Fan feed style grid layout */
+                <>
+                {/* Mobile: Fan feed style grid layout */}
                 <div className="md:hidden">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
                     {userPosts.map((post) => (
@@ -1272,7 +1273,7 @@ export const CreatorProfile: React.FC = () => {
                   </div>
                 </div>
 
-                /* Desktop: Keep Instagram-style layout */
+                {/* Desktop: Keep Instagram-style layout */}
                 <div className="hidden md:block">
                   <div className="space-y-0 -mx-4">
                     {userPosts.map((post) => (
@@ -1498,6 +1499,7 @@ export const CreatorProfile: React.FC = () => {
                     ))}
                   </div>
                 </div>
+                </>
               ) : (
                 <Card className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
@@ -1519,7 +1521,7 @@ export const CreatorProfile: React.FC = () => {
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers && creator.tiers.length > 0 ? (
-              creator.tiers.map((tier) => (
+              creator.tiers.map((tier: any) => (
                 <Card key={tier.id} className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -1562,7 +1564,7 @@ export const CreatorProfile: React.FC = () => {
                             );
                           }
 
-                          return benefits.map((benefit, index) => (
+                          return benefits.map((benefit: any, index: number) => (
                             <li key={index} className="flex items-center gap-2 text-sm">
                               <Check className="w-4 h-4 text-accent" />
                               <span>{benefit}</span>
