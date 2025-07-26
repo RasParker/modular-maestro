@@ -573,7 +573,7 @@ export const FeedPage: React.FC = () => {
       </div>
 
       {/* Feed Content */}
-      <EdgeToEdgeContainer maxWidth="6xl" enablePadding className="py-4 sm:py-6">
+      <EdgeToEdgeContainer maxWidth="7xl" enablePadding className="py-4 sm:py-6">
         {loading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
@@ -608,7 +608,7 @@ export const FeedPage: React.FC = () => {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 p-2 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 max-w-7xl mx-auto">
               {feed.map((post) => (
                 <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                   {/* Thumbnail */}
@@ -792,58 +792,60 @@ export const FeedPage: React.FC = () => {
 
                   {/* Creator Info and Content - Below thumbnail */}
                   <div className="space-y-3">
-                    {/* Creator Header */}
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                    {/* Creator Header with Caption */}
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-12 w-12 flex-shrink-0">
                         <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
                         <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-foreground">
-                          {post.creator.display_name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          @{post.creator.username} • {getTimeAgo(post.posted)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Post Content/Caption */}
-                    <div>
-                      {(() => {
-                        const { truncated, needsExpansion } = truncateText(post.content, 3);
-                        return (
-                          <p className="text-sm leading-relaxed text-foreground">
-                            {expandedCaptions[post.id] ? post.content : (
-                              <>
-                                {truncated}
-                                {needsExpansion && !expandedCaptions[post.id] && (
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-foreground">
+                            {post.creator.display_name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            @{post.creator.username} • {getTimeAgo(post.posted)}
+                          </p>
+                        </div>
+                        
+                        {/* Post Content/Caption - Same row */}
+                        <div>
+                          {(() => {
+                            const { truncated, needsExpansion } = truncateText(post.content, 3);
+                            return (
+                              <p className="text-sm leading-relaxed text-foreground">
+                                {expandedCaptions[post.id] ? post.content : (
                                   <>
-                                    {'... '}
+                                    {truncated}
+                                    {needsExpansion && !expandedCaptions[post.id] && (
+                                      <>
+                                        {'... '}
+                                        <button
+                                          onClick={() => toggleCaptionExpansion(post.id)}
+                                          className="text-primary hover:text-primary/80 font-medium"
+                                        >
+                                          Read more
+                                        </button>
+                                      </>
+                                    )}
+                                  </>
+                                )}
+                                {expandedCaptions[post.id] && needsExpansion && (
+                                  <>
+                                    {' '}
                                     <button
                                       onClick={() => toggleCaptionExpansion(post.id)}
                                       className="text-primary hover:text-primary/80 font-medium"
                                     >
-                                      Read more
+                                      Show less
                                     </button>
                                   </>
                                 )}
-                              </>
-                            )}
-                            {expandedCaptions[post.id] && needsExpansion && (
-                              <>
-                                {' '}
-                                <button
-                                  onClick={() => toggleCaptionExpansion(post.id)}
-                                  className="text-primary hover:text-primary/80 font-medium"
-                                >
-                                  Show less
-                                </button>
-                              </>
-                            )}
-                          </p>
-                        );
-                      })()}
+                              </p>
+                            );
+                          })()}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
