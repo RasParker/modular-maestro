@@ -13,6 +13,7 @@ import { Signup } from '@/pages/Signup';
 import { Explore } from '@/pages/Explore';
 import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorProfile } from '@/pages/CreatorProfile';
+import { VideoWatch } from '@/pages/VideoWatch';
 import { FeedPage } from '@/pages/fan/FeedPage';
 import { CreatorDashboard } from '@/pages/creator/CreatorDashboard';
 import { CreatePost } from '@/pages/creator/CreatePost';
@@ -64,7 +65,7 @@ function App() {
 
               {/* Public Creator Profile Route - Must be accessible to everyone */}
               <Route path="/creator/:username" element={<CreatorProfile />} />
-              
+
               {/* Public Post Viewing Route - Must be accessible to everyone */}
               <Route path="/creator/posts/:id" element={<CreatorProfile />} />
 
@@ -106,7 +107,8 @@ function App() {
 
               {/* Default route */}
               <Route path="/" element={<Login />} />
-              
+              <Route path="/watch/:id" element={<VideoWatch />} />
+
               {/* Catch-all route for undefined paths */}
               <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

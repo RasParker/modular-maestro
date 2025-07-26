@@ -551,39 +551,12 @@ export const FeedPage: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="space-y-0 -mx-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
             {feed.map((post) => (
-              <div key={post.id} className="mb-6">{/* Instagram-style borderless post - mobile optimized */}
-                {/* Post Header - Mobile Instagram style */}
-              <div className="flex items-center justify-between px-3 py-3">
-                <div className="flex items-center gap-3 flex-1">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                    <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex items-center gap-2 flex-1">
-                    <p className="font-semibold text-foreground text-sm">{post.creator.display_name}</p>
-                    <span className="text-xs text-muted-foreground">
-                      {getTimeAgo(post.posted)}
-                    </span>
-                  </div>
-                </div>
-                <Badge variant={getTierColor(post.tier)} className="text-xs px-1 py-0 h-4">
-                  {post.tier === 'public' ? 'Free' : 
-                   post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                   post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                   post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                   post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                   post.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                   post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                   post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                   post.tier}
-                </Badge>
-              </div>
-              {/* Post Media - Responsive aspect ratio */}
-              <div className="w-full">
+              <div key={post.id} className="feed-card">
+                {/* Thumbnail */}
                 <div 
-                  className="relative cursor-pointer active:opacity-90 transition-opacity"
+                  className="feed-card-thumbnail cursor-pointer"
                   onClick={() => handleThumbnailClick(post)}
                   role="button"
                   tabIndex={0}
@@ -595,199 +568,73 @@ export const FeedPage: React.FC = () => {
                   }}
                 >
                   {post.thumbnail ? (
-                    <img 
-                      src={post.thumbnail} 
-                      alt={`${post.creator.display_name}'s post`}
-                      className="w-full aspect-[9/16] sm:aspect-[4/5] md:aspect-[1/1] object-cover"
-                    />
+                    post.type === 'video' ? (
+                      <img 
+                        src={post.thumbnail} 
+                        alt={`${post.creator.display_name}'s video`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img 
+                        src={post.thumbnail} 
+                        alt={`${post.creator.display_name}'s post`}
+                        className="w-full h-full object-cover"
+                      />
+                    )
                   ) : (
-                    // Use placeholder image for demo purposes as requested in prompt
                     <img 
-                      src={post.id === '1' ? 'https://placehold.co/1080x1920/E63946/FFFFFF?text=Creator+Post+1' :
-                           post.id === '2' ? 'https://placehold.co/1080x1920/457B9D/FFFFFF?text=Creator+Post+2' :
-                           post.id === '3' ? 'https://placehold.co/1080x1920/1D3557/FFFFFF?text=Creator+Post+3' :
-                           `https://placehold.co/1080x1920/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                      src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
+                           post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
+                           post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
+                           `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                       alt={`${post.creator.display_name}'s post`}
-                      className="w-full aspect-[9/16] sm:aspect-[4/5] md:aspect-[1/1] object-cover"
+                      className="w-full h-full object-cover"
                     />
                   )}
-                  {/* Content type overlay - smaller for mobile */}
-                  <div className="absolute top-2 left-2 z-20">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
+
+                  {/* Content type overlay */}
+                  <div className="absolute top-2 left-2">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
                       {getTypeIcon(post.type)}
                     </div>
                   </div>
-                </div>
-                {(() => {
-                        const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
-                        const mediaUrl = mediaUrls[0];
-                        const fullUrl = mediaUrl?.startsWith('http') ? mediaUrl : `/uploads/${mediaUrl}`;
 
-                        if (post.media_type === 'video') {
-                          return (
-                            <div className="video-post-container w-full aspect-[9/16] bg-black rounded-lg overflow-hidden">
-                              <video
-                                src={fullUrl}
-                                className="w-full h-full"
-                                controls
-                                playsInline
-                                data-aspect-ratio="unknown"
-                                onLoadedMetadata={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  const aspectRatio = video.videoWidth / video.videoHeight;
-
-                                  if (aspectRatio > 1) {
-                                    // Landscape video
-                                    video.setAttribute('data-aspect-ratio', 'landscape');
-                                    video.style.objectFit = 'contain';
-                                  } else {
-                                    // Portrait video
-                                    video.setAttribute('data-aspect-ratio', 'portrait');
-                                    video.style.objectFit = 'cover';
-                                  }
-                                }}
-                                onError={(e) => {
-                                  const target = e.target as HTMLVideoElement;
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-16 h-16 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>`;
-                                  }
-                                }}
-                              />
-                            </div>
-                          );
-                        } else if (post.media_type === 'image') {
-                          return (
-                            <img
-                              src={fullUrl}
-                              alt={post.title}
-                              className="w-full h-full object-cover rounded-lg"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-16 h-16 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
-                                }
-                              }}
-                            />
-                          );
-                        } else {
-                          return (
-                            <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
-<FileText className="w-16 h-16 text-muted-foreground" />
-                            </div>
-                          );
-                        }
-                      })()}
-              </div>
-
-              {/* Action Buttons - Mobile Instagram style with inline stats */}
-              <div className="px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={`h-8 w-8 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                        onClick={() => handleLike(post.id)}
-                      >
-                        <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
-                      </Button>
-                      <span className="text-sm font-medium text-foreground">
-                        {post.likes}
-                      </span>
+                  {/* Duration overlay for videos */}
+                  {post.type === 'video' && (
+                    <div className="absolute bottom-2 right-2">
+                      <div className="px-1 py-0.5 bg-black/60 rounded text-white text-xs">
+                        {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0 text-muted-foreground"
-                        onClick={() => handleCommentClick(post.id)}
-                      >
-                        <MessageSquare className="w-6 h-6" />
-                      </Button>
-                      <span className="text-sm font-medium text-foreground">
-                        {post.comments}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-muted-foreground"
-                        onClick={() => handleShare(post.id)}
-                      >
-                        <Share2 className="w-6 h-6" />
-                      </Button>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Post Caption - Mobile Instagram style */}
-                <div className="mb-1">
-                  {(() => {
-                    const { truncated, needsExpansion } = truncateText(post.content);
-                    const isExpanded = expandedCaptions[post.id];
-
-                    return (
-                      <p className="text-sm leading-relaxed text-foreground">
-                        {isExpanded ? post.content : (
-                          <>
-                            {truncated}
-                            {needsExpansion && !isExpanded && (
-                              <>
-                                {'... '}
-                                <button
-                                  onClick={() => toggleCaptionExpansion(post.id)}
-                                  className="text-muted-foreground hover:text-foreground font-normal"
-                                >
-                                  more
-                                </button>
-                              </>
-                            )}
-                          </>
-                        )}
-                        {isExpanded && needsExpansion && (
-                          <>
-                            {' '}
-                            <button
-                              onClick={() => toggleCaptionExpansion(post.id)}
-                              className="text-muted-foreground hover:text-foreground font-normal"
-                            >
-                              less
-                            </button>
-                          </>
-                        )}
+                {/* Card Content */}
+                <div className="feed-card-content">
+                  <div className="flex items-start gap-2">
+                    <Avatar className="h-6 w-6 flex-shrink-0">
+                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                      <AvatarFallback className="text-xs">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="feed-card-title">
+                        {post.content || post.title || 'Untitled Post'}
+                      </h3>
+                      <p className="feed-card-meta">
+                        <span>{post.creator.display_name}</span>
+                        <span>•</span>
+                        <span>{post.views} views</span>
+                        <span>•</span>
+                        <span>{getTimeAgo(post.posted)}</span>
                       </p>
-                    );
-                  })()}
-                </div>
-
-                {/* View comments link */}
-                {post.comments > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 text-muted-foreground text-sm font-normal"
-                    onClick={() => handleCommentClick(post.id)}
-                  >
-                    View all {post.comments} comments
-                  </Button>
-                )}
-              </div>
-              {/* Comments Section - Mobile optimized */}
-              {showComments[post.id] && (
-                <div className="px-3 pb-3 border-t border-border/30 mx-3">
-                  <div className="pt-3">
-                    <CommentSection
-                      postId={post.id}
-                      initialComments={post.initialComments || []}
-                      onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                    />
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
+                          {post.tier === 'public' ? 'Free' : post.tier}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
               </div>
             ))}
           </div>
