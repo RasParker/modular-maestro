@@ -404,7 +404,7 @@ export const FeedPage: React.FC = () => {
       media.src = post.thumbnail;
       media.onloadedmetadata = () => {
         const aspectRatio = media.videoWidth / media.videoHeight;
-        
+
         if (aspectRatio > 1) {
           // 16:9 or landscape video - navigate to YouTube-style watch page
           navigate(`/video/${post.id}`);
@@ -416,7 +416,7 @@ export const FeedPage: React.FC = () => {
           setIsModalOpen(true);
         }
       };
-      
+
       // Fallback for when metadata can't be loaded - assume portrait for modal
       media.onerror = () => {
         const index = feed.findIndex(p => p.id === post.id);
@@ -544,7 +544,7 @@ export const FeedPage: React.FC = () => {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               Latest content from creators you follow
             </p>
-            
+
             {/* View Toggle - Desktop Only */}
             <div className="hidden md:flex justify-center">
               <div className="inline-flex items-center rounded-lg border border-border bg-background p-1">
@@ -596,7 +596,7 @@ export const FeedPage: React.FC = () => {
             ))}
           </div>
         ) : feed.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 px-4 sm:px-6">
             <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
             <p className="text-muted-foreground mb-6">
@@ -807,7 +807,7 @@ export const FeedPage: React.FC = () => {
                             @{post.creator.username} • {getTimeAgo(post.posted)}
                           </p>
                         </div>
-                        
+
                         {/* Post Content/Caption - Same row */}
                         <div>
                           {(() => {
