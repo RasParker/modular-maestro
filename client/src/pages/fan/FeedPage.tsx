@@ -573,7 +573,7 @@ export const FeedPage: React.FC = () => {
       </div>
 
       {/* Feed Content */}
-      <EdgeToEdgeContainer maxWidth="4xl" enablePadding className="py-6 sm:py-8">
+      <EdgeToEdgeContainer maxWidth="8xl" enablePadding className="py-6 sm:py-8">
         {loading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (

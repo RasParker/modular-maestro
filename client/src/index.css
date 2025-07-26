@@ -427,10 +427,18 @@
     display: flex;
     flex-direction: column;
     transition: all 0.2s ease;
+    max-width: 320px; /* Increased from default to better fill larger container */
   }
 
   .youtube-grid-card:hover {
     transform: translateY(-2px);
+  }
+
+  /* Responsive adjustments for larger grid */
+  @media (min-width: 1536px) {
+    .youtube-grid-card {
+      max-width: 350px;
+    }
   }
 
   /* Feed Card Layout (kept for compatibility) */
