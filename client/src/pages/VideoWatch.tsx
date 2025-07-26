@@ -311,7 +311,7 @@ export const VideoWatch: React.FC = () => {
           {/* Next Videos Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold mb-4">Up next</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               {nextVideos.map((video) => {
                 const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;
                 const videoFullUrl = videoMediaUrl?.startsWith('http') ? videoMediaUrl : `/uploads/${videoMediaUrl}`;
@@ -322,7 +322,7 @@ export const VideoWatch: React.FC = () => {
                     className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 transition-colors"
                     onClick={() => handleVideoCardClick(video.id)}
                   >
-                    <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-2">
+                    <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-3">
                       {video.media_type === 'video' ? (
                         <video
                           src={videoFullUrl}
