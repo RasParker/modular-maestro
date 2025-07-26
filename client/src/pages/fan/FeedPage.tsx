@@ -8,7 +8,7 @@ import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, FileText, Loader2 } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, FileText, Loader2, Grid3X3, List } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -276,6 +276,7 @@ export const FeedPage: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'single'>('grid');
 
   // Fetch real posts from API
   useEffect(() => {
@@ -509,9 +510,33 @@ export const FeedPage: React.FC = () => {
             <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
               Your Feed
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               Latest content from creators you follow
             </p>
+            
+            {/* View Toggle - Desktop Only */}
+            <div className="hidden md:flex justify-center">
+              <div className="inline-flex items-center rounded-lg border border-border bg-background p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="h-8 px-3"
+                >
+                  <Grid3X3 className="w-4 h-4 mr-2" />
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'single' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('single')}
+                  className="h-8 px-3"
+                >
+                  <List className="w-4 h-4 mr-2" />
+                  Single
+                </Button>
+              </div>
+            </div>
           </div>
         </EdgeToEdgeContainer>
       </div>
@@ -550,7 +575,7 @@ export const FeedPage: React.FC = () => {
               <Link to="/explore">Discover Creators</Link>
             </Button>
           </div>
-        ) : (
+        ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
             {feed.map((post) => (
               <div key={post.id} className="feed-card">
@@ -636,6 +661,194 @@ export const FeedPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          /* Single View */
+          <div className="space-y-6">
+            {feed.map((post) => (
+              <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Creator Header */}
+                  <div className="p-4 pb-0">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                        <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">
+                            {post.creator.display_name}
+                          </h3>
+                          <Badge variant={getTierColor(post.tier)} className="text-xs">
+                            {post.tier === 'public' ? 'Free' : post.tier}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          @{post.creator.username} • {getTimeAgo(post.posted)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Post Content/Caption */}
+                    <div className="mb-4">
+                      {(() => {
+                        const { truncated, needsExpansion } = truncateText(post.content, 3);
+                        return (
+                          <p className="text-sm leading-relaxed text-foreground">
+                            {expandedCaptions[post.id] ? post.content : (
+                              <>
+                                {truncated}
+                                {needsExpansion && !expandedCaptions[post.id] && (
+                                  <>
+                                    {'... '}
+                                    <button
+                                      onClick={() => toggleCaptionExpansion(post.id)}
+                                      className="text-primary hover:text-primary/80 font-medium"
+                                    >
+                                      Read more
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                            {expandedCaptions[post.id] && needsExpansion && (
+                              <>
+                                {' '}
+                                <button
+                                  onClick={() => toggleCaptionExpansion(post.id)}
+                                  className="text-primary hover:text-primary/80 font-medium"
+                                >
+                                  Show less
+                                </button>
+                              </>
+                            )}
+                          </p>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Media Content */}
+                  <div 
+                    className="relative aspect-video bg-black cursor-pointer"
+                    onClick={() => handleThumbnailClick(post)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleThumbnailClick(post);
+                      }
+                    }}
+                  >
+                    {post.thumbnail ? (
+                      post.type === 'video' ? (
+                        <img 
+                          src={post.thumbnail} 
+                          alt={`${post.creator.display_name}'s video`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img 
+                          src={post.thumbnail} 
+                          alt={`${post.creator.display_name}'s post`}
+                          className="w-full h-full object-cover"
+                        />
+                      )
+                    ) : (
+                      <img 
+                        src={post.id === '1' ? 'https://placehold.co/1280x720/E63946/FFFFFF?text=Creator+Post+1' :
+                             post.id === '2' ? 'https://placehold.co/1280x720/457B9D/FFFFFF?text=Creator+Post+2' :
+                             post.id === '3' ? 'https://placehold.co/1280x720/1D3557/FFFFFF?text=Creator+Post+3' :
+                             `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                        alt={`${post.creator.display_name}'s post`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+
+                    {/* Content type overlay */}
+                    <div className="absolute top-4 left-4">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm">
+                        {getTypeIcon(post.type)}
+                      </div>
+                    </div>
+
+                    {/* Duration overlay for videos */}
+                    {post.type === 'video' && (
+                      <div className="absolute bottom-4 right-4">
+                        <div className="px-2 py-1 bg-black/60 rounded text-white text-sm">
+                          {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`h-8 w-8 p-0 ${post.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                            onClick={() => handleLike(post.id)}
+                          >
+                            <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
+                          </Button>
+                          <span className="text-sm font-medium text-foreground">
+                            {post.likes}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                            onClick={() => handleCommentClick(post.id)}
+                          >
+                            <MessageSquare className="w-5 h-5" />
+                          </Button>
+                          <span className="text-sm font-medium text-foreground">
+                            {post.comments}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                            onClick={() => handleShare(post.id)}
+                          >
+                            <Share2 className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Eye className="w-4 h-4" />
+                        <span>{post.views} views</span>
+                      </div>
+                    </div>
+
+                    {/* Comments Section */}
+                    {showComments[post.id] && (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <CommentSection
+                          postId={post.id}
+                          initialComments={post.initialComments || []}
+                          onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                          isBottomSheet={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}

@@ -432,6 +432,11 @@
     gap: 4px;
   }
 
+  /* Single View Styles */
+  .feed-single-view .aspect-video {
+    max-height: 60vh;
+  }
+
   /* Mobile responsive adjustments */
   @media (max-width: 768px) {
     .content-wrapper {
@@ -448,6 +453,11 @@
 
     .feed-card-meta {
       font-size: 11px;
+    }
+
+    /* Hide view toggle on mobile */
+    .view-toggle {
+      display: none !important;
     }
   }
 }
