@@ -241,37 +241,11 @@ export const VideoWatch: React.FC = () => {
       {/* Content Wrapper - Scrollable area below video */}
       <div className="content-wrapper bg-background">
         <div className="px-4 py-4">
-          {/* Video Title */}
-          <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">
-            {post.title || post.content}
-          </h1>
-
           {/* View count and date */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
             <span>•</span>
             <span>{new Date(post.created_at).toLocaleDateString()}</span>
-          </div>
-
-          {/* Creator Info Row */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={post.creator_avatar} alt={post.creator_username} />
-                <AvatarFallback>{post.creator_display_name?.charAt(0) || 'U'}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-foreground text-sm">
-                  {post.creator_display_name || post.creator_username}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {Math.floor(Math.random() * 100) + 10}K subscribers
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="rounded-full">
-              Subscribe
-            </Button>
           </div>
 
           {/* Action Buttons Row */}
