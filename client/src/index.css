@@ -355,7 +355,7 @@
   @media (max-width: 768px) {
     .video-player-wrapper {
       aspect-ratio: 16 / 9;
-      max-height: 35vh; /* Limit height on mobile for better UX */
+      max-height: 40vh; /* Slightly larger for better viewing */
     }
   }
 
@@ -380,9 +380,17 @@
   /* Mobile content wrapper adjustments */
   @media (max-width: 768px) {
     .content-wrapper {
-      max-height: calc(100vh - 35vh); /* Subtract video player max height */
+      height: calc(100vh - 40vh); /* Match video player height */
       padding-bottom: 2rem; /* Extra padding for better scrolling */
     }
+  }
+
+  /* Line clamp utility for video titles */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* Immersive Mode for Portrait Videos */
