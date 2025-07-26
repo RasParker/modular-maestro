@@ -110,7 +110,7 @@ function App() {
               <Route path="/video/:id" element={<VideoWatch />} />
 
               {/* Catch-all route for undefined paths */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
             </AppLayout>
           </Router>
