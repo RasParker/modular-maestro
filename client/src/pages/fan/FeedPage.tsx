@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -265,6 +265,7 @@ const MOCK_FEED = [
 ];
 
 export const FeedPage: React.FC = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
   const [feed, setFeed] = useState<any[]>([]);
@@ -396,10 +397,40 @@ export const FeedPage: React.FC = () => {
   };
 
   const handleThumbnailClick = (post: any) => {
-    const index = feed.findIndex(p => p.id === post.id);
-    setSelectedContent(post);
-    setSelectedIndex(index);
-    setIsModalOpen(true);
+    // For video content, check aspect ratio to determine navigation behavior
+    if (post.type === 'video' && post.thumbnail) {
+      // Create a temporary image/video element to detect aspect ratio
+      const media = document.createElement('video');
+      media.src = post.thumbnail;
+      media.onloadedmetadata = () => {
+        const aspectRatio = media.videoWidth / media.videoHeight;
+        
+        if (aspectRatio > 1) {
+          // 16:9 or landscape video - navigate to YouTube-style watch page
+          navigate(`/video/${post.id}`);
+        } else {
+          // 9:16 or portrait video - open Instagram-style modal
+          const index = feed.findIndex(p => p.id === post.id);
+          setSelectedContent(post);
+          setSelectedIndex(index);
+          setIsModalOpen(true);
+        }
+      };
+      
+      // Fallback for when metadata can't be loaded - assume portrait for modal
+      media.onerror = () => {
+        const index = feed.findIndex(p => p.id === post.id);
+        setSelectedContent(post);
+        setSelectedIndex(index);
+        setIsModalOpen(true);
+      };
+    } else {
+      // Non-video content always opens in modal
+      const index = feed.findIndex(p => p.id === post.id);
+      setSelectedContent(post);
+      setSelectedIndex(index);
+      setIsModalOpen(true);
+    }
   };
 
   const closeModal = () => {

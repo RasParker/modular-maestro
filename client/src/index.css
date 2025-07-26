@@ -347,9 +347,23 @@
   .video-player-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
     background-color: #000;
     overflow: hidden;
+  }
+
+  /* Mobile: Video takes natural aspect ratio with letterboxing */
+  @media (max-width: 768px) {
+    .video-player-wrapper {
+      aspect-ratio: 16 / 9;
+      max-height: 35vh; /* Limit height on mobile for better UX */
+    }
+  }
+
+  /* Desktop: Maintain original 16:9 aspect ratio */
+  @media (min-width: 769px) {
+    .video-player-wrapper {
+      aspect-ratio: 16 / 9;
+    }
   }
 
   .video-player-wrapper .video-element {
@@ -360,7 +374,15 @@
   .content-wrapper {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 56.25vw); /* Subtract video player height */
+    background: hsl(var(--background));
+  }
+
+  /* Mobile content wrapper adjustments */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      max-height: calc(100vh - 35vh); /* Subtract video player max height */
+      padding-bottom: 2rem; /* Extra padding for better scrolling */
+    }
   }
 
   /* Immersive Mode for Portrait Videos */

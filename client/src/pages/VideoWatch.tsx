@@ -156,8 +156,8 @@ export const VideoWatch: React.FC = () => {
 
   return (
     <div className={`min-h-screen bg-background ${isImmersive ? 'is-immersive' : ''}`}>
-      {/* Video Player Wrapper */}
-      <div className="video-player-wrapper relative bg-black aspect-video w-full">
+      {/* Video Player Wrapper - YouTube style for mobile */}
+      <div className="video-player-wrapper relative bg-black w-full">
         {/* Back Button */}
         {!isImmersive && (
           <Button
@@ -182,7 +182,7 @@ export const VideoWatch: React.FC = () => {
           </Button>
         )}
 
-        {/* Immersive Toggle Button */}
+        {/* Immersive Toggle Button - only for portrait videos */}
         {videoAspectRatio === 'portrait' && !isImmersive && (
           <Button
             variant="ghost"
@@ -203,89 +203,92 @@ export const VideoWatch: React.FC = () => {
             playsInline
             onLoadedMetadata={handleVideoLoad}
             style={{
-              objectFit: videoAspectRatio === 'landscape' ? 'cover' : 'contain',
-              backgroundColor: videoAspectRatio === 'portrait' ? 'black' : 'transparent'
+              objectFit: videoAspectRatio === 'landscape' ? 'contain' : 'contain',
+              backgroundColor: 'black'
             }}
           />
         ) : (
           <img
             src={fullMediaUrl}
             alt={post.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-black"
           />
         )}
       </div>
 
-      {/* Content Wrapper */}
+      {/* Content Wrapper - Scrollable area below video */}
       <div className="content-wrapper bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="px-4 py-4">
           {/* Video Title */}
-          <h1 className="text-2xl font-bold text-foreground mb-4">
+          <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">
             {post.title || post.content}
           </h1>
 
-          {/* Creator Info and Actions */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
+          {/* View count and date */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+            <span>•</span>
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+          </div>
+
+          {/* Creator Info Row */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
                 <AvatarImage src={post.creator_avatar} alt={post.creator_username} />
                 <AvatarFallback>{post.creator_display_name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold text-foreground">
+                <p className="font-semibold text-foreground text-sm">
                   {post.creator_display_name || post.creator_username}
                 </p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Eye className="w-4 h-4" />
-                  <span>{Math.floor(Math.random() * 1000) + 100} views</span>
-                  <span>•</span>
-                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                <div className="flex items-center gap-1">
+                  <Badge variant={post.tier === 'public' ? 'outline' : 'default'} className="text-xs">
+                    {post.tier === 'public' ? 'Free' : post.tier}
+                  </Badge>
                 </div>
               </div>
             </div>
-
-            <div className="flex items-center gap-2">
-              <Badge variant={post.tier === 'public' ? 'outline' : 'default'}>
-                {post.tier === 'public' ? 'Free' : post.tier}
-              </Badge>
-            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-6 mb-6 p-4 bg-muted/30 rounded-lg">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`flex items-center gap-2 ${liked ? 'text-red-500' : ''}`}
-              onClick={handleLike}
-            >
-              <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-              <span>{post.likes_count || 0}</span>
-            </Button>
+          {/* Action Buttons Row */}
+          <div className="flex items-center justify-between mb-6 px-2">
+            <div className="flex items-center gap-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`flex flex-col items-center gap-1 h-auto py-2 px-3 ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                onClick={handleLike}
+              >
+                <Heart className={`w-6 h-6 ${liked ? 'fill-current' : ''}`} />
+                <span className="text-xs">{post.likes_count || 0}</span>
+              </Button>
 
-            <Button variant="ghost" size="sm" className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              <span>{post.comments_count || 0}</span>
-            </Button>
+              <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-muted-foreground">
+                <MessageSquare className="w-6 h-6" />
+                <span className="text-xs">{post.comments_count || 0}</span>
+              </Button>
 
-            <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleShare}>
-              <Share2 className="w-5 h-5" />
-              <span>Share</span>
-            </Button>
+              <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-muted-foreground" onClick={handleShare}>
+                <Share2 className="w-6 h-6" />
+                <span className="text-xs">Share</span>
+              </Button>
+            </div>
           </div>
 
           {/* Description */}
           {post.content && (
-            <Card className="mb-6">
-              <CardContent className="p-4">
-                <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
-              </CardContent>
-            </Card>
+            <div className="mb-6 bg-muted/30 rounded-lg p-4">
+              <p className="text-foreground text-sm leading-relaxed">{post.content}</p>
+            </div>
           )}
 
           {/* Comments Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">Comments</h3>
+          <div className="border-t border-border pt-4">
+            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Comments
+            </h3>
             <CommentSection
               postId={post.id.toString()}
               initialComments={[]}
