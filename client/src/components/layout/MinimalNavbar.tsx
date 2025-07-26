@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -35,7 +36,12 @@ export const MinimalNavbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Check if this is an edge-to-edge page that needs floating navbar
+  const isEdgeToEdgePage = location.pathname.startsWith('/video/') || 
+                          (location.pathname === '/fan/feed' && isMobile);
 
   const handleLogout = () => {
     logout();
@@ -166,7 +172,11 @@ export const MinimalNavbar: React.FC = () => {
   const navigationItems = getNavigationItems();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${
+      isEdgeToEdgePage 
+        ? 'bg-transparent pointer-events-none' 
+        : 'bg-background/80 backdrop-blur-md border-b border-border'
+    }`}>
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}

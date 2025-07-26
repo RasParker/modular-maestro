@@ -533,7 +533,220 @@ export const FeedPage: React.FC = () => {
   };
 
   return (
-    <EdgeToEdgeContainer>
+    <div className="min-h-screen bg-background">
+      {/* Mobile Layout - Edge-to-edge like VideoWatch */}
+      <div className="md:hidden">
+        {/* Mobile Feed Container - Full Width */}
+        <div className="w-full bg-background">
+          {loading ? (
+            <div className="space-y-0">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-full">
+                  <div className="px-3 py-3">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-muted rounded-full animate-pulse"></div>
+                      <div className="space-y-2">
+                        <div className="w-28 h-3 bg-muted rounded animate-pulse"></div>
+                        <div className="w-20 h-2 bg-muted rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="w-full h-64 bg-muted rounded-lg animate-pulse mb-3"></div>
+                    <div className="space-y-2">
+                      <div className="w-full h-3 bg-muted rounded animate-pulse"></div>
+                      <div className="w-3/4 h-3 bg-muted rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : feed.length === 0 ? (
+            <div className="text-center py-16 px-4">
+              <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
+              <p className="text-muted-foreground mb-6">
+                Follow some creators to see their content in your feed
+              </p>
+              <Button asChild>
+                <Link to="/explore">Discover Creators</Link>
+              </Button>
+            </div>
+          ) : (
+            /* Mobile Feed Items */
+            <div className="space-y-0">
+              {feed.map((post) => (
+                <div key={post.id} className="w-full border-b border-border/30">
+                  {/* Creator Info Header */}
+                  <div className="flex items-center px-3 py-3">
+                    <Avatar className="h-10 w-10 mr-3">
+                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                      <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground truncate">
+                          {post.creator.display_name}
+                        </h3>
+                        <Badge variant={getTierColor(post.tier)} className="text-xs">
+                          {post.tier === 'public' ? 'Free' : post.tier}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {getTimeAgo(post.posted)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Media Content - Edge to Edge */}
+                  <div 
+                    className="relative w-full aspect-square bg-black cursor-pointer"
+                    onClick={() => handleThumbnailClick(post)}
+                  >
+                    {post.thumbnail ? (
+                      post.type === 'video' ? (
+                        <video
+                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          className="w-full h-full object-cover"
+                          muted
+                          preload="metadata"
+                          onError={(e) => {
+                            const target = e.target as HTMLVideoElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                <div class="text-white text-sm">Video unavailable</div>
+                              </div>`;
+                            }
+                          }}
+                        />
+                      ) : (
+                        <img 
+                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          alt={`${post.creator.display_name}'s post`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                          }}
+                        />
+                      )
+                    ) : (
+                      <img 
+                        src={post.id === '1' ? 'https://placehold.co/800x800/E63946/FFFFFF?text=Creator+Post+1' :
+                             post.id === '2' ? 'https://placehold.co/800x800/457B9D/FFFFFF?text=Creator+Post+2' :
+                             post.id === '3' ? 'https://placehold.co/800x800/1D3557/FFFFFF?text=Creator+Post+3' :
+                             `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                        alt={`${post.creator.display_name}'s post`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+
+                    {/* Play button overlay for videos */}
+                    {post.type === 'video' && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
+                          <Video className="w-8 h-8 text-white" fill="white" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons and Content */}
+                  <div className="px-3 py-3">
+                    {/* Action Buttons Row */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`h-auto p-0 ${post.liked ? 'text-red-500' : 'text-foreground'}`}
+                          onClick={() => handleLike(post.id)}
+                        >
+                          <Heart className={`w-6 h-6 ${post.liked ? 'fill-current' : ''}`} />
+                        </Button>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-auto p-0 text-foreground"
+                          onClick={() => handleCommentClick(post.id)}
+                        >
+                          <MessageSquare className="w-6 h-6" />
+                        </Button>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-auto p-0 text-foreground"
+                          onClick={() => handleShare(post.id)}
+                        >
+                          <Share2 className="w-6 h-6" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Likes Count */}
+                    <div className="text-sm font-semibold text-foreground mb-2">
+                      {post.likes} likes
+                    </div>
+
+                    {/* Caption */}
+                    <div className="text-sm text-foreground mb-2">
+                      <span className="font-semibold mr-2">{post.creator.display_name}</span>
+                      {(() => {
+                        const { truncated, needsExpansion } = truncateText(post.content, 2);
+                        const isExpanded = expandedCaptions[post.id];
+
+                        return (
+                          <>
+                            <span>
+                              {isExpanded || !needsExpansion ? post.content : truncated}
+                              {needsExpansion && !isExpanded && '...'}
+                            </span>
+                            {needsExpansion && (
+                              <button
+                                onClick={() => toggleCaptionExpansion(post.id)}
+                                className="text-muted-foreground ml-1 text-sm hover:underline"
+                              >
+                                {isExpanded ? 'Read less' : 'Read more'}
+                              </button>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+
+                    {/* View Comments Button */}
+                    {post.comments > 0 && (
+                      <button
+                        onClick={() => handleCommentClick(post.id)}
+                        className="text-sm text-muted-foreground hover:underline"
+                      >
+                        View all {post.comments} comments
+                      </button>
+                    )}
+
+                    {/* Comments Section */}
+                    {showComments[post.id] && (
+                      <div className="mt-4">
+                        <CommentSection
+                          postId={post.id}
+                          initialComments={post.initialComments || []}
+                          onCommentCountChange={(newCount) => handleCommentCountChange(post.id, newCount)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Layout - Keep original design */}
+      <div className="hidden md:block">
+        <EdgeToEdgeContainer>
       {/* Hero Section - Full Width */}
       <div className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b border-border">
         <EdgeToEdgeContainer maxWidth="4xl" enablePadding enableTopPadding>
@@ -1320,6 +1533,8 @@ export const FeedPage: React.FC = () => {
           </div>
         </SheetContent>
       </Sheet>
-    </EdgeToEdgeContainer>
+        </EdgeToEdgeContainer>
+      </div>
+    </div>
   );
 };

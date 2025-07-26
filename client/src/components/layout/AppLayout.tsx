@@ -17,17 +17,21 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   // Don't show navigation on auth pages
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   
+  // Pages that need edge-to-edge layout (no top padding for mobile)
+  const isEdgeToEdgePage = location.pathname.startsWith('/video/') || 
+                          (location.pathname === '/fan/feed' && isMobile);
+  
   if (isAuthPage) {
     return <div className="min-h-screen">{children}</div>;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation - Always shown */}
+      {/* Top Navigation - Always shown, but positioned differently for edge-to-edge pages */}
       <MinimalNavbar />
       
-      {/* Main Content - Edge to Edge */}
-      <main className={`${isMobile ? 'pb-16' : ''} pt-16`}>
+      {/* Main Content - Conditional padding */}
+      <main className={`${isMobile ? 'pb-16' : ''} ${isEdgeToEdgePage ? '' : 'pt-16'}`}>
         {children}
       </main>
       
