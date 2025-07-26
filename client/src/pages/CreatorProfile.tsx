@@ -375,13 +375,21 @@ export const CreatorProfile: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {posts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="feed-card cursor-pointer group"
-                        onClick={() => handlePostClick(post)}
-                      >
-                        <div className="feed-card-thumbnail">
-                          {post.media_url && (
+                      <div key={post.id} className="feed-card">
+                        {/* Thumbnail */}
+                        <div 
+                          className="feed-card-thumbnail cursor-pointer"
+                          onClick={() => handlePostClick(post)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handlePostClick(post);
+                            }
+                          }}
+                        >
+                          {post.media_url ? (
                             post.media_type === 'video' ? (
                               <div className="relative">
                                 <video
@@ -389,7 +397,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   muted
                                 />
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                                   <Play className="w-12 h-12 text-white" />
                                 </div>
                               </div>
@@ -400,27 +408,43 @@ export const CreatorProfile: React.FC = () => {
                                 className="w-full h-full object-cover"
                               />
                             )
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              {getMediaIcon(post.media_type)}
+                            </div>
                           )}
                           <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             {getMediaIcon(post.media_type)}
                           </div>
                         </div>
 
+                        {/* Content */}
                         <div className="feed-card-content">
-                          <h3 className="font-semibold text-sm line-clamp-2 mb-1">
-                            {post.title}
-                          </h3>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>{formatDate(post.created_at)}</span>
-                            <div className="flex items-center gap-3">
-                              <span className="flex items-center gap-1">
-                                <Eye className="w-3 h-3" />
-                                {post.views_count}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Heart className="w-3 h-3" />
-                                {post.likes_count}
-                              </span>
+                          <div className="flex items-start gap-3 mb-2">
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              <AvatarImage src={creator.avatar} alt={creator.display_name} />
+                              <AvatarFallback className="text-xs">
+                                {creator.display_name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="feed-card-title">{post.title}</h3>
+                              <div className="feed-card-meta">
+                                <span>{creator.display_name}</span>
+                                <span>•</span>
+                                <span>{formatDate(post.created_at)}</span>
+                              </div>
+                              <div className="feed-card-meta mt-1">
+                                <span className="flex items-center gap-1">
+                                  <Eye className="w-3 h-3" />
+                                  {post.views_count.toLocaleString()} views
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  <Heart className="w-3 h-3" />
+                                  {post.likes_count}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
