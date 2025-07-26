@@ -242,7 +242,7 @@ export const VideoWatch: React.FC = () => {
         <div className="px-4 py-4">
           {/* Video Title */}
           <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">
-            {post.title || post.content}
+            {post.content}
           </h1>
 
           {/* View count and date */}
