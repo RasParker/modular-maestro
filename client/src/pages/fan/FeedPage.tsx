@@ -583,8 +583,6 @@ export const FeedPage: React.FC = () => {
             <div className="space-y-0">
               {feed.map((post) => (
                 <div key={post.id} className="w-full border-b border-border/30">
-
-                  {/* Media Content - Edge to Edge - YouTube 16:9 Style */}
                   <div 
                     className="relative w-full aspect-video bg-black cursor-pointer"
                     onClick={() => handleThumbnailClick(post)}
