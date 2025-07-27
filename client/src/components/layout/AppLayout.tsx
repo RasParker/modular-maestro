@@ -18,8 +18,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   // Pages that need edge-to-edge layout (no top padding for mobile)
-  const isEdgeToEdgePage = location.pathname.startsWith('/video/') || 
-                          (location.pathname === '/fan/feed' && isMobile);
+  const isEdgeToEdgePage = location.pathname.startsWith('/video/');
 
   if (isAuthPage) {
     return <div className="min-h-screen">{children}</div>;

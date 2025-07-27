@@ -545,7 +545,7 @@ export const FeedPage: React.FC = () => {
       {/* Mobile Layout - Edge-to-edge like VideoWatch */}
       <div className="md:hidden">
         {/* Mobile Feed Container - Full Width */}
-        <div className="w-full bg-background">
+        <div className="w-full bg-background -mt-16 pt-16">
           {loading ? (
             <div className="space-y-0">
               {[1, 2, 3].map((i) => (
@@ -580,9 +580,9 @@ export const FeedPage: React.FC = () => {
             </div>
           ) : (
             /* Mobile Feed Items */
-            <div className="space-y-4">
+            <div className="space-y-0">
               {feed.map((post) => (
-                <div key={post.id} className="w-full bg-background border border-border/20 rounded-lg overflow-hidden">
+                <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
                   <div 
                     className="relative w-full aspect-video bg-black cursor-pointer"
                     onClick={() => handleThumbnailClick(post)}
