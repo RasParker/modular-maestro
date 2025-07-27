@@ -356,12 +356,13 @@ export const VideoWatch: React.FC = () => {
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                               {video.title || video.content}
                             </h4>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="truncate">{video.creator_display_name || video.creator_username}</span>
-                              <span>•</span>
-                              <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                              <span>•</span>
-                              <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <span>•</span>
+                                <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -556,12 +557,13 @@ export const VideoWatch: React.FC = () => {
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                               {video.title || video.content}
                             </h4>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="truncate">{video.creator_display_name || video.creator_username || video.display_name || video.username}</span>
-                              <span>•</span>
-                              <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                              <span>•</span>
-                              <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <span>•</span>
+                                <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                              </div>
                             </div>
                           </div>
                         </div>

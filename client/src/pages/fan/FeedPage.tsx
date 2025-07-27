@@ -651,7 +651,7 @@ export const FeedPage: React.FC = () => {
                     {/* Play button overlay for videos - YouTube style */}
                     {post.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center backdrop-blur-sm">
+                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
                           <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z"/>
                           </svg>
@@ -661,13 +661,13 @@ export const FeedPage: React.FC = () => {
 
                     {/* Duration Badge for videos */}
                     {post.type === 'video' && (
-                      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">
                         {post.duration || '0:00'}
                       </div>
                     )}
 
                     {/* Media Type Badge */}
-                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded px-2 py-1">
+                    <div className="absolute top-2 right-2 bg-black rounded px-2 py-1">
                       {getTypeIcon(post.type)}
                     </div>
                   </div>
@@ -1204,7 +1204,7 @@ export const FeedPage: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-white/10 sm:text-gray-600 sm:hover:bg-gray-100/10"
+                className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full text-white hover:bg-gray-800 sm:text-gray-600 sm:hover:bg-gray-200"
                 onClick={closeModal}
               >
                 <ArrowLeft className="w-7 h-7" />
@@ -1275,7 +1275,7 @@ export const FeedPage: React.FC = () => {
                 )}
 
                 {/* Mobile overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none">
                   {/* Creator info overlay - bottom left - moved up */}
                   <div className="absolute bottom-20 left-4 right-16 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-3">
@@ -1339,7 +1339,7 @@ export const FeedPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
+                        className={`h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
                         onClick={() => handleLike(selectedContent.id)}
                       >
                         <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
@@ -1353,7 +1353,7 @@ export const FeedPage: React.FC = () => {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                        className="h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 text-white"
                         onClick={handleModalCommentClick}
                       >
                         <MessageSquare className="w-6 h-6" />
@@ -1367,7 +1367,7 @@ export const FeedPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-12 w-12 p-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                        className="h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 text-white"
                         onClick={() => handleShare(selectedContent.id)}
                       >
                         <Share2 className="w-6 h-6" />
