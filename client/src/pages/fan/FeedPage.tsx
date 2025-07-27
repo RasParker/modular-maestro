@@ -627,7 +627,7 @@ export const FeedPage: React.FC = () => {
                       />
                     )}
 
-                    {/* Play button overlay for videos - YouTube style */}
+                    {/* Play button overlay for videos */}
                     {post.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
@@ -649,94 +649,6 @@ export const FeedPage: React.FC = () => {
                     <div className="absolute top-2 right-2 bg-black rounded px-2 py-1">
                       {getTypeIcon(post.type)}
                     </div>
-                  </div>
-
-                  {/* YouTube-style Content Info */}
-                  <div className="px-3 py-3">
-                    {/* Video Title */}
-                    <h3 className="font-medium text-foreground text-sm leading-snug line-clamp-2 mb-2">
-                      {post.title || post.content}
-                    </h3>
-
-                    {/* Video Stats */}
-                    <div className="flex items-center text-xs text-muted-foreground space-x-1 mb-3">
-                      <span>{post.views} views</span>
-                      <span>•</span>
-                      <span>{getTimeAgo(post.created_at)}</span>
-                    </div>
-
-                    {/* Action Buttons Row - YouTube Style */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <button
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-1 text-sm ${
-                            post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
-                          } transition-colors`}
-                        >
-                          <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
-                          <span>{post.likes}</span>
-                        </button>
-
-                        <button 
-                          onClick={() => toggleComments(post.id)}
-                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
-                        >
-                          <MessageCircle className="w-5 h-5" />
-                          <span>{post.comments}</span>
-                        </button>
-
-                        <button 
-                          onClick={() => handleShare(post.id)}
-                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-green-500 transition-colors"
-                        >
-                          <Share className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      {/* More Options */}
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </div>
-
-                    {/* Description/Caption */}
-                    {post.content && post.content !== post.title && (
-                      <div className="mt-3 text-sm text-muted-foreground">
-                        {(()=> {
-                          const { truncated, needsExpansion } = truncateText(post.content, 2);
-                          const isExpanded = expandedCaptions[post.id];
-
-                          return (
-                            <>
-                              <span>
-                                {isExpanded || !needsExpansion ? post.content : truncated}
-                                {needsExpansion && !isExpanded && '...'}
-                              </span>
-                              {needsExpansion && (
-                                <button
-                                  onClick={() => toggleCaptionExpansion(post.id)}
-                                  className="text-primary ml-1 text-sm hover:underline font-medium"
-                                >
-                                  {isExpanded ? 'Show less' : 'Show more'}
-                                </button>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </div>
-                    )}
-
-                    {/* Comments Section */}
-                    {showComments[post.id] && (
-                      <div className="mt-4">
-                        <CommentSection
-                          postId={post.id}
-                          initialComments={post.initialComments || []}
-                          onCommentCountChange={(newCount) => handleCommentCountChange(post.id, newCount)}
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
