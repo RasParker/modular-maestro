@@ -651,68 +651,55 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Bottom section with actions */}
+                  {/* Bottom section - VideoWatch Up Next style */}
                   <div className="p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-4">
-                        <button
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-1 text-sm ${
-                            post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
-                          } transition-colors`}
-                        >
-                          <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
-                          <span>{post.likes}</span>
-                        </button>
+                    <div className="flex gap-3">
+                      <Avatar className="h-9 w-9 flex-shrink-0">
+                        <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                        <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                          {post.content || 'Untitled Post'}
+                        </h4>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                          <span className="truncate mr-2">{post.creator.display_name}</span>
+                          <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                            <span>{post.views} views</span>
+                            <span>•</span>
+                            <span>{getTimeAgo(post.posted)}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Action buttons row */}
+                        <div className="flex items-center gap-4 mt-2">
+                          <button
+                            onClick={() => handleLike(post.id)}
+                            className={`flex items-center gap-1 text-xs ${
+                              post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
+                            } transition-colors`}
+                          >
+                            <Heart className={`w-4 h-4 ${post.liked ? 'fill-current' : ''}`} />
+                            <span>{post.likes}</span>
+                          </button>
 
-                        <button 
-                          onClick={() => toggleComments(post.id)}
-                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
-                        >
-                          <MessageCircle className="w-5 h-5" />
-                          <span>{post.comments}</span>
-                        </button>
+                          <button 
+                            onClick={() => toggleComments(post.id)}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 transition-colors"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>{post.comments}</span>
+                          </button>
 
-                        <button 
-                          onClick={() => handleShare(post.id)}
-                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-green-500 transition-colors"
-                        >
-                          <Share className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Eye className="w-4 h-4" />
-                        <span>{post.views} views</span>
+                          <button 
+                            onClick={() => handleShare(post.id)}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-green-500 transition-colors"
+                          >
+                            <Share className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Caption */}
-                    {post.content && (
-                      <div className="text-sm text-foreground">
-                        {(()=> {
-                          const { truncated, needsExpansion } = truncateText(post.content, 2);
-                          const isExpanded = expandedCaptions[post.id];
-
-                          return (
-                            <>
-                              <span>
-                                {isExpanded || !needsExpansion ? post.content : truncated}
-                                {needsExpansion && !isExpanded && '...'}
-                              </span>
-                              {needsExpansion && (
-                                <button
-                                  onClick={() => toggleCaptionExpansion(post.id)}
-                                  className="text-primary ml-1 text-sm hover:underline font-medium"
-                                >
-                                  {isExpanded ? 'Show less' : 'Show more'}
-                                </button>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </div>
-                    )}
 
                     {/* Comments Section */}
                     {showComments[post.id] && (
