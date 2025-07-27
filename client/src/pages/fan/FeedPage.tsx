@@ -580,9 +580,9 @@ export const FeedPage: React.FC = () => {
             </div>
           ) : (
             /* Mobile Feed Items */
-            <div className="space-y-0">
+            <div className="space-y-4">
               {feed.map((post) => (
-                <div key={post.id} className="w-full border-b border-border/30">
+                <div key={post.id} className="w-full bg-background border border-border/20 rounded-lg overflow-hidden">
                   <div 
                     className="relative w-full aspect-video bg-black cursor-pointer"
                     onClick={() => handleThumbnailClick(post)}
@@ -649,6 +649,81 @@ export const FeedPage: React.FC = () => {
                     <div className="absolute top-2 right-2 bg-black rounded px-2 py-1">
                       {getTypeIcon(post.type)}
                     </div>
+                  </div>
+
+                  {/* Bottom section with actions */}
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-4">
+                        <button
+                          onClick={() => handleLike(post.id)}
+                          className={`flex items-center space-x-1 text-sm ${
+                            post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
+                          } transition-colors`}
+                        >
+                          <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
+                          <span>{post.likes}</span>
+                        </button>
+
+                        <button 
+                          onClick={() => toggleComments(post.id)}
+                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors"
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                          <span>{post.comments}</span>
+                        </button>
+
+                        <button 
+                          onClick={() => handleShare(post.id)}
+                          className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-green-500 transition-colors"
+                        >
+                          <Share className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Eye className="w-4 h-4" />
+                        <span>{post.views} views</span>
+                      </div>
+                    </div>
+
+                    {/* Caption */}
+                    {post.content && (
+                      <div className="text-sm text-foreground">
+                        {(()=> {
+                          const { truncated, needsExpansion } = truncateText(post.content, 2);
+                          const isExpanded = expandedCaptions[post.id];
+
+                          return (
+                            <>
+                              <span>
+                                {isExpanded || !needsExpansion ? post.content : truncated}
+                                {needsExpansion && !isExpanded && '...'}
+                              </span>
+                              {needsExpansion && (
+                                <button
+                                  onClick={() => toggleCaptionExpansion(post.id)}
+                                  className="text-primary ml-1 text-sm hover:underline font-medium"
+                                >
+                                  {isExpanded ? 'Show less' : 'Show more'}
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
+
+                    {/* Comments Section */}
+                    {showComments[post.id] && (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <CommentSection
+                          postId={post.id}
+                          initialComments={post.initialComments || []}
+                          onCommentCountChange={(newCount) => handleCommentCountChange(post.id, newCount)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
