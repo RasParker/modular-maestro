@@ -8,7 +8,7 @@ import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, MessageSquare, Calendar, Eye, Share2, ArrowLeft, Image, Video, Music, FileText, Loader2, Grid3X3, List } from 'lucide-react';
+import { Heart, MessageSquare, MessageCircle, Calendar, Eye, Share2, Share, ArrowLeft, Image, Video, Music, FileText, Loader2, Grid3X3, List, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -457,6 +457,13 @@ export const FeedPage: React.FC = () => {
       setSelectedContent(feed[prevIndex]);
       setExpandedModalCaption(false);
     }
+  };
+
+  const toggleComments = (postId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
   const toggleCaptionExpansion = (postId: string) => {

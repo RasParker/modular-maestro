@@ -861,8 +861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/tiers/:tierId", async (req, res) => {
     try {
       const tierId = parseInt(req.params.tierId);
-      const deleted```text
- = await storage.deleteSubscriptionTier(tierId);
+      const deleted = await storage.deleteSubscriptionTier(tierId);
 
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
