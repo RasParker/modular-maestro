@@ -313,7 +313,7 @@ export const VideoWatch: React.FC = () => {
 
             {/* Next Videos Section - Edge-to-Edge */}
             <div className="space-y-0 -mx-4">
-              <h3 className="text-lg font-semibold mb-4 px-4">Up next</h3>
+              <h3 className="text-lg font-semibold mb-4 px-4 text-primary">Up next - UPDATED</h3>
               <div className="space-y-0">
                 {nextVideos.map((video) => {
                   const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;
@@ -357,9 +357,9 @@ export const VideoWatch: React.FC = () => {
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                               {video.title || video.content}
                             </h4>
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="truncate">{video.creator_display_name || video.creator_username}</span>
-                              <div className="flex items-center gap-1 flex-shrink-0">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                              <span className="truncate mr-2">{video.creator_display_name || video.creator_username}</span>
+                              <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                 <span>{Math.floor(Math.random() * 500) + 100}K views</span>
                                 <span>•</span>
                                 <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
@@ -558,9 +558,9 @@ export const VideoWatch: React.FC = () => {
                             <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                               {video.title || video.content}
                             </h4>
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="truncate">{video.creator_display_name || video.creator_username || video.display_name || video.username}</span>
-                              <div className="flex items-center gap-1 flex-shrink-0">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                              <span className="truncate mr-2">{video.creator_display_name || video.creator_username || video.display_name || video.username}</span>
+                              <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                 <span>{Math.floor(Math.random() * 500) + 100}K views</span>
                                 <span>•</span>
                                 <span>{Math.floor(Math.random() * 7) + 1}d ago</span>

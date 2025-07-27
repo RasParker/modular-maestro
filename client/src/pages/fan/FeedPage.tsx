@@ -1340,7 +1340,7 @@ export const FeedPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
+                        className={`h-12 w-12 p-0 rounded-full bg-gray-900 border-2 border-gray-500 ${selectedContent.liked ? 'text-red-500' : 'text-white'}`}
                         onClick={() => handleLike(selectedContent.id)}
                       >
                         <Heart className={`w-6 h-6 ${selectedContent.liked ? 'fill-current' : ''}`} />
@@ -1354,7 +1354,7 @@ export const FeedPage: React.FC = () => {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 text-white"
+                        className="h-12 w-12 p-0 rounded-full bg-gray-900 border-2 border-gray-500 text-white"
                         onClick={handleModalCommentClick}
                       >
                         <MessageSquare className="w-6 h-6" />
@@ -1368,7 +1368,7 @@ export const FeedPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-12 w-12 p-0 rounded-full bg-gray-800 border border-gray-600 text-white"
+                        className="h-12 w-12 p-0 rounded-full bg-gray-900 border-2 border-gray-500 text-white"
                         onClick={() => handleShare(selectedContent.id)}
                       >
                         <Share2 className="w-6 h-6" />
