@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// UI Updates Applied: Up Next layout fix + transparency removal - Jan 27 2025
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -342,7 +343,7 @@ export const VideoWatch: React.FC = () => {
                           <div className="absolute inset-0 flex items-center justify-center">
                             <Play className="w-6 h-6 text-white" fill="white" />
                           </div>
-                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                          <div className="absolute bottom-1 right-1 bg-black text-white text-xs px-1 rounded">
                             {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                           </div>
                         </div>
@@ -543,7 +544,7 @@ export const VideoWatch: React.FC = () => {
                           <div className="absolute inset-0 flex items-center justify-center">
                             <Play className="w-4 h-4 text-white" fill="white" />
                           </div>
-                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                          <div className="absolute bottom-1 right-1 bg-black text-white text-xs px-1 rounded">
                             {Math.floor(Math.random() * 10) + 5}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                           </div>
                         </div>
