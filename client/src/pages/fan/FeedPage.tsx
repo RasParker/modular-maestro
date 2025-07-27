@@ -583,26 +583,6 @@ export const FeedPage: React.FC = () => {
             <div className="space-y-0">
               {feed.map((post) => (
                 <div key={post.id} className="w-full border-b border-border/30">
-                  {/* Creator Info Header */}
-                  <div className="flex items-center px-3 py-3">
-                    <Avatar className="h-10 w-10 mr-3">
-                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                      <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-foreground truncate">
-                          {post.creator.display_name}
-                        </h3>
-                        <Badge variant={getTierColor(post.tier)} className="text-xs">
-                          {post.tier === 'public' ? 'Free' : post.tier}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {getTimeAgo(post.posted)}
-                      </p>
-                    </div>
-                  </div>
 
                   {/* Media Content - Edge to Edge - YouTube 16:9 Style */}
                   <div 
