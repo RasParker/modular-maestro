@@ -671,33 +671,7 @@ export const FeedPage: React.FC = () => {
                           </div>
                         </div>
                         
-                        {/* Action buttons row */}
-                        <div className="flex items-center gap-4 mt-2">
-                          <button
-                            onClick={() => handleLike(post.id)}
-                            className={`flex items-center gap-1 text-xs ${
-                              post.liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
-                            } transition-colors`}
-                          >
-                            <Heart className={`w-4 h-4 ${post.liked ? 'fill-current' : ''}`} />
-                            <span>{post.likes}</span>
-                          </button>
-
-                          <button 
-                            onClick={() => toggleComments(post.id)}
-                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 transition-colors"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            <span>{post.comments}</span>
-                          </button>
-
-                          <button 
-                            onClick={() => handleShare(post.id)}
-                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-green-500 transition-colors"
-                          >
-                            <Share className="w-4 h-4" />
-                          </button>
-                        </div>
+                        
                       </div>
                     </div>
 
