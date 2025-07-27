@@ -313,7 +313,7 @@ export const VideoWatch: React.FC = () => {
 
             {/* Next Videos Section - Edge-to-Edge */}
             <div className="space-y-0 -mx-4">
-              <h3 className="text-lg font-semibold mb-4 px-4 text-primary">Up next - UPDATED</h3>
+              <h3 className="text-lg font-semibold mb-4 px-4 text-foreground">Up next</h3>
               <div className="space-y-0">
                 {nextVideos.map((video) => {
                   const videoMediaUrl = Array.isArray(video.media_urls) ? video.media_urls[0] : video.media_urls;

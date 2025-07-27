@@ -18,7 +18,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   // Pages that need edge-to-edge layout (no top padding for mobile)
-  const isEdgeToEdgePage = location.pathname.startsWith('/video/');
+  const isEdgeToEdgePage = false; // Removed video watch to restore normal layout
 
   if (isAuthPage) {
     return <div className="min-h-screen">{children}</div>;

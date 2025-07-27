@@ -40,7 +40,7 @@ export const MinimalNavbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Check if this is an edge-to-edge page that needs floating navbar
-  const isEdgeToEdgePage = location.pathname.startsWith('/video/');
+  const isEdgeToEdgePage = false; // Removed video watch from edge-to-edge to restore solid navbar
 
   const handleLogout = () => {
     logout();
