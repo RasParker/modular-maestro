@@ -724,7 +724,7 @@ export const FeedPage: React.FC = () => {
                     {/* Description/Caption */}
                     {post.content && post.content !== post.title && (
                       <div className="mt-3 text-sm text-muted-foreground">
-                        {(() => {
+                        {(()=> {
                           const { truncated, needsExpansion } = truncateText(post.content, 2);
                           const isExpanded = expandedCaptions[post.id];
 
@@ -1516,7 +1516,8 @@ export const FeedPage: React.FC = () => {
                   <div className="flex-1 overflow-hidden">
                     <CommentSection
                       postId={selectedContent.id}
-                      initialComments={selectedContent.initialComments || []}
+                      initialComments={selectedContent.initial```text
+Comments || []}
                       onCommentCountChange={(count) => handleCommentCountChange(selectedContent.id, count)}
                       isBottomSheet={false}
                     />
