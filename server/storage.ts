@@ -13,6 +13,7 @@ import {
   messages,
   notifications,
   notification_preferences,
+  reports,
   type User, 
   type InsertUser,
   type Post,
@@ -34,7 +35,9 @@ import {
   type Notification,
   type InsertNotification,
   type NotificationPreferences,
-  type InsertNotificationPreferences
+  type InsertNotificationPreferences,
+  type Report,
+  type InsertReport
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, gte, lte } from "drizzle-orm";
@@ -123,7 +126,12 @@ export interface IStorage {
   createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences>;
   updateNotificationPreferences(userId: number, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined>;
 
-    // Creator goals methods
+  // Report methods
+  createReport(report: InsertReport): Promise<Report>;
+  getReports(): Promise<Report[]>;
+  updateReportStatus(reportId: number, status: string, adminNotes?: string, resolvedBy?: number): Promise<Report | undefined>;
+
+  // Creator goals methods
   getCreatorGoals(creatorId: number): Promise<any>;
   saveCreatorGoals(creatorId: number, goals: any): Promise<void>;
 }
@@ -922,6 +930,46 @@ export class DatabaseStorage implements IStorage {
       console.log(`Saved goals for creator ${creatorId}:`, goals);
     } catch (error) {
       console.error('Error saving creator goals:', error);
+      throw error;
+    }
+  }
+
+  // Report methods
+  async createReport(report: InsertReport): Promise<Report> {
+    try {
+      const [newReport] = await db.insert(reports).values(report).returning();
+      return newReport;
+    } catch (error) {
+      console.error('Error creating report:', error);
+      throw error;
+    }
+  }
+
+  async getReports(): Promise<Report[]> {
+    try {
+      return await db.select().from(reports).orderBy(desc(reports.created_at));
+    } catch (error) {
+      console.error('Error getting reports:', error);
+      return [];
+    }
+  }
+
+  async updateReportStatus(reportId: number, status: string, adminNotes?: string, resolvedBy?: number): Promise<Report | undefined> {
+    try {
+      const updates: Partial<Report> = { 
+        status,
+        updated_at: new Date()
+      };
+      if (adminNotes !== undefined) updates.admin_notes = adminNotes;
+      if (resolvedBy !== undefined) updates.resolved_by = resolvedBy;
+
+      const [updatedReport] = await db.update(reports)
+        .set(updates)
+        .where(eq(reports.id, reportId))
+        .returning();
+      return updatedReport;
+    } catch (error) {
+      console.error('Error updating report status:', error);
       throw error;
     }
   }

@@ -1516,8 +1516,7 @@ export const FeedPage: React.FC = () => {
                   <div className="flex-1 overflow-hidden">
                     <CommentSection
                       postId={selectedContent.id}
-                      initialComments={selectedContent.initial```text
-Comments || []}
+                      initialComments={selectedContent.initialComments || []}
                       onCommentCountChange={(count) => handleCommentCountChange(selectedContent.id, count)}
                       isBottomSheet={false}
                     />

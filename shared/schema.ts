@@ -185,10 +185,6 @@ export const notifications = pgTable("notifications", {
   entity_type: text("entity_type"), // 'post', 'comment', 'subscription', 'message', 'payment'
   entity_id: integer("entity_id"), // ID of the related entity
   metadata: json("metadata").$type<{
-    amount?: string;
-    tier_name?: string;
-    post_title?: string;
-    comment_content?: string;
     [key: string]: any;
   }>(),
   created_at: timestamp("created_at").notNull().defaultNow(),
