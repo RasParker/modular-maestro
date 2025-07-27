@@ -723,11 +723,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (success) {
         // Get comment details for notification
         const comment = await storage.getComment(commentId);
-        
+
         if (comment && comment.user_id !== userId) { // Don't notify if user likes their own comment
           // Get the post details to include in notification
           const post = await storage.getPost(comment.post_id);
-          
+
           if (post) {
             console.log(`Sending comment like notification to comment author ${comment.user_id} for comment ${commentId} from user ${userId}`);
             try {
@@ -861,7 +861,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/tiers/:tierId", async (req, res) => {
     try {
       const tierId = parseInt(req.params.tierId);
-      const deleted = await storage.deleteSubscriptionTier(tierId);
+      const deleted```text
+ = await storage.deleteSubscriptionTier(tierId);
 
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
@@ -966,15 +967,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Error updating creator subscriber count:', error);
         // Don't fail the subscription creation if count update fails
       }
-      
+
       // Notify creator of new subscriber
       try {
           // Get tier name for the notification
           const tier = await storage.getSubscriptionTier(validatedData.tier_id);
           const tierName = tier?.name || 'unknown';
-          
+
           console.log(`Creating new subscriber notification: creator=${validatedData.creator_id}, fan=${validatedData.fan_id}, tier=${tierName}`);
-          
+
           await NotificationService.notifyNewSubscriber(
               validatedData.creator_id,
               validatedData.fan_id,

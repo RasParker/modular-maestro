@@ -3,10 +3,12 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { cronService } from "./services/cronService"; // Assuming cronService.ts exists
 import { initializeDatabase } from "./init-db";
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -44,7 +46,7 @@ app.use((req, res, next) => {
     console.log('Starting database initialization...');
     await initializeDatabase();
     console.log('Database initialization completed');
-    
+
     console.log('Starting route registration...');
     const server = await registerRoutes(app);
     console.log('Route registration completed');
