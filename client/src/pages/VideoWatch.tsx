@@ -241,7 +241,7 @@ export const VideoWatch: React.FC = () => {
         </div>
 
         {/* Content Wrapper - Scrollable area below video */}
-        <div className="content-wrapper bg-background">
+        <div className="content-wrapper bg-background scrollbar-hide"></div>
           <div className="px-4 py-4">
             {/* Video Title */}
             <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">

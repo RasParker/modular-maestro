@@ -688,7 +688,7 @@ export const CreatorProfile: React.FC = () => {
   const handleContentClick = (post: any) => {
     // Check if we're on mobile
     const isMobile = window.innerWidth < 768;
-    
+
     if (isMobile) {
       // Navigate to watch page instead of modal for mobile
       if (post.media_type === 'video') {
@@ -862,7 +862,8 @@ export const CreatorProfile: React.FC = () => {
         if (subscription && subscription.status === 'active' && subscription.creator_id === creator.id) {
           console.log('✅ Subscription confirmed for messaging');
           setUserSubscription(subscription);
-          if (creator?.id) {
+          if (creator?.id)```python
+ {
             initiateChatMutation.mutate(creator.id);
           }
           return;
@@ -1574,7 +1575,7 @@ export const CreatorProfile: React.FC = () => {
                           if (benefits.length === 0) {
                             return (
                               <li className="flex items-center gap-2 text-sm">
-                                <Check className="w-4 h-4 text-accent" />
+                                <Check classNameName="w-4 h-4 text-accent" />
                                 <span>Access to exclusive content</span>
                               </li>
                             );
@@ -1601,7 +1602,7 @@ export const CreatorProfile: React.FC = () => {
                 </Card>
               ))
             ) : (
-              <Card className="bg-gradient-card border-border/50">
+              <Card className="border border-border">
                 <CardContent className="p-6">
                   <div className="text-center py-4">
                     <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
