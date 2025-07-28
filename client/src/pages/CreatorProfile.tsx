@@ -862,8 +862,7 @@ export const CreatorProfile: React.FC = () => {
         if (subscription && subscription.status === 'active' && subscription.creator_id === creator.id) {
           console.log('✅ Subscription confirmed for messaging');
           setUserSubscription(subscription);
-          if (creator?.id)```python
- {
+          if (creator?.id) {
             initiateChatMutation.mutate(creator.id);
           }
           return;
@@ -1575,7 +1574,7 @@ export const CreatorProfile: React.FC = () => {
                           if (benefits.length === 0) {
                             return (
                               <li className="flex items-center gap-2 text-sm">
-                                <Check classNameName="w-4 h-4 text-accent" />
+                                <Check className="w-4 h-4 text-accent" />
                                 <span>Access to exclusive content</span>
                               </li>
                             );
