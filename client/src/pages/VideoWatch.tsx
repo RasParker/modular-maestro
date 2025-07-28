@@ -265,7 +265,7 @@ export const VideoWatch: React.FC = () => {
                 <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h1 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
+                <h1 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                   {post.content}
                 </h1>
                 <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
@@ -486,7 +486,7 @@ export const VideoWatch: React.FC = () => {
                   <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
+                  <h1 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                     {post.content}
                   </h1>
                   <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
