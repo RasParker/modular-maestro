@@ -280,12 +280,7 @@ export const VideoWatch: React.FC = () => {
               </div>
             </div>
 
-            {/* Description */}
-            {post.content && (
-              <div className="mb-6 bg-muted/30 rounded-lg p-4">
-                <p className="text-foreground text-sm leading-relaxed">{post.content}</p>
-              </div>
-            )}
+
 
             {/* Comments Container - YouTube Style */}
             <div 
