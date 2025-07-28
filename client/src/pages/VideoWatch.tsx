@@ -243,18 +243,16 @@ export const VideoWatch: React.FC = () => {
         {/* Content Wrapper - Scrollable area below video */}
         <div className="content-wrapper bg-background scrollbar-hide">
           <div className="px-4 py-4">
-            {/* Video Title */}
-            <h1 className="text-lg font-bold text-foreground mb-3 leading-tight">
-              {post.content}
-            </h1>
-
-            {/* Creator info row - matching sidebar card style */}
-            <div className="flex items-center gap-3 mb-3">
+            {/* Video Caption with Avatar */}
+            <div className="flex items-start gap-3 mb-3">
               <Avatar className="h-9 w-9 flex-shrink-0">
                 <AvatarImage src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} alt={post.creator_username} />
                 <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
+                <h1 className="text-foreground leading-tight mb-1" style={{ fontSize: '20px', fontWeight: 700 }}>
+                  {post.content}
+                </h1>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
                   <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
@@ -463,15 +461,8 @@ export const VideoWatch: React.FC = () => {
                 )}
               </div>
 
-              {/* Video Title */}
-              <div className="mb-4">
-                <h1 className="text-xl font-bold text-foreground mb-2 leading-tight">
-                  {post.content}
-                </h1>
-              </div>
-
-              {/* Creator info row - matching sidebar card style */}
-              <div className="flex items-center gap-3 mb-4">
+              {/* Video Caption with Avatar */}
+              <div className="flex items-start gap-3 mb-4">
                 <Avatar className="h-9 w-9 flex-shrink-0">
                   <AvatarImage 
                     src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} 
@@ -480,6 +471,9 @@ export const VideoWatch: React.FC = () => {
                   <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
+                  <h1 className="text-foreground leading-tight mb-2" style={{ fontSize: '20px', fontWeight: 700 }}>
+                    {post.content}
+                  </h1>
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
                     <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
