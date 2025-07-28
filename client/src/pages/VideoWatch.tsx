@@ -552,18 +552,20 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex gap-3 px-3">
+                        <div className="flex gap-3">
                           <Avatar className="h-9 w-9 flex-shrink-0">
                             <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
                             <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-foreground line-clamp-2 mb-1 leading-tight" style={{ fontSize: '14px', fontWeight: 500 }}>
+                            <h3 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
                               {video.title || video.content}
-                            </h4>
-                            <div className="text-muted-foreground" style={{ fontSize: '12px', fontWeight: 400 }}>
-                              <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
-                              <div className="flex items-center gap-1">
+                            </h3>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-muted-foreground truncate" style={{ fontSize: '12px', fontWeight: 400 }}>
+                                {video.creator_display_name || video.creator_username}
+                              </p>
+                              <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0" style={{ fontSize: '12px', fontWeight: 400 }}>
                                 <span>{Math.floor(Math.random() * 500) + 100}K views</span>
                                 <span>•</span>
                                 <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
