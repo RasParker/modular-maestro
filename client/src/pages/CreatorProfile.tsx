@@ -10,7 +10,7 @@ import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -174,6 +174,7 @@ export const CreatorProfile: React.FC = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
+  const [isSubscriptionTiersExpanded, setIsSubscriptionTiersExpanded] = useState(false);
 
   // Define isOwnProfile early to avoid initialization issues
   const isOwnProfile = user?.username === username;
@@ -1131,6 +1132,122 @@ export const CreatorProfile: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Compact Subscription Tiers - Show for profiles with tiers */}
+      {creator?.tiers && creator.tiers.length > 0 && (
+        <div className="md:hidden mx-4 mb-6">
+          <div className="bg-gradient-card border border-border/50 rounded-lg shadow-sm overflow-hidden">
+            {!isSubscriptionTiersExpanded ? (
+              /* Compact View */
+              <div 
+                className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => setIsSubscriptionTiersExpanded(true)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-base font-semibold">SUBSCRIBE NOW</h3>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {creator.tiers.slice(0, 3).map((tier: any, index: number) => (
+                        <div key={tier.id} className="flex items-center gap-1">
+                          <span className="text-sm font-medium text-accent">GHS {tier.price}</span>
+                          {index < Math.min(creator.tiers.length - 1, 2) && (
+                            <span className="text-xs text-muted-foreground">•</span>
+                          )}
+                        </div>
+                      ))}
+                      {creator.tiers.length > 3 && (
+                        <span className="text-xs text-muted-foreground">+{creator.tiers.length - 3} more</span>
+                      )}
+                    </div>
+                  </div>
+                  {isOwnProfile ? (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="px-4 py-2 text-sm font-medium rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSubscriptionTiersExpanded(true);
+                      }}
+                    >
+                      MANAGE
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSubscriptionTiersExpanded(true);
+                      }}
+                    >
+                      NOW
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Expanded View */
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-semibold">SUBSCRIPTION IN BUNDLES</h3>
+                  <button 
+                    onClick={() => setIsSubscriptionTiersExpanded(false)}
+                    className="p-1 hover:bg-muted/50 rounded-full transition-colors"
+                  >
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  {creator.tiers.map((tier: any, index: number) => (
+                    <div 
+                      key={tier.id} 
+                      className={`flex items-center justify-between p-3 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer' : ''}`}
+                      onClick={!isOwnProfile ? () => handleSubscribe(tier.id) : undefined}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium uppercase">{tier.name}</span>
+                          {index === 0 && creator.tiers.length > 1 && (
+                            <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">POPULAR</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                          {tier.description || 'Access to exclusive content'}
+                        </p>
+                      </div>
+                      <div className="text-right ml-4">
+                        <div className="text-sm font-bold text-accent">GHS {tier.price}</div>
+                        <div className="text-xs text-muted-foreground">per month</div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {isOwnProfile && (
+                    <div className="pt-2 border-t border-border/20">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-sm"
+                        asChild
+                      >
+                        <Link to="/creator/tiers">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Edit Tiers
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="max-w-4xl mx-auto md:px-6 py-8">
