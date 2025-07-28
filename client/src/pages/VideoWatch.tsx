@@ -248,11 +248,22 @@ export const VideoWatch: React.FC = () => {
               {post.content}
             </h1>
 
-            {/* View count and date */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
-              <span>•</span>
-              <span>{new Date(post.created_at).toLocaleDateString()}</span>
+            {/* Creator info row - matching sidebar card style */}
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar className="h-9 w-9 flex-shrink-0">
+                <AvatarImage src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} alt={post.creator_username} />
+                <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
+                  <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
+                    <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                    <span>•</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Action Buttons Row */}
@@ -454,27 +465,27 @@ export const VideoWatch: React.FC = () => {
                 )}
               </div>
 
-              {/* Creator Profile and Video Title */}
-              <div className="mb-4">
-                <div className="flex items-start gap-3 mb-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={post.creator_avatar} alt={post.creator_username} />
-                    <AvatarFallback>{post.creator_username?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground mb-1">{post.creator_display_name || post.creator_username}</p>
-                    <h1 className="text-base font-medium text-foreground">
-                      {post.content}
-                    </h1>
+              {/* Video Title */}
+              <h1 className="text-xl font-bold text-foreground mb-4 leading-tight">
+                {post.content}
+              </h1>
+
+              {/* Creator info row - matching mobile layout */}
+              <div className="flex items-center gap-3 mb-4">
+                <Avatar className="h-10 w-10 flex-shrink-0">
+                  <AvatarImage src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} alt={post.creator_username} />
+                  <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-foreground truncate mr-4">{post.creator_display_name || post.creator_username}</span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground flex-shrink-0">
+                      <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                      <span>•</span>
+                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* View count and date */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
-                <span>•</span>
-                <span>{new Date(post.created_at).toLocaleDateString()}</span>
               </div>
 
               {/* Action Buttons Row */}
