@@ -548,7 +548,7 @@ export const FeedPage: React.FC = () => {
         <div className="w-full bg-background -mt-16 pt-16 overflow-y-auto scrollbar-hide" style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
-        }}></div>
+        }}>
           {loading ? (
             <div className="space-y-0">
               {[1, 2, 3].map((i) => (
