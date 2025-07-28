@@ -544,8 +544,11 @@ export const FeedPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Mobile Layout - Edge-to-edge like VideoWatch */}
       <div className="md:hidden">
-        {/* Mobile Feed Container - Full Width */}
-        <div className="w-full bg-background -mt-16 pt-16">
+        {/* Mobile Feed Container - Full Width with invisible scrollbar */}
+        <div className="w-full bg-background -mt-16 pt-16 overflow-y-auto scrollbar-hide" style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}></div>
           {loading ? (
             <div className="space-y-0">
               {[1, 2, 3].map((i) => (

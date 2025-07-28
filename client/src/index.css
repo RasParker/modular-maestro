@@ -498,6 +498,16 @@
     max-height: 60vh;
   }
 
+  /* Invisible scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Mobile responsive adjustments */
   @media (max-width: 768px) {
     .content-wrapper {
@@ -519,6 +529,16 @@
     /* Hide view toggle on mobile */
     .view-toggle {
       display: none !important;
+    }
+
+    /* Apply invisible scrollbar to mobile feed */
+    .mobile-feed-container {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .mobile-feed-container::-webkit-scrollbar {
+      display: none;
     }
   }
 }

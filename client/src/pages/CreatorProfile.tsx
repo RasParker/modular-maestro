@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -143,6 +143,7 @@ export const CreatorProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(
     () => localStorage.getItem('profilePhotoUrl')
@@ -685,20 +686,32 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleContentClick = (post: any) => {
-    // Handle both string and array formats for media_urls
-    const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
-    const mediaUrl = mediaUrls[0];
-    const fullUrl = mediaUrl?.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+    // Check if we're on mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Navigate to watch page instead of modal for mobile
+      if (post.media_type === 'video') {
+        navigate(`/video/${post.id}`);
+      } else {
+        // For images and other content, still navigate to watch page
+        navigate(`/video/${post.id}`);
+      }
+    } else {
+      // Desktop behavior - use modal
+      const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+      const mediaUrl = mediaUrls[0];
+      const fullUrl = mediaUrl?.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
 
-    // Transform the post data to match the content manager modal structure
-    const modalData = {
-      ...post,
-      mediaPreview: fullUrl,
-      type: post.media_type === 'image' ? 'Image' : post.media_type === 'video' ? 'Video' : 'Text',
-      caption: post.content || post.title
-    };
-    setSelectedContent(modalData);
-    setIsModalOpen(true);
+      const modalData = {
+        ...post,
+        mediaPreview: fullUrl,
+        type: post.media_type === 'image' ? 'Image' : post.media_type === 'video' ? 'Video' : 'Text',
+        caption: post.content || post.title
+      };
+      setSelectedContent(modalData);
+      setIsModalOpen(true);
+    }
   };
 
   const closeModal = () => {
@@ -1120,7 +1133,7 @@ export const CreatorProfile: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto md:px-6 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -1130,14 +1143,16 @@ export const CreatorProfile: React.FC = () => {
               <div className="mb-4"></div>
               {userPosts.length > 0 ? (
                 <>
-                {/* Mobile: Fan feed style grid layout */}
+                {/* Mobile: Edge-to-edge borderless layout like fan feed */}
                 <div className="md:hidden">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}>
                     {userPosts.map((post) => (
-                      <div key={post.id} className="feed-card">
-                        {/* Thumbnail */}
+                      <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
                         <div 
-                          className="feed-card-thumbnail cursor-pointer"
+                          className="relative w-full aspect-video bg-black cursor-pointer"
                           onClick={() => handleContentClick(post)}
                           role="button"
                           tabIndex={0}
@@ -1242,24 +1257,25 @@ export const CreatorProfile: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Card Content */}
-                        <div className="feed-card-content">
-                          <div className="flex items-start gap-2">
-                            <Avatar className="h-6 w-6 flex-shrink-0">
+                        {/* Bottom section - VideoWatch Up Next style */}
+                        <div className="p-3">
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-                              <AvatarFallback className="text-xs">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
-                              <h3 className="feed-card-title">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
-                              </h3>
-                              <p className="feed-card-meta">
-                                <span>{creator.display_name}</span>
-                                <span>•</span>
-                                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
-                                <span>•</span>
-                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                              </p>
+                              </h4>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                                <span className="truncate mr-2">{creator.display_name}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                                  <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                                  <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                </div>
+                              </div>
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
                                   {post.tier === 'public' ? 'Free' : post.tier}
