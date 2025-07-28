@@ -253,13 +253,12 @@ export const VideoWatch: React.FC = () => {
                 <h1 className="text-foreground leading-tight mb-1" style={{ fontSize: '20px', fontWeight: 700 }}>
                   {post.content}
                 </h1>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
-                  <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
-                    <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
-                    <span>•</span>
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                  </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
+                  <span>•</span>
+                  <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                  <span>•</span>
+                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -474,13 +473,12 @@ export const VideoWatch: React.FC = () => {
                   <h1 className="text-foreground leading-tight mb-2" style={{ fontSize: '20px', fontWeight: 700 }}>
                     {post.content}
                   </h1>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
-                    <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
-                      <span>876K views</span>
-                      <span>•</span>
-                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                    </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
+                    <span>•</span>
+                    <span>876K views</span>
+                    <span>•</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
