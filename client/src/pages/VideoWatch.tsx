@@ -354,23 +354,21 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="px-4">
-                          <div className="flex gap-3">
-                            <Avatar className="h-9 w-9 flex-shrink-0">
-                              <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
-                              <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-normal text-foreground line-clamp-2 mb-1 leading-tight">
-                                {video.title || video.content}
-                              </h4>
-                              <div className="text-xs text-muted-foreground">
-                                <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
-                                <div className="flex items-center gap-1">
-                                  <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                                  <span>•</span>
-                                  <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
-                                </div>
+                        <div className="flex gap-3 px-4">
+                          <Avatar className="h-9 w-9 flex-shrink-0">
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-xs font-light text-foreground line-clamp-2 mb-1 leading-tight">
+                              {video.title || video.content}
+                            </h4>
+                            <div className="text-xs text-muted-foreground">
+                              <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
+                              <div className="flex items-center gap-1">
+                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <span>•</span>
+                                <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
                               </div>
                             </div>
                           </div>
@@ -465,29 +463,32 @@ export const VideoWatch: React.FC = () => {
                 )}
               </div>
 
-              {/* Video Title with Avatar */}
-              <div className="flex items-start gap-3 mb-3">
-                <Avatar className="h-10 w-10 flex-shrink-0">
+              {/* Video Title */}
+              <div className="mb-4">
+                <h1 className="text-xl font-bold text-foreground mb-2 leading-tight">
+                  {post.content}
+                </h1>
+              </div>
+
+              {/* Creator info row - matching sidebar card style */}
+              <div className="flex items-center gap-3 mb-4">
+                <Avatar className="h-9 w-9 flex-shrink-0">
                   <AvatarImage 
-                    src={post.creator_avatar ? (post.creator_avatar.startsWith('http') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} 
+                    src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} 
                     alt={post.creator_username} 
                   />
                   <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl font-bold text-foreground mb-2 leading-tight">
-                    {post.content}
-                  </h1>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-foreground truncate mr-2">{post.creator_display_name || post.creator_username}</span>
+                    <div className="flex items-center gap-2 text-muted-foreground flex-shrink-0">
+                      <span>876K views</span>
+                      <span>•</span>
+                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* View stats with username */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
-                <span>•</span>
-                <span>876K views</span>
-                <span>•</span>
-                <span>7/28/2025</span>
               </div>
 
               {/* Action Buttons Row */}
@@ -559,23 +560,21 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="px-4">
-                          <div className="flex gap-3">
-                            <Avatar className="h-9 w-9 flex-shrink-0">
-                              <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
-                              <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-normal text-foreground line-clamp-2 mb-1 leading-tight">
-                                {video.title || video.content}
-                              </h4>
-                              <div className="text-xs text-muted-foreground">
-                                <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
-                                <div className="flex items-center gap-1">
-                                  <span>{Math.floor(Math.random() * 500) + 100}K views</span>
-                                  <span>•</span>
-                                  <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
-                                </div>
+                        <div className="flex gap-3 px-3">
+                          <Avatar className="h-9 w-9 flex-shrink-0">
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-xs font-light text-foreground line-clamp-2 mb-1 leading-tight">
+                              {video.title || video.content}
+                            </h4>
+                            <div className="text-xs text-muted-foreground">
+                              <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
+                              <div className="flex items-center gap-1">
+                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <span>•</span>
+                                <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
                               </div>
                             </div>
                           </div>
