@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { CreatorPostActions } from '@/components/creator/CreatorPostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
+import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -175,6 +176,7 @@ export const CreatorProfile: React.FC = () => {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
   const [isSubscriptionTiersExpanded, setIsSubscriptionTiersExpanded] = useState(false);
+  const [tierDetailsModalOpen, setTierDetailsModalOpen] = useState(false);
 
   // Define isOwnProfile early to avoid initialization issues
   const isOwnProfile = user?.username === username;
@@ -1193,7 +1195,7 @@ export const CreatorProfile: React.FC = () => {
               /* Expanded View */
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-semibold">SUBSCRIPTION IN BUNDLES</h3>
+                  <h3 className="text-base font-semibold">SUBSCRIPTION TIERS</h3>
                   <button 
                     onClick={() => setIsSubscriptionTiersExpanded(false)}
                     className="p-1 hover:bg-muted/50 rounded-full transition-colors"
@@ -1207,7 +1209,10 @@ export const CreatorProfile: React.FC = () => {
                     <div 
                       key={tier.id} 
                       className={`flex items-center justify-between p-3 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer' : ''}`}
-                      onClick={!isOwnProfile ? () => handleSubscribe(tier.id) : undefined}
+                      onClick={!isOwnProfile ? () => {
+                        setSelectedTier(tier);
+                        setTierDetailsModalOpen(true);
+                      } : undefined}
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -1838,6 +1843,23 @@ export const CreatorProfile: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Tier Details Modal */}
+      {selectedTier && (
+        <TierDetailsModal
+          isOpen={tierDetailsModalOpen}
+          onClose={() => {
+            setTierDetailsModalOpen(false);
+            setSelectedTier(null);
+          }}
+          tier={selectedTier}
+          creatorName={creator.display_name || creator.username}
+          onSubscribe={() => {
+            setTierDetailsModalOpen(false);
+            setPaymentModalOpen(true);
+          }}
+        />
+      )}
 
       {/* Payment Modal */}
       {selectedTier && (
