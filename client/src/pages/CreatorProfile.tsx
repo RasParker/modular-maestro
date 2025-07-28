@@ -1533,12 +1533,12 @@ export const CreatorProfile: React.FC = () => {
           </div>
 
           {/* Subscription Tiers */}
-          <div id="subscription-tiers" className="space-y-4">
+          <div id="subscription-tiers" className="space-y-4 px-4 md:px-0">
             <h2 className="text-xl font-semibold">Subscription Tiers</h2>
 
             {creator.tiers && creator.tiers.length > 0 ? (
               creator.tiers.map((tier: any) => (
-                <Card key={tier.id} className="bg-gradient-card border-border/50">
+                <Card key={tier.id} className="bg-gradient-card border border-border/50 shadow-sm">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -1601,7 +1601,7 @@ export const CreatorProfile: React.FC = () => {
                 </Card>
               ))
             ) : (
-              <Card className="border border-border">
+              <Card className="border border-border shadow-sm">
                 <CardContent className="p-6">
                   <div className="text-center py-4">
                     <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
