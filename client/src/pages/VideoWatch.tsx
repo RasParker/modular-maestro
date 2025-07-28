@@ -468,7 +468,10 @@ export const VideoWatch: React.FC = () => {
               {/* Video Title with Avatar */}
               <div className="flex items-start gap-3 mb-3">
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarImage src={post.creator_avatar ? (post.creator_avatar.startsWith('/uploads/') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} alt={post.creator_username} />
+                  <AvatarImage 
+                    src={post.creator_avatar ? (post.creator_avatar.startsWith('http') ? post.creator_avatar : `/uploads/${post.creator_avatar}`) : undefined} 
+                    alt={post.creator_username} 
+                  />
                   <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
@@ -482,9 +485,9 @@ export const VideoWatch: React.FC = () => {
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                 <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
                 <span>•</span>
-                <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                <span>876K views</span>
                 <span>•</span>
-                <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                <span>7/28/2025</span>
               </div>
 
               {/* Action Buttons Row */}
