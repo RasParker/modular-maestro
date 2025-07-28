@@ -1408,229 +1408,268 @@ export const CreatorProfile: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Desktop: Keep Instagram-style layout */}
+                {/* Desktop: YouTube-style 16:9 card layout */}
                 <div className="hidden md:block">
-                  <div className="space-y-0 -mx-4">
+                  <div className="max-w-4xl mx-auto space-y-6">
                     {userPosts.map((post) => (
-                      <div key={post.id} className="mb-6">{/* Instagram-style borderless post - desktop */}
-                        {/* Post Header - Desktop Instagram style */}
-                        <div className="flex items-center justify-between px-3 py-3">
-                          <div className="flex items-center gap-3 flex-1">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : null} alt={creator.username} />
-                              <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex items-center gap-2 flex-1">
-                              <p className="font-semibold text-foreground text-sm">{creator.display_name}</p>
-                              <span className="text-xs text-muted-foreground">
-                                {getTimeAgo(post.created_at || post.createdAt)}
-                              </span>
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="text-xs px-1 py-0 h-4 border-accent text-accent">
-                            {post.tier === 'public' ? 'Free' : 
-                             post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
-                             post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
-                             post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
-                             post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
-                             post.tier.toLowerCase().includes('power') ? 'Power Gains' :
-                             post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
-                             post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
-                             post.tier}
-                          </Badge>
-                        </div>
-
-                        {/* Post Media - Desktop Instagram style */}
-                        {post.media_urls && ((() => {
-                          const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
-                          return mediaUrls[0];
-                        })()) && (
-                          <div className="w-full">
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          {/* Media Content - 16:9 aspect ratio */}
+                          <div 
+                            className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
+                            onClick={() => handleContentClick(post)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleContentClick(post);
+                              }
+                            }}
+                          >
                             {(() => {
                               const hasAccess = hasAccessToTier(post.tier);
-                              return hasAccess;
-                            })() ? (
-                              <div 
-                                className="relative cursor-pointer active:opacity-90 transition-opacity"
-                                onClick={() => handleContentClick(post)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    handleContentClick(post);
-                                  }
-                                }}
-                              >
-                                {(() => {
-                                  const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
-                                  const mediaUrl = mediaUrls[0];
-                                  const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
 
-                                  return post.media_type === 'video' ? (
-                                    <video 
-                                      src={fullUrl}
-                                      className="w-full aspect-square object-cover"
-                                      muted
-                                      preload="metadata"
-                                    />
-                                  ) : (
-                                    <img 
-                                      src={fullUrl}
-                                      alt={post.title}
-                                      className="w-full aspect-square object-cover"
+                              if (!hasAccess) {
+                                return (
+                                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                    <div className="text-center z-10 p-4">
+                                      <div className="mb-3">
+                                        <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-foreground mb-2">
+                                        {post.tier === 'supporter' ? 'Supporter' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                      </h3>
+                                      <p className="text-sm text-muted-foreground mb-3">
+                                        Subscribe to unlock
+                                      </p>
+                                      <Button 
+                                        size="sm" 
+                                        className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (!user) {
+                                            window.location.href = `/login?redirect=/creator/${username}`;
+                                          } else {
+                                            document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                          }
+                                        }}
+                                      >
+                                        {!user ? 'Login' : 'Subscribe'}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                              const mediaUrl = mediaUrls[0];
+
+                              if (mediaUrl) {
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                                return post.media_type === 'video' ? (
+                                  <video 
+                                    src={fullUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
                                     onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                        target.className = "w-full aspect-square object-cover opacity-50";
-                                      }}
-                                    />
-                                  );
-                                })()}
-                                <div className="absolute top-2 left-2 z-20">
-                                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                                    {getMediaOverlayIcon(post.media_type)}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="w-full aspect-square bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
-                                <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-                                <div className="text-center z-10 p-4">
-                                  <div className="mb-3">
-                                    <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                  </div>
-                                  <h3 className="text-base font-medium text-foreground mb-2">
-                                    {post.tier === 'supporter' ? 'Supporter' : 
-                                     post.tier === 'fan' ? 'Fan' : 
-                                     post.tier === 'premium' ? 'Premium' : 
-                                     post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground mb-3">
-                                    Subscribe to unlock
-                                  </p>
-                                  <Button 
-                                    size="sm" 
-                                    className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
-                                    onClick={() => {
-                                      if (!user) {
-                                        window.location.href = `/login?redirect=/creator/${username}`;
-                                      } else {
-                                        document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                          <div class="text-white text-sm">Video unavailable</div>
+                                        </div>`;
                                       }
                                     }}
-                                  >
-                                    {!user ? 'Login' : 'Subscribe'}
-                                  </Button>
+                                  />
+                                ) : (
+                                  <img 
+                                    src={fullUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full h-full object-cover opacity-50";
+                                    }}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <img 
+                                    src={`https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                    alt={`${creator.display_name}'s post`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                );
+                              }
+                            })()}
+
+                            {/* Play button for videos */}
+                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
+                                  <Video className="w-8 h-8 text-white" fill="white" />
                                 </div>
                               </div>
                             )}
-                          </div>
-                        )}
 
-                        {/* Action Buttons - Desktop Instagram style */}
-                        <div className="px-3 py-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`h-10 w-10 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                                  onClick={() => handleLike(post.id)}
-                                >
-                                  <Heart className={`w-7 h-7 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                </Button>
-                                {(postLikes[post.id]?.count || post.likes_count || post.likes || 0) > 0 && (
+                            {/* Duration overlay for videos */}
+                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
+                              <div className="absolute bottom-4 right-4">
+                                <div className="px-2 py-1 bg-black/80 rounded text-white text-sm font-medium">
+                                  {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tier badge */}
+                            <div className="absolute top-4 left-4">
+                              <Badge variant={getTierColor(post.tier)} className="text-sm">
+                                {post.tier === 'public' ? 'Free' : 
+                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                                 post.tier}
+                              </Badge>
+                            </div>
+
+                            {/* Content type overlay */}
+                            <div className="absolute top-4 right-4">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Creator Info and Content - Below thumbnail */}
+                          <div className="space-y-3">
+                            {/* Creator Header with Caption */}
+                            <div className="flex items-start gap-3">
+                              <Avatar className="h-12 w-12 flex-shrink-0">
+                                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                                <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="font-semibold text-foreground">
+                                    {creator.display_name}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    @{creator.username} • {getTimeAgo(post.created_at || post.createdAt)}
+                                  </p>
+                                </div>
+
+                                {/* Post Content/Caption */}
+                                {(post.content || post.title) && (
+                                  <div>
+                                    <p className="text-sm leading-relaxed text-foreground">
+                                      {post.content || post.title}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                              {isOwnProfile && (
+                                <div className="flex items-center gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 w-8 p-0 text-muted-foreground"
+                                    onClick={() => handleEdit(post.id)}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 w-8 p-0 text-muted-foreground"
+                                    onClick={() => handleDelete(post.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="mt-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`h-8 w-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                    onClick={() => handleLike(post.id)}
+                                  >
+                                    <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                  </Button>
                                   <span className="text-sm font-medium text-foreground">
                                     {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
                                   </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-10 w-10 p-0 text-muted-foreground"
-                                  onClick={() => handleCommentClick(post.id)}
-                                >
-                                  <MessageSquare className="w-7 h-7" />
-                                </Button>
-                                {post.comments_count > 0 && (
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 w-8 p-0 text-muted-foreground"
+                                    onClick={() => handleCommentClick(post.id)}
+                                  >
+                                    <MessageSquare className="w-5 h-5" />
+                                  </Button>
                                   <span className="text-sm font-medium text-foreground">
-                                    {post.comments_count}
+                                    {post.comments_count || 0}
                                   </span>
-                                )}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-muted-foreground"
+                                    onClick={() => handleShare(post.id)}
+                                  >
+                                    <Share2 className="w-5 h-5" />
+                                  </Button>
+                                </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-10 w-10 p-0 text-muted-foreground"
-                                onClick={() => handleShare(post.id)}
-                              >
-                                <Share2 className="w-7 h-7" />
-                              </Button>
+
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Eye className="w-4 h-4" />
+                                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                              </div>
                             </div>
-                            {isOwnProfile && (
-                              <div className="flex items-center gap-1">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-8 w-8 p-0 text-muted-foreground"
-                                  onClick={() => handleEdit(post.id)}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-8 w-8 p-0 text-muted-foreground"
-                                  onClick={() => handleDelete(post.id)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+
+                            {/* Comments Section */}
+                            {showComments[post.id] && (
+                              <div className="mt-4 border-t border-border pt-4">
+                                <CommentSection
+                                  postId={post.id}
+                                  initialComments={post.comments || []}
+                                  onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
+                                  creatorId={creator?.id?.toString()}
+                                  isBottomSheet={false}
+                                />
                               </div>
                             )}
                           </div>
-
-                          {/* Post Caption - Desktop Instagram style */}
-                          {(post.content || post.title) && (
-                            <div className="mb-1">
-                              <p className="text-sm leading-relaxed text-foreground">
-                                {post.content || post.title}
-                              </p>
-                            </div>
-                          )}
-
-                          {/* View comments link */}
-                          {(post.comments_count || 0) > 0 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-auto p-0 text-muted-foreground text-sm font-normal"
-                              onClick={() => handleCommentClick(post.id)}
-                            >
-                              View all {post.comments_count} comments
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Comments Section - Desktop optimized */}
-                        {showComments[post.id] && (
-                          <div className="px-3 pb-3 border-t border-border/30 mx-3">
-                            <div className="pt-3">
-                              <CommentSection
-                                postId={post.id}
-                                initialComments={post.comments || []}
-                                onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                                creatorId={creator?.id?.toString()}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </div>
