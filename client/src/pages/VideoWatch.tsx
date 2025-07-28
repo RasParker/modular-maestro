@@ -32,7 +32,14 @@ export const VideoWatch: React.FC = () => {
         const response = await fetch(`/api/posts/${id}`);
         if (response.ok) {
           const postData = await response.json();
-          setPost(postData);
+          // Map the creator data to the expected format
+          const mappedPost = {
+            ...postData,
+            creator_display_name: postData.creator?.username || 'Unknown Creator',
+            creator_username: postData.creator?.username || 'unknown',
+            creator_avatar: postData.creator?.avatar || null
+          };
+          setPost(mappedPost);
 
           // Check if user has liked this post
           if (user) {
@@ -68,8 +75,16 @@ export const VideoWatch: React.FC = () => {
         const response = await fetch('/api/posts');
         if (response.ok) {
           const posts = await response.json();
-          // Filter out current video and take next 5
-          const filtered = posts.filter((p: any) => p.id.toString() !== id).slice(0, 5);
+          // Filter out current video and take next 5, and map creator data
+          const filtered = posts
+            .filter((p: any) => p.id.toString() !== id)
+            .slice(0, 5)
+            .map((post: any) => ({
+              ...post,
+              creator_display_name: post.username || 'Unknown Creator',
+              creator_username: post.username || 'unknown',
+              creator_avatar: post.avatar || null
+            }));
           setNextVideos(filtered);
         }
       } catch (error) {
