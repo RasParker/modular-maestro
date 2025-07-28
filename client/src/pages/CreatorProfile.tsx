@@ -1135,33 +1135,33 @@ export const CreatorProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Compact Subscription Tiers - Show for profiles with tiers */}
+      {/* Compact Subscription Tiers - Show for profiles with tiers (Mobile + Desktop) */}
       {creator?.tiers && creator.tiers.length > 0 && (
-        <div className="md:hidden mx-4 mb-6">
+        <div className="mx-4 mb-6 max-w-4xl md:mx-auto md:px-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg shadow-sm overflow-hidden">
             {!isSubscriptionTiersExpanded ? (
               /* Compact View */
               <div 
-                className="p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                className="p-4 md:p-6 cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setIsSubscriptionTiersExpanded(true)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-semibold">SUBSCRIBE NOW</h3>
+                      <h3 className="text-base md:text-lg font-semibold">SUBSCRIBE NOW</h3>
                       <ChevronDown className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 md:gap-6">
                       {creator.tiers.slice(0, 3).map((tier: any, index: number) => (
                         <div key={tier.id} className="flex items-center gap-1">
-                          <span className="text-sm font-medium text-accent">GHS {tier.price}</span>
+                          <span className="text-sm md:text-base font-medium text-accent">GHS {tier.price}</span>
                           {index < Math.min(creator.tiers.length - 1, 2) && (
-                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs md:text-sm text-muted-foreground">•</span>
                           )}
                         </div>
                       ))}
                       {creator.tiers.length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{creator.tiers.length - 3} more</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">+{creator.tiers.length - 3} more</span>
                       )}
                     </div>
                   </div>
@@ -1169,7 +1169,7 @@ export const CreatorProfile: React.FC = () => {
                     <Button 
                       size="sm" 
                       variant="outline"
-                      className="px-4 py-2 text-sm font-medium rounded-full"
+                      className="px-4 py-2 text-sm font-medium rounded-full md:px-6 md:py-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsSubscriptionTiersExpanded(true);
@@ -1180,7 +1180,7 @@ export const CreatorProfile: React.FC = () => {
                   ) : (
                     <Button 
                       size="sm" 
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium rounded-full"
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium rounded-full md:px-6 md:py-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsSubscriptionTiersExpanded(true);
@@ -1193,9 +1193,9 @@ export const CreatorProfile: React.FC = () => {
               </div>
             ) : (
               /* Expanded View */
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-semibold">SUBSCRIPTION TIERS</h3>
+              <div className="p-4 md:p-6">
+                <div className="flex items-center justify-between mb-4 md:mb-6">
+                  <h3 className="text-base md:text-lg font-semibold">SUBSCRIPTION TIERS</h3>
                   <button 
                     onClick={() => setIsSubscriptionTiersExpanded(false)}
                     className="p-1 hover:bg-muted/50 rounded-full transition-colors"
@@ -1204,30 +1204,30 @@ export const CreatorProfile: React.FC = () => {
                   </button>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {creator.tiers.map((tier: any, index: number) => (
                     <div 
                       key={tier.id} 
-                      className={`flex items-center justify-between p-3 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer' : ''}`}
+                      className={`flex flex-col p-3 md:p-4 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer hover:shadow-md' : ''}`}
                       onClick={!isOwnProfile ? () => {
                         setSelectedTier(tier);
                         setTierDetailsModalOpen(true);
                       } : undefined}
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium uppercase">{tier.name}</span>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm md:text-base font-medium uppercase">{tier.name}</span>
                           {index === 0 && creator.tiers.length > 1 && (
                             <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">POPULAR</span>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                        <p className="text-xs md:text-sm text-muted-foreground mb-3 line-clamp-2">
                           {tier.description || 'Access to exclusive content'}
                         </p>
                       </div>
-                      <div className="text-right ml-4">
-                        <div className="text-sm font-bold text-accent">GHS {tier.price}</div>
-                        <div className="text-xs text-muted-foreground">per month</div>
+                      <div className="border-t border-border/20 pt-3">
+                        <div className="text-lg md:text-xl font-bold text-accent">GHS {tier.price}</div>
+                        <div className="text-xs md:text-sm text-muted-foreground">per month</div>
                       </div>
                     </div>
                   ))}
@@ -1256,15 +1256,12 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto md:px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-
-            {/* Recent Posts Preview - Fan Feed Postcard Style */}
-            <div>
-              <div className="mb-4"></div>
-              {userPosts.length > 0 ? (
-                <>
+        <div className="space-y-6">
+          {/* Recent Posts Preview - Fan Feed Postcard Style */}
+          <div>
+            <div className="mb-4"></div>
+            {userPosts.length > 0 ? (
+              <>
                 {/* Mobile: Edge-to-edge borderless layout like fan feed */}
                 <div className="md:hidden">
                   <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
@@ -1650,98 +1647,6 @@ export const CreatorProfile: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              )}
-            </div>
-          </div>
-
-          {/* Subscription Tiers */}
-          <div id="subscription-tiers" className="space-y-4 px-4 md:px-0">
-            <h2 className="text-xl font-semibold">Subscription Tiers</h2>
-
-            {creator.tiers && creator.tiers.length > 0 ? (
-              creator.tiers.map((tier: any) => (
-                <Card key={tier.id} className="bg-gradient-card border border-border/50 shadow-sm">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">{tier.name}</h3>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-accent">GHS {tier.price}</div>
-                          <div className="text-sm text-muted-foreground">per month</div>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground">{tier.description}</p>
-
-                      <ul className="space-y-2">
-                        {(() => {
-                          let benefits = tier.benefits || [];
-
-                          // Handle case where benefits might be a JSON string
-                          if (typeof benefits === 'string') {
-                            try {
-                              benefits = JSON.parse(benefits);
-                            } catch (e) {
-                              console.warn('Failed to parse benefits JSON:', e);
-                              benefits = [];
-                            }
-                          }
-
-                          // Ensure benefits is an array - handle null, undefined, or other non-array types
-                          if (!benefits || !Array.isArray(benefits)) {
-                            benefits = [];
-                          }
-
-                          // If no benefits, show a default message
-                          if (benefits.length === 0) {
-                            return (
-                              <li className="flex items-center gap-2 text-sm">
-                                <Check className="w-4 h-4 text-accent" />
-                                <span>Access to exclusive content</span>
-                              </li>
-                            );
-                          }
-
-                          return benefits.map((benefit: any, index: number) => (
-                            <li key={index} className="flex items-center gap-2 text-sm">
-                              <Check className="w-4 h-4 text-accent" />
-                              <span>{benefit}</span>
-                            </li>
-                          ));
-                        })()}
-                      </ul>
-
-                      <Button 
-                        variant="premium" 
-                        className="w-full"
-                        onClick={() => handleSubscribe(tier.id)}
-                      >
-                        Subscribe
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="border border-border shadow-sm">
-                <CardContent className="p-6">
-                  <div className="text-center py-4">
-                    <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No subscription tiers</h3>
-                    <p className="text-muted-foreground text-sm">
-                      {isOwnProfile ? 'Create subscription tiers to start monetizing your content.' : `${creator?.display_name || creator?.username} hasn't created any subscription tiers yet.`}
-                    </p>
-                    {isOwnProfile && (
-                      <Button variant="outline" size="sm" asChild className="mt-4">
-                        <Link to="/creator/tiers">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Tiers
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
             )}
           </div>
         </div>
