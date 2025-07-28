@@ -566,10 +566,10 @@ export const VideoWatch: React.FC = () => {
                             <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-xs font-light text-foreground line-clamp-2 mb-1 leading-tight">
+                            <h4 className="text-foreground line-clamp-2 mb-1 leading-tight" style={{ fontSize: '14px', fontWeight: 500 }}>
                               {video.title || video.content}
                             </h4>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-muted-foreground" style={{ fontSize: '12px', fontWeight: 400 }}>
                               <div className="truncate mb-0.5">{video.creator_display_name || video.creator_username}</div>
                               <div className="flex items-center gap-1">
                                 <span>{Math.floor(Math.random() * 500) + 100}K views</span>
