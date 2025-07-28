@@ -854,11 +854,9 @@ export const FeedPage: React.FC = () => {
                     <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                       {post.content || post.title || 'Untitled Post'}
                     </h3>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs text-muted-foreground truncate">
-                        {post.creator.display_name}
-                      </p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                      <span className="truncate mr-2">{post.creator.display_name}</span>
+                      <div className="flex items-center gap-1 flex-shrink-0 text-right">
                         <span>{post.views} views</span>
                         <span>•</span>
                         <span>{getTimeAgo(post.posted)}</span>
@@ -955,60 +953,22 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Creator Info and Content - Below thumbnail */}
-                  <div className="space-y-3">
-                    {/* Creator Header with Caption */}
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12 flex-shrink-0">
-                        <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                        <AvatarFallback>{post.creator.display_name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-foreground">
-                            {post.creator.display_name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            @{post.creator.username} • {getTimeAgo(post.posted)}
-                          </p>
-                        </div>
-
-                        {/* Post Content/Caption - Same row */}
-                        <div>
-                          {(() => {
-                            const { truncated, needsExpansion } = truncateText(post.content, 3);
-                            return (
-                              <p className="text-sm leading-relaxed text-foreground">
-                                {expandedCaptions[post.id] ? post.content : (
-                                  <>
-                                    {truncated}
-                                    {needsExpansion && !expandedCaptions[post.id] && (
-                                      <>
-                                        {'... '}
-                                        <button
-                                          onClick={() => toggleCaptionExpansion(post.id)}
-                                          className="text-primary hover:text-primary/80 font-medium"
-                                        >
-                                          Read more
-                                        </button>
-                                      </>
-                                    )}
-                                  </>
-                                )}
-                                {expandedCaptions[post.id] && needsExpansion && (
-                                  <>
-                                    {' '}
-                                    <button
-                                      onClick={() => toggleCaptionExpansion(post.id)}
-                                      className="text-primary hover:text-primary/80 font-medium"
-                                    >
-                                      Show less
-                                    </button>
-                                  </>
-                                )}
-                              </p>
-                            );
-                          })()}
+                  {/* Creator Info and Content - VideoWatch Up Next style */}
+                  <div className="flex gap-3">
+                    <Avatar className="h-9 w-9 flex-shrink-0">
+                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
+                      <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                        {post.content || 'Untitled Post'}
+                      </h4>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                        <span className="truncate mr-2">{post.creator.display_name}</span>
+                        <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                          <span>{post.views} views</span>
+                          <span>•</span>
+                          <span>{getTimeAgo(post.posted)}</span>
                         </div>
                       </div>
                     </div>
