@@ -265,15 +265,16 @@ export const VideoWatch: React.FC = () => {
                 <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h1 className="text-foreground leading-tight mb-1" style={{ fontSize: '20px', fontWeight: 700 }}>
+                <h1 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
                   {post.content}
                 </h1>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
-                  <span>•</span>
-                  <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
-                  <span>•</span>
-                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                  <span className="truncate mr-2">{post.creator_display_name || post.creator_username}</span>
+                  <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                    <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                    <span>•</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -485,15 +486,16 @@ export const VideoWatch: React.FC = () => {
                   <AvatarFallback className="text-sm">{(post.creator_display_name || post.creator_username || 'U').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-foreground leading-tight mb-2" style={{ fontSize: '20px', fontWeight: 700 }}>
+                  <h1 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
                     {post.content}
                   </h1>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">{post.creator_display_name || post.creator_username}</span>
-                    <span>•</span>
-                    <span>876K views</span>
-                    <span>•</span>
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                    <span className="truncate mr-2">{post.creator_display_name || post.creator_username}</span>
+                    <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                      <span>876K views</span>
+                      <span>•</span>
+                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </div>
               </div>
