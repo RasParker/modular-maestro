@@ -12,7 +12,7 @@ import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -1099,16 +1099,7 @@ export const CreatorProfile: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 pb-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                    className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
-                    title="Start conversation"
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                  </Button>
+                  {/* Chat button moved to below bio section */}
                 </div>
               )}
             </div>
@@ -1123,18 +1114,7 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-                {!isOwnProfile && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                    className="h-8 w-8 p-0 hover:bg-accent/20 transition-colors ml-auto"
-                    title="Start conversation"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
-                )}
+                {/* Chat button moved to below bio section */}
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">@{creator.username}</p>
@@ -1144,7 +1124,7 @@ export const CreatorProfile: React.FC = () => {
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
-              {isOwnProfile && (
+              {isOwnProfile ? (
                 <div className="flex items-center gap-2 mt-2">
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/settings">
@@ -1154,6 +1134,62 @@ export const CreatorProfile: React.FC = () => {
                   </Button>
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/creator/upload">Create Post</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    title="Start conversation"
+                    onClick={handleChatClick}
+                    disabled={initiateChatMutation.isPending}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    title="Like creator"
+                    onClick={() => {
+                      toast({
+                        title: "Feature coming soon",
+                        description: "Like functionality will be available soon.",
+                      });
+                    }}
+                  >
+                    <Heart className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    title="Add to favorites"
+                    onClick={() => {
+                      toast({
+                        title: "Feature coming soon",
+                        description: "Favorite functionality will be available soon.",
+                      });
+                    }}
+                  >
+                    <Star className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    title="Share profile"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast({
+                        title: "Profile link copied",
+                        description: "Creator profile link has been copied to your clipboard.",
+                      });
+                    }}
+                  >
+                    <Share className="w-4 h-4" />
                   </Button>
                 </div>
               )}
@@ -1195,7 +1231,7 @@ export const CreatorProfile: React.FC = () => {
         </div>
         
         {/* Desktop Action Buttons */}
-        {isOwnProfile && (
+        {isOwnProfile ? (
           <div className="hidden md:flex items-center gap-2 mt-4">
             <Button 
               variant="outline" 
@@ -1218,6 +1254,62 @@ export const CreatorProfile: React.FC = () => {
               <Link to="/creator/upload">
                 <Plus className="w-4 h-4" />
               </Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Start conversation"
+              onClick={handleChatClick}
+              disabled={initiateChatMutation.isPending}
+            >
+              <MessageSquare className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Like creator"
+              onClick={() => {
+                toast({
+                  title: "Feature coming soon",
+                  description: "Like functionality will be available soon.",
+                });
+              }}
+            >
+              <Heart className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Add to favorites"
+              onClick={() => {
+                toast({
+                  title: "Feature coming soon", 
+                  description: "Favorite functionality will be available soon.",
+                });
+              }}
+            >
+              <Star className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Share profile"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast({
+                  title: "Profile link copied",
+                  description: "Creator profile link has been copied to your clipboard.",
+                });
+              }}
+            >
+              <Share className="w-4 h-4" />
             </Button>
           </div>
         )}
