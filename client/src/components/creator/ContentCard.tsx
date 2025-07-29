@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -97,12 +98,11 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   return (
     <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
       <CardContent className="p-4">
-        {/* YouTube-style content layout */}
-        <div className="space-y-3">
-          {/* Media Preview - 16:9 aspect ratio YouTube-style thumbnail */}
-          <div className="relative">
+        <div className="flex gap-4">
+          {/* Media Preview - Left side */}
+          <div className="flex-shrink-0">
             <div 
-              className="w-full aspect-video overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
+              className="w-40 h-24 overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewContent && onViewContent({
@@ -147,7 +147,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
                   <div className="text-center text-muted-foreground">
                     {getTypeIcon()}
-                    <p className="mt-2 text-xs">{type} Content</p>
+                    <p className="mt-1 text-xs">{type}</p>
                   </div>
                 </div>
               )}
@@ -155,16 +155,16 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               {/* Play button overlay for videos */}
               {type === 'Video' && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 bg-black/70 rounded-full flex items-center justify-center">
-                    <Video className="w-6 h-6 text-white" fill="white" />
+                  <div className="w-8 h-8 bg-black/70 rounded-full flex items-center justify-center">
+                    <Video className="w-4 h-4 text-white" fill="white" />
                   </div>
                 </div>
               )}
 
               {/* Duration overlay for videos */}
               {type === 'Video' && (
-                <div className="absolute bottom-2 right-2">
-                  <div className="px-2 py-1 bg-black/80 rounded text-white text-xs font-medium">
+                <div className="absolute bottom-1 right-1">
+                  <div className="px-1 py-0.5 bg-black/80 rounded text-white text-xs font-medium">
                     {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                   </div>
                 </div>
@@ -172,15 +172,15 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
           </div>
 
-          {/* Content details below thumbnail - YouTube style */}
-          <div className="space-y-2">
+          {/* Content details - Right side */}
+          <div className="flex-1 min-w-0 space-y-2">
             {/* Title/Caption with tier badge */}
-            <div className="flex items-start gap-2">
+            <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 {(() => {
-                  const { truncated, needsExpansion } = truncateText(caption);
+                  const { truncated, needsExpansion } = truncateText(caption, 80);
                   return (
-                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                    <h3 className="text-sm font-medium text-foreground leading-tight">
                       {expandedCaption ? caption : (
                         <>
                           {truncated}
@@ -223,63 +223,68 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               </Badge>
             </div>
 
-            {/* Meta information and stats */}
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <span>{date}</span>
-                {status === 'Published' && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        <span>{views}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        <span>{likes}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MessageCircle className="w-3 h-3" />
-                        <span>{comments}</span>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {status === 'Scheduled' && scheduledFor && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
-                      <Timer className="w-3 h-3" />
-                      <span>
-                        {(() => {
-                          const releaseDate = new Date(scheduledFor);
-                          const now = new Date();
-                          const isToday = releaseDate.toDateString() === now.toDateString();
-                          const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
-
-                          if (isToday) {
-                            return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                          } else if (isTomorrow) {
-                            return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                          } else {
-                            return releaseDate.toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true
-                            });
-                          }
-                        })()}
-                      </span>
-                    </div>
-                  </>
-                )}
+            {/* Meta information */}
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                {getTypeIcon()}
+                <span>{type}</span>
               </div>
+              <span>•</span>
+              <span>{date}</span>
+              {status === 'Scheduled' && scheduledFor && (
+                <>
+                  <span>•</span>
+                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                    <Timer className="w-3 h-3" />
+                    <span>
+                      {(() => {
+                        const releaseDate = new Date(scheduledFor);
+                        const now = new Date();
+                        const isToday = releaseDate.toDateString() === now.toDateString();
+                        const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+
+                        if (isToday) {
+                          return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                        } else if (isTomorrow) {
+                          return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                        } else {
+                          return releaseDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                          });
+                        }
+                      })()}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Stats and Actions */}
+            <div className="flex items-center justify-between">
+              {/* Stats */}
+              {status === 'Published' && (
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    <span>{views}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    <span>{likes}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3" />
+                    <span>{comments}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 ml-auto">
                 <Button
                   variant="outline"
                   size="sm"
