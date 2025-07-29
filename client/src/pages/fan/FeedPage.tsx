@@ -778,7 +778,7 @@ export const FeedPage: React.FC = () => {
               {feed.map((post) => (
                 <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                   {/* Thumbnail */}
-                <div className="relative w-full aspect-video bg-black overflow-hidden mb-3">
+                <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg"></div>
                   {post.thumbnail ? (
                     post.type === 'video' ? (
                       <video
