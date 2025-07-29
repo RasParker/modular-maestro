@@ -853,7 +853,8 @@ export const CreatorProfile: React.FC = () => {
       }, 500);
     },
     onError: (error) => {
-      toast({
+      toast```tool_code
+({
         title: "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
@@ -1457,36 +1458,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -1498,6 +1470,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1666,36 +1667,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -1707,6 +1679,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1870,36 +1871,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -1911,6 +1883,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2079,36 +2080,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -2120,6 +2092,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2278,36 +2279,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -2319,6 +2291,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2487,36 +2488,7 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <div className="flex items-center gap-1">
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-1 mr-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                        className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                      <span>•</span>
-                                    </div>
-                                  )}
-                                  <span className="truncate">{creator.display_name}</span>
-                                </div>
+                                <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                   <Eye className="w-3 h-3" />
                                   <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
@@ -2528,6 +2500,35 @@ export const CreatorProfile: React.FC = () => {
                                   <span>•</span>
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2683,7 +2684,7 @@ export const CreatorProfile: React.FC = () => {
           creatorName={creator.display_name || creator.username}
         />
       )}
-      </div>
+    </div>
     </>
   );
 };
