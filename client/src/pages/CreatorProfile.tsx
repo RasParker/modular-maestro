@@ -693,7 +693,7 @@ export const CreatorProfile: React.FC = () => {
   // Filter posts based on active tab
   const getFilteredPosts = () => {
     if (!userPosts) return [];
-    
+
     switch (activeTab) {
       case 'public':
         return userPosts.filter(post => post.tier === 'public');
@@ -708,7 +708,7 @@ export const CreatorProfile: React.FC = () => {
   // Get post counts for each tab
   const getPostCounts = () => {
     if (!userPosts) return { all: 0, subscription: 0, public: 0 };
-    
+
     return {
       all: userPosts.length,
       subscription: userPosts.filter(post => post.tier !== 'public').length,
@@ -853,7 +853,8 @@ export const CreatorProfile: React.FC = () => {
       }, 500);
     },
     onError: (error) => {
-      toast({
+      toast```tool_code
+({
         title: "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
@@ -1002,6 +1003,27 @@ export const CreatorProfile: React.FC = () => {
       </div>
     );
   }
+
+  const handleEditPost = (postId: string) => {
+    const post = userPosts.find(p => p.id === postId);
+    if (post) {
+      setEditingPost(post);
+      setEditCaption(post.content || post.title);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleDeletePost = (postId: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this post? This action cannot be undone.");
+    if (confirmDelete) {
+      // Simulate deletion
+      setUserPosts(prev => prev.filter(post => post.id !== postId));
+      toast({
+        title: "Post deleted",
+        description: "Your post has been successfully deleted.",
+      });
+    }
+  };
 
   return (
     <>
@@ -1233,7 +1255,7 @@ export const CreatorProfile: React.FC = () => {
                     <ChevronUp className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {creator.tiers.map((tier: any, index: number) => (
                     <div 
@@ -1264,7 +1286,7 @@ export const CreatorProfile: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 {isOwnProfile && (
                   <div className="mt-4 pt-4 border-t border-border/20">
                     <Button 
@@ -1425,6 +1447,7 @@ export const CreatorProfile: React.FC = () => {
 
                         {/* Bottom section - VideoWatch Up Next style */}
                         <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
                           <div className="flex gap-3">
                             <Avatar className="h-9 w-9 flex-shrink-0">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
@@ -1437,15 +1460,46 @@ export const CreatorProfile: React.FC = () => {
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                                 <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
                                   <span>•</span>
                                   <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
-                                  {post.tier === 'public' ? 'Free' : post.tier}
-                                </Badge>
                               </div>
                             </div>
                           </div>
@@ -1602,118 +1656,61 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Creator Info and Content - Below thumbnail */}
-                          <div className="space-y-3">
-                            {/* Creator Header with Caption */}
-                            <div className="flex items-start gap-3">
-                              <Avatar className="h-12 w-12 flex-shrink-0">
-                                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-                                <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-foreground">
-                                    {creator.display_name}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    @{creator.username} • {getTimeAgo(post.created_at || post.createdAt)}
-                                  </p>
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                                <span className="truncate mr-2">{creator.display_name}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
+                                  <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-
-                                {/* Post Content/Caption */}
-                                {(post.content || post.title) && (
-                                  <div>
-                                    <p className="text-sm leading-relaxed text-foreground">
-                                      {post.content || post.title}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                              {isOwnProfile && (
-                                <div className="flex items-center gap-1">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleEdit(post.id)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleDelete(post.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="mt-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`h-8 w-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                                    onClick={() => handleLike(post.id)}
-                                  >
-                                    <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleCommentClick(post.id)}
-                                  >
-                                    <MessageSquare className="w-5 h-5" />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {post.comments_count || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleShare(post.id)}
-                                  >
-                                    <Share2 className="w-5 h-5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Eye className="w-4 h-4" />
-                                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
                               </div>
                             </div>
-
-                            {/* Comments Section */}
-                            {showComments[post.id] && (
-                              <div className="mt-4 border-t border-border pt-4">
-                                <CommentSection
-                                  postId={post.id}
-                                  initialComments={post.comments || []}
-                                  onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                                  creatorId={creator?.id?.toString()}
-                                  isBottomSheet={false}
-                                />
-                              </div>
-                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -1863,6 +1860,7 @@ export const CreatorProfile: React.FC = () => {
 
                         {/* Bottom section - VideoWatch Up Next style */}
                         <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
                           <div className="flex gap-3">
                             <Avatar className="h-9 w-9 flex-shrink-0">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
@@ -1875,15 +1873,46 @@ export const CreatorProfile: React.FC = () => {
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                                 <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
                                   <span>•</span>
                                   <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
-                                  {post.tier === 'public' ? 'Free' : post.tier}
-                                </Badge>
                               </div>
                             </div>
                           </div>
@@ -2040,118 +2069,61 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Creator Info and Content - Below thumbnail */}
-                          <div className="space-y-3">
-                            {/* Creator Header with Caption */}
-                            <div className="flex items-start gap-3">
-                              <Avatar className="h-12 w-12 flex-shrink-0">
-                                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-                                <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-foreground">
-                                    {creator.display_name}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    @{creator.username} • {getTimeAgo(post.created_at || post.createdAt)}
-                                  </p>
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                                <span className="truncate mr-2">{creator.display_name}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
+                                  <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-
-                                {/* Post Content/Caption */}
-                                {(post.content || post.title) && (
-                                  <div>
-                                    <p className="text-sm leading-relaxed text-foreground">
-                                      {post.content || post.title}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                              {isOwnProfile && (
-                                <div className="flex items-center gap-1">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleEdit(post.id)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleDelete(post.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="mt-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`h-8 w-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                                    onClick={() => handleLike(post.id)}
-                                  >
-                                    <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleCommentClick(post.id)}
-                                  >
-                                    <MessageSquare className="w-5 h-5" />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {post.comments_count || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleShare(post.id)}
-                                  >
-                                    <Share2 className="w-5 h-5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Eye className="w-4 h-4" />
-                                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
                               </div>
                             </div>
-
-                            {/* Comments Section */}
-                            {showComments[post.id] && (
-                              <div className="mt-4 border-t border-border pt-4">
-                                <CommentSection
-                                  postId={post.id}
-                                  initialComments={post.comments || []}
-                                  onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                                  creatorId={creator?.id?.toString()}
-                                  isBottomSheet={false}
-                                />
-                              </div>
-                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -2296,6 +2268,7 @@ export const CreatorProfile: React.FC = () => {
 
                         {/* Bottom section - VideoWatch Up Next style */}
                         <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
                           <div className="flex gap-3">
                             <Avatar className="h-9 w-9 flex-shrink-0">
                               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
@@ -2308,15 +2281,46 @@ export const CreatorProfile: React.FC = () => {
                               <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                                 <span className="truncate mr-2">{creator.display_name}</span>
                                 <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
                                   <span>•</span>
                                   <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant={getTierColor(post.tier)} className="text-[10px] px-1 py-0 h-3">
-                                  {post.tier === 'public' ? 'Free' : post.tier}
-                                </Badge>
                               </div>
                             </div>
                           </div>
@@ -2473,118 +2477,61 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Creator Info and Content - Below thumbnail */}
-                          <div className="space-y-3">
-                            {/* Creator Header with Caption */}
-                            <div className="flex items-start gap-3">
-                              <Avatar className="h-12 w-12 flex-shrink-0">
-                                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-                                <AvatarFallback>{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-foreground">
-                                    {creator.display_name}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    @{creator.username} • {getTimeAgo(post.created_at || post.createdAt)}
-                                  </p>
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                                <span className="truncate mr-2">{creator.display_name}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
+                                  <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>•</span>
+                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
+                                  <span>{post.likes_count || 0}</span>
+                                  <span>•</span>
+                                  <MessageSquare className="w-3 h-3" />
+                                  <span>{post.comments_count || 0}</span>
+                                  {isOwnProfile && (
+                                    <>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletePost(post.id);
+                                          }}
+                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-
-                                {/* Post Content/Caption */}
-                                {(post.content || post.title) && (
-                                  <div>
-                                    <p className="text-sm leading-relaxed text-foreground">
-                                      {post.content || post.title}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                              {isOwnProfile && (
-                                <div className="flex items-center gap-1">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleEdit(post.id)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleDelete(post.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="mt-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`h-8 w-8 p-0 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
-                                    onClick={() => handleLike(post.id)}
-                                  >
-                                    <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {postLikes[post.id]?.count || post.likes_count || post.likes || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleCommentClick(post.id)}
-                                  >
-                                    <MessageSquare className="w-5 h-5" />
-                                  </Button>
-                                  <span className="text-sm font-medium text-foreground">
-                                    {post.comments_count || 0}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-muted-foreground"
-                                    onClick={() => handleShare(post.id)}
-                                  >
-                                    <Share2 className="w-5 h-5" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Eye className="w-4 h-4" />
-                                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
                               </div>
                             </div>
-
-                            {/* Comments Section */}
-                            {showComments[post.id] && (
-                              <div className="mt-4 border-t border-border pt-4">
-                                <CommentSection
-                                  postId={post.id}
-                                  initialComments={post.comments || []}
-                                  onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                                  creatorId={creator?.id?.toString()}
-                                  isBottomSheet={false}
-                                />
-                              </div>
-                            )}
                           </div>
                         </CardContent>
                       </Card>
