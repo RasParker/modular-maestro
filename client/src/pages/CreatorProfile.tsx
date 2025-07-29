@@ -852,7 +852,7 @@ export const CreatorProfile: React.FC = () => {
         window.location.href = '/fan/messages';
       }, 500);
     },
-    onError: (error) =>```text
+    onError: (error) => {
       toast({
         title: "Error",
         description: "Failed to start conversation. Please try again.",
