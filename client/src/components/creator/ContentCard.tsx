@@ -57,31 +57,15 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 }) => {
   const [expandedCaption, setExpandedCaption] = useState(false);
 
-  const truncateText = (text: string) => {
-    // Only truncate if text is likely to exceed one line (roughly 60-80 characters)
-    if (text.length <= 60) {
+  const truncateText = (text: string, maxLength: number = 100) => {
+    if (text.length <= maxLength) {
       return { truncated: text, needsExpansion: false };
     }
     
-    // Find a good break point around 50-60 characters
-    const words = text.split(' ');
-    let truncated = '';
-    
-    for (let i = 0; i < words.length; i++) {
-      const testString = truncated + (truncated ? ' ' : '') + words[i];
-      if (testString.length > 50) {
-        if (truncated === '') {
-          // If even the first word is too long, take it anyway
-          truncated = words[0];
-        }
-        break;
-      }
-      truncated = testString;
-    }
-    
+    const truncated = text.slice(0, maxLength).trim();
     return {
       truncated,
-      needsExpansion: truncated !== text
+      needsExpansion: true
     };
   };
 
@@ -111,82 +95,15 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     }
   };
 
-  const getMediaOverlayIcon = (mediaType: string) => {
-    switch (mediaType?.toLowerCase()) {
-      case 'image':
-        return <Image className="w-4 h-4 text-white" />;
-      case 'video':
-        return <Video className="w-4 h-4 text-white" />;
-      case 'text':
-        return <FileText className="w-4 h-4 text-white" />;
-      default:
-        return <FileText className="w-4 h-4 text-white" />;
-    }
-  };
-
   return (
     <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
-      <CardContent className="p-3">
-        {/* Content Preview - Profile style layout */}
-        <div className="space-y-3">
-          {/* Header - Tier badge and date at top of card */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs px-2 py-0 h-5">
-                {tier}
-              </Badge>
-            </div>
-            <span className="text-xs text-muted-foreground">{date}</span>
-          </div>
-
-          {/* Caption */}
-          {(() => {
-            const { truncated, needsExpansion } = truncateText(caption);
-            return (
-              <div className="font-medium text-foreground text-sm leading-tight">
-                {expandedCaption ? caption : (
-                  <>
-                    {truncated}
-                    {needsExpansion && !expandedCaption && (
-                      <>
-                        {'... '}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedCaption(true);
-                          }}
-                          className="text-primary hover:text-primary/80 font-medium"
-                        >
-                          read more
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-                {expandedCaption && needsExpansion && (
-                  <>
-                    {' '}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedCaption(false);
-                      }}
-                      className="text-primary hover:text-primary/80 font-medium"
-                    >
-                      read less
-                    </button>
-                  </>
-                )}
-              </div>
-            );
-          })()}
-
-
-
-          {/* Media Preview - Square aspect ratio like profile */}
-          <div className="relative">
+      <CardContent className="p-4">
+        {/* YouTube-style horizontal layout */}
+        <div className="flex gap-4">
+          {/* Thumbnail - 16:9 aspect ratio */}
+          <div className="flex-shrink-0">
             <div 
-              className="w-full aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity"
+              className="w-48 h-[108px] overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity relative"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewContent && onViewContent({
@@ -206,14 +123,20 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               }}
             >
               {mediaPreview ? (
-                <div className="w-full h-full">
+                <div className="w-full h-full relative">
                   {type === 'Video' ? (
-                    <video 
-                      src={mediaPreview}
-                      className="w-full h-full object-cover"
-                      muted
-                      preload="metadata"
-                    />
+                    <>
+                      <video 
+                        src={mediaPreview}
+                        className="w-full h-full object-cover"
+                        muted
+                        preload="metadata"
+                      />
+                      {/* Video duration overlay */}
+                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 py-0.5 rounded">
+                        {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                      </div>
+                    </>
                   ) : (
                     <img 
                       src={mediaPreview}
@@ -231,63 +154,119 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
                   <div className="text-center text-muted-foreground">
                     {getTypeIcon()}
-                    <p className="mt-2 text-xs">{type} Content</p>
+                    <p className="mt-1 text-xs">{type}</p>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Bottom row - Stats/Release Info and Actions combined */}
-          <div className="flex items-center justify-between pt-1">
-            {/* Stats or Release Info */}
-            {status === 'Published' ? (
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Eye className="w-3 h-3" />
-                  <span>{views}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Heart className="w-3 h-3" />
-                  <span>{likes}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="w-3 h-3" />
-                  <span>{comments}</span>
-                </div>
-              </div>
-            ) : status === 'Scheduled' && scheduledFor ? (
-              <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
-                <Timer className="w-3 h-3" />
-                <span>
-                  {(() => {
-                    const releaseDate = new Date(scheduledFor);
-                    const now = new Date();
-                    const isToday = releaseDate.toDateString() === now.toDateString();
-                    const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
-                    
-                    if (isToday) {
-                      return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                    } else if (isTomorrow) {
-                      return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                    } else {
-                      return releaseDate.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      });
-                    }
-                  })()}
-                </span>
-              </div>
-            ) : (
-              <div></div>
-            )}
+          {/* Content Details */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between">
+            {/* Top section - Title and description */}
+            <div className="space-y-2">
+              {/* Title/Caption */}
+              {(() => {
+                const { truncated, needsExpansion } = truncateText(caption, 120);
+                return (
+                  <div className="font-medium text-foreground text-base leading-tight">
+                    {expandedCaption ? caption : (
+                      <>
+                        {truncated}
+                        {needsExpansion && !expandedCaption && (
+                          <>
+                            {'... '}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedCaption(true);
+                              }}
+                              className="text-primary hover:text-primary/80 font-medium text-sm"
+                            >
+                              more
+                            </button>
+                          </>
+                        )}
+                      </>
+                    )}
+                    {expandedCaption && needsExpansion && (
+                      <>
+                        {' '}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedCaption(false);
+                          }}
+                          className="text-primary hover:text-primary/80 font-medium text-sm"
+                        >
+                          less
+                        </button>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
 
-            {/* Action Buttons - compact inline */}
-            <div className="flex items-center gap-1">
+              {/* Metadata row */}
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
+                    {tier}
+                  </Badge>
+                  <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
+                    {status}
+                  </Badge>
+                </div>
+                <span className="text-xs">{date}</span>
+              </div>
+
+              {/* Stats or Release Info */}
+              {status === 'Published' ? (
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>{views.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-4 h-4" />
+                    <span>{likes.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{comments.toLocaleString()}</span>
+                  </div>
+                </div>
+              ) : status === 'Scheduled' && scheduledFor ? (
+                <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 font-medium">
+                  <Timer className="w-4 h-4" />
+                  <span>
+                    {(() => {
+                      const releaseDate = new Date(scheduledFor);
+                      const now = new Date();
+                      const isToday = releaseDate.toDateString() === now.toDateString();
+                      const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+                      
+                      if (isToday) {
+                        return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                      } else if (isTomorrow) {
+                        return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                      } else {
+                        return releaseDate.toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        });
+                      }
+                    })()}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Action Buttons - bottom right */}
+            <div className="flex items-center justify-end gap-2 mt-3">
               <Button
                 variant="outline"
                 size="sm"
@@ -295,9 +274,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                   e.stopPropagation();
                   onEdit(id);
                 }}
-                className="h-7 px-2 text-xs"
+                className="h-8 px-3 text-sm"
               >
-                <Edit3 className="w-3 h-3" />
+                <Edit3 className="w-4 h-4 mr-1" />
+                Edit
               </Button>
               
               <Button
@@ -307,9 +287,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                   e.stopPropagation();
                   onDelete(id);
                 }}
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                className="h-8 px-3 text-sm text-destructive hover:text-destructive"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-4 h-4 mr-1" />
+                Delete
               </Button>
             </div>
           </div>
