@@ -1084,24 +1084,6 @@ export const CreatorProfile: React.FC = () => {
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
                 </div>
               </div>
-              {isOwnProfile ? (
-                <div className="flex items-center gap-2 pb-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                    className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
-                    title="Start conversation"
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 pb-2">
-                  {/* Chat button moved to below bio section */}
-                </div>
-              )}
             </div>
 
             {/* Mobile Layout - Clean profile info only */}
@@ -1146,18 +1128,6 @@ export const CreatorProfile: React.FC = () => {
               );
             })()}
           </div>
-          {isOwnProfile && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              asChild
-              className="p-1 h-auto flex-shrink-0"
-            >
-              <Link to="/creator/settings">
-                <Settings className="w-4 h-4" />
-              </Link>
-            </Button>
-          )}
         </div>
         
         {/* Action Buttons - Both Desktop and Mobile */}
