@@ -852,7 +852,6 @@ export const CreatorProfile: React.FC = () => {
         window.location.href = '/fan/messages';
       }, 500);
     },
-    ```text
     onError: (error) => {
       toast({
         title: "Error",
@@ -2169,11 +2168,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI` viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="200" height="200" fill="#f3f4f6"/>
-                                    <path d="M100 75L125 100H112V125H88V100H75L100 75Z" fill="#9ca3af"/>
-                                    <text x="100" y="150" text-anchor="middle" fill="#9ca3af" font-size="12">Image not found</text>
-                                  </svg>';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PC9kZWZzPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+PHBhdGggZD0iTTEwMCA3NUwxMjUgMTAwSDExMlYxMjVIODhWMTAwSDc1TDEwMCA3NVoiIGZpbGw9IiM5Y2EzYWYiLz48dGV4dCB4PSIxMDAiIHk9IjE1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzljYTNhZiIgZm9udC1zaXplPSIxMiI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
