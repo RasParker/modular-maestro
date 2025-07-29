@@ -853,8 +853,7 @@ export const CreatorProfile: React.FC = () => {
       }, 500);
     },
     onError: (error) => {
-      toast```tool_code
-({
+      toast({
         title: "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
