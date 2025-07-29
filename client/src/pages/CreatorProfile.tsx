@@ -854,7 +854,9 @@ export const CreatorProfile: React.FC = () => {
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title:Component will have the stats/action icons removed from the feed cards.
+```typescript
+ "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
       });
@@ -898,10 +900,9 @@ export const CreatorProfile: React.FC = () => {
           }
           return;
         }
+      } catch (error) {
+        console.error('Error checking subscription for messaging:', error);
       }
-    } catch (error) {
-      console.error('Error checking subscription for messaging:', error);
-    }
 
     console.log('❌ No valid subscription found for messaging');
     toast({
@@ -1456,49 +1457,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -1665,49 +1627,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -1869,49 +1792,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -2078,49 +1962,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -2277,49 +2122,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -2486,49 +2292,10 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                                <span className="truncate mr-2">{creator.display_name}</span>
-                                <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                  <Eye className="w-3 h-3" />
-                                  <span>{post.views || Math.floor(Math.random() * 1000) + 100}</span>
-                                  <span>•</span>
-                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  <span>•</span>
-                                  <Heart className={`w-3 h-3 ${post.liked ? 'text-red-500 fill-current' : ''}`} />
-                                  <span>{post.likes_count || 0}</span>
-                                  <span>•</span>
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{post.comments_count || 0}</span>
-                                  {isOwnProfile && (
-                                    <>
-                                      <span>•</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditPost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeletePost(post.id);
-                                          }}
-                                          className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                                        >
-                                          <Trash2 className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <span className="mx-1">•</span>
+                                <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                               </div>
                             </div>
                           </div>
