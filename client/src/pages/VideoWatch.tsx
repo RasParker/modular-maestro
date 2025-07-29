@@ -462,14 +462,9 @@ export const VideoWatch: React.FC = () => {
               <div className="flex items-center justify-center">
                 <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mb-2"></div>
               </div>
-              <div className="flex items-center justify-between">
-                <SheetTitle className="text-lg font-semibold text-foreground">
-                  Comments
-                </SheetTitle>
-                <Button variant="ghost" size="sm" onClick={() => setShowCommentsSheet(false)}>
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
+              <SheetTitle className="text-lg font-semibold text-foreground text-center">
+                Comments
+              </SheetTitle>
 
               {/* Sort Options */}
               <div className="flex items-center gap-3 mt-3">

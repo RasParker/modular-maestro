@@ -107,10 +107,10 @@ export const ContentScheduleCard: React.FC<ContentScheduleCardProps> = ({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm truncate">{title || description || 'Untitled Post'}</h4>
+        <h4 className="font-medium text-sm line-clamp-2 break-words overflow-hidden">{title || description || 'Untitled Post'}</h4>
         <div className="flex items-center gap-2 mt-1">
           <Badge variant="outline" className="text-xs">{tier}</Badge>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground truncate">
             {scheduledFor 
               ? new Date(scheduledFor).toLocaleDateString() + ' at ' + new Date(scheduledFor).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
               : date

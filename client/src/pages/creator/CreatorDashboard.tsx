@@ -270,7 +270,7 @@ export const CreatorDashboard: React.FC = () => {
                 <CardDescription className="text-sm">Revenue breakdown by tier</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {console.log('Rendering tier performance, length:', tierPerformance.length, 'data:', tierPerformance)}
+
                 {tierPerformance.length > 0 ? (
                   tierPerformance.map((tier) => (
                     <div key={tier.name} className="space-y-2">
@@ -322,7 +322,7 @@ export const CreatorDashboard: React.FC = () => {
                   {scheduledContent.length > 0 ? (
                     scheduledContent.length > 2 ? (
                       <div>
-                        <ScrollArea className="h-[200px] w-full">
+                        <ScrollArea className="h-[200px] w-full scrollbar-hide">
                           <div className="space-y-4 pr-4">
                             {scheduledContent.map((content) => (
                               <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
@@ -549,7 +549,7 @@ export const CreatorDashboard: React.FC = () => {
                 <CardContent>
                   {userPosts.length > 0 ? (
                     userPosts.length > 2 ? (
-                      <ScrollArea className="h-[200px] w-full">
+                      <ScrollArea className="h-[200px] w-full scrollbar-hide">
                         <div className="space-y-4 pr-4">
                           {userPosts.map((post) => (
                         <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
@@ -607,10 +607,10 @@ export const CreatorDashboard: React.FC = () => {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
+                            <h4 className="font-medium text-sm line-clamp-2 break-words">{post.caption || post.title || 'Untitled Post'}</h4>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-xs text-muted-foreground truncate">
                                 {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
                               </span>
                             </div>
@@ -691,10 +691,10 @@ export const CreatorDashboard: React.FC = () => {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm truncate">{post.caption || post.title || 'Untitled Post'}</h4>
+                              <h4 className="font-medium text-sm line-clamp-2 break-words">{post.caption || post.title || 'Untitled Post'}</h4>
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-muted-foreground truncate">
                                   {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
                                 </span>
                               </div>
