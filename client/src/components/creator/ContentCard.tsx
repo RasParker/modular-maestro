@@ -152,14 +152,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 </div>
               )}
 
-              {/* Play button overlay for videos */}
-              {type === 'Video' && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-black/70 rounded-full flex items-center justify-center">
-                    <Video className="w-4 h-4 text-white" fill="white" />
-                  </div>
-                </div>
-              )}
+              
 
               {/* Duration overlay for videos */}
               {type === 'Video' && (
@@ -174,61 +167,55 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
           {/* Content details - Right side */}
           <div className="flex-1 min-w-0 space-y-2">
-            {/* Title/Caption with tier badge */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                {(() => {
-                  const { truncated, needsExpansion } = truncateText(caption, 80);
-                  return (
-                    <h3 className="text-sm font-medium text-foreground leading-tight">
-                      {expandedCaption ? caption : (
-                        <>
-                          {truncated}
-                          {needsExpansion && !expandedCaption && (
-                            <>
-                              {'... '}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedCaption(true);
-                                }}
-                                className="text-primary hover:text-primary/80 font-medium"
-                              >
-                                more
-                              </button>
-                            </>
-                          )}
-                        </>
-                      )}
-                      {expandedCaption && needsExpansion && (
-                        <>
-                          {' '}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setExpandedCaption(false);
-                            }}
-                            className="text-primary hover:text-primary/80 font-medium"
-                          >
-                            less
-                          </button>
-                        </>
-                      )}
-                    </h3>
-                  );
-                })()}
-              </div>
-              <Badge variant="outline" className="text-xs px-2 py-0 h-5 flex-shrink-0">
-                {tier}
-              </Badge>
+            {/* Title/Caption */}
+            <div className="flex-1 min-w-0">
+              {(() => {
+                const { truncated, needsExpansion } = truncateText(caption, 80);
+                return (
+                  <h3 className="text-sm font-medium text-foreground leading-tight line-clamp-2 sm:line-clamp-none">
+                    {expandedCaption ? caption : (
+                      <>
+                        {truncated}
+                        {needsExpansion && !expandedCaption && (
+                          <>
+                            <span className="hidden sm:inline">... </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedCaption(true);
+                              }}
+                              className="text-primary hover:text-primary/80 font-medium hidden sm:inline"
+                            >
+                              more
+                            </button>
+                          </>
+                        )}
+                      </>
+                    )}
+                    {expandedCaption && needsExpansion && (
+                      <>
+                        {' '}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedCaption(false);
+                          }}
+                          className="text-primary hover:text-primary/80 font-medium hidden sm:inline"
+                        >
+                          less
+                        </button>
+                      </>
+                    )}
+                  </h3>
+                );
+              })()}
             </div>
 
             {/* Meta information */}
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                {getTypeIcon()}
-                <span>{type}</span>
-              </div>
+              <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+                {tier}
+              </Badge>
               <span>•</span>
               <span>{date}</span>
               {status === 'Scheduled' && scheduledFor && (
