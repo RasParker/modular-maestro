@@ -141,21 +141,23 @@ export const BottomNavigation: React.FC = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-t border-border">
-      <div className="flex justify-around items-center h-16 px-2">
-        {navigationItems.map((item) => (
-          <Link
-            key={item.href}
-            to={item.href}
-            className={`flex flex-col items-center justify-center space-y-1 p-2 rounded-lg transition-colors min-w-0 flex-1 ${
-              item.active 
-                ? 'text-primary' 
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <item.icon className="w-5 h-5" />
-            <span className="text-xs font-medium truncate">{item.label}</span>
-          </Link>
-        ))}
+      <div className="flex items-center justify-center h-16 px-4 max-w-screen-sm mx-auto">
+        <div className="flex items-center justify-between w-full max-w-md">
+          {navigationItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`flex flex-col items-center justify-center space-y-1 p-3 rounded-lg transition-colors min-w-0 ${
+                item.active 
+                  ? 'text-primary' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-xs font-medium truncate max-w-[60px] text-center">{item.label}</span>
+            </Link>
+          ))}
+        </div>
       </div>
     </nav>
   );
