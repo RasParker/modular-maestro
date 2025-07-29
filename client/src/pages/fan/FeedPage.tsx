@@ -668,7 +668,8 @@ export const FeedPage: React.FC = () => {
                         <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                           <span className="truncate mr-2">{post.creator.display_name}</span>
                           <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                            <span>{post.views} views</span>
+                            <Eye className="w-3 h-3" />
+                            <span>{post.views}</span>
                             <span>•</span>
                             <span>{getTimeAgo(post.posted)}</span>
                           </div>
@@ -857,7 +858,8 @@ export const FeedPage: React.FC = () => {
                     <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                       <span className="truncate mr-2">{post.creator.display_name}</span>
                       <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                        <span>{post.views} views</span>
+                        <Eye className="w-3 h-3" />
+                        <span>{post.views}</span>
                         <span>•</span>
                         <span>{getTimeAgo(post.posted)}</span>
                       </div>
@@ -966,7 +968,8 @@ export const FeedPage: React.FC = () => {
                       <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                         <span className="truncate mr-2">{post.creator.display_name}</span>
                         <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                          <span>{post.views} views</span>
+                          <Eye className="w-3 h-3" />
+                          <span>{post.views}</span>
                           <span>•</span>
                           <span>{getTimeAgo(post.posted)}</span>
                         </div>
