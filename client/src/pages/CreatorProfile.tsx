@@ -1054,14 +1054,14 @@ export const CreatorProfile: React.FC = () => {
             </div>
           )}
           
-          {/* Cover Photo Upload Button - Only show for own profile */}
-          {isOwnProfile && (
+          {/* Cover Photo Upload Button - Only show for own profile and when no cover photo */}
+          {isOwnProfile && !creator.cover && (
             <div className="absolute top-4 right-4">
               <Button
                 variant="outline"
                 size="sm"
                 className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
-                title="Change cover photo"
+                title="Add cover photo"
                 asChild
               >
                 <Link to="/creator/settings?tab=profile">
@@ -1082,14 +1082,14 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               
-              {/* Profile Photo Upload Button - Only show for own profile */}
-              {isOwnProfile && (
+              {/* Profile Photo Upload Button - Only show for own profile and when no avatar */}
+              {isOwnProfile && !creator.avatar && (
                 <div className="absolute -bottom-1 -right-1">
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-6 w-6 p-0 bg-primary rounded-full border-2 border-background hover:bg-primary/90 transition-colors"
-                    title="Change profile photo"
+                    title="Add profile photo"
                     asChild
                   >
                     <Link to="/creator/settings?tab=profile">
