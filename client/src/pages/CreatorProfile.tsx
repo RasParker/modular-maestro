@@ -717,31 +717,41 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleContentClick = (post: any) => {
-    // Check if we're on mobile
-    const isMobile = window.innerWidth < 768;
-
-    if (isMobile) {
-      // Navigate to watch page instead of modal for mobile
-      if (post.media_type === 'video') {
-        navigate(`/video/${post.id}`);
-      } else {
-        // For images and other content, still navigate to watch page
-        navigate(`/video/${post.id}`);
-      }
-    } else {
-      // Desktop behavior - use modal
+    // For video content, check aspect ratio to determine navigation behavior
+    if (post.media_type === 'video' && post.media_urls) {
       const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
       const mediaUrl = mediaUrls[0];
       const fullUrl = mediaUrl?.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+      
+      // Create a temporary video element to detect aspect ratio
+      const media = document.createElement('video');
+      media.src = fullUrl;
+      media.onloadedmetadata = () => {
+        const aspectRatio = media.videoWidth / media.videoHeight;
 
-      const modalData = {
-        ...post,
-        mediaPreview: fullUrl,
-        type: post.media_type === 'image' ? 'Image' : post.media_type === 'video' ? 'Video' : 'Text',
-        caption: post.content || post.title
+        if (aspectRatio > 1) {
+          // 16:9 or landscape video - navigate to YouTube-style watch page
+          navigate(`/video/${post.id}`);
+        } else {
+          // 9:16 or portrait video - open Instagram-style modal
+          const modalData = {
+            ...post,
+            mediaPreview: fullUrl,
+            type: 'Video',
+            caption: post.content || post.title
+          };
+          setSelectedContent(modalData);
+          setIsModalOpen(true);
+        }
       };
-      setSelectedContent(modalData);
-      setIsModalOpen(true);
+
+      // Fallback for when metadata can't be loaded - assume landscape for watch page
+      media.onerror = () => {
+        navigate(`/video/${post.id}`);
+      };
+    } else {
+      // For non-video content, always navigate to watch page
+      navigate(`/video/${post.id}`);
     }
   };
 
