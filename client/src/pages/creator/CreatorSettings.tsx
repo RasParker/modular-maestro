@@ -720,8 +720,8 @@ export const CreatorSettings: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Instructions */}
-                      <div className="mt-16 space-y-2">
+                      {/* Instructions and Remove Buttons */}
+                      <div className="mt-16 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-muted-foreground">
                           <div>
                             <p className="font-medium text-foreground mb-1">Cover Photo</p>
@@ -732,6 +732,100 @@ export const CreatorSettings: React.FC = () => {
                             <p>Square image recommended. Max file size: 5MB</p>
                           </div>
                         </div>
+                        
+                        {/* Remove Photo Buttons */}
+                        {(coverPhotoUrl || profilePhotoUrl) && (
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            {coverPhotoUrl && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                  try {
+                                    // Remove from localStorage
+                                    localStorage.removeItem('coverPhotoUrl');
+                                    setCoverPhotoUrl(null);
+                                    
+                                    // Sync to database
+                                    await fetch('/api/users/sync-profile', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        coverPhotoUrl: null,
+                                      }),
+                                    });
+                                    
+                                    // Trigger reactivity
+                                    window.dispatchEvent(new CustomEvent('localStorageChange', {
+                                      detail: { keys: ['coverPhotoUrl'] }
+                                    }));
+                                    
+                                    toast({
+                                      title: "Cover photo removed",
+                                      description: "Your cover photo has been removed successfully.",
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to remove cover photo. Please try again.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Remove Cover Photo
+                              </Button>
+                            )}
+                            
+                            {profilePhotoUrl && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                  try {
+                                    // Remove from localStorage
+                                    localStorage.removeItem('profilePhotoUrl');
+                                    setProfilePhotoUrl(null);
+                                    
+                                    // Sync to database
+                                    await fetch('/api/users/sync-profile', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        profilePhotoUrl: null,
+                                      }),
+                                    });
+                                    
+                                    // Update user context
+                                    updateUser({ avatar: undefined } as any);
+                                    
+                                    // Trigger reactivity
+                                    window.dispatchEvent(new CustomEvent('localStorageChange', {
+                                      detail: { keys: ['profilePhotoUrl'] }
+                                    }));
+                                    
+                                    toast({
+                                      title: "Profile photo removed",
+                                      description: "Your profile photo has been removed successfully.",
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to remove profile photo. Please try again.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Remove Profile Photo
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 

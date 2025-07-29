@@ -1057,17 +1057,58 @@ export const CreatorProfile: React.FC = () => {
           {/* Cover Photo Upload Button - Only show for own profile and when no cover photo */}
           {isOwnProfile && !creator.cover && (
             <div className="absolute top-4 right-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
-                title="Add cover photo"
-                asChild
-              >
-                <Link to="/creator/settings?tab=profile">
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
+                  title="Add cover photo"
+                  onClick={() => document.getElementById('header-cover-upload')?.click()}
+                >
                   <Plus className="w-4 h-4" />
-                </Link>
-              </Button>
+                </Button>
+                <input
+                  id="header-cover-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const formData = new FormData();
+                        formData.append('coverPhoto', file);
+                        
+                        const response = await fetch('/api/upload/cover-photo', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        
+                        if (!response.ok) throw new Error('Upload failed');
+                        
+                        const result = await response.json();
+                        
+                        // Update localStorage and trigger re-render
+                        localStorage.setItem('coverPhotoUrl', result.url);
+                        window.dispatchEvent(new CustomEvent('localStorageChange', {
+                          detail: { keys: ['coverPhotoUrl'] }
+                        }));
+                        
+                        toast({
+                          title: "Cover photo updated",
+                          description: "Your cover photo has been updated successfully.",
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Upload failed",
+                          description: "Failed to upload cover photo. Please try again.",
+                          variant: "destructive",
+                        });
+                      }
+                    }
+                  }}
+                />
+              </div>
             </div>
           )}
           
