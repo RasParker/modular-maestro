@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,7 +60,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     if (text.length <= maxLength) {
       return { truncated: text, needsExpansion: false };
     }
-    
+
     const truncated = text.slice(0, maxLength).trim();
     return {
       truncated,
@@ -98,12 +97,12 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   return (
     <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
       <CardContent className="p-4">
-        {/* YouTube-style horizontal layout */}
-        <div className="flex gap-4">
-          {/* Thumbnail - 16:9 aspect ratio */}
-          <div className="flex-shrink-0">
+        {/* YouTube-style content layout */}
+        <div className="space-y-3">
+          {/* Media Preview - 16:9 aspect ratio YouTube-style thumbnail */}
+          <div className="relative">
             <div 
-              className="w-48 h-[108px] overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity relative"
+              className="w-full aspect-video overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewContent && onViewContent({
@@ -123,20 +122,14 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               }}
             >
               {mediaPreview ? (
-                <div className="w-full h-full relative">
+                <div className="w-full h-full">
                   {type === 'Video' ? (
-                    <>
-                      <video 
-                        src={mediaPreview}
-                        className="w-full h-full object-cover"
-                        muted
-                        preload="metadata"
-                      />
-                      {/* Video duration overlay */}
-                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 py-0.5 rounded">
-                        {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                      </div>
-                    </>
+                    <video 
+                      src={mediaPreview}
+                      className="w-full h-full object-cover"
+                      muted
+                      preload="metadata"
+                    />
                   ) : (
                     <img 
                       src={mediaPreview}
@@ -154,144 +147,163 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
                   <div className="text-center text-muted-foreground">
                     {getTypeIcon()}
-                    <p className="mt-1 text-xs">{type}</p>
+                    <p className="mt-2 text-xs">{type} Content</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Play button overlay for videos */}
+              {type === 'Video' && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-black/70 rounded-full flex items-center justify-center">
+                    <Video className="w-6 h-6 text-white" fill="white" />
+                  </div>
+                </div>
+              )}
+
+              {/* Duration overlay for videos */}
+              {type === 'Video' && (
+                <div className="absolute bottom-2 right-2">
+                  <div className="px-2 py-1 bg-black/80 rounded text-white text-xs font-medium">
+                    {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Content Details */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between">
-            {/* Top section - Title and description */}
-            <div className="space-y-2">
-              {/* Title/Caption */}
-              {(() => {
-                const { truncated, needsExpansion } = truncateText(caption, 120);
-                return (
-                  <div className="font-medium text-foreground text-base leading-tight">
-                    {expandedCaption ? caption : (
-                      <>
-                        {truncated}
-                        {needsExpansion && !expandedCaption && (
-                          <>
-                            {'... '}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedCaption(true);
-                              }}
-                              className="text-primary hover:text-primary/80 font-medium text-sm"
-                            >
-                              more
-                            </button>
-                          </>
-                        )}
-                      </>
-                    )}
-                    {expandedCaption && needsExpansion && (
-                      <>
-                        {' '}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedCaption(false);
-                          }}
-                          className="text-primary hover:text-primary/80 font-medium text-sm"
-                        >
-                          less
-                        </button>
-                      </>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* Metadata row */}
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
-                    {tier}
-                  </Badge>
-                  <Badge variant={getStatusColor()} className="text-xs px-2 py-0 h-5">
-                    {status}
-                  </Badge>
-                </div>
-                <span className="text-xs">{date}</span>
+          {/* Content details below thumbnail - YouTube style */}
+          <div className="space-y-2">
+            {/* Title/Caption with tier badge */}
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                {(() => {
+                  const { truncated, needsExpansion } = truncateText(caption);
+                  return (
+                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                      {expandedCaption ? caption : (
+                        <>
+                          {truncated}
+                          {needsExpansion && !expandedCaption && (
+                            <>
+                              {'... '}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedCaption(true);
+                                }}
+                                className="text-primary hover:text-primary/80 font-medium"
+                              >
+                                more
+                              </button>
+                            </>
+                          )}
+                        </>
+                      )}
+                      {expandedCaption && needsExpansion && (
+                        <>
+                          {' '}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedCaption(false);
+                            }}
+                            className="text-primary hover:text-primary/80 font-medium"
+                          >
+                            less
+                          </button>
+                        </>
+                      )}
+                    </h3>
+                  );
+                })()}
               </div>
-
-              {/* Stats or Release Info */}
-              {status === 'Published' ? (
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{views.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Heart className="w-4 h-4" />
-                    <span>{likes.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MessageCircle className="w-4 h-4" />
-                    <span>{comments.toLocaleString()}</span>
-                  </div>
-                </div>
-              ) : status === 'Scheduled' && scheduledFor ? (
-                <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 font-medium">
-                  <Timer className="w-4 h-4" />
-                  <span>
-                    {(() => {
-                      const releaseDate = new Date(scheduledFor);
-                      const now = new Date();
-                      const isToday = releaseDate.toDateString() === now.toDateString();
-                      const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
-                      
-                      if (isToday) {
-                        return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                      } else if (isTomorrow) {
-                        return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
-                      } else {
-                        return releaseDate.toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                          hour12: true
-                        });
-                      }
-                    })()}
-                  </span>
-                </div>
-              ) : null}
+              <Badge variant="outline" className="text-xs px-2 py-0 h-5 flex-shrink-0">
+                {tier}
+              </Badge>
             </div>
 
-            {/* Action Buttons - bottom right */}
-            <div className="flex items-center justify-end gap-2 mt-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(id);
-                }}
-                className="h-8 px-3 text-sm"
-              >
-                <Edit3 className="w-4 h-4 mr-1" />
-                Edit
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(id);
-                }}
-                className="h-8 px-3 text-sm text-destructive hover:text-destructive"
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                Delete
-              </Button>
+            {/* Meta information and stats */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span>{date}</span>
+                {status === 'Published' && (
+                  <>
+                    <span>•</span>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        <span>{views}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Heart className="w-3 h-3" />
+                        <span>{likes}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageCircle className="w-3 h-3" />
+                        <span>{comments}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+                {status === 'Scheduled' && scheduledFor && (
+                  <>
+                    <span>•</span>
+                    <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                      <Timer className="w-3 h-3" />
+                      <span>
+                        {(() => {
+                          const releaseDate = new Date(scheduledFor);
+                          const now = new Date();
+                          const isToday = releaseDate.toDateString() === now.toDateString();
+                          const isTomorrow = releaseDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
+
+                          if (isToday) {
+                            return `Today ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                          } else if (isTomorrow) {
+                            return `Tomorrow ${releaseDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+                          } else {
+                            return releaseDate.toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            });
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(id);
+                  }}
+                  className="h-7 px-2 text-xs"
+                >
+                  <Edit3 className="w-3 h-3" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(id);
+                  }}
+                  className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
