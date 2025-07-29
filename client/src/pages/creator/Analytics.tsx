@@ -168,7 +168,7 @@ export const Analytics: React.FC = () => {
                   <p className="text-2xl font-bold text-foreground">{analytics.postsThisMonth}</p>
                   <p className="text-xs text-success">+{Math.round((analytics.postsThisMonth / Math.max(analytics.postsThisMonth - 2, 1)) * 100 - 100)}% vs last month</p>
                 </div>
-                <Eye className="h-8 w-8 text-primary" />
+                <FileText className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>

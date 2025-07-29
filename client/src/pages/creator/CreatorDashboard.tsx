@@ -12,17 +12,18 @@ import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { 
-  DollarSign, 
-  Users, 
-  TrendingUp, 
-  Calendar, 
   BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Plus,
+  Calendar,
+  FileText,
   Settings,
+  Heart,
   User,
   Crown,
-  FileText,
   Eye,
-  Heart,
   MessageSquare,
   Image,
   Video,
@@ -79,13 +80,13 @@ export const CreatorDashboard: React.FC = () => {
 
   const fetchUserPosts = async () => {
     if (!user) return;
-    
+
     try {
       const response = await fetch(`/api/creator/${user.id}/content`);
       if (response.ok) {
         const posts = await response.json();
         console.log('Fetched user content:', posts);
-        
+
 
         // Filter for scheduled content - check for both status and scheduled_for date
         const scheduled = posts.filter((post: any) => 
@@ -252,7 +253,7 @@ export const CreatorDashboard: React.FC = () => {
                     <p className="text-xl sm:text-2xl font-bold text-foreground">{analytics.engagementRate}%</p>
                     <p className="text-xs text-success">Above average</p>
                   </div>
-                  <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                  <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -332,7 +333,7 @@ export const CreatorDashboard: React.FC = () => {
                                       const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
                                         ? content.media_urls[0] 
                                         : `/uploads/${content.media_urls[0]}`;
-                                      
+
                                       return content.media_type === 'video' ? (
                                         <video
                                           src={mediaUrl}
@@ -432,7 +433,7 @@ export const CreatorDashboard: React.FC = () => {
                                   const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
                                     ? content.media_urls[0] 
                                     : `/uploads/${content.media_urls[0]}`;
-                                  
+
                                   return content.media_type === 'video' ? (
                                     <video
                                       src={mediaUrl}
@@ -559,7 +560,7 @@ export const CreatorDashboard: React.FC = () => {
                                 const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
                                   ? post.media_urls[0] 
                                   : `/uploads/${post.media_urls[0]}`;
-                                
+
                                 return post.media_type === 'video' ? (
                                   <video
                                     src={mediaUrl}
@@ -643,7 +644,7 @@ export const CreatorDashboard: React.FC = () => {
                                   const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
                                     ? post.media_urls[0] 
                                     : `/uploads/${post.media_urls[0]}`;
-                                  
+
                                   return post.media_type === 'video' ? (
                                     <video
                                       src={mediaUrl}

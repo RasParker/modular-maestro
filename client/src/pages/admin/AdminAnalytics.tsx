@@ -4,7 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ArrowLeft, BarChart3, TrendingUp, Users, DollarSign, Crown, Activity } from 'lucide-react';
+import { 
+  Shield, 
+  Users, 
+  DollarSign, 
+  AlertTriangle, 
+  TrendingUp, 
+  FileText,
+  Settings,
+  BarChart3,
+  Crown,
+  Flag,
+  Activity,
+  Eye
+} from 'lucide-react';
 
 export const AdminAnalytics: React.FC = () => {
   return (
