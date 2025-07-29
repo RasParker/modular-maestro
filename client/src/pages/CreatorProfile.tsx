@@ -1067,7 +1067,7 @@ export const CreatorProfile: React.FC = () => {
             <div className="hidden md:flex w-full items-end justify-between">
               <div className="flex-1 pb-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                  <h1 className="text-xl font-semibold text-foreground">{creator?.display_name || creator?.username}</h1>
                   {creator.verified && (
                     <Badge variant="secondary" className="bg-accent text-accent-foreground">
                       <Star className="w-3 h-3 mr-1" />
@@ -1076,7 +1076,7 @@ export const CreatorProfile: React.FC = () => {
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-muted-foreground">@{creator.username}</p>
+                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
                   <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -1086,14 +1086,15 @@ export const CreatorProfile: React.FC = () => {
               </div>
               {isOwnProfile ? (
                 <div className="flex items-center gap-2 pb-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleChatClick}
+                    disabled={initiateChatMutation.isPending}
+                    className="h-10 w-10 p-0 hover:bg-accent/20 transition-colors"
+                    title="Start conversation"
+                  >
+                    <MessageSquare className="w-5 h-5" />
                   </Button>
                 </div>
               ) : (
@@ -1115,7 +1116,7 @@ export const CreatorProfile: React.FC = () => {
             {/* Mobile Layout - Action buttons below profile info */}
             <div className="md:hidden flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{creator?.display_name || creator?.username}</h1>
+                <h1 className="text-xl font-semibold text-foreground">{creator?.display_name || creator?.username}</h1>
                 {creator.verified && (
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     <Star className="w-3 h-3 mr-1" />
@@ -1136,7 +1137,7 @@ export const CreatorProfile: React.FC = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-muted-foreground">@{creator.username}</p>
+                <p className="text-sm text-muted-foreground">@{creator.username}</p>
                 <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -1192,6 +1193,34 @@ export const CreatorProfile: React.FC = () => {
             </Button>
           )}
         </div>
+        
+        {/* Desktop Action Buttons */}
+        {isOwnProfile && (
+          <div className="hidden md:flex items-center gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Edit Profile"
+              asChild
+            >
+              <Link to="/creator/settings">
+                <Settings className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-10 w-10 p-0"
+              title="Create Post"
+              asChild
+            >
+              <Link to="/creator/upload">
+                <Plus className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Compact Subscription Tiers - Show for profiles with tiers (Mobile + Desktop) */}
