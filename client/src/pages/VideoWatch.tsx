@@ -379,7 +379,8 @@ export const VideoWatch: React.FC = () => {
                             <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                               <span className="truncate mr-2">{video.creator_display_name || video.creator_username}</span>
                               <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <Eye className="w-3 h-3" />
+                                <span>{Math.floor(Math.random() * 500) + 100}K</span>
                                 <span>•</span>
                                 <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
                               </div>
@@ -581,7 +582,8 @@ export const VideoWatch: React.FC = () => {
                             <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                               <span className="truncate mr-2">{video.creator_display_name || video.creator_username}</span>
                               <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                                <span>{Math.floor(Math.random() * 500) + 100}K views</span>
+                                <Eye className="w-3 h-3" />
+                                <span>{Math.floor(Math.random() * 500) + 100}K</span>
                                 <span>•</span>
                                 <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
                               </div>
