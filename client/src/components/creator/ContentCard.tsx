@@ -154,8 +154,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
               
 
-              {/* Duration overlay for videos */}
-              {type === 'Video' && (
+              {/* Duration overlay for videos - Only show for Published content */}
+              {type === 'Video' && status === 'Published' && (
                 <div className="absolute bottom-1 right-1">
                   <div className="px-1 py-0.5 bg-black/80 rounded text-white text-xs font-medium">
                     {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
@@ -212,18 +212,18 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
 
             {/* Meta information */}
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+              <Badge variant="outline" className="text-xs px-2 py-0 h-5 flex-shrink-0">
                 {tier}
               </Badge>
-              <span>•</span>
-              <span>{date}</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="truncate">{date}</span>
               {status === 'Scheduled' && scheduledFor && (
                 <>
-                  <span>•</span>
-                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                  <span className="hidden sm:inline">•</span>
+                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium flex-shrink-0">
                     <Timer className="w-3 h-3" />
-                    <span>
+                    <span className="text-xs truncate">
                       {(() => {
                         const releaseDate = new Date(scheduledFor);
                         const now = new Date();
@@ -251,19 +251,19 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
 
             {/* Stats and Actions */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               {/* Stats */}
               {status === 'Published' && (
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground min-w-0 flex-1">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <Eye className="w-3 h-3" />
                     <span>{views}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <Heart className="w-3 h-3" />
                     <span>{likes}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <MessageCircle className="w-3 h-3" />
                     <span>{comments}</span>
                   </div>
@@ -271,7 +271,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1 ml-auto">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
