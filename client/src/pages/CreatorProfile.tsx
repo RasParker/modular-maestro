@@ -1041,7 +1041,7 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Creator Header */}
       <div className="relative">
-        <div className="h-48 md:h-64 overflow-hidden">
+        <div className="h-48 md:h-64 overflow-hidden relative">
           {creator.cover ? (
             <img 
               src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`} 
@@ -1050,18 +1050,55 @@ export const CreatorProfile: React.FC = () => {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-r from-primary/20 to-accent/20 flex items-center justify-center">
-              <span className="text-muted-foreground">No cover photo</span>
+              <span className="text-muted-foreground hidden md:block">No cover photo</span>
             </div>
           )}
+          
+          {/* Cover Photo Upload Button - Only show for own profile */}
+          {isOwnProfile && (
+            <div className="absolute top-4 right-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
+                title="Change cover photo"
+                asChild
+              >
+                <Link to="/creator/settings?tab=profile">
+                  <Plus className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
+          
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-3">
-            <Avatar className="w-24 h-24 border-4 border-background">
-              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
-              <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-24 h-24 border-4 border-background">
+                <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              
+              {/* Profile Photo Upload Button - Only show for own profile */}
+              {isOwnProfile && (
+                <div className="absolute -bottom-1 -right-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 w-6 p-0 bg-primary rounded-full border-2 border-background hover:bg-primary/90 transition-colors"
+                    title="Change profile photo"
+                    asChild
+                  >
+                    <Link to="/creator/settings?tab=profile">
+                      <Plus className="w-3 h-3 text-primary-foreground" />
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
 
             {/* Desktop Layout - Action buttons on the right */}
             <div className="hidden md:flex w-full items-end justify-between">
