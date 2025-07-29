@@ -43,14 +43,8 @@ export const TierDetailsModal: React.FC<TierDetailsModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="relative">
-          <button
-            onClick={onClose}
-            className="absolute right-0 top-0 p-1 hover:bg-muted rounded-full transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          <DialogTitle className="text-left pr-8">
+        <DialogHeader>
+          <DialogTitle className="text-left">
             Subscribe to {creatorName}
           </DialogTitle>
         </DialogHeader>
@@ -58,12 +52,14 @@ export const TierDetailsModal: React.FC<TierDetailsModalProps> = ({
         <div className="space-y-6">
           {/* Tier Header */}
           <div className="text-center space-y-3">
-            <div className="relative inline-block">
+            <div className="space-y-2">
+              <div className="flex justify-center">
+                <Badge variant="secondary" className="text-xs">
+                  <Star className="h-3 w-3 mr-1" />
+                  Popular
+                </Badge>
+              </div>
               <h2 className="text-2xl font-bold uppercase">{tier.name}</h2>
-              <Badge variant="secondary" className="absolute -top-2 -right-12 text-xs">
-                <Star className="h-3 w-3 mr-1" />
-                Popular
-              </Badge>
             </div>
             <div className="text-3xl font-bold text-accent">
               GHS {tier.price}
