@@ -851,7 +851,7 @@ export const CreatorProfile: React.FC = () => {
         // Navigate to messages page
         window.location.href = '/fan/messages';
       }, 500);
-    },```text
+    },
     onError: (error) => {
       toast({
         title: "Error",
