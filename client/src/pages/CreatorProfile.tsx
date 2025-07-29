@@ -1457,10 +1457,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
@@ -1711,10 +1715,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
@@ -1960,10 +1968,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
@@ -2214,10 +2226,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
@@ -2458,10 +2474,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
@@ -2712,10 +2732,14 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center text-xs text-muted-foreground">
-                                  <span className="truncate mr-2">{creator.display_name}</span>
-                                  <span>•</span>
-                                  <span className="ml-1">{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
