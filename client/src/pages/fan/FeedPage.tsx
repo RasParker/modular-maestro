@@ -778,8 +778,8 @@ export const FeedPage: React.FC = () => {
               {feed.map((post) => (
                 <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                   {/* Thumbnail */}
-                <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg"></div>
-                  {post.thumbnail ? (
+                  <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg">
+                    {post.thumbnail ? (
                     post.type === 'video' ? (
                       <video
                         src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
@@ -837,13 +837,13 @@ export const FeedPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Content type badge */}
-                  <div className="absolute top-2 left-2">
-                    <Badge variant={getTierColor(post.tier)} className="text-xs">
-                      {post.tier === 'public' ? 'Free' : post.tier}
-                    </Badge>
+                    {/* Content type badge */}
+                    <div className="absolute top-2 left-2">
+                      <Badge variant={getTierColor(post.tier)} className="text-xs">
+                        {post.tier === 'public' ? 'Free' : post.tier}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
 
                 {/* YouTube-style content below thumbnail */}
                 <div className="flex gap-3">

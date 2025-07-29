@@ -401,7 +401,7 @@ export const VideoWatch: React.FC = () => {
                       onClick={() => handleVideoCardClick(video.id)}
                     >
                       <div className="py-3">
-                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg"></div>
+                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg">
                           {video.media_type === 'video' ? (
                             <video
                               src={videoFullUrl}
@@ -662,7 +662,7 @@ export const VideoWatch: React.FC = () => {
                       onClick={() => handleVideoCardClick(video.id)}
                     >
                       <div className="p-3">
-                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-2 rounded-lg"></div>
+                        <div className="relative w-full aspect-video bg-black overflow-hidden mb-2 rounded-lg">
                           {video.media_type === 'video' ? (
                             <video
                               src={videoFullUrl}
