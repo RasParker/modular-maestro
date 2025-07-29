@@ -854,9 +854,7 @@ export const CreatorProfile: React.FC = () => {
     },
     onError: (error) => {
       toast({
-        title:Component will have the stats/action icons removed from the feed cards.
-```typescript
- "Error",
+        title: "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
       });
@@ -900,9 +898,10 @@ export const CreatorProfile: React.FC = () => {
           }
           return;
         }
-      } catch (error) {
-        console.error('Error checking subscription for messaging:', error);
       }
+    } catch (error) {
+      console.error('Error in handleChatClick:', error);
+    }
 
     console.log('❌ No valid subscription found for messaging');
     toast({
