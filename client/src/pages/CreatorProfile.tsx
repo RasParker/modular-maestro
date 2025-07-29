@@ -1104,7 +1104,7 @@ export const CreatorProfile: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile Layout - Action buttons below profile info */}
+            {/* Mobile Layout - Clean profile info only */}
             <div className="md:hidden flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-xl font-semibold text-foreground">{creator?.display_name || creator?.username}</h1>
@@ -1114,7 +1114,6 @@ export const CreatorProfile: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-                {/* Chat button moved to below bio section */}
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">@{creator.username}</p>
@@ -1124,75 +1123,6 @@ export const CreatorProfile: React.FC = () => {
                 <Users className="w-4 h-4" />
                 {(creator?.total_subscribers || 0).toLocaleString()} subscribers
               </div>
-              {isOwnProfile ? (
-                <div className="flex items-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/settings">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/creator/upload">Create Post</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
-                    title="Start conversation"
-                    onClick={handleChatClick}
-                    disabled={initiateChatMutation.isPending}
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
-                    title="Like creator"
-                    onClick={() => {
-                      toast({
-                        title: "Feature coming soon",
-                        description: "Like functionality will be available soon.",
-                      });
-                    }}
-                  >
-                    <Heart className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
-                    title="Add to favorites"
-                    onClick={() => {
-                      toast({
-                        title: "Feature coming soon",
-                        description: "Favorite functionality will be available soon.",
-                      });
-                    }}
-                  >
-                    <Star className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
-                    title="Share profile"
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast({
-                        title: "Profile link copied",
-                        description: "Creator profile link has been copied to your clipboard.",
-                      });
-                    }}
-                  >
-                    <Share className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1230,9 +1160,9 @@ export const CreatorProfile: React.FC = () => {
           )}
         </div>
         
-        {/* Desktop Action Buttons */}
+        {/* Action Buttons - Both Desktop and Mobile */}
         {isOwnProfile ? (
-          <div className="hidden md:flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-2 mt-4">
             <Button 
               variant="outline" 
               size="sm" 
@@ -1257,7 +1187,7 @@ export const CreatorProfile: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="hidden md:flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-2 mt-4">
             <Button 
               variant="outline" 
               size="sm" 
