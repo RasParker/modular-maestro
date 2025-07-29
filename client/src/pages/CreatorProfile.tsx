@@ -849,8 +849,7 @@ export const CreatorProfile: React.FC = () => {
         // Invalidate conversations query to refresh the list
         queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
         // Navigate to messages page
-        window.location.```text
-href = '/fan/messages';
+        window.location.href = '/fan/messages';
       }, 500);
     },
     onError: (error) => {
@@ -1601,7 +1600,6 @@ href = '/fan/messages';
                                         </div>`;
                                       }
                                     }}
-```javascript
                                   />
                                 ) : (
                                   <img 
