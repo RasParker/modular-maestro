@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
-import { ArrowLeft, TrendingUp, Users, DollarSign, Eye, Heart } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, DollarSign, Eye, Heart, FileText } from 'lucide-react';
 
 export const Analytics: React.FC = () => {
   const { user } = useAuth();
