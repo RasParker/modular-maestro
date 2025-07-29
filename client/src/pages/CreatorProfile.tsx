@@ -1047,7 +1047,7 @@ export const CreatorProfile: React.FC = () => {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="max-w-4xl mx-auto flex items-end gap-4">
+          <div className="max-w-4xl mx-auto flex items-end gap-3">
             <Avatar className="w-24 h-24 border-4 border-background">
               <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
               <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
@@ -1153,7 +1153,7 @@ export const CreatorProfile: React.FC = () => {
 
       {/* Bio Section */}
       <div className="max-w-4xl mx-auto px-6 py-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             {(() => {
               const bioText = creator.bio || (isOwnProfile ? 'Add a bio to tell people about yourself.' : 'No bio available.');
@@ -1194,13 +1194,13 @@ export const CreatorProfile: React.FC = () => {
                 className="p-4 md:p-6 cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setIsSubscriptionTiersExpanded(true)}
               >
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-base md:text-lg font-semibold">SUBSCRIBE NOW</h3>
                       <ChevronDown className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+                    <div className="flex items-center gap-3 md:gap-3 flex-wrap">
                       {creator.tiers.slice(0, 3).map((tier: any, index: number) => (
                         <div key={tier.id} className="flex items-center gap-1">
                           <span className="text-sm md:text-base font-medium text-accent whitespace-nowrap">GHS {tier.price}</span>
@@ -1255,7 +1255,7 @@ export const CreatorProfile: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-3">
                   {creator.tiers.map((tier: any, index: number) => (
                     <div 
                       key={tier.id} 
@@ -1427,12 +1427,14 @@ export const CreatorProfile: React.FC = () => {
                             }
                           })()}
 
-                          {/* Content type overlay */}
-                          <div className="absolute top-2 left-2">
-                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                              {getMediaOverlayIcon(post.media_type)}
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* Duration overlay for videos */}
                           {post.media_type === 'video' && (
@@ -1463,13 +1465,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
@@ -1696,12 +1698,14 @@ export const CreatorProfile: React.FC = () => {
                               </Badge>
                             </div>
 
-                            {/* Content type overlay */}
-                            <div className="absolute top-4 right-4">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                                {getMediaOverlayIcon(post.media_type)}
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
 
                           {/* Creator Info and Content - Fan Feed Single View Style */}
@@ -1721,13 +1725,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
@@ -1938,12 +1942,14 @@ export const CreatorProfile: React.FC = () => {
                             }
                           })()}
 
-                          {/* Content type overlay */}
-                          <div className="absolute top-2 left-2">
-                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                              {getMediaOverlayIcon(post.media_type)}
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* Duration overlay for videos */}
                           {post.media_type === 'video' && (
@@ -1974,13 +1980,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
@@ -2207,12 +2213,14 @@ export const CreatorProfile: React.FC = () => {
                               </Badge>
                             </div>
 
-                            {/* Content type overlay */}
-                            <div className="absolute top-4 right-4">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                                {getMediaOverlayIcon(post.media_type)}
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
 
                           {/* Creator Info and Content - Fan Feed Single View Style */}
@@ -2232,13 +2240,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
@@ -2444,12 +2452,14 @@ export const CreatorProfile: React.FC = () => {
                             }
                           })()}
 
-                          {/* Content type overlay */}
-                          <div className="absolute top-2 left-2">
-                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                              {getMediaOverlayIcon(post.media_type)}
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* Duration overlay for videos */}
                           {post.media_type === 'video' && (
@@ -2480,13 +2490,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
@@ -2713,12 +2723,14 @@ export const CreatorProfile: React.FC = () => {
                               </Badge>
                             </div>
 
-                            {/* Content type overlay */}
-                            <div className="absolute top-4 right-4">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
-                                {getMediaOverlayIcon(post.media_type)}
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
 
                           {/* Creator Info and Content - Fan Feed Single View Style */}
@@ -2738,13 +2750,13 @@ export const CreatorProfile: React.FC = () => {
                                     <Eye className="w-3 h-3" />
                                     <span>{Math.floor(Math.random() * 2000) + 100}</span>
                                     <span>•</span>
-                                    <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
                                   </div>
                                 </div>
 
                                 {/* Stats/action icons row with edit/delete buttons */}
                                 <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3">
                                     {/* Like button */}
                                     <div className="flex items-center gap-1">
                                       <Button 
