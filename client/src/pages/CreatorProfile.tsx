@@ -854,7 +854,6 @@ export const CreatorProfile: React.FC = () => {
     },
     onError: (error) => {
       toast({
-```text
         title: "Error",
         description: "Failed to start conversation. Please try again.",
         variant: "destructive"
@@ -1457,8 +1456,6 @@ export const CreatorProfile: React.FC = () => {
                               <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
-                              
-</previous_generation>```text
 
                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                                   <div className="flex items-center">
@@ -2054,7 +2051,20 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                      </CardContent>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: YouTube-style 16:9 card layout */}
+                <div className="hidden md:block">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {getFilteredPosts().map((post) => (
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="text-sm text-foreground">{post.content || post.title || 'Untitled Post'}</div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </div>
@@ -2297,6 +2307,19 @@ export const CreatorProfile: React.FC = () => {
                               
                             </div>
                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: YouTube-style 16:9 card layout */}
+                <div className="hidden md:block">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {getFilteredPosts().map((post) => (
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          <div className="text-sm text-foreground">{post.content || post.title || 'Untitled Post'}</div>
                         </CardContent>
                       </Card>
                     ))}
