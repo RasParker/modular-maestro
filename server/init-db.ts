@@ -1,4 +1,7 @@
+
 import { db } from './db';
+import fs from 'fs';
+import path from 'path';
 
 export async function initializeDatabase() {
   console.log('Initializing database tables...');
@@ -15,7 +18,20 @@ export async function initializeDatabase() {
     
     console.log('Database connection test successful:', result);
     
-    console.log('Database already configured with PostgreSQL schema');
+    // Read and execute the SQL schema file
+    const sqlFilePath = path.join(__dirname, 'create-tables.sql');
+    if (fs.existsSync(sqlFilePath)) {
+      console.log('Reading SQL schema file...');
+      const sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
+      
+      console.log('Executing database schema...');
+      await db.execute(sqlContent);
+      
+      console.log('Database schema created successfully');
+    } else {
+      console.warn('SQL schema file not found, skipping table creation');
+    }
+    
     console.log('Database initialization completed successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
