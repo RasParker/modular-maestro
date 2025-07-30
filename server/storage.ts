@@ -422,8 +422,8 @@ export class DatabaseStorage implements IStorage {
           name: tier.name,
           description: tier.description,
           price: tier.price,
-          currency: tier.currency,
-          benefits: tier.benefits as string[] || [],
+          currency: tier.currency || 'GHS',
+          benefits: tier.benefits || [],
         })
         .returning();
       console.log('Subscription tier created successfully:', newTier);
