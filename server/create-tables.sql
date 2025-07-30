@@ -37,6 +37,46 @@ CREATE TABLE IF NOT EXISTS subscription_tiers (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Create users table first (required by other tables)
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  avatar TEXT,
+  role VARCHAR(50) DEFAULT 'fan' NOT NULL,
+  status VARCHAR(50) DEFAULT 'active' NOT NULL,
+  display_name TEXT,
+  bio TEXT,
+  cover_image TEXT,
+  social_links JSONB,
+  verified BOOLEAN DEFAULT false NOT NULL,
+  total_subscribers INTEGER DEFAULT 0 NOT NULL,
+  total_earnings DECIMAL(10,2) DEFAULT 0.00 NOT NULL,
+  commission_rate DECIMAL(5,2) DEFAULT 0.15 NOT NULL,
+  comments_enabled BOOLEAN DEFAULT true NOT NULL,
+  profile_discoverable BOOLEAN DEFAULT true NOT NULL,
+  activity_status_visible BOOLEAN DEFAULT true NOT NULL,
+  is_online BOOLEAN DEFAULT false NOT NULL,
+  last_seen TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+);
+
+-- Create subscription_tiers table (required by other tables)
+CREATE TABLE IF NOT EXISTS subscription_tiers (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'GHS' NOT NULL,
+  benefits JSONB DEFAULT '[]'::jsonb NOT NULL,
+  is_active BOOLEAN DEFAULT true NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+);
+
 -- Create posts table
 CREATE TABLE IF NOT EXISTS posts (
   id SERIAL PRIMARY KEY,
