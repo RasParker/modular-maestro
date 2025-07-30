@@ -172,7 +172,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               {(() => {
                 const { truncated, needsExpansion } = truncateText(caption, 80);
                 return (
-                  <h3 className="text-sm font-medium text-foreground leading-tight line-clamp-2 break-words overflow-hidden">
+                  <h3 className="text-sm font-medium text-foreground leading-tight break-words overflow-hidden md:line-clamp-2 line-clamp-1">
                     {expandedCaption ? caption : (
                       <>
                         {truncated}

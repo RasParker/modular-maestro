@@ -13,7 +13,7 @@ import { NotificationService } from './notification-service';
 import type { InsertUser, InsertPost, InsertSubscription, InsertSubscriptionTier, InsertComment, InsertNotification, User } from '@shared/schema';
 import { insertUserSchema, insertPostSchema, insertSubscriptionSchema, insertSubscriptionTierSchema, insertCommentSchema, insertReportSchema, insertCreatorPayoutSettingsSchema } from "@shared/schema";
 import { db, pool } from './db';
-import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable, conversations as conversationsTable, messages as messagesTable } from '../shared/schema';
+import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, creator_likes, creator_favorites, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable, conversations as conversationsTable, messages as messagesTable } from '../shared/schema';
 import { eq, desc, and, gte, lte, count, sum, sql, inArray, asc, like, or, isNull, gt, lt } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
@@ -2585,6 +2585,164 @@ app.post('/api/conversations', async (req, res) => {
     } catch (error) {
       console.error('Error sending test subscription notification:', error);
       res.status(500).json({ error: "Failed to send test subscription notification" });
+    }
+  });
+
+  // Creator Like Routes
+  app.post("/api/creators/:creatorId/like", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const { fanId } = req.body;
+
+      if (!fanId) {
+        return res.status(400).json({ error: "fanId is required" });
+      }
+
+      const existingLike = await db
+        .select()
+        .from(creator_likes)
+        .where(and(
+          eq(creator_likes.fan_id, fanId),
+          eq(creator_likes.creator_id, creatorId)
+        ))
+        .limit(1);
+
+      if (existingLike.length > 0) {
+        return res.status(400).json({ error: "Creator already liked" });
+      }
+
+      await db.insert(creator_likes).values({
+        fan_id: fanId,
+        creator_id: creatorId,
+      });
+
+      res.json({ success: true, message: "Creator liked successfully" });
+    } catch (error) {
+      console.error('Error liking creator:', error);
+      res.status(500).json({ error: "Failed to like creator" });
+    }
+  });
+
+  app.delete("/api/creators/:creatorId/like", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const { fanId } = req.body;
+
+      if (!fanId) {
+        return res.status(400).json({ error: "fanId is required" });
+      }
+
+      await db
+        .delete(creator_likes)
+        .where(and(
+          eq(creator_likes.fan_id, fanId),
+          eq(creator_likes.creator_id, creatorId)
+        ));
+
+      res.json({ success: true, message: "Creator unliked successfully" });
+    } catch (error) {
+      console.error('Error unliking creator:', error);
+      res.status(500).json({ error: "Failed to unlike creator" });
+    }
+  });
+
+  app.get("/api/creators/:creatorId/like/:fanId", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const fanId = parseInt(req.params.fanId);
+
+      const like = await db
+        .select()
+        .from(creator_likes)
+        .where(and(
+          eq(creator_likes.fan_id, fanId),
+          eq(creator_likes.creator_id, creatorId)
+        ))
+        .limit(1);
+
+      res.json({ liked: like.length > 0 });
+    } catch (error) {
+      console.error('Error checking creator like status:', error);
+      res.status(500).json({ error: "Failed to check like status" });
+    }
+  });
+
+  // Creator Favorite Routes
+  app.post("/api/creators/:creatorId/favorite", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const { fanId } = req.body;
+
+      if (!fanId) {
+        return res.status(400).json({ error: "fanId is required" });
+      }
+
+      const existingFavorite = await db
+        .select()
+        .from(creator_favorites)
+        .where(and(
+          eq(creator_favorites.fan_id, fanId),
+          eq(creator_favorites.creator_id, creatorId)
+        ))
+        .limit(1);
+
+      if (existingFavorite.length > 0) {
+        return res.status(400).json({ error: "Creator already favorited" });
+      }
+
+      await db.insert(creator_favorites).values({
+        fan_id: fanId,
+        creator_id: creatorId,
+      });
+
+      res.json({ success: true, message: "Creator added to favorites successfully" });
+    } catch (error) {
+      console.error('Error favoriting creator:', error);
+      res.status(500).json({ error: "Failed to favorite creator" });
+    }
+  });
+
+  app.delete("/api/creators/:creatorId/favorite", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const { fanId } = req.body;
+
+      if (!fanId) {
+        return res.status(400).json({ error: "fanId is required" });
+      }
+
+      await db
+        .delete(creator_favorites)
+        .where(and(
+          eq(creator_favorites.fan_id, fanId),
+          eq(creator_favorites.creator_id, creatorId)
+        ));
+
+      res.json({ success: true, message: "Creator removed from favorites successfully" });
+    } catch (error) {
+      console.error('Error unfavoriting creator:', error);
+      res.status(500).json({ error: "Failed to unfavorite creator" });
+    }
+  });
+
+  app.get("/api/creators/:creatorId/favorite/:fanId", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const fanId = parseInt(req.params.fanId);
+
+      const favorite = await db
+        .select()
+        .from(creator_favorites)
+        .where(and(
+          eq(creator_favorites.fan_id, fanId),
+          eq(creator_favorites.creator_id, creatorId)
+        ))
+        .limit(1);
+
+      res.json({ favorited: favorite.length > 0 });
+    } catch (error) {
+      console.error('Error checking creator favorite status:', error);
+      res.status(500).json({ error: "Failed to check favorite status" });
     }
   });
 

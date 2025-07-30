@@ -179,6 +179,10 @@ export const CreatorProfile: React.FC = () => {
   const [isSubscriptionTiersExpanded, setIsSubscriptionTiersExpanded] = useState(false);
   const [tierDetailsModalOpen, setTierDetailsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [isCreatorLiked, setIsCreatorLiked] = useState(false);
+  const [isCreatorFavorited, setIsCreatorFavorited] = useState(false);
+  const [likingCreator, setLikingCreator] = useState(false);
+  const [favoritingCreator, setFavoritingCreator] = useState(false);
 
   // Define isOwnProfile early to avoid initialization issues
   const isOwnProfile = user?.username === username;
@@ -431,6 +435,37 @@ export const CreatorProfile: React.FC = () => {
     return () => {
       window.removeEventListener('subscriptionStatusChange', handleSubscriptionChange as EventListener);
     };
+  }, [user, creator, isOwnProfile]);
+
+  // Check creator like and favorite status
+  useEffect(() => {
+    const checkCreatorInteractions = async () => {
+      if (!user || !creator || isOwnProfile) {
+        setIsCreatorLiked(false);
+        setIsCreatorFavorited(false);
+        return;
+      }
+
+      try {
+        // Check like status
+        const likeResponse = await fetch(`/api/creators/${creator.id}/like/${user.id}`);
+        if (likeResponse.ok) {
+          const likeData = await likeResponse.json();
+          setIsCreatorLiked(likeData.liked);
+        }
+
+        // Check favorite status
+        const favoriteResponse = await fetch(`/api/creators/${creator.id}/favorite/${user.id}`);
+        if (favoriteResponse.ok) {
+          const favoriteData = await favoriteResponse.json();
+          setIsCreatorFavorited(favoriteData.favorited);
+        }
+      } catch (error) {
+        console.error('Error checking creator interactions:', error);
+      }
+    };
+
+    checkCreatorInteractions();
   }, [user, creator, isOwnProfile]);
 
   useEffect(() => {
@@ -923,6 +958,134 @@ export const CreatorProfile: React.FC = () => {
     document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleCreatorLike = async () => {
+    if (!user || !creator || isOwnProfile) {
+      return;
+    }
+
+    if (user.role !== 'fan') {
+      toast({
+        title: "Access Restricted",
+        description: "Only fans can like creators.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLikingCreator(true);
+
+    try {
+      if (isCreatorLiked) {
+        // Unlike creator
+        const response = await fetch(`/api/creators/${creator.id}/like`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fanId: user.id }),
+        });
+
+        if (response.ok) {
+          setIsCreatorLiked(false);
+          toast({
+            title: "Unliked",
+            description: `You no longer like ${creator.display_name || creator.username}.`,
+          });
+        }
+      } else {
+        // Like creator
+        const response = await fetch(`/api/creators/${creator.id}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fanId: user.id }),
+        });
+
+        if (response.ok) {
+          setIsCreatorLiked(true);
+          toast({
+            title: "Liked!",
+            description: `You liked ${creator.display_name || creator.username}.`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling creator like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLikingCreator(false);
+    }
+  };
+
+  const handleCreatorFavorite = async () => {
+    if (!user || !creator || isOwnProfile) {
+      return;
+    }
+
+    if (user.role !== 'fan') {
+      toast({
+        title: "Access Restricted",
+        description: "Only fans can favorite creators.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setFavoritingCreator(true);
+
+    try {
+      if (isCreatorFavorited) {
+        // Remove from favorites
+        const response = await fetch(`/api/creators/${creator.id}/favorite`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fanId: user.id }),
+        });
+
+        if (response.ok) {
+          setIsCreatorFavorited(false);
+          toast({
+            title: "Removed from favorites",
+            description: `${creator.display_name || creator.username} removed from your favorites.`,
+          });
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch(`/api/creators/${creator.id}/favorite`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fanId: user.id }),
+        });
+
+        if (response.ok) {
+          setIsCreatorFavorited(true);
+          toast({
+            title: "Added to favorites!",
+            description: `${creator.display_name || creator.username} added to your favorites.`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling creator favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setFavoritingCreator(false);
+    }
+  };
+
   const handleEdit = (postId: string) => {
     const post = userPosts.find(p => p.id === postId);
     if (post) {
@@ -1251,28 +1414,20 @@ export const CreatorProfile: React.FC = () => {
               size="sm" 
               className="h-10 w-10 p-0"
               title="Like creator"
-              onClick={() => {
-                toast({
-                  title: "Feature coming soon",
-                  description: "Like functionality will be available soon.",
-                });
-              }}
+              disabled={likingCreator || isOwnProfile || !user || user.role !== 'fan'}
+              onClick={handleCreatorLike}
             >
-              <Heart className="w-4 h-4" />
+              <Heart className={`w-4 h-4 ${isCreatorLiked ? 'fill-red-500 text-red-500' : ''}`} />
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
               className="h-10 w-10 p-0"
               title="Add to favorites"
-              onClick={() => {
-                toast({
-                  title: "Feature coming soon", 
-                  description: "Favorite functionality will be available soon.",
-                });
-              }}
+              disabled={favoritingCreator || isOwnProfile || !user || user.role !== 'fan'}
+              onClick={handleCreatorFavorite}
             >
-              <Star className="w-4 h-4" />
+              <Star className={`w-4 h-4 ${isCreatorFavorited ? 'fill-yellow-500 text-yellow-500' : ''}`} />
             </Button>
             <Button 
               variant="outline" 

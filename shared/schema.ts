@@ -228,6 +228,21 @@ export const messages = pgTable("messages", {
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Creator interaction tables
+export const creator_likes = pgTable("creator_likes", {
+  id: serial("id").primaryKey(),
+  fan_id: integer("fan_id").notNull(),
+  creator_id: integer("creator_id").notNull(),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const creator_favorites = pgTable("creator_favorites", {
+  id: serial("id").primaryKey(),
+  fan_id: integer("fan_id").notNull(),
+  creator_id: integer("creator_id").notNull(),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Database relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   posts: many(posts),
@@ -241,6 +256,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   received_messages: many(messages, { relationName: "receivedMessages" }),
   notifications: many(notifications),
   notification_preferences: one(notification_preferences),
+  liked_creators: many(creator_likes, { relationName: "fanLikes" }),
+  creator_likes_received: many(creator_likes, { relationName: "creatorLikes" }),
+  favorite_creators: many(creator_favorites, { relationName: "fanFavorites" }),
+  creator_favorites_received: many(creator_favorites, { relationName: "creatorFavorites" }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -350,6 +369,28 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 export const notificationPreferencesRelations = relations(notification_preferences, ({ one }) => ({
   user: one(users, {
     fields: [notification_preferences.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const creatorLikesRelations = relations(creator_likes, ({ one }) => ({
+  fan: one(users, {
+    fields: [creator_likes.fan_id],
+    references: [users.id],
+  }),
+  creator: one(users, {
+    fields: [creator_likes.creator_id],
+    references: [users.id],
+  }),
+}));
+
+export const creatorFavoritesRelations = relations(creator_favorites, ({ one }) => ({
+  fan: one(users, {
+    fields: [creator_favorites.fan_id],
+    references: [users.id],
+  }),
+  creator: one(users, {
+    fields: [creator_favorites.creator_id],
     references: [users.id],
   }),
 }));
@@ -521,3 +562,18 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
 export type NotificationPreferences = typeof notification_preferences.$inferSelect;
+
+export const insertCreatorLikeSchema = createInsertSchema(creator_likes).pick({
+  fan_id: true,
+  creator_id: true,
+});
+
+export const insertCreatorFavoriteSchema = createInsertSchema(creator_favorites).pick({
+  fan_id: true,
+  creator_id: true,
+});
+
+export type InsertCreatorLike = z.infer<typeof insertCreatorLikeSchema>;
+export type CreatorLike = typeof creator_likes.$inferSelect;
+export type InsertCreatorFavorite = z.infer<typeof insertCreatorFavoriteSchema>;
+export type CreatorFavorite = typeof creator_favorites.$inferSelect;
