@@ -254,16 +254,29 @@
   * {
     @apply border-border;
   }
-
-  html, body {
+  body {
     @apply bg-background text-foreground;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Tab indicator styling */
+  .tab-trigger {
+    @apply relative;
   }
 
-  #root {
-    min-height: 100vh;
+  .tab-trigger::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-transparent transition-all duration-200;
+  }
+
+  .tab-trigger[data-state="active"]::after {
+    @apply bg-primary;
+  }
+
+  /* Ensure consistent tab spacing */
+  .tab-trigger {
+    @apply px-4 min-w-0 flex-1;
   }
 }
 
