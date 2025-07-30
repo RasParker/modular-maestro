@@ -30,6 +30,26 @@
     overflow: hidden;
   }
 
+  /* Tab trigger indicator that matches text width */
+  .tab-trigger[data-state="active"]::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 2px;
+    background-color: hsl(var(--primary));
+    border-radius: 2px;
+    width: calc(100% - 2rem);
+  }
+
+  /* On desktop, make indicator match text width more precisely */
+  @media (min-width: 768px) {
+    .tab-trigger[data-state="active"]::after {
+      width: calc(100% - 3rem);
+    }
+  }
+
   /* Custom scrollbar styles */
   .scrollbar-thin {
     scrollbar-width: thin;
