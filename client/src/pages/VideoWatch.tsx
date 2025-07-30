@@ -24,6 +24,32 @@ export const VideoWatch: React.FC = () => {
   const [showCommentsSheet, setShowCommentsSheet] = useState(false);
   const [nextVideos, setNextVideos] = useState<any[]>([]);
 
+  const getTimeAgo = (dateString: string) => {
+    // Handle CURRENT_TIMESTAMP literal string
+    if (dateString === "CURRENT_TIMESTAMP") {
+      return 'Just now';
+    }
+
+    const date = new Date(dateString);
+
+    // Check if date is invalid
+    if (isNaN(date.getTime())) {
+      return 'Just now';
+    }
+
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    return `${Math.floor(diffInDays / 7)}w ago`;
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       if (!id) return;
@@ -273,7 +299,7 @@ export const VideoWatch: React.FC = () => {
                   <div className="flex items-center gap-1 flex-shrink-0 text-right">
                     <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
                     <span>•</span>
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    <span>{getTimeAgo(post.created_at)}</span>
                   </div>
                 </div>
               </div>
@@ -438,7 +464,7 @@ export const VideoWatch: React.FC = () => {
                                 <Eye className="w-3 h-3" />
                                 <span>{Math.floor(Math.random() * 500) + 100}K</span>
                                 <span>•</span>
-                                <span>{Math.floor(Math.random() * 7) + 1}d ago</span>
+                                <span>{getTimeAgo(video.created_at)}</span>
                               </div>
                             </div>
                           </div>
@@ -546,7 +572,7 @@ export const VideoWatch: React.FC = () => {
                     <div className="flex items-center gap-1 flex-shrink-0 text-right">
                       <span>876K views</span>
                       <span>•</span>
-                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                      <span>{getTimeAgo(post.created_at)}</span>
                     </div>
                   </div>
                 </div>
