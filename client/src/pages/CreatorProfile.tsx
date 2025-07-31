@@ -1539,7 +1539,9 @@ export const CreatorProfile: React.FC = () => {
                     <div 
                       key={tier.id} 
                       className={`flex flex-col p-4 md:p-5 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer hover:shadow-md' : ''}`}
-                      onClick={!isOwnProfile ? () => {
+                      onClick={!isOwnProfile ? (e) => {
+                        e.stopPropagation();
+                        console.log('Tier clicked:', tier);
                         setSelectedTier(tier);
                         setTierDetailsModalOpen(true);
                       } : undefined}

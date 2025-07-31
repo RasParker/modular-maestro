@@ -180,8 +180,15 @@ export class PaymentService {
 
       return response.data;
     } catch (error: any) {
-      console.error('Mobile money payment error:', error.response?.data || error.message);
-      throw new Error(`Mobile money payment failed: ${error.response?.data?.message || error.message}`);
+      const errorData = error.response?.data;
+      console.error('Mobile money payment error:', errorData || error.message);
+      
+      // Handle specific mobile money errors
+      if (errorData?.message === 'Charge attempted' && errorData?.data?.message?.includes('test mobile money number')) {
+        throw new Error('Please use test mobile money number: 0551234987 for testing');
+      }
+      
+      throw new Error(`Mobile money payment failed: ${errorData?.message || error.message}`);
     }
   }
 

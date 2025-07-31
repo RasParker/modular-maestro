@@ -115,7 +115,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
           title: "Mobile Money Payment",
           description: "Please check your phone and approve the payment request.",
         });
-        
+
         // You might want to implement payment status polling here
         // For now, we'll close the modal and show instructions
         onClose();

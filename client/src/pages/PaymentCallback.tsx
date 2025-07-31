@@ -25,14 +25,29 @@ export const PaymentCallback: React.FC = () => {
       }
 
       try {
+        console.log('Verifying payment with reference:', reference);
+        
         // Simulate verification delay in development
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         const response = await fetch(`/api/payments/verify/${reference}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const result = await response.json();
+        console.log('Payment verification result:', result);
 
         if (result.success && result.data.status === 'success') {
           setStatus('success');
+          
+          // Dispatch subscription status change event
+          const event = new CustomEvent('subscriptionStatusChange', {
+            detail: { type: 'subscriptionCreated', paymentData: result.data }
+          });
+          window.dispatchEvent(event);
+          
           toast({
             title: "Payment Successful!",
             description: "Your subscription has been activated.",
@@ -41,7 +56,7 @@ export const PaymentCallback: React.FC = () => {
           setStatus('failed');
           toast({
             title: "Payment Failed",
-            description: "There was an issue processing your payment.",
+            description: result.data?.gateway_response || result.message || "There was an issue processing your payment.",
             variant: "destructive"
           });
         }
@@ -50,7 +65,7 @@ export const PaymentCallback: React.FC = () => {
         setStatus('failed');
         toast({
           title: "Verification Error",
-          description: "Could not verify payment status.",
+          description: `Could not verify payment status: ${error.message}`,
           variant: "destructive"
         });
       } finally {
