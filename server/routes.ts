@@ -340,53 +340,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Fetching posts with params:', { status, creatorId });
 
-      // Build the query with proper join to get creator data
-      let query = db.select({
-        id: posts.id,
-        creator_id: posts.creator_id,
-        title: posts.title,
-        content: posts.content,
-        media_type: posts.media_type,
-        media_urls: posts.media_urls,
-        tier: posts.tier,
-        status: posts.status,
-        created_at: posts.created_at,
-        likes_count: posts.likes_count,
-        comments_count: posts.comments_count,
-        creator_username: users.username,
-        creator_display_name: users.display_name,
-        creator_avatar: users.avatar
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.creator_id, users.id));
+      // Use a simpler approach with separate query building
+      let allPosts;
 
-      // Apply filters
-      if (!status) {
-        // For public feed, only show published posts
-        query = query.where(eq(posts.status, 'published'));
-      } else if (status !== 'all') {
-        query = query.where(eq(posts.status, status as string));
-      }
-
-      // Filter by creator if specified
       if (creatorId) {
         const creatorIdNum = parseInt(creatorId as string);
-        if (status && status !== 'all') {
-          query = query.where(and(
-            eq(posts.creator_id, creatorIdNum),
-            eq(posts.status, status as string)
-          ));
-        } else if (status === 'all') {
-          query = query.where(eq(posts.creator_id, creatorIdNum));
-        } else {
-          query = query.where(and(
+        if (!status || status === 'published') {
+          // Creator posts, published only
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .where(and(
             eq(posts.creator_id, creatorIdNum),
             eq(posts.status, 'published')
-          ));
+          ))
+          .orderBy(desc(posts.created_at));
+        } else if (status === 'all') {
+          // Creator posts, all statuses
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .where(eq(posts.creator_id, creatorIdNum))
+          .orderBy(desc(posts.created_at));
+        } else {
+          // Creator posts with specific status
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .where(and(
+            eq(posts.creator_id, creatorIdNum),
+            eq(posts.status, status as string)
+          ))
+          .orderBy(desc(posts.created_at));
+        }
+      } else {
+        if (!status || status === 'published') {
+          // Public feed, published only
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .where(eq(posts.status, 'published'))
+          .orderBy(desc(posts.created_at));
+        } else if (status === 'all') {
+          // All posts, all statuses
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .orderBy(desc(posts.created_at));
+        } else {
+          // Public feed with specific status
+          allPosts = await db.select({
+            id: posts.id,
+            creator_id: posts.creator_id,
+            title: posts.title,
+            content: posts.content,
+            media_type: posts.media_type,
+            media_urls: posts.media_urls,
+            tier: posts.tier,
+            status: posts.status,
+            created_at: posts.created_at,
+            likes_count: posts.likes_count,
+            comments_count: posts.comments_count,
+            creator_username: users.username,
+            creator_display_name: users.display_name,
+            creator_avatar: users.avatar
+          })
+          .from(posts)
+          .leftJoin(users, eq(posts.creator_id, users.id))
+          .where(eq(posts.status, status as string))
+          .orderBy(desc(posts.created_at));
         }
       }
-
-      const allPosts = await query.orderBy(desc(posts.created_at));
 
       console.log(`Found ${allPosts.length} posts`);
       res.json(allPosts);
