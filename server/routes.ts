@@ -862,6 +862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierId = parseInt(req.params.tierId);
       const deleted = await storage.deleteSubscriptionTier(tierId);```text
 
+```text
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
       }
@@ -2634,6 +2635,7 @@ app.post('/api/conversations', async (req, res) => {
       console.log('Subscription details:', JSON.stringify(subscription, null, 2));
 
       // You can store this in a push_subscriptions table
+      ```text
       // await storage.savePushSubscription(userId, subscription);
 
       res.json({ success: true, message: "Push subscription registered successfully" });
@@ -3123,6 +3125,9 @@ function formatTimeAgo(date: Date): string {
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
+
+  // Checking subscription for access control
+      
   if (diffInHours < 24) {
     return diffInHours + " hour" + (diffInHours === 1 ? '' : 's') + " ago";
   }
