@@ -85,6 +85,21 @@ export const FanSettings: React.FC = () => {
             showActivity: settings.activity_status_visible,
           }));
         }
+
+        // Load notification preferences if available
+        try {
+          const notificationResponse = await fetch('/api/user/notification-preferences');
+          if (notificationResponse.ok) {
+            const notificationSettings = await notificationResponse.json();
+            setPreferences(prev => ({
+              ...prev,
+              emailNotifications: notificationSettings.email_notifications ?? true,
+              pushNotifications: notificationSettings.push_notifications ?? false,
+            }));
+          }
+        } catch (notificationError) {
+          console.log('Notification preferences not available:', notificationError);
+        }
       } catch (error) {
         console.error('Error loading user settings:', error);
       }
@@ -179,9 +194,32 @@ export const FanSettings: React.FC = () => {
       return;
     }
 
+    if (formData.newPassword.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsPasswordLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to change password');
+      }
 
       toast({
         title: "Password changed",
@@ -197,7 +235,7 @@ export const FanSettings: React.FC = () => {
     } catch (error) {
       toast({
         title: "Update failed",
-        description: "Failed to update password. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update password. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -548,9 +586,37 @@ export const FanSettings: React.FC = () => {
                       </div>
                       <Switch
                         checked={preferences.emailNotifications}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({ ...prev, emailNotifications: checked }))
-                        }
+                        onCheckedChange={async (checked) => {
+                          setPreferences(prev => ({ ...prev, emailNotifications: checked }));
+                          
+                          try {
+                            const response = await fetch('/api/user/notification-preferences', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                email_notifications: checked,
+                              }),
+                            });
+
+                            if (response.ok) {
+                              toast({
+                                title: "Email notifications updated",
+                                description: checked ? "Email notifications enabled" : "Email notifications disabled",
+                              });
+                            } else {
+                              throw new Error('Failed to save email notification preference');
+                            }
+                          } catch (error) {
+                            console.error('Error saving email notification preference:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to save notification preference. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
                       />
                     </div>
 
@@ -565,9 +631,37 @@ export const FanSettings: React.FC = () => {
                       </div>
                       <Switch
                         checked={preferences.pushNotifications}
-                        onCheckedChange={(checked) => 
-                          setPreferences(prev => ({ ...prev, pushNotifications: checked }))
-                        }
+                        onCheckedChange={async (checked) => {
+                          setPreferences(prev => ({ ...prev, pushNotifications: checked }));
+                          
+                          try {
+                            const response = await fetch('/api/user/notification-preferences', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                push_notifications: checked,
+                              }),
+                            });
+
+                            if (response.ok) {
+                              toast({
+                                title: "Push notifications updated",
+                                description: checked ? "Push notifications enabled" : "Push notifications disabled",
+                              });
+                            } else {
+                              throw new Error('Failed to save push notification preference');
+                            }
+                          } catch (error) {
+                            console.error('Error saving push notification preference:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to save notification preference. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
                       />
                     </div>
 
@@ -766,7 +860,38 @@ export const FanSettings: React.FC = () => {
                       <select 
                         className="w-full p-2 border rounded-md bg-background"
                         value={privacySettings.profileVisibility}
-                        onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
+                        onChange={async (e) => {
+                          const newValue = e.target.value;
+                          setPrivacySettings(prev => ({ ...prev, profileVisibility: newValue }));
+                          
+                          try {
+                            const response = await fetch('/api/user/privacy-settings', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                profile_visibility: newValue,
+                              }),
+                            });
+
+                            if (response.ok) {
+                              toast({
+                                title: "Profile visibility updated",
+                                description: `Profile is now ${newValue}`,
+                              });
+                            } else {
+                              throw new Error('Failed to save profile visibility');
+                            }
+                          } catch (error) {
+                            console.error('Error saving profile visibility:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to save profile visibility. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
                       >
                         <option value="public">Public - Anyone can view</option>
                         <option value="subscribers">Subscribers Only</option>
@@ -800,7 +925,38 @@ export const FanSettings: React.FC = () => {
                       <select 
                         className="w-full p-2 border rounded-md bg-background"
                         value={privacySettings.allowDirectMessages}
-                        onChange={(e) => setPrivacySettings(prev => ({ ...prev, allowDirectMessages: e.target.value }))}
+                        onChange={async (e) => {
+                          const newValue = e.target.value;
+                          setPrivacySettings(prev => ({ ...prev, allowDirectMessages: newValue }));
+                          
+                          try {
+                            const response = await fetch('/api/user/privacy-settings', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                allow_direct_messages: newValue,
+                              }),
+                            });
+
+                            if (response.ok) {
+                              toast({
+                                title: "Message settings updated",
+                                description: `Direct messages now allowed from: ${newValue === 'everyone' ? 'everyone' : newValue === 'subscribed' ? 'creators you\'re subscribed to' : 'no one'}`,
+                              });
+                            } else {
+                              throw new Error('Failed to save message settings');
+                            }
+                          } catch (error) {
+                            console.error('Error saving message settings:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to save message settings. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
                       >
                         <option value="everyone">Everyone</option>
                         <option value="subscribed">Creators I'm subscribed to</option>

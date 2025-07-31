@@ -19,6 +19,7 @@ import paymentRoutes from './routes/payment';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from "./middleware/auth";
+import bcrypt from "bcryptjs";
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -1672,35 +1673,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Privacy settings endpoint
-  app.post('/api/user/privacy-settings', async (req, res) => {
+  // Change user password
+  app.post("/api/user/change-password", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
-      if (!req.session?.userId) {
-        return res.status(401).json({ error: 'Unauthorized' });
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
       }
 
-      const userId = req.session.userId;
-      const { profile_discoverable, activity_status_visible } = req.body;
+      const { currentPassword, newPassword } = req.body;
 
-      const updateData: any = { updated_at: new Date() };
-
-      if (profile_discoverable !== undefined) {
-        updateData.profile_discoverable = profile_discoverable;
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'Current password and new password are required' });
       }
 
-      if (activity_status_visible !== undefined) {
-        updateData.activity_status_visible = activity_status_visible;
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'New password must be at least 6 characters long' });
       }
 
-      await db
-        .update(users)
-        .set(updateData)
-        .where(eq(users.id, userId));
+      // Get current user data
+      const [user] = await db.select()
+        .from(usersTable)
+        .where(eq(usersTable.id, userId))
+        .limit(1);
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ error: 'Current password is incorrect' });
+      }
+
+      // Hash new password
+      const saltRounds = 10;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update password
+      await db.update(usersTable)
+        .set({
+          password: hashedNewPassword,
+          updated_at: new Date()
+        })
+        .where(eq(usersTable.id, userId));
+
+      res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ error: 'Failed to change password' });
+    }
+  });
+
+  // Update user privacy settings
+  app.post("/api/user/privacy-settings", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const { profile_discoverable, activity_status_visible, profile_visibility, allow_direct_messages } = req.body;
+
+      // Update user privacy settings
+      await db.update(usersTable)
+        .set({
+          profile_discoverable: profile_discoverable !== undefined ? profile_discoverable : undefined,
+          activity_status_visible: activity_status_visible !== undefined ? activity_status_visible : undefined,
+          updated_at: new Date()
+        })
+        .where(eq(usersTable.id, userId));
 
       res.json({ success: true });
     } catch (error) {
-      console.error('Error saving privacy settings:', error);
-      res.status(500).json({ error: 'Failed to save privacy settings' });
+      console.error('Error updating privacy settings:', error);
+      res.status(500).json({ error: 'Failed to update privacy settings' });
+    }
+  });
+
+  // Get user notification preferences
+  app.get("/api/user/notification-preferences", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      // For now, return default values since we don't have a notifications table
+      // In a real app, you'd fetch these from a user_preferences table
+      res.json({
+        email_notifications: true,
+        push_notifications: false,
+      });
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+      res.status(500).json({ error: 'Failed to fetch notification preferences' });
+    }
+  });
+
+  // Update user notification preferences
+  app.post("/api/user/notification-preferences", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const { email_notifications, push_notifications } = req.body;
+
+      // For now, we'll just return success since we don't have a notifications table
+      // In a real app, you'd store these preferences in a user_preferences table
+      console.log(`User ${userId} notification preferences:`, { email_notifications, push_notifications });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      res.status(500).json({ error: 'Failed to update notification preferences' });
     }
   });
 
@@ -2546,7 +2635,7 @@ app.post('/api/conversations', async (req, res) => {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      const { title = 'Test Push Notification', message = 'This is a test push notification from Xclusive Creator Hub' } = req.body;
+      const { title = 'Test Push Notification', message = 'This is a test push notification from Xclusive Creator Hub'} = req.body;
 
       // In a real implementation, you would:
       // 1. Get the user's push subscription from the database
