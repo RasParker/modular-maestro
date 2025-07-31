@@ -848,8 +848,7 @@ export const CreatorProfile: React.FC = () => {
       }));
 
       // Refetch posts to get updated counts from database
-```text
- if (creator?.id) {
+      if (creator?.id) {
         fetchUserPosts(creator.id);
       }
     } catch (error) {
@@ -2365,7 +2364,8 @@ export const CreatorProfile: React.FC = () => {
                             className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
                             onClick={() => handleContentClick(post)}
                             role="button"
-                            tabIndex={0                            onKeyDown={(e) => {
+                            tabIndex={0}
+                            onKeyDown={(e) => {
                               if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
                                 handleContentClick(post);

@@ -14,6 +14,7 @@ import { Explore } from '@/pages/Explore';
 import { CreatorProfile } from '@/pages/CreatorProfile';
 import { VideoWatch } from '@/pages/VideoWatch';
 import { FeedPage } from '@/pages/fan/FeedPage';
+import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorDashboard } from '@/pages/creator/CreatorDashboard';
 import { CreatePost } from '@/pages/creator/CreatePost';
 import { Analytics } from '@/pages/creator/Analytics';
