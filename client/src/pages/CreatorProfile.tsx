@@ -1543,7 +1543,13 @@ export const CreatorProfile: React.FC = () => {
                         e.stopPropagation();
                         console.log('Tier clicked:', tier);
                         setSelectedTier(tier);
-                        setTierDetailsModalOpen(true);
+                        // Check if user is logged in
+                        if (!user) {
+                          window.location.href = `/login?redirect=/creator/${username}`;
+                          return;
+                        }
+                        // Open payment modal directly for better UX
+                        setPaymentModalOpen(true);
                       } : undefined}
                     >
                       <div className="flex-1 mb-4">
@@ -2742,10 +2748,12 @@ export const CreatorProfile: React.FC = () => {
           tier={selectedTier}
           creatorName={creator.display_name || creator.username}
           onSubscribe={() => {
+            console.log('CreatorProfile: onSubscribe called from TierDetailsModal');
             // Keep the tier selected and switch to payment modal
             setTierDetailsModalOpen(false);
             // Small delay to ensure smooth transition
             setTimeout(() => {
+              console.log('Opening PaymentModal with tier:', selectedTier);
               setPaymentModalOpen(true);
             }, 100);
           }}

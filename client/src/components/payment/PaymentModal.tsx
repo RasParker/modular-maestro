@@ -50,7 +50,17 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
   };
 
   const handleCardPayment = async () => {
-    if (!user || !paystackConfig) return;
+    if (!user || !paystackConfig) {
+      console.error('Missing user or paystack config:', { user: !!user, paystackConfig: !!paystackConfig });
+      return;
+    }
+
+    console.log('Initializing card payment for:', { 
+      fan_id: user.id, 
+      tier_id: tier.id, 
+      tier_name: tier.name,
+      payment_method: 'card' 
+    });
 
     setIsLoading(true);
 
@@ -69,12 +79,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
       });
 
       const data = await response.json();
+      console.log('Payment initialization response:', data);
 
       if (data.success) {
+        console.log('Redirecting to Paystack:', data.data.authorization_url);
         // Redirect to Paystack payment page
         window.location.href = data.data.authorization_url;
       } else {
-        throw new Error(data.message);
+        throw new Error(data.message || 'Payment initialization failed');
       }
     } catch (error: any) {
       console.error('Payment initialization error:', error);
@@ -89,7 +101,22 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
   };
 
   const handleMobileMoneyPayment = async () => {
-    if (!user || !phoneNumber || !mobileProvider) return;
+    if (!user || !phoneNumber || !mobileProvider) {
+      console.error('Missing mobile money payment data:', { 
+        user: !!user, 
+        phoneNumber: !!phoneNumber, 
+        mobileProvider: !!mobileProvider 
+      });
+      return;
+    }
+
+    console.log('Initializing mobile money payment for:', { 
+      fan_id: user.id, 
+      tier_id: tier.id,
+      tier_name: tier.name,
+      phone: phoneNumber,
+      provider: mobileProvider
+    });
 
     setIsLoading(true);
 
@@ -109,6 +136,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
       });
 
       const data = await response.json();
+      console.log('Mobile money payment initialization response:', data);
 
       if (data.success) {
         toast({
@@ -120,7 +148,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
         // For now, we'll close the modal and show instructions
         onClose();
       } else {
-        throw new Error(data.message);
+        throw new Error(data.message || 'Mobile money payment initialization failed');
       }
     } catch (error: any) {
       console.error('Mobile money payment error:', error);

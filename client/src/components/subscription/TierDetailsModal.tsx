@@ -36,8 +36,9 @@ export const TierDetailsModal: React.FC<TierDetailsModalProps> = ({
   ];
 
   const handleSubscribe = () => {
-    onClose();
+    console.log('TierDetailsModal: handleSubscribe called');
     onSubscribe();
+    onClose();
   };
 
   return (
