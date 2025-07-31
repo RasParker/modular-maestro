@@ -20,6 +20,7 @@ import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from "./middleware/auth";
 import bcrypt from "bcryptjs";
+import * as schema from '../shared/schema';
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -859,7 +860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/tiers/:tierId", async (req, res) => {
     try {
       const tierId = parseInt(req.params.tierId);
-      const deleted = await storage.deleteSubscriptionTier(tierId);
+      const deleted = await storage.deleteSubscriptionTier(tierId);```text
 
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
@@ -1170,6 +1171,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to cancel subscription" });
     }
   });
+
+// Posts endpoint for feed
+  app.get('/api/posts', async (req, res) => {
+    try {
+      const posts = await db.select({
+        id: schema.posts.id,
+        creator_id: schema.posts.creator_id,
+        title: schema.posts.title,
+        content: schema.posts.content,
+        media_type: schema.posts.media_type,
+        media_urls: schema.posts.media_urls,
+        tier_name: schema.posts.tier_name,
+        status: schema.posts.status,
+        created_at: schema.posts.created_at,
+        likes_count: schema.posts.likes_count,
+        comments_count: schema.posts.comments_count,
+        creator_username: schema.users.username,
+        creator_display_name: schema.users.display_name,
+        creator_avatar: schema.users.avatar
+      })
+      .from(schema.posts)
+      .leftJoin(schema.users, eq(schema.posts.creator_id, schema.users.id))
+      .where(eq(schema.posts.status, 'published'))
+      .orderBy(desc(schema.posts.created_at));
+
+      res.json(posts);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ error: 'Failed to fetch posts' });
+    }
+  });
+
+  // Admin routes
+  app.use('/api/admin', adminRoutes);
 
   // Admin routes
   app.get('/api/admin/users', async (req, res) => {
@@ -1692,7 +1727,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get current user data
-      const [user] = await db.select()
+      const [user] = await db```text
+        .select()
         .from(usersTable)
         .where(eq(usersTable.id, userId))
         .limit(1);

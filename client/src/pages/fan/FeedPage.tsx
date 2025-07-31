@@ -330,6 +330,14 @@ export const FeedPage: React.FC = () => {
           // Only show posts user has access to in feed
           const accessiblePosts = transformedPosts.filter(post => post.hasAccess);
           setFeed(accessiblePosts);
+        } else {
+          // If API fails, fall back to mock data for development
+          console.warn('API failed, using mock data');
+          const mockWithAccess = MOCK_FEED.map(post => ({
+            ...post,
+            hasAccess: true // Mock data is always accessible
+          }));
+          setFeed(mockWithAccess);
         }
       } catch (error) {
         console.error('Error fetching feed:', error);
