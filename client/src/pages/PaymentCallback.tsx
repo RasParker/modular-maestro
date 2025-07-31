@@ -46,6 +46,16 @@ export const PaymentCallback: React.FC = () => {
           window.dispatchEvent(event);
           console.log('🔄 Dispatched subscription status change event');
           
+          // Force clear any cached subscription data
+          sessionStorage.removeItem('userSubscriptions');
+          
+          // Trigger a storage event to force components to refresh
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'subscriptionUpdate',
+            newValue: Date.now().toString(),
+            url: window.location.href
+          }));
+          
           toast({
             title: "Payment Successful!",
             description: "Your subscription has been activated. Redirecting...",
@@ -87,24 +97,17 @@ export const PaymentCallback: React.FC = () => {
 
   const handleContinue = () => {
     if (status === 'success') {
-      // First try to go back to the creator profile page
+      // Use window.location for more reliable navigation
       const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
       if (creatorProfile) {
         sessionStorage.removeItem('lastCreatorProfile');
-        try {
-          navigate(creatorProfile);
-        } catch (error) {
-          console.error('Navigation error:', error);
-          // Fallback to fan dashboard if navigation fails
-          navigate('/fan/dashboard');
-        }
+        window.location.href = creatorProfile;
       } else {
-        // Fallback to fan dashboard
-        navigate('/fan/dashboard');
+        window.location.href = '/fan/dashboard';
       }
     } else {
       // On failure, go back to explore page
-      navigate('/explore');
+      window.location.href = '/explore';
     }
   };
 

@@ -106,6 +106,42 @@ export const FanDashboard: React.FC = () => {
     fetchNewContentCount();
   }, [user]);
 
+  useEffect(() => {
+    if (user?.id) {
+      const interval = setInterval(() => {
+        fetchNewContentCount();
+      }, 30000); // Check every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  // Listen for subscription updates from payment callback
+  useEffect(() => {
+    const handleSubscriptionUpdate = () => {
+      console.log('🔄 Dashboard: Subscription update detected, refreshing...');
+      if (user?.id) {
+        fetchSubscriptions();
+        fetchRecentActivity();
+        fetchNewContentCount();
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'subscriptionUpdate') {
+        handleSubscriptionUpdate();
+      }
+    };
+
+    window.addEventListener('subscriptionStatusChange', handleSubscriptionUpdate);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('subscriptionStatusChange', handleSubscriptionUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [user]);
+
   return (
     <EdgeToEdgeContainer>
       {/* Hero Section - Full Width */}
