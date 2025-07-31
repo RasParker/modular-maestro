@@ -334,10 +334,9 @@ export const FeedPage: React.FC = () => {
             };
           });
 
-          // Only show posts user has access to in feed
-          const accessiblePosts = transformedPosts.filter(post => post.hasAccess);
-          console.log('Accessible posts after filtering:', accessiblePosts.length);
-          setFeed(accessiblePosts);
+          // Show all posts but mark access level for display logic
+          console.log('Total posts after filtering:', transformedPosts.length);
+          setFeed(transformedPosts);
         } else {
           const errorText = await response.text();
           console.error('API request failed:', response.status, errorText);
@@ -365,9 +364,9 @@ export const FeedPage: React.FC = () => {
       return true;
     }
 
-    // If user is not logged in, still show content but mark as needing subscription
+    // If user is not logged in, no access to premium content
     if (!user) {
-      return true; // Allow viewing but handle access in UI
+      return false;
     }
 
     // Find user's subscription to this creator
@@ -375,13 +374,23 @@ export const FeedPage: React.FC = () => {
       sub => sub.creator_id === creatorId && sub.status === 'active'
     );
 
-    // If no subscription, still allow viewing (will handle paywall in UI)
+    // If no subscription, no access to premium content
     if (!userSubscription) {
-      return true;
+      return false;
     }
 
-    // If user has subscription, they have access
-    return true;
+    // Define tier hierarchy (lower index = higher access level)
+    const tierHierarchy = ['superfan', 'premium', 'fan', 'supporter'];
+    const postTierIndex = tierHierarchy.indexOf(postTier.toLowerCase());
+    const userTierIndex = tierHierarchy.indexOf(userSubscription.tier_name?.toLowerCase() || '');
+
+    // If post tier or user tier not found in hierarchy, deny access
+    if (postTierIndex === -1 || userTierIndex === -1) {
+      return false;
+    }
+
+    // User has access if their tier level is equal or higher than required
+    return userTierIndex <= postTierIndex;
   };
 
   const handleLike = async (postId: string) => {
@@ -711,6 +720,16 @@ export const FeedPage: React.FC = () => {
                           <p className="text-sm text-muted-foreground mb-4">
                             Subscribe to view this content
                           </p>
+                          <Button 
+                            size="sm" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/creator/${post.creator.username}`);
+                            }}
+                            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                          >
+                            Subscribe
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -913,12 +932,22 @@ export const FeedPage: React.FC = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                           </div>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-muted-foreground mb-2">
                             {post.tier === 'supporter' ? 'Supporter' : 
                              post.tier === 'fan' ? 'Fan' : 
                              post.tier === 'premium' ? 'Premium' : 
                              post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
                           </p>
+                          <Button 
+                            size="sm" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/creator/${post.creator.username}`);
+                            }}
+                            className="bg-accent hover:bg-accent/90 text-accent-foreground text-xs h-6 px-2"
+                          >
+                            Subscribe
+                          </Button>
                         </div>
                       </div>
                     )}

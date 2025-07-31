@@ -2334,7 +2334,7 @@ app.get('/api/conversations', async (req, res) => {
     }
 
     // Combine and format conversations
-    let allConversations = [];
+    let allConversations: any[] = [];
 
     // Add fan conversations (where current user is the fan)
     fanConversations.forEach(conv => {
@@ -2371,7 +2371,7 @@ app.get('/api/conversations', async (req, res) => {
     });
 
     // Sort by timestamp
-    allConversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    allConversations.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     console.log('Found conversations:', allConversations.length);
     res.json(allConversations);
@@ -2627,7 +2627,7 @@ app.post('/api/conversations', async (req, res) => {
           title: 'New Subscriber!',
           message: 'John Doe subscribed to your Premium tier',
           action_url: '/creator/subscribers',
-          metadata: { tier_name: 'Premium' }
+          metadata: null
         },
         {
           user_id: userId,

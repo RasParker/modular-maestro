@@ -417,14 +417,7 @@ export class DatabaseStorage implements IStorage {
 
       const [newTier] = await db
         .insert(subscription_tiers)
-        .values({
-          creator_id: tier.creator_id,
-          name: tier.name,
-          description: tier.description,
-          price: tier.price,
-          currency: tier.currency || 'GHS',
-          benefits: tier.benefits || [],
-        })
+        .values(tier)
         .returning();
       console.log('Subscription tier created successfully:', newTier);
       return newTier;
