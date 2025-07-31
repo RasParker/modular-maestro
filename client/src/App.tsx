@@ -11,7 +11,6 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Explore } from '@/pages/Explore';
-import { FanDashboard } from '@/pages/fan/FanDashboard';
 import { CreatorProfile } from '@/pages/CreatorProfile';
 import { VideoWatch } from '@/pages/VideoWatch';
 import { FeedPage } from '@/pages/fan/FeedPage';

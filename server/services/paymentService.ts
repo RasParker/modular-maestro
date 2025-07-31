@@ -82,6 +82,12 @@ export class PaymentService {
   private baseURL = 'https://api.paystack.co';
   private secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_placeholder';
   private publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder';
+  
+  // Development mode flag
+  private isDevelopment = process.env.NODE_ENV !== 'production' && (
+    this.secretKey === 'sk_test_placeholder' || 
+    this.publicKey === 'pk_test_placeholder'
+  );
 
   private getHeaders() {
     return {
@@ -97,6 +103,21 @@ export class PaymentService {
 
   // Initialize standard payment (cards)
   async initializePayment(data: PaystackInitializeRequest): Promise<PaystackInitializeResponse> {
+    // Development mode: return mock response
+    if (this.isDevelopment) {
+      console.log('🔧 Development mode: Simulating Paystack payment initialization');
+      const reference = data.reference || this.generateReference();
+      return {
+        status: true,
+        message: 'Authorization URL created (Development Mode)',
+        data: {
+          authorization_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`,
+          access_code: 'dev_access_code',
+          reference: reference
+        }
+      };
+    }
+
     const payload = {
       email: data.email,
       amount: Math.round(data.amount * 100), // Convert to pesewas
@@ -123,6 +144,22 @@ export class PaymentService {
 
   // Initialize mobile money payment
   async initializeMobileMoneyPayment(data: MobileMoneyRequest): Promise<any> {
+    // Development mode: return mock response
+    if (this.isDevelopment) {
+      console.log('🔧 Development mode: Simulating mobile money payment initialization');
+      const reference = data.reference || this.generateReference();
+      return {
+        status: true,
+        message: 'Mobile money charge initiated (Development Mode)',
+        data: {
+          status: 'send_otp',
+          reference: reference,
+          display_text: `Please approve the payment on your ${data.provider.toUpperCase()} mobile money wallet`,
+          authorization_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`
+        }
+      };
+    }
+
     const payload = {
       email: data.email,
       amount: Math.round(data.amount * 100), // Convert to pesewas
@@ -150,6 +187,59 @@ export class PaymentService {
 
   // Verify payment
   async verifyPayment(reference: string): Promise<PaystackVerifyResponse> {
+    // Development mode: return mock successful verification
+    if (this.isDevelopment) {
+      console.log('🔧 Development mode: Simulating payment verification for reference:', reference);
+      return {
+        status: true,
+        message: 'Verification successful (Development Mode)',
+        data: {
+          id: Math.floor(Math.random() * 1000000),
+          domain: 'test',
+          status: 'success',
+          reference: reference,
+          amount: 5000, // Mock amount in pesewas (GHS 50)
+          message: 'Approved (Development Mode)',
+          gateway_response: 'Successful',
+          paid_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          channel: 'card',
+          currency: 'GHS',
+          ip_address: '127.0.0.1',
+          metadata: {},
+          log: {},
+          fees: 0,
+          fees_split: null,
+          authorization: {
+            authorization_code: 'AUTH_dev123',
+            bin: '408408',
+            last4: '4081',
+            exp_month: '12',
+            exp_year: '2030',
+            channel: 'card',
+            card_type: 'visa',
+            bank: 'TEST BANK',
+            country_code: 'GH',
+            brand: 'visa',
+            reusable: true,
+            signature: 'SIG_dev123',
+            account_name: 'Development User'
+          },
+          customer: {
+            id: 123456,
+            first_name: 'Development',
+            last_name: 'User',
+            email: 'dev@example.com',
+            customer_code: 'CUS_dev123',
+            phone: '233200000000',
+            metadata: {},
+            risk_action: 'default',
+            international_format_phone: '+233200000000'
+          }
+        }
+      };
+    }
+
     try {
       const response: AxiosResponse<PaystackVerifyResponse> = await axios.get(
         `${this.baseURL}/transaction/verify/${reference}`,
