@@ -50,10 +50,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
   };
 
   const handleCardPayment = async () => {
-    if (!user || !paystackConfig) {
-      console.error('Missing user or paystack config:', { user: !!user, paystackConfig: !!paystackConfig });
-      return;
-    }
+    if (!user || !tier) return;
 
     console.log('Initializing card payment for:', { 
       fan_id: user.id, 
@@ -65,6 +62,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
     setIsLoading(true);
 
     try {
+      // Store current location for return navigation
+      sessionStorage.setItem('lastCreatorProfile', window.location.pathname);
+
       // Initialize payment
       const response = await fetch('/api/payments/initialize', {
         method: 'POST',
@@ -121,6 +121,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
     setIsLoading(true);
 
     try {
+       // Store current location for return navigation
+       sessionStorage.setItem('lastCreatorProfile', window.location.pathname);
       // Initialize mobile money payment
       const response = await fetch('/api/payments/mobile-money/initialize', {
         method: 'POST',

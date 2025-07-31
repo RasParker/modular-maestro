@@ -27,9 +27,6 @@ export const PaymentCallback: React.FC = () => {
       try {
         console.log('Verifying payment with reference:', reference);
         
-        // Simulate verification delay in development
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
         const response = await fetch(`/api/payments/verify/${reference}`);
         
         if (!response.ok) {
@@ -47,6 +44,7 @@ export const PaymentCallback: React.FC = () => {
             detail: { type: 'subscriptionCreated', paymentData: result.data }
           });
           window.dispatchEvent(event);
+          console.log('🔄 Dispatched subscription status change event');
           
           toast({
             title: "Payment Successful!",
@@ -60,7 +58,7 @@ export const PaymentCallback: React.FC = () => {
             variant: "destructive"
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Payment verification error:', error);
         setStatus('failed');
         toast({
@@ -78,9 +76,18 @@ export const PaymentCallback: React.FC = () => {
 
   const handleContinue = () => {
     if (status === 'success') {
-      navigate('/fan/dashboard');
+      // First try to go back to the creator profile page
+      const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
+      if (creatorProfile) {
+        sessionStorage.removeItem('lastCreatorProfile');
+        navigate(creatorProfile);
+      } else {
+        // Fallback to fan dashboard
+        navigate('/fan/dashboard');
+      }
     } else {
-      navigate(-1); // Go back to previous page
+      // On failure, go back to explore page
+      navigate('/explore');
     }
   };
 
@@ -116,7 +123,7 @@ export const PaymentCallback: React.FC = () => {
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
             {status === 'success' 
-              ? 'Your subscription has been activated successfully. You now have access to exclusive content!'
+              ? 'Your subscription has been activated successfully. You can now access exclusive content!'
               : 'We could not process your payment. Please try again or contact support if the issue persists.'
             }
           </p>
@@ -126,7 +133,7 @@ export const PaymentCallback: React.FC = () => {
             </p>
           )}
           <Button onClick={handleContinue} className="w-full">
-            {status === 'success' ? 'Continue to Dashboard' : 'Try Again'}
+            {status === 'success' ? 'Continue' : 'Try Again'}
           </Button>
         </CardContent>
       </Card>
