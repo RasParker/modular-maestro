@@ -1674,9 +1674,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Change user password
-  app.post("/api/user/change-password", authenticateToken, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/user/change-password", async (req, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.session?.userId;
       if (!userId) {
         return res.status(401).json({ error: 'User not authenticated' });
       }
@@ -1727,9 +1727,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update user privacy settings
-  app.post("/api/user/privacy-settings", authenticateToken, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/user/privacy-settings", async (req, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.session?.userId;
       if (!userId) {
         return res.status(401).json({ error: 'User not authenticated' });
       }
@@ -1753,9 +1753,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user notification preferences
-  app.get("/api/user/notification-preferences", authenticateToken, async (req: AuthenticatedRequest, res) => {
+  app.get("/api/user/notification-preferences", async (req, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.session?.userId;
       if (!userId) {
         return res.status(401).json({ error: 'User not authenticated' });
       }
@@ -1773,9 +1773,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update user notification preferences
-  app.post("/api/user/notification-preferences", authenticateToken, async (req: AuthenticatedRequest, res) => {
+  app.post("/api/user/notification-preferences", async (req, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.session?.userId;
       if (!userId) {
         return res.status(401).json({ error: 'User not authenticated' });
       }
