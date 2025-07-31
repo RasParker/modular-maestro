@@ -860,9 +860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/tiers/:tierId", async (req, res) => {
     try {
       const tierId = parseInt(req.params.tierId);
-      const deleted = await storage.deleteSubscriptionTier(tierId);```text
-
-```text
+      const deleted = await storage.deleteSubscriptionTier(tierId);
       if (!deleted) {
         return res.status(404).json({ error: "Tier not found" });
       }
@@ -1183,7 +1181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: schema.posts.content,
         media_type: schema.posts.media_type,
         media_urls: schema.posts.media_urls,
-        tier_name: schema.posts.tier_name,
+        tier: schema.posts.tier,
         status: schema.posts.status,
         created_at: schema.posts.created_at,
         likes_count: schema.posts.likes_count,
@@ -1728,7 +1726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get current user data
-      const [user] = await db```text
+      const [user] = await db
         .select()
         .from(usersTable)
         .where(eq(usersTable.id, userId))
@@ -2325,7 +2323,7 @@ app.get('/api/conversations/:conversationId/messages', async (req, res) => {
       .from(conversationsTable)
       .where(
         and(
-          eq(conversationsTable.id, conversationId),
+          eq(conversationsTable.id, parseInt(conversationId)),
           or(
             eq(conversationsTable.participant_1_id, currentUserId),
             eq(conversationsTable.participant_2_id, currentUserId)
@@ -2349,7 +2347,7 @@ app.get('/api/conversations/:conversationId/messages', async (req, res) => {
       })
       .from(messagesTable)
       .leftJoin(usersTable, eq(messagesTable.sender_id, usersTable.id))
-      .where(eq(messagesTable.conversation_id, conversationId))
+      .where(eq(messagesTable.conversation_id, parseInt(conversationId)))
       .orderBy(asc(messagesTable.created_at));
 
     console.log('Found messages:', messages.length);
@@ -2375,7 +2373,7 @@ app.post('/api/conversations/:conversationId/messages', async (req, res) => {
     const conversation = await db
       .select()
       .from(conversationsTable)
-      .where(eq(conversationsTable.id, conversationId))
+      .where(eq(conversationsTable.id, parseInt(conversationId)))
       .limit(1);
 
     if (conversation.length === 0) {
@@ -2569,7 +2567,7 @@ app.post('/api/conversations', async (req, res) => {
           title: 'Payment Successful',
           message: 'Your payment of GHS 50 for Premium tier was processed successfully',
           action_url: '/fan/subscriptions',
-          metadata: { amount: '50', tier_name: 'Premium' }
+          metadata: {}
         },
         {
           user_id: userId,
@@ -2577,7 +2575,7 @@ app.post('/api/conversations', async (req, res) => {
           title: 'New Content',
           message: 'FitnessGuru posted: "5 Tips for Building Muscle"',
           action_url: '/fan/posts/123',
-          metadata: { post_title: '5 Tips for Building Muscle' }
+          metadata: {}
         }
       ];
 
@@ -2610,7 +2608,7 @@ app.post('/api/conversations', async (req, res) => {
         title,
         message,
         action_url: '/fan/notifications',
-        metadata: { test: true, timestamp: new Date().toISOString() }
+        metadata: {}
       });
 
       res.json({ message: "Real-time test notification sent successfully" });
@@ -2635,7 +2633,6 @@ app.post('/api/conversations', async (req, res) => {
       console.log('Subscription details:', JSON.stringify(subscription, null, 2));
 
       // You can store this in a push_subscriptions table
-      ```text
       // await storage.savePushSubscription(userId, subscription);
 
       res.json({ success: true, message: "Push subscription registered successfully" });
@@ -2879,7 +2876,7 @@ app.post('/api/conversations', async (req, res) => {
   const wss = new WebSocketServer({ 
     server: httpServer, 
     path: '/ws',
-    verifyClient: (info) => {
+    verifyClient: (info: any) => {
       // Basic verification - you could add session validation here
       return true;
     }
