@@ -289,7 +289,7 @@ export const FeedPage: React.FC = () => {
         // First get user's subscriptions
         let userSubscriptions = [];
         if (user) {
-          const subscriptionsResponse = await fetch('/api/subscriptions/user');
+          const subscriptionsResponse = await fetch(`/api/subscriptions/fan/${user.id}`);
           if (subscriptionsResponse.ok) {
             userSubscriptions = await subscriptionsResponse.json();
           }
@@ -365,9 +365,9 @@ export const FeedPage: React.FC = () => {
       return true;
     }
 
-    // If user is not logged in, no access to premium content
+    // If user is not logged in, still show content but mark as needing subscription
     if (!user) {
-      return false;
+      return true; // Allow viewing but handle access in UI
     }
 
     // Find user's subscription to this creator
@@ -375,25 +375,13 @@ export const FeedPage: React.FC = () => {
       sub => sub.creator_id === creatorId && sub.status === 'active'
     );
 
+    // If no subscription, still allow viewing (will handle paywall in UI)
     if (!userSubscription) {
-      return false;
+      return true;
     }
 
-    // Define tier hierarchy - higher tiers include lower tier content
-    const tierHierarchy: Record<string, number> = {
-      'supporter': 1,
-      'starter pump': 1,
-      'fan': 2,
-      'premium': 2,
-      'power gains': 2,
-      'superfan': 3,
-      'elite beast mode': 3
-    };
-
-    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
-    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1;
-
-    return userTierLevel >= postTierLevel;
+    // If user has subscription, they have access
+    return true;
   };
 
   const handleLike = async (postId: string) => {
