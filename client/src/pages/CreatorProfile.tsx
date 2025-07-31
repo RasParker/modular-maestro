@@ -752,6 +752,21 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleContentClick = (post: any) => {
+    // Check access control first
+    if (!hasAccessToTier(post.tier)) {
+      console.log('Access denied for post tier:', post.tier);
+      // Show subscription prompt and scroll to tiers section
+      const tiersSection = document.getElementById('subscription-tiers');
+      if (tiersSection) {
+        tiersSection.scrollIntoView({ behavior: 'smooth' });
+        // Expand tiers if they're collapsed
+        if (!isSubscriptionTiersExpanded) {
+          setIsSubscriptionTiersExpanded(true);
+        }
+      }
+      return;
+    }
+
     // For video content, check aspect ratio to determine navigation behavior
     if (post.media_type === 'video' && post.media_urls) {
       const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
