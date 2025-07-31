@@ -280,38 +280,56 @@ export const FeedPage: React.FC = () => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'single'>('grid');
 
-  // Fetch real posts from API
+  // Fetch real posts from API with subscription filtering
   useEffect(() => {
     const fetchFeed = async () => {
       try {
         setLoading(true);
+        
+        // First get user's subscriptions
+        let userSubscriptions = [];
+        if (user) {
+          const subscriptionsResponse = await fetch('/api/subscriptions/user');
+          if (subscriptionsResponse.ok) {
+            userSubscriptions = await subscriptionsResponse.json();
+          }
+        }
+
         const response = await fetch('/api/posts');
         if (response.ok) {
           const posts = await response.json();
 
-          // Transform posts to match the expected format
-          const transformedPosts = posts.map((post: any) => ({
-            id: post.id.toString(),
-            creator: {
-              username: post.creator_username || post.username || 'Unknown',
-              display_name: post.creator_display_name || post.display_name || post.username || 'Unknown',
-              avatar: post.creator_avatar || post.avatar || ''
-            },
-            content: post.content || post.title || '',
-            type: post.media_type || 'post',
-            tier: post.tier_name || post.tier || 'public',
-            thumbnail: post.media_urls && post.media_urls.length > 0 
-              ? `/uploads/${post.media_urls[0]}` 
-              : '',
-            posted: post.created_at || new Date().toISOString(),
-            likes: post.likes_count || 0,
-            comments: post.comments_count || 0,
-            views: Math.floor(Math.random() * 1000) + 100, // Placeholder until views tracking is implemented
-            liked: false, // Will be updated when user interactions are implemented
-            initialComments: [] // Will be populated when comments are fetched
-          }));
+          // Transform and filter posts based on access
+          const transformedPosts = posts.map((post: any) => {
+            const postTier = post.tier_name || post.tier || 'public';
+            
+            return {
+              id: post.id.toString(),
+              creator: {
+                username: post.creator_username || post.username || 'Unknown',
+                display_name: post.creator_display_name || post.display_name || post.username || 'Unknown',
+                avatar: post.creator_avatar || post.avatar || '',
+                id: post.creator_id
+              },
+              content: post.content || post.title || '',
+              type: post.media_type || 'post',
+              tier: postTier,
+              thumbnail: post.media_urls && post.media_urls.length > 0 
+                ? `/uploads/${post.media_urls[0]}` 
+                : '',
+              posted: post.created_at || new Date().toISOString(),
+              likes: post.likes_count || 0,
+              comments: post.comments_count || 0,
+              views: Math.floor(Math.random() * 1000) + 100,
+              liked: false,
+              initialComments: [],
+              hasAccess: hasAccessToContent(postTier, post.creator_id, userSubscriptions)
+            };
+          });
 
-          setFeed(transformedPosts);
+          // Only show posts user has access to in feed
+          const accessiblePosts = transformedPosts.filter(post => post.hasAccess);
+          setFeed(accessiblePosts);
         }
       } catch (error) {
         console.error('Error fetching feed:', error);
@@ -327,6 +345,44 @@ export const FeedPage: React.FC = () => {
 
     fetchFeed();
   }, [user, toast]);
+
+  // Check if user has access to content based on subscription
+  const hasAccessToContent = (postTier: string, creatorId: number, userSubscriptions: any[]) => {
+    // Public content is always accessible
+    if (postTier === 'public') {
+      return true;
+    }
+
+    // If user is not logged in, no access to premium content
+    if (!user) {
+      return false;
+    }
+
+    // Find user's subscription to this creator
+    const userSubscription = userSubscriptions.find(
+      sub => sub.creator_id === creatorId && sub.status === 'active'
+    );
+
+    if (!userSubscription) {
+      return false;
+    }
+
+    // Define tier hierarchy - higher tiers include lower tier content
+    const tierHierarchy: Record<string, number> = {
+      'supporter': 1,
+      'starter pump': 1,
+      'fan': 2,
+      'premium': 2,
+      'power gains': 2,
+      'superfan': 3,
+      'elite beast mode': 3
+    };
+
+    const userTierLevel = tierHierarchy[userSubscription.tier_name?.toLowerCase()] || 0;
+    const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1;
+
+    return userTierLevel >= postTierLevel;
+  };
 
   const handleLike = async (postId: string) => {
     if (!user) return;
@@ -398,6 +454,13 @@ export const FeedPage: React.FC = () => {
   };
 
   const handleThumbnailClick = (post: any) => {
+    // Check if user has access to this content
+    if (!post.hasAccess) {
+      // Redirect to creator profile for subscription
+      navigate(`/creator/${post.creator.username}`);
+      return;
+    }
+
     // For video content, check aspect ratio to determine navigation behavior
     if (post.type === 'video' && post.thumbnail) {
       // Create a temporary image/video element to detect aspect ratio
@@ -590,44 +653,66 @@ export const FeedPage: React.FC = () => {
                     className="relative w-full aspect-video bg-black cursor-pointer"
                     onClick={() => handleThumbnailClick(post)}
                   >
-                    {post.thumbnail ? (
-                      post.type === 'video' ? (
-                        <video
-                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
-                          className="w-full h-full object-cover"
-                          muted
-                          preload="metadata"
-                          onError={(e) => {
-                            const target = e.target as HTMLVideoElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
-                                <div class="text-white text-sm">Video unavailable</div>
-                              </div>`;
-                            }
-                          }}
-                        />
+                    {post.hasAccess ? (
+                      post.thumbnail ? (
+                        post.type === 'video' ? (
+                          <video
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            className="w-full h-full object-cover"
+                            muted
+                            preload="metadata"
+                            onError={(e) => {
+                              const target = e.target as HTMLVideoElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                  <div class="text-white text-sm">Video unavailable</div>
+                                </div>`;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <img 
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            alt={`${post.creator.display_name}'s post`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                            }}
+                          />
+                        )
                       ) : (
                         <img 
-                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          src={post.id === '1' ? 'https://placehold.co/800x800/E63946/FFFFFF?text=Creator+Post+1' :
+                               post.id === '2' ? 'https://placehold.co/800x800/457B9D/FFFFFF?text=Creator+Post+2' :
+                               post.id === '3' ? 'https://placehold.co/800x800/1D3557/FFFFFF?text=Creator+Post+3' :
+                               `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                           alt={`${post.creator.display_name}'s post`}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
-                          }}
                         />
                       )
                     ) : (
-                      <img 
-                        src={post.id === '1' ? 'https://placehold.co/800x800/E63946/FFFFFF?text=Creator+Post+1' :
-                             post.id === '2' ? 'https://placehold.co/800x800/457B9D/FFFFFF?text=Creator+Post+2' :
-                             post.id === '3' ? 'https://placehold.co/800x800/1D3557/FFFFFF?text=Creator+Post+3' :
-                             `https://placehold.co/800x800/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
-                        alt={`${post.creator.display_name}'s post`}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                        <div className="text-center z-10 p-4">
+                          <div className="mb-3">
+                            <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-base font-medium text-foreground mb-2">
+                            {post.tier === 'supporter' ? 'Supporter' : 
+                             post.tier === 'fan' ? 'Fan' : 
+                             post.tier === 'premium' ? 'Premium' : 
+                             post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Subscribe to view this content
+                          </p>
+                        </div>
+                      </div>
                     )}
 
                     {/* Play button overlay for videos */}
@@ -779,45 +864,64 @@ export const FeedPage: React.FC = () => {
                 <div key={post.id} className="youtube-grid-card cursor-pointer" onClick={() => handleThumbnailClick(post)}>
                   {/* Thumbnail */}
                   <div className="relative w-full aspect-video bg-black overflow-hidden mb-3 rounded-lg">
-                    {post.thumbnail ? (
-                    post.type === 'video' ? (
-                      <video
-                        src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
-                        className="w-full h-full object-cover"
-                        muted
-                        preload="metadata"
-                        onError={(e) => {
-                          const target = e.target as HTMLVideoElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
-                              <div class="text-white text-xs">Video unavailable</div>
-                            </div>`;
-                          }
-                        }}
-                      />
+                    {post.hasAccess ? (
+                      post.thumbnail ? (
+                        post.type === 'video' ? (
+                          <video
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            className="w-full h-full object-cover"
+                            muted
+                            preload="metadata"
+                            onError={(e) => {
+                              const target = e.target as HTMLVideoElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                  <div class="text-white text-xs">Video unavailable</div>
+                                </div>`;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <img 
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            alt={`${post.creator.display_name}'s post`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                            }}
+                          />
+                        )
+                      ) : (
+                        <img 
+                          src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
+                               post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
+                               post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
+                               `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                          alt={`${post.creator.display_name}'s post`}
+                          className="w-full h-full object-cover"
+                        />
+                      )
                     ) : (
-                      <img 
-                        src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
-                        alt={`${post.creator.display_name}'s post`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
-                        }}
-                      />
-                    )
-                  ) : (
-                    <img 
-                      src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
-                           post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
-                           post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
-                           `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
-                      alt={`${post.creator.display_name}'s post`}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
+                      <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                        <div className="text-center z-10 p-2">
+                          <div className="mb-2">
+                            <svg className="w-8 h-8 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {post.tier === 'supporter' ? 'Supporter' : 
+                             post.tier === 'fan' ? 'Fan' : 
+                             post.tier === 'premium' ? 'Premium' : 
+                             post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                   {/* Play button overlay for videos */}
                   {post.type === 'video' && (
@@ -889,44 +993,71 @@ export const FeedPage: React.FC = () => {
                       }
                     }}
                   >
-                    {post.thumbnail ? (
-                      post.type === 'video' ? (
-                        <video
-                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
-                          className="w-full h-full object-cover"
-                          muted
-                          preload="metadata"
-                          onError={(e) => {
-                            const target = e.target as HTMLVideoElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
-                                <div class="text-white text-sm">Video unavailable</div>
-                              </div>`;
-                            }
-                          }}
-                        />
+                    {post.hasAccess ? (
+                      post.thumbnail ? (
+                        post.type === 'video' ? (
+                          <video
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            className="w-full h-full object-cover"
+                            muted
+                            preload="metadata"
+                            onError={(e) => {
+                              const target = e.target as HTMLVideoElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                  <div class="text-white text-sm">Video unavailable</div>
+                                </div>`;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <img 
+                            src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                            alt={`${post.creator.display_name}'s post`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
+                            }}
+                          />
+                        )
                       ) : (
                         <img 
-                          src={post.thumbnail.startsWith('/uploads/') ? post.thumbnail : `/uploads/${post.thumbnail}`}
+                          src={post.id === '1' ? 'https://placehold.co/1280x720/E63946/FFFFFF?text=Creator+Post+1' :
+                               post.id === '2' ? 'https://placehold.co/1280x720/457B9D/FFFFFF?text=Creator+Post+2' :
+                               post.id === '3' ? 'https://placehold.co/1280x720/1D3557/FFFFFF?text=Creator+Post+3' :
+                               `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                           alt={`${post.creator.display_name}'s post`}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`;
-                          }}
                         />
                       )
                     ) : (
-                      <img 
-                        src={post.id === '1' ? 'https://placehold.co/1280x720/E63946/FFFFFF?text=Creator+Post+1' :
-                             post.id === '2' ? 'https://placehold.co/1280x720/457B9D/FFFFFF?text=Creator+Post+2' :
-                             post.id === '3' ? 'https://placehold.co/1280x720/1D3557/FFFFFF?text=Creator+Post+3' :
-                             `https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
-                        alt={`${post.creator.display_name}'s post`}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                        <div className="text-center z-10 p-6">
+                          <div className="mb-4">
+                            <svg className="w-16 h-16 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-xl font-medium text-foreground mb-2">
+                            {post.tier === 'supporter' ? 'Supporter' : 
+                             post.tier === 'fan' ? 'Fan' : 
+                             post.tier === 'premium' ? 'Premium' : 
+                             post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                          </h3>
+                          <p className="text-muted-foreground mb-4">
+                            Subscribe to {post.creator.display_name} to view this content
+                          </p>
+                          <Button asChild className="mt-2">
+                            <a href={`/creator/${post.creator.username}`}>
+                              View Profile
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
                     )}
 
                     {/* Play button for videos */}
