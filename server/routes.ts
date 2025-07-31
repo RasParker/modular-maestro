@@ -332,36 +332,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Post routes
-  // Get all posts for a creator
+  // Get all posts for feed and creator content
   app.get("/api/posts", async (req, res) => {
     try {
       // Get query parameters to determine what posts to fetch
       const { status, creatorId } = req.query;
 
-      let query = db.select().from(posts);
+      console.log('Fetching posts with params:', { status, creatorId });
 
-      // If no specific status is requested, only show published posts (for public feeds)
+      // Build the query with proper join to get creator data
+      let query = db.select({
+        id: posts.id,
+        creator_id: posts.creator_id,
+        title: posts.title,
+        content: posts.content,
+        media_type: posts.media_type,
+        media_urls: posts.media_urls,
+        tier: posts.tier,
+        status: posts.status,
+        created_at: posts.created_at,
+        likes_count: posts.likes_count,
+        comments_count: posts.comments_count,
+        creator_username: users.username,
+        creator_display_name: users.display_name,
+        creator_avatar: users.avatar
+      })
+      .from(posts)
+      .leftJoin(users, eq(posts.creator_id, users.id));
+
+      // Apply filters
       if (!status) {
+        // For public feed, only show published posts
         query = query.where(eq(posts.status, 'published'));
-      } else if (status && status !== 'all') {
+      } else if (status !== 'all') {
         query = query.where(eq(posts.status, status as string));
       }
 
       // Filter by creator if specified
       if (creatorId) {
         const creatorIdNum = parseInt(creatorId as string);
-        if (status) {
-          // For creator's own dashboard, allow filtering by status
-          if (status === 'all') {
-            query = query.where(eq(posts.creator_id, creatorIdNum));
-          } else {
-            query = query.where(and(
-              eq(posts.creator_id, creatorIdNum),
-              eq(posts.status, status as string)
-            ));
-          }
+        if (status && status !== 'all') {
+          query = query.where(and(
+            eq(posts.creator_id, creatorIdNum),
+            eq(posts.status, status as string)
+          ));
+        } else if (status === 'all') {
+          query = query.where(eq(posts.creator_id, creatorIdNum));
         } else {
-          // For public viewing, still only show published
           query = query.where(and(
             eq(posts.creator_id, creatorIdNum),
             eq(posts.status, 'published')
@@ -371,19 +388,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const allPosts = await query.orderBy(desc(posts.created_at));
 
-      // Then enrich with user data
-      const postsWithUsers = await Promise.all(
-        allPosts.map(async (post) => {
-          const user = await storage.getUser(post.creator_id);
-          return {
-            ...post,
-            username: user?.username || null,
-            avatar: user?.avatar || null
-          };
-        })
-      );
-
-      res.json(postsWithUsers);
+      console.log(`Found ${allPosts.length} posts`);
+      res.json(allPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
       res.status(500).json({ error: 'Failed to fetch posts' });
@@ -1171,36 +1177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-// Posts endpoint for feed
-  app.get('/api/posts', async (req, res) => {
-    try {
-      const posts = await db.select({
-        id: schema.posts.id,
-        creator_id: schema.posts.creator_id,
-        title: schema.posts.title,
-        content: schema.posts.content,
-        media_type: schema.posts.media_type,
-        media_urls: schema.posts.media_urls,
-        tier: schema.posts.tier,
-        status: schema.posts.status,
-        created_at: schema.posts.created_at,
-        likes_count: schema.posts.likes_count,
-        comments_count: schema.posts.comments_count,
-        creator_username: schema.users.username,
-        creator_display_name: schema.users.display_name,
-        creator_avatar: schema.users.avatar
-      })
-      .from(schema.posts)
-      .leftJoin(schema.users, eq(schema.posts.creator_id, schema.users.id))
-      .where(eq(schema.posts.status, 'published'))
-      .orderBy(desc(schema.posts.created_at));
 
-      res.json(posts);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      res.status(500).json({ error: 'Failed to fetch posts' });
-    }
-  });
 
   // Admin routes
   app.use('/api/admin', adminRoutes);

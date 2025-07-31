@@ -298,24 +298,31 @@ export const FeedPage: React.FC = () => {
         const response = await fetch('/api/posts');
         if (response.ok) {
           const posts = await response.json();
+          console.log('Fetched posts from API:', posts.length);
+
+          if (!Array.isArray(posts)) {
+            throw new Error('Invalid response format from API');
+          }
 
           // Transform and filter posts based on access
           const transformedPosts = posts.map((post: any) => {
-            const postTier = post.tier_name || post.tier || 'public';
+            const postTier = post.tier || 'public';
             
             return {
               id: post.id.toString(),
               creator: {
-                username: post.creator_username || post.username || 'Unknown',
-                display_name: post.creator_display_name || post.display_name || post.username || 'Unknown',
-                avatar: post.creator_avatar || post.avatar || '',
+                username: post.creator_username || 'Unknown',
+                display_name: post.creator_display_name || post.creator_username || 'Unknown',
+                avatar: post.creator_avatar || '',
                 id: post.creator_id
               },
               content: post.content || post.title || '',
               type: post.media_type || 'post',
               tier: postTier,
               thumbnail: post.media_urls && post.media_urls.length > 0 
-                ? `/uploads/${post.media_urls[0]}` 
+                ? post.media_urls[0].startsWith('/uploads/') 
+                  ? post.media_urls[0] 
+                  : `/uploads/${post.media_urls[0]}`
                 : '',
               posted: post.created_at || new Date().toISOString(),
               likes: post.likes_count || 0,
@@ -329,15 +336,12 @@ export const FeedPage: React.FC = () => {
 
           // Only show posts user has access to in feed
           const accessiblePosts = transformedPosts.filter(post => post.hasAccess);
+          console.log('Accessible posts after filtering:', accessiblePosts.length);
           setFeed(accessiblePosts);
         } else {
-          // If API fails, fall back to mock data for development
-          console.warn('API failed, using mock data');
-          const mockWithAccess = MOCK_FEED.map(post => ({
-            ...post,
-            hasAccess: true // Mock data is always accessible
-          }));
-          setFeed(mockWithAccess);
+          const errorText = await response.text();
+          console.error('API request failed:', response.status, errorText);
+          throw new Error(`API request failed with status ${response.status}`);
         }
       } catch (error) {
         console.error('Error fetching feed:', error);
