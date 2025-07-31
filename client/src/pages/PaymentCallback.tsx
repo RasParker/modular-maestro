@@ -48,8 +48,19 @@ export const PaymentCallback: React.FC = () => {
           
           toast({
             title: "Payment Successful!",
-            description: "Your subscription has been activated.",
+            description: "Your subscription has been activated. Redirecting...",
           });
+
+          // Auto-redirect after successful payment (3 second delay)
+          setTimeout(() => {
+            const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
+            if (creatorProfile) {
+              sessionStorage.removeItem('lastCreatorProfile');
+              window.location.href = creatorProfile;
+            } else {
+              window.location.href = '/fan/dashboard';
+            }
+          }, 3000);
         } else {
           setStatus('failed');
           toast({
@@ -80,7 +91,13 @@ export const PaymentCallback: React.FC = () => {
       const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
       if (creatorProfile) {
         sessionStorage.removeItem('lastCreatorProfile');
-        navigate(creatorProfile);
+        try {
+          navigate(creatorProfile);
+        } catch (error) {
+          console.error('Navigation error:', error);
+          // Fallback to fan dashboard if navigation fails
+          navigate('/fan/dashboard');
+        }
       } else {
         // Fallback to fan dashboard
         navigate('/fan/dashboard');
@@ -123,7 +140,7 @@ export const PaymentCallback: React.FC = () => {
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
             {status === 'success' 
-              ? 'Your subscription has been activated successfully. You can now access exclusive content!'
+              ? 'Your subscription has been activated successfully. You can now access exclusive content! Redirecting automatically...'
               : 'We could not process your payment. Please try again or contact support if the issue persists.'
             }
           </p>
@@ -135,6 +152,28 @@ export const PaymentCallback: React.FC = () => {
           <Button onClick={handleContinue} className="w-full">
             {status === 'success' ? 'Continue' : 'Try Again'}
           </Button>
+          
+          {/* Alternative navigation buttons in case of connection issues */}
+          {status === 'success' && (
+            <div className="flex gap-2 mt-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.href = '/fan/dashboard'}
+                className="flex-1"
+              >
+                Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.href = '/explore'}
+                className="flex-1"
+              >
+                Explore
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
