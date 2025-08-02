@@ -129,7 +129,7 @@ router.post('/mobile-money/initialize', async (req, res) => {
 });
 
 // Verify payment
-router.get('/verify/:reference', async (req, res) => {
+router.post('/verify/:reference', async (req, res) => {
   try {
     const { reference } = req.params;
 
