@@ -63,12 +63,14 @@ app.use((req, res, next) => {
     // importantly only setup vite in development and after
     // setting up all the other routes so the catch-all route
     // doesn't interfere with the other routes
-    if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === undefined) {
+    if (process.env.NODE_ENV === "production") {
+      console.log('Setting up static file serving for production...');
+      serveStatic(app);
+      console.log('Static file serving setup completed');
+    } else {
       console.log('Setting up Vite for development...');
       await setupVite(app, server);
       console.log('Vite setup completed');
-    } else {
-      serveStatic(app);
     }
 
     // Start cron service for automated post publishing
