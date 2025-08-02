@@ -83,11 +83,8 @@ export class PaymentService {
   private secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_placeholder';
   private publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder';
 
-  // Development mode flag
-  private isDevelopment = process.env.NODE_ENV !== 'production' && (
-    this.secretKey === 'sk_test_placeholder' || 
-    this.publicKey === 'pk_test_placeholder'
-  );
+  // Development mode flag - Force development mode to use localhost callbacks
+  private isDevelopment = true;
 
   // Store metadata for development mode
   private devMetadataStore: Map<string, any> = new Map();
@@ -138,7 +135,7 @@ export class PaymentService {
         status: true,
         message: 'Authorization URL created (Development Mode)',
         data: {
-          authorization_url: `${process.env.REPL_SLUG && process.env.REPL_OWNER ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app` : 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`,
+          authorization_url: `http://localhost:5000/payment/callback?reference=${reference}&status=success`,
           access_code: 'dev_access_code',
           reference: reference
         }
