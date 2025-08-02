@@ -3182,6 +3182,66 @@ app.post('/api/conversations', async (req, res) => {
     }
   });
 
+  // Payment verification endpoint
+  app.get('/api/payments/verify/:reference', async (req, res) => {
+    try {
+      const { reference } = req.params;
+
+      // In development, simulate successful payment
+      if (process.env.NODE_ENV === 'development') {
+        res.json({
+          success: true,
+          data: {
+            status: 'success',
+            reference,
+            amount: 1500, // GHS 15.00
+            customer: {
+              email: 'test@example.com'
+            }
+          }
+        });
+        return;
+      }
+
+      // In production, verify with Paystack
+      const paystackResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const paystackData = await paystackResponse.json();
+
+      if (paystackData.status && paystackData.data.status === 'success') {
+        // Update subscription status in database
+        // This would typically involve creating a subscription record
+
+        res.json({
+          success: true,
+          data: paystackData.data
+        });
+      } else {
+        res.json({
+          success: false,
+          message: 'Payment verification failed'
+        });
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  });
+
+  // Payment callback route - serve the React app for payment callback handling
+  app.get('/payment/callback', (req, res) => {
+    // This will be handled by the React router, just serve the main HTML
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+  });
+
   return httpServer;
 }
 

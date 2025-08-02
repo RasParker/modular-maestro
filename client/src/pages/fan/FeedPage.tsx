@@ -753,15 +753,18 @@ export const FeedPage: React.FC = () => {
                   <div className="p-3">
                     <div className="flex gap-3">
                       <Avatar className="h-9 w-9 flex-shrink-0">
-                        <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                        <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                        <AvatarImage 
+                          src={post.creator.avatar ? (post.creator.avatar.startsWith('/uploads/') ? post.creator.avatar : `/uploads/${post.creator.avatar}`) : undefined} 
+                          alt={post.creator.username} 
+                        />
+                        <AvatarFallback className="text-sm">{(post.creator.display_name || post.creator.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                           {post.content || 'Untitled Post'}
                         </h4>
                         <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                          <span className="truncate mr-2">{post.creator.display_name}</span>
+                          <span className="truncate mr-2">{post.creator.display_name || post.creator.username}</span>
                           <div className="flex items-center gap-1 flex-shrink-0 text-right">
                             <Eye className="w-3 h-3" />
                             <span>{post.views}</span>
@@ -965,15 +968,18 @@ export const FeedPage: React.FC = () => {
                 {/* YouTube-style content below thumbnail */}
                 <div className="flex gap-3">
                   <Avatar className="h-9 w-9 flex-shrink-0">
-                    <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                    <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                    <AvatarImage 
+                      src={post.creator.avatar ? (post.creator.avatar.startsWith('/uploads/') ? post.creator.avatar : `/uploads/${post.creator.avatar}`) : undefined} 
+                      alt={post.creator.username} 
+                    />
+                    <AvatarFallback className="text-sm">{(post.creator.display_name || post.creator.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                       {post.content || post.title || 'Untitled Post'}
                     </h3>
                     <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                      <span className="truncate mr-2">{post.creator.display_name}</span>
+                      <span className="truncate mr-2">{post.creator.display_name || post.creator.username}</span>
                       <div className="flex items-center gap-1 flex-shrink-0 text-right">
                         <Eye className="w-3 h-3" />
                         <span>{post.views}</span>
@@ -1095,15 +1101,18 @@ export const FeedPage: React.FC = () => {
                   {/* Creator Info and Content - VideoWatch Up Next style */}
                   <div className="flex gap-3">
                     <Avatar className="h-9 w-9 flex-shrink-0">
-                      <AvatarImage src={post.creator.avatar} alt={post.creator.username} />
-                      <AvatarFallback className="text-sm">{post.creator.display_name.charAt(0)}</AvatarFallback>
+                      <AvatarImage 
+                        src={post.creator.avatar ? (post.creator.avatar.startsWith('/uploads/') ? post.creator.avatar : `/uploads/${post.creator.avatar}`) : undefined} 
+                        alt={post.creator.username} 
+                      />
+                      <AvatarFallback className="text-sm">{(post.creator.display_name || post.creator.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
                         {post.content || 'Untitled Post'}
                       </h4>
                       <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                        <span className="truncate mr-2">{post.creator.display_name}</span>
+                        <span className="truncate mr-2">{post.creator.display_name || post.creator.username}</span>
                         <div className="flex items-center gap-1 flex-shrink-0 text-right">
                           <Eye className="w-3 h-3" />
                           <span>{post.views}</span>
@@ -1305,8 +1314,11 @@ export const FeedPage: React.FC = () => {
                   <div className="absolute bottom-20 left-4 right-16 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-3">
                       <Avatar className="h-10 w-10 border-2 border-white">
-                        <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
-                        <AvatarFallback className="text-black">{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                        <AvatarImage 
+                          src={selectedContent.creator.avatar ? (selectedContent.creator.avatar.startsWith('/uploads/') ? selectedContent.creator.avatar : `/uploads/${selectedContent.creator.avatar}`) : undefined} 
+                          alt={selectedContent.creator.username} 
+                        />
+                        <AvatarFallback className="text-black">{(selectedContent.creator.display_name || selectedContent.creator.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <p className="font-semibold text-white text-sm drop-shadow-lg">
@@ -1477,8 +1489,11 @@ export const FeedPage: React.FC = () => {
                   <div className="px-4 py-3 border-b border-border">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={selectedContent.creator.avatar} alt={selectedContent.creator.username} />
-                        <AvatarFallback>{selectedContent.creator.display_name.charAt(0)}</AvatarFallback>
+                        <AvatarImage 
+                          src={selectedContent.creator.avatar ? (selectedContent.creator.avatar.startsWith('/uploads/') ? selectedContent.creator.avatar : `/uploads/${selectedContent.creator.avatar}`) : undefined} 
+                          alt={selectedContent.creator.username} 
+                        />
+                        <AvatarFallback>{(selectedContent.creator.display_name || selectedContent.creator.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <p className="font-semibold text-foreground text-sm">

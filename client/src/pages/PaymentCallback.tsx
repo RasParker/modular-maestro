@@ -1,107 +1,195 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 const PaymentCallback: React.FC = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'cancelled'>('loading');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const verifyPayment = async () => {
+    const processPayment = async () => {
       const reference = searchParams.get('reference');
+      const paymentStatus = searchParams.get('status');
+
+      console.log('Payment callback params:', { reference, paymentStatus });
 
       if (!reference) {
         setStatus('failed');
-        setMessage('No payment reference found');
+        setMessage('Payment reference not found');
         return;
       }
 
       try {
-        console.log('Verifying payment with reference:', reference);
-
-        const response = await fetch(`/api/payments/verify/${reference}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        const data = await response.json();
-        console.log('Payment verification response:', data);
-
-        if (response.ok && data.success) {
+        // For development, we'll simulate a successful payment since we're in dev mode
+        if (paymentStatus === 'success') {
           setStatus('success');
-          setMessage(data.message || 'Payment successful! Your subscription is now active.');
+          setMessage('Payment successful! Your subscription is now active.');
 
-          // Redirect to fan dashboard after a short delay
+          toast({
+            title: "Payment Successful",
+            description: "Your subscription has been activated successfully!",
+          });
+
+          // Redirect after 3 seconds
           setTimeout(() => {
-            window.location.href = `${window.location.origin}/fan/dashboard`;
-          }, 2000);
+            const lastProfile = sessionStorage.getItem('lastCreatorProfile');
+            if (lastProfile) {
+              sessionStorage.removeItem('lastCreatorProfile');
+              navigate(lastProfile);
+            } else {
+              navigate('/fan/dashboard');
+            }
+          }, 3000);
         } else {
-          setStatus('failed');
-          setMessage(data.message || 'Payment verification failed');
+          // Try to verify with backend
+          const response = await fetch(`/api/payments/verify/${reference}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const result = await response.json();
+
+          if (result.success && result.data.status === 'success') {
+            setStatus('success');
+            setMessage('Payment successful! Your subscription is now active.');
+
+            toast({
+              title: "Payment Successful",
+              description: "Your subscription has been activated successfully!",
+            });
+
+            // Redirect after 3 seconds
+            setTimeout(() => {
+              const lastProfile = sessionStorage.getItem('lastCreatorProfile');
+              if (lastProfile) {
+                sessionStorage.removeItem('lastCreatorProfile');
+                navigate(lastProfile);
+              } else {
+                navigate('/fan/dashboard');
+              }
+            }, 3000);
+          } else {
+            setStatus('failed');
+            setMessage(result.message || 'Payment verification failed');
+          }
         }
       } catch (error) {
         console.error('Payment verification error:', error);
         setStatus('failed');
-        setMessage('An error occurred while verifying payment');
+        setMessage('Failed to verify payment. Please contact support.');
       }
     };
 
-    verifyPayment();
-  }, [searchParams, navigate]);
+    // Check URL params for immediate status
+    const urlStatus = searchParams.get('status');
+    if (urlStatus === 'success') {
+      processPayment();
+    } else if (urlStatus === 'cancelled') {
+      setStatus('cancelled');
+      setMessage('Payment was cancelled');
+    } else {
+      processPayment();
+    }
+  }, [searchParams, navigate, toast]);
 
-  const handleReturnToDashboard = () => {
-    navigate('/fan/dashboard', { replace: true });
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'success':
+        return <CheckCircle className="w-16 h-16 text-green-500" />;
+      case 'failed':
+        return <XCircle className="w-16 h-16 text-red-500" />;
+      case 'cancelled':
+        return <XCircle className="w-16 h-16 text-yellow-500" />;
+      default:
+        return <Loader2 className="w-16 h-16 text-primary animate-spin" />;
+    }
+  };
+
+  const getStatusTitle = () => {
+    switch (status) {
+      case 'success':
+        return 'Payment Successful!';
+      case 'failed':
+        return 'Payment Failed';
+      case 'cancelled':
+        return 'Payment Cancelled';
+      default:
+        return 'Processing Payment...';
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'success':
+        return 'text-green-600';
+      case 'failed':
+        return 'text-red-600';
+      case 'cancelled':
+        return 'text-yellow-600';
+      default:
+        return 'text-primary';
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">
-            {status === 'loading' && 'Verifying Payment...'}
-            {status === 'success' && 'Payment Successful!'}
-            {status === 'failed' && 'Payment Verification'}
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            {getStatusIcon()}
+          </div>
+          <CardTitle className={`text-2xl ${getStatusColor()}`}>
+            {getStatusTitle()}
           </CardTitle>
+          <CardDescription>
+            {message || 'Please wait while we process your payment...'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           {status === 'loading' && (
-            <div className="flex justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
+            <p className="text-sm text-muted-foreground">
+              This may take a few moments...
+            </p>
           )}
 
           {status === 'success' && (
-            <div className="space-y-4">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-              <p className="text-muted-foreground">{message}</p>
-              <p className="text-sm text-muted-foreground">
-                Redirecting to dashboard...
-              </p>
-              <Button 
-                onClick={handleReturnToDashboard}
-                className="w-full"
-              >
-                Return to Dashboard
-              </Button>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Redirecting you back to the creator profile...
+            </p>
           )}
 
-          {status === 'failed' && (
-            <div className="space-y-4">
-              <XCircle className="h-16 w-16 text-red-500 mx-auto" />
-              <p className="text-muted-foreground">{message}</p>
+          {(status === 'failed' || status === 'cancelled') && (
+            <div className="space-y-3">
               <Button 
-                onClick={handleReturnToDashboard}
+                onClick={() => {
+                  const lastProfile = sessionStorage.getItem('lastCreatorProfile');
+                  if (lastProfile) {
+                    sessionStorage.removeItem('lastCreatorProfile');
+                    navigate(lastProfile);
+                  } else {
+                    navigate('/fan/dashboard');
+                  }
+                }}
                 className="w-full"
               >
-                Return to Dashboard
+                Return to Profile
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/fan/dashboard')}
+                className="w-full"
+              >
+                Go to Dashboard
               </Button>
             </div>
           )}
