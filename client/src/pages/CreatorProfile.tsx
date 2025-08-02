@@ -1953,14 +1953,6 @@ export const CreatorProfile: React.FC = () => {
                               }
                             })()}
 
-                            {/* Play button for videos */}
-                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                                  <Video className="w-8 h-8 text-white" fill="white" />
-                                </div>
-                              </div>
-                            )}
 
                             {/* Duration overlay for videos */}
                             {post.media_type === 'video' && hasAccessToTier(post.tier) && (
@@ -2468,14 +2460,6 @@ export const CreatorProfile: React.FC = () => {
                               }
                             })()}
 
-                            {/* Play button for videos */}
-                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                                  <Video className="w-8 h-8 text-white" fill="white" />
-                                </div>
-                              </div>
-                            )}
 
                             {/* Duration overlay for videos */}
                             {post.media_type === 'video' && hasAccessToTier(post.tier) && (
