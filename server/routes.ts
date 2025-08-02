@@ -854,8 +854,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.error('Failed to send comment like notification:', notificationError);
             }
           }
-        } else```tool_code
-if (comment && comment.user_id === userId) {
+        } else if (comment && comment.user_id === userId) {
           console.log('Skipping notification - user liked their own comment');
         } else {
           console.log('Comment not found for like notification');
@@ -1716,7 +1715,7 @@ if (comment && comment.user_id === userId) {
       if (coverPhotoUrl !== undefined) updateData.cover_image = coverPhotoUrl;
 
       const updatedUser = await db.update(users)
-        .set(updateData)```tool_code
+        .set(updateData)
         .where(eq(users.id, req.session.userId))
         .returning();
 
