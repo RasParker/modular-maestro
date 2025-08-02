@@ -845,7 +845,7 @@ export const CreatorProfile: React.FC = () => {
         ...prev,
         [postId]: {
           liked: !currentLike.liked,
-          count: currentLike.liked ? currentLike.count - 1 : currentgeneration>
+          count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
         }
       }));
 
