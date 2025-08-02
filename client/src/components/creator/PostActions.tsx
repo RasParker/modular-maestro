@@ -27,8 +27,8 @@ export const PostActions: React.FC<PostActionsProps> = ({
   onDelete
 }) => {
   return (
-    <div className="flex items-center justify-between mt-2">
-      <div className="flex items-center gap-6">
+    <div className="flex items-center justify-between mt-2 px-2">
+      <div className="flex items-center gap-6"></div>
         {/* Like button */}
         <Button
           variant="ghost"
