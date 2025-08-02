@@ -315,11 +315,8 @@ export class PaymentService {
       ]
     };
 
-    // Get the correct domain for Replit
-    const baseUrl = process.env.REPL_SLUG && process.env.REPL_OWNER 
-      ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app`
-      : 'http://localhost:5000';
-    const callbackUrl = `${baseUrl}/payment/callback`;
+    // Use localhost callback URL to bypass deployment issues
+    const callbackUrl = 'http://localhost:5000/payment/callback';
 
     return this.initializePayment({
       email,
