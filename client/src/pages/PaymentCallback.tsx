@@ -51,7 +51,7 @@ const PaymentCallback: React.FC = () => {
         } else {
           // Try to verify with backend
           const response = await fetch(`/api/payments/verify/${reference}`, {
-            method: 'GET',
+            method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
