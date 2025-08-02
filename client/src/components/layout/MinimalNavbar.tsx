@@ -174,7 +174,7 @@ export const MinimalNavbar: React.FC = () => {
     <nav className={`fixed top-0 left-0 right-0 z-50 ${
       isEdgeToEdgePage 
         ? 'bg-transparent pointer-events-none' 
-        : 'bg-background/80 backdrop-blur-md border-b border-border'
+        : 'bg-background border-b border-border'
     }`}>
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -345,6 +345,16 @@ export const MinimalNavbar: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Theme Toggle Section */}
+                    <div className="mt-6 px-6">
+                      <div className="border-t pt-6">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Theme</span>
+                          <ThemeToggle />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </SheetContent>

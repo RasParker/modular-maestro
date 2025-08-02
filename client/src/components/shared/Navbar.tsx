@@ -61,7 +61,7 @@ export const Navbar: React.FC = () => {
   ].filter(item => item.show);
 
   return (
-    <nav className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+    <nav className="bg-card border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -174,6 +174,16 @@ export const Navbar: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Theme Toggle Section */}
+                    <div className="mt-6 px-6">
+                      <div className="border-t pt-6">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Theme</span>
+                          <ThemeToggle />
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Mobile Auth Buttons */}
                     {!user && (

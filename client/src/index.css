@@ -484,6 +484,19 @@
     transform: translateY(-2px);
   }
 
+  /* Remove rounded corners on mobile for up next cards */
+  @media (max-width: 768px) {
+    .youtube-grid-card .rounded-lg,
+    .youtube-grid-card .rounded-md {
+      border-radius: 0 !important;
+    }
+    
+    .feed-card .rounded-lg,
+    .feed-card .rounded-md {
+      border-radius: 0 !important;
+    }
+  }
+
   /* Line clamp utilities */
   .line-clamp-2 {
     display: -webkit-box;
