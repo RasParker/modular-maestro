@@ -1,5 +1,6 @@
 
 import { db } from './db';
+import { sql } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,7 +18,7 @@ export async function initializeDatabase() {
     
     // Use a simpler query with timeout handling
     const result = await Promise.race([
-      db.execute(`SELECT 1 as test`),
+      db.execute(sql`SELECT 1 as test`),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 15 seconds')), 15000))
     ]);
     
@@ -30,7 +31,7 @@ export async function initializeDatabase() {
       const sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
       
       console.log('Executing database schema...');
-      await db.execute(sqlContent);
+      await db.execute(sql.raw(sqlContent));
       
       console.log('Database schema created successfully');
     } else {
