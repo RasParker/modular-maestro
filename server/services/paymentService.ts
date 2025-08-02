@@ -135,7 +135,7 @@ export class PaymentService {
         status: true,
         message: 'Authorization URL created (Development Mode)',
         data: {
-          authorization_url: `http://localhost:5000/payment/callback?reference=${reference}&status=success`,
+          authorization_url: `/payment/callback?reference=${reference}&status=success`,
           access_code: 'dev_access_code',
           reference: reference
         }
@@ -312,8 +312,8 @@ export class PaymentService {
       ]
     };
 
-    // Use localhost callback URL to bypass deployment issues
-    const callbackUrl = 'http://localhost:5000/payment/callback';
+    // Use relative callback URL to work in current environment
+    const callbackUrl = '/payment/callback';
 
     return this.initializePayment({
       email,
