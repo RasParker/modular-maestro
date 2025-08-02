@@ -842,7 +842,6 @@ export const CreatorProfile: React.FC = () => {
 
       // Update local state immediately for responsive UI
       setPostLikes(prev => ({
-```typescript
         ...prev,
         [postId]: {
           liked: !currentLike.liked,
