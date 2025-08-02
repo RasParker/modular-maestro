@@ -135,7 +135,7 @@ export class PaymentService {
         status: true,
         message: 'Authorization URL created (Development Mode)',
         data: {
-          authorization_url: `/payment/callback?reference=${reference}&status=success`,
+          authorization_url: `${process.env.REPL_SLUG && process.env.REPL_OWNER ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app` : 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`,
           access_code: 'dev_access_code',
           reference: reference
         }
