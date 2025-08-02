@@ -83,8 +83,8 @@ export class PaymentService {
   private secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_placeholder';
   private publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder';
 
-  // Development mode flag - Force development mode to use localhost callbacks
-  private isDevelopment = true;
+  // Development mode flag - Only use development mode in actual development
+  private isDevelopment = process.env.NODE_ENV !== 'production';
 
   // Store metadata for development mode
   private devMetadataStore: Map<string, any> = new Map();
@@ -312,8 +312,11 @@ export class PaymentService {
       ]
     };
 
-    // Use relative callback URL to work in current environment
-    const callbackUrl = '/payment/callback';
+    // Use current environment's callback URL
+    const baseUrl = process.env.REPL_SLUG && process.env.REPL_OWNER 
+      ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app`
+      : 'http://localhost:5000';
+    const callbackUrl = `${baseUrl}/payment/callback`;
 
     return this.initializePayment({
       email,
