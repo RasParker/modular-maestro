@@ -28,7 +28,7 @@ export const PostActions: React.FC<PostActionsProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-between mt-2 px-2">
-      <div className="flex items-center gap-6"></div>
+      <div className="flex items-center gap-6">
         {/* Like button */}
         <Button
           variant="ghost"
