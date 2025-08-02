@@ -842,6 +842,7 @@ export const CreatorProfile: React.FC = () => {
 
       // Update local state immediately for responsive UI
       setPostLikes(prev => ({
+```typescript
         ...prev,
         [postId]: {
           liked: !currentLike.liked,
@@ -1758,17 +1759,78 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <div className="-ml-2">
-                                  <PostActions
-                                    post={post}
-                                    postLikes={postLikes}
-                                    isOwnProfile={isOwnProfile}
-                                    onLike={handleLike}
-                                    onComment={handleCommentClick}
-                                    onShare={handleShare}
-                                    onEdit={handleEditPost}
-                                    onDelete={handleDeletePost}
-                                  />
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 -ml-2">
+                                  <div className="flex items-center gap-4">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-1 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-xs">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-xs">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-xs">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-xs">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-xs">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
 
                             </div>
@@ -1941,17 +2003,78 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <div className="-ml-2">
-                                  <PostActions
-                                    post={post}
-                                    postLikes={postLikes}
-                                    isOwnProfile={isOwnProfile}
-                                    onLike={handleLike}
-                                    onComment={handleCommentClick}
-                                    onShare={handleShare}
-                                    onEdit={handleEditPost}
-                                    onDelete={handleDeletePost}
-                                  />
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 -ml-2">
+                                  <div className="flex items-center gap-4">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-1 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-xs">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-xs">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-xs">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-xs">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-xs">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
 
                             </div>
@@ -2127,17 +2250,78 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <div className="-ml-2">
-                                  <PostActions
-                                    post={post}
-                                    postLikes={postLikes}
-                                    isOwnProfile={isOwnProfile}
-                                    onLike={handleLike}
-                                    onComment={handleCommentClick}
-                                    onShare={handleShare}
-                                    onEdit={handleEditPost}
-                                    onDelete={handleDeletePost}
-                                  />
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 -ml-2">
+                                  <div className="flex items-center gap-4">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-1 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-xs">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-xs">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-xs">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-xs">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-xs">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
 
                             </div>
@@ -2172,7 +2356,7 @@ export const CreatorProfile: React.FC = () => {
 
                               if (!hasAccess) {
                                 return (
-                                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                  <div className="w-full h-full bgradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
                                     <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
                                     <div className="text-center z-10 p-4">
                                       <div className="mb-3">
@@ -2310,17 +2494,78 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <div className="-ml-2">
-                                  <PostActions
-                                    post={post}
-                                    postLikes={postLikes}
-                                    isOwnProfile={isOwnProfile}
-                                    onLike={handleLike}
-                                    onComment={handleCommentClick}
-                                    onShare={handleShare}
-                                    onEdit={handleEditPost}
-                                    onDelete={handleDeletePost}
-                                  />
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 -ml-2">
+                                  <div className="flex items-center gap-4">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-1 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-xs">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-xs">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-xs">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-xs">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-1 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-xs">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
 
                             </div>
