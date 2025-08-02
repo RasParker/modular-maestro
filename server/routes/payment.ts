@@ -140,11 +140,15 @@ router.get('/verify/:reference', async (req, res) => {
       });
     }
 
+    console.log('🔍 Verifying payment with reference:', reference);
     const verificationResult = await paymentService.verifyPayment(reference);
+    console.log('✅ Payment verification result:', verificationResult.data.status);
 
     if (verificationResult.data.status === 'success') {
+      console.log('💳 Processing successful payment...');
       // Process successful payment
       await paymentService.processSuccessfulPayment(verificationResult.data);
+      console.log('✅ Payment processing completed successfully');
     }
 
     res.json({
@@ -153,7 +157,7 @@ router.get('/verify/:reference', async (req, res) => {
       message: 'Payment verified successfully'
     });
   } catch (error: any) {
-    console.error('Payment verification error:', error);
+    console.error('❌ Payment verification error:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Payment verification failed'

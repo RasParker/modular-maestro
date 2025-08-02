@@ -61,16 +61,11 @@ export const PaymentCallback: React.FC = () => {
             description: "Your subscription has been activated. Redirecting...",
           });
 
-          // Auto-redirect after successful payment (3 second delay)
+          // Auto-redirect after successful payment (2 second delay)
           setTimeout(() => {
-            const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
-            if (creatorProfile) {
-              sessionStorage.removeItem('lastCreatorProfile');
-              window.location.href = creatorProfile;
-            } else {
-              window.location.href = '/fan/dashboard';
-            }
-          }, 3000);
+            // Always go to fan dashboard after successful payment
+            navigate('/fan/dashboard', { replace: true });
+          }, 2000);
         } else {
           setStatus('failed');
           toast({
@@ -97,17 +92,11 @@ export const PaymentCallback: React.FC = () => {
 
   const handleContinue = () => {
     if (status === 'success') {
-      // Use window.location for more reliable navigation
-      const creatorProfile = sessionStorage.getItem('lastCreatorProfile');
-      if (creatorProfile) {
-        sessionStorage.removeItem('lastCreatorProfile');
-        window.location.href = creatorProfile;
-      } else {
-        window.location.href = '/fan/dashboard';
-      }
+      // Always navigate to fan dashboard after successful payment
+      navigate('/fan/dashboard', { replace: true });
     } else {
       // On failure, go back to explore page
-      window.location.href = '/explore';
+      navigate('/explore', { replace: true });
     }
   };
 
@@ -156,27 +145,7 @@ export const PaymentCallback: React.FC = () => {
             {status === 'success' ? 'Continue' : 'Try Again'}
           </Button>
           
-          {/* Alternative navigation buttons in case of connection issues */}
-          {status === 'success' && (
-            <div className="flex gap-2 mt-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => window.location.href = '/fan/dashboard'}
-                className="flex-1"
-              >
-                Dashboard
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => window.location.href = '/explore'}
-                className="flex-1"
-              >
-                Explore
-              </Button>
-            </div>
-          )}
+          
         </CardContent>
       </Card>
     </div>

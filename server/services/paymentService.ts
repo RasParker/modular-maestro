@@ -89,6 +89,9 @@ export class PaymentService {
     this.publicKey === 'pk_test_placeholder'
   );
 
+  // Store metadata for development mode
+  private devMetadataStore: Map<string, any> = new Map();
+
   private getHeaders() {
     return {
       Authorization: `Bearer ${this.secretKey}`,
@@ -101,12 +104,36 @@ export class PaymentService {
     return `xclusive_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  // Store metadata for development mode
+  private storeDevMetadata(reference: string, metadata: any): void {
+    if (this.isDevelopment) {
+      this.devMetadataStore.set(reference, metadata);
+      console.log('🔧 Stored dev metadata for reference:', reference, metadata);
+    }
+  }
+
+  // Retrieve metadata for development mode
+  private getDevMetadataFromReference(reference: string): any {
+    if (this.isDevelopment && this.devMetadataStore.has(reference)) {
+      const metadata = this.devMetadataStore.get(reference);
+      console.log('🔧 Retrieved dev metadata for reference:', reference, metadata);
+      return metadata;
+    }
+    return {};
+  }
+
   // Initialize standard payment (cards)
   async initializePayment(data: PaystackInitializeRequest): Promise<PaystackInitializeResponse> {
     // Development mode: return mock response
     if (this.isDevelopment) {
       console.log('🔧 Development mode: Simulating Paystack payment initialization');
       const reference = data.reference || this.generateReference();
+      
+      // Store metadata for later retrieval
+      if (data.metadata) {
+        this.storeDevMetadata(reference, data.metadata);
+      }
+      
       return {
         status: true,
         message: 'Authorization URL created (Development Mode)',
@@ -194,9 +221,13 @@ export class PaymentService {
 
   // Verify payment
   async verifyPayment(reference: string): Promise<PaystackVerifyResponse> {
-    // Development mode: return mock successful verification
+    // Development mode: return mock successful verification with proper metadata
     if (this.isDevelopment) {
       console.log('🔧 Development mode: Simulating payment verification for reference:', reference);
+      
+      // Extract metadata from reference if it was stored during initialization
+      const devMetadata = this.getDevMetadataFromReference(reference);
+      
       return {
         status: true,
         message: 'Verification successful (Development Mode)',
@@ -213,7 +244,7 @@ export class PaymentService {
           channel: 'card',
           currency: 'GHS',
           ip_address: '127.0.0.1',
-          metadata: {},
+          metadata: devMetadata,
           log: {},
           fees: 0,
           fees_split: null,
