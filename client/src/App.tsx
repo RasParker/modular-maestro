@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -69,7 +68,7 @@ function App() {
 
               {/* Public Post Viewing Route - Must be accessible to everyone */}
               <Route path="/creator/posts/:id" element={<CreatorProfile />} />
-                
+
                 {/* Fan Routes */}
               <Route path="/fan/dashboard" element={<ProtectedRoute allowedRoles={['fan']}><FanDashboard /></ProtectedRoute>} />
               <Route path="/fan/feed" element={<ProtectedRoute allowedRoles={['fan']}><FeedPage /></ProtectedRoute>} />
@@ -80,7 +79,8 @@ function App() {
               <Route path="/fan/settings" element={<ProtectedRoute allowedRoles={['fan']}><FanSettings /></ProtectedRoute>} />
 
               {/* Payment Routes */}
-              <Route path="/payment/callback" element={<PaymentCallback />} />
+              <Route path="/payment-callback" element={<PaymentCallback />} />
+          <Route path="/payment/callback" element={<PaymentCallback />} />
 
               {/* Creator Routes */}
               <Route path="/creator/dashboard" element={<ProtectedRoute allowedRoles={['creator']}><CreatorDashboard /></ProtectedRoute>} />

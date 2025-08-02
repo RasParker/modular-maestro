@@ -186,7 +186,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
             <Lock className="h-5 w-5" />
             Subscribe to {creatorName}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-center">
             You're subscribing to the {tier.name} tier
           </DialogDescription>
         </DialogHeader>
