@@ -176,6 +176,87 @@ router.get('/config', (req, res) => {
   });
 });
 
+// Payment callback handler (for redirects from Paystack)
+router.get('/callback', async (req, res) => {
+  try {
+    const { reference, status } = req.query;
+
+    if (!reference) {
+      return res.status(400).send(`
+        <html>
+          <head><title>Payment Error</title></head>
+          <body>
+            <h1>Payment Error</h1>
+            <p>No payment reference found</p>
+            <script>setTimeout(() => window.close(), 3000);</script>
+          </body>
+        </html>
+      `);
+    }
+
+    // For development mode, we can directly process the payment
+    const paymentResult = await paymentService.verifyPayment(reference as string);
+    
+    if (paymentResult.status) {
+      // Payment successful - redirect to success page
+      return res.send(`
+        <html>
+          <head>
+            <title>Payment Successful</title>
+            <style>
+              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+              .success { color: #28a745; }
+              .loading { color: #007bff; }
+            </style>
+          </head>
+          <body>
+            <h1 class="success">Payment Successful!</h1>
+            <p>Your subscription has been activated.</p>
+            <p class="loading">Redirecting you back to the app...</p>
+            <script>
+              setTimeout(() => {
+                window.location.href = '/fan/dashboard';
+              }, 2000);
+            </script>
+          </body>
+        </html>
+      `);
+    } else {
+      // Payment failed
+      return res.send(`
+        <html>
+          <head><title>Payment Failed</title></head>
+          <body>
+            <h1>Payment Failed</h1>
+            <p>There was an issue processing your payment. Please try again.</p>
+            <script>
+              setTimeout(() => {
+                window.location.href = '/fan/dashboard';
+              }, 3000);
+            </script>
+          </body>
+        </html>
+      `);
+    }
+  } catch (error: any) {
+    console.error('Payment callback error:', error);
+    res.status(500).send(`
+      <html>
+        <head><title>Payment Error</title></head>
+        <body>
+          <h1>Payment Error</h1>
+          <p>An error occurred processing your payment.</p>
+          <script>
+            setTimeout(() => {
+              window.location.href = '/fan/dashboard';
+            }, 3000);
+          </script>
+        </body>
+      </html>
+    `);
+  }
+});
+
 // Paystack webhook handler
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
