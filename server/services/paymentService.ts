@@ -138,7 +138,7 @@ export class PaymentService {
         status: true,
         message: 'Authorization URL created (Development Mode)',
         data: {
-          authorization_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`,
+          authorization_url: `${process.env.REPL_SLUG && process.env.REPL_OWNER ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app` : 'http://localhost:5000'}/payment/callback?reference=${reference}&status=success`,
           access_code: 'dev_access_code',
           reference: reference
         }
@@ -227,6 +227,7 @@ export class PaymentService {
 
       // Extract metadata from reference if it was stored during initialization
       const devMetadata = this.getDevMetadataFromReference(reference);
+      console.log('🔧 Development mode verification - metadata retrieved:', devMetadata);
 
       return {
         status: true,
@@ -236,7 +237,7 @@ export class PaymentService {
           domain: 'test',
           status: 'success',
           reference: reference,
-          amount: 5000, // Mock amount in pesewas (GHS 50)
+          amount: devMetadata?.tier_price ? parseFloat(devMetadata.tier_price) * 100 : 1000, // Use actual tier price in pesewas
           message: 'Approved (Development Mode)',
           gateway_response: 'Successful',
           paid_at: new Date().toISOString(),
@@ -298,6 +299,7 @@ export class PaymentService {
     const metadata = {
       fan_id: fanId,
       tier_id: tierId,
+      tier_price: amount.toString(),
       payment_type: 'subscription',
       custom_fields: [
         {
@@ -313,7 +315,11 @@ export class PaymentService {
       ]
     };
 
-    const callbackUrl = `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/payment/callback`;
+    // Get the correct domain for Replit
+    const baseUrl = process.env.REPL_SLUG && process.env.REPL_OWNER 
+      ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app`
+      : 'http://localhost:5000';
+    const callbackUrl = `${baseUrl}/payment/callback`;
 
     return this.initializePayment({
       email,
@@ -354,8 +360,8 @@ export class PaymentService {
         tier_id: parseInt(tierId),
         status: 'active',
         auto_renew: true,
-        current_period_start: currentDate,
-        current_period_end: nextBillingDate,
+        started_at: currentDate,
+        ends_at: nextBillingDate,
         next_billing_date: nextBillingDate
       });
 
