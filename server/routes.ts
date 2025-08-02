@@ -21,6 +21,7 @@ import adminRoutes from './routes/admin';
 import { authenticateToken } from "./middleware/auth";
 import bcrypt from "bcryptjs";
 import * as schema from '../shared/schema';
+import jwt from 'jsonwebtoken';
 
 // Extend Express session interface
 declare module 'express-session' {
@@ -63,6 +64,8 @@ const upload = multer({
   }
 });
 
+const JWT_SECRET = process.env.SESSION_SECRET || 'xclusive-secret-key-2024';
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Use memory store for development
   const MemoryStoreSession = MemoryStore(session);
@@ -85,7 +88,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve uploaded files statically
   app.use('/uploads', express.static(uploadsDir));
-  // Authentication routes
+
+  // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
       console.log('Login attempt received:', { email: req.body?.email });
@@ -176,7 +180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/register", async (req, res) => {
+  app.post('/api/auth/register', async (req, res) => {
     try {
       console.log('Registration request received:', req.body);
 
@@ -850,7 +854,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.error('Failed to send comment like notification:', notificationError);
             }
           }
-        } else if (comment && comment.user_id === userId) {
+        } else```tool_code
+if (comment && comment.user_id === userId) {
           console.log('Skipping notification - user liked their own comment');
         } else {
           console.log('Comment not found for like notification');
@@ -1275,8 +1280,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to cancel subscription" });
     }
   });
-
-
 
   // Admin routes
   app.use('/api/admin', adminRoutes);
@@ -1713,7 +1716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (coverPhotoUrl !== undefined) updateData.cover_image = coverPhotoUrl;
 
       const updatedUser = await db.update(users)
-        .set(updateData)
+        .set(updateData)```tool_code
         .where(eq(users.id, req.session.userId))
         .returning();
 
@@ -3200,7 +3203,7 @@ function formatTimeAgo(date: Date): string {
   const diffInHours = Math.floor(diffInMinutes / 60);
 
   // Checking subscription for access control
-      
+
   if (diffInHours < 24) {
     return diffInHours + " hour" + (diffInHours === 1 ? '' : 's') + " ago";
   }
@@ -3212,3 +3215,5 @@ function formatTimeAgo(date: Date): string {
 
   return date.toLocaleDateString();
 }
+
+// Adding register endpoint with proper error handling and logout and auth verification endpoints.
