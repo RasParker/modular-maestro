@@ -82,7 +82,7 @@ export class PaymentService {
   private baseURL = 'https://api.paystack.co';
   private secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_placeholder';
   private publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder';
-  
+
   // Development mode flag
   private isDevelopment = process.env.NODE_ENV !== 'production' && (
     this.secretKey === 'sk_test_placeholder' || 
@@ -128,12 +128,12 @@ export class PaymentService {
     if (this.isDevelopment) {
       console.log('🔧 Development mode: Simulating Paystack payment initialization');
       const reference = data.reference || this.generateReference();
-      
+
       // Store metadata for later retrieval
       if (data.metadata) {
         this.storeDevMetadata(reference, data.metadata);
       }
-      
+
       return {
         status: true,
         message: 'Authorization URL created (Development Mode)',
@@ -209,12 +209,12 @@ export class PaymentService {
     } catch (error: any) {
       const errorData = error.response?.data;
       console.error('Mobile money payment error:', errorData || error.message);
-      
+
       // Handle specific mobile money errors
       if (errorData?.message === 'Charge attempted' && errorData?.data?.message?.includes('test mobile money number')) {
         throw new Error('Please use test mobile money number: 0551234987 for testing');
       }
-      
+
       throw new Error(`Mobile money payment failed: ${errorData?.message || error.message}`);
     }
   }
@@ -224,10 +224,10 @@ export class PaymentService {
     // Development mode: return mock successful verification with proper metadata
     if (this.isDevelopment) {
       console.log('🔧 Development mode: Simulating payment verification for reference:', reference);
-      
+
       // Extract metadata from reference if it was stored during initialization
       const devMetadata = this.getDevMetadataFromReference(reference);
-      
+
       return {
         status: true,
         message: 'Verification successful (Development Mode)',
@@ -294,7 +294,7 @@ export class PaymentService {
   // Create subscription payment
   async createSubscriptionPayment(fanId: number, tierId: number, amount: number, email: string): Promise<PaystackInitializeResponse> {
     const reference = this.generateReference();
-    
+
     const metadata = {
       fan_id: fanId,
       tier_id: tierId,
@@ -345,7 +345,7 @@ export class PaymentService {
       // Create subscription
       const currentDate = new Date();
       const nextBillingDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
-      
+
       const subscription = await storage.createSubscription({
         fan_id: parseInt(fanId),
         creator_id: tier.creator_id,
@@ -372,7 +372,7 @@ export class PaymentService {
       try {
         const { NotificationService } = require('../notification-service');
         console.log(`Creating new subscriber notification via payment: creator=${tier.creator_id}, fan=${fanId}, tier=${tier.name}`);
-        
+
         await NotificationService.notifyNewSubscriber(
           tier.creator_id,
           parseInt(fanId),
