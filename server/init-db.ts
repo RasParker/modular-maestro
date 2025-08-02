@@ -13,19 +13,32 @@ export async function initializeDatabase() {
   console.log('Initializing database tables...');
   
   try {
-    // Test database connection with more detailed error handling
+    // Test database connection with shorter timeout for faster feedback
     console.log('Testing database connection...');
     
-    // Use a simpler query with timeout handling
     const result = await Promise.race([
       db.execute(sql`SELECT 1 as test`),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 15 seconds')), 15000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 5 seconds')), 5000))
     ]);
     
-    console.log('Database connection test successful:', result);
+    console.log('Database connection test successful');
     
-    // Read and execute the SQL schema file
-    const sqlFilePath = path.join(__dirname, 'create-tables.sql');
+    // Check if tables already exist to skip schema creation if possible
+    const tablesCheck = await db.execute(sql`
+      SELECT COUNT(*) as table_count 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_name IN ('users', 'posts', 'subscriptions')
+    `);
+    
+    const tableCount = (tablesCheck as any).rows[0]?.table_count || 0;
+    
+    if (parseInt(tableCount) >= 3) {
+      console.log('Core tables already exist, skipping schema creation');
+      return;
+    }
+    
+    // Read and execute the optimized SQL schema file
+    const sqlFilePath = path.join(__dirname, 'create-tables-optimized.sql');
     if (fs.existsSync(sqlFilePath)) {
       console.log('Reading SQL schema file...');
       const sqlContent = fs.readFileSync(sqlFilePath, 'utf8');

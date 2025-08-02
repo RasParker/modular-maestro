@@ -26,6 +26,19 @@ Preferred communication style: Simple, everyday language.
 - **Core Features**: Multi-role authentication, secure session handling, robust subscription system with multiple tiers, comprehensive content management (creation, scheduling, moderation, tier-based access), and a real-time notification system via WebSockets.
 - **System Design Choices**: Emphasis on secure password hashing, proper database relations, and a clear client-server architecture with role-based access control. Implemented data retention policies for activity feeds to optimize performance.
 
+## Recent Changes
+
+### Performance Optimization Updates
+- **Date**: August 2, 2025
+- **Startup Performance**: Optimized server startup time by implementing non-blocking database initialization and cron service startup
+- **Database Optimization**: 
+  - Reduced database connection pool size for faster startup
+  - Implemented schema existence checking to skip unnecessary table creation
+  - Created optimized SQL schema file without duplicates (reduced from 269 to ~140 lines)
+  - Reduced connection timeouts for faster feedback
+- **Background Processing**: Moved database initialization and cron service to background processes to allow immediate server startup
+- **Schema Management**: Consolidated duplicate table definitions and added performance indexes
+
 ## External Dependencies
 
 ### UI & Styling

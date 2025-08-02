@@ -42,14 +42,16 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Initialize database tables
-    console.log('Starting database initialization...');
-    await initializeDatabase();
-    console.log('Database initialization completed');
-
     console.log('Starting route registration...');
     const server = await registerRoutes(app);
     console.log('Route registration completed');
+
+    // Initialize database tables in background (non-blocking)
+    console.log('Starting database initialization in background...');
+    initializeDatabase().catch(err => {
+      console.error('Background database initialization failed:', err);
+    });
+    console.log('Database initialization started in background');
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -73,10 +75,16 @@ app.use((req, res, next) => {
       console.log('Vite setup completed');
     }
 
-    // Start cron service for automated post publishing
-    console.log('Starting cron service...');
-    cronService.start();
-    console.log('Cron service started');
+    // Start cron service for automated post publishing (non-blocking)
+    console.log('Starting cron service in background...');
+    setTimeout(() => {
+      try {
+        cronService.start();
+        console.log('Cron service started successfully');
+      } catch (error) {
+        console.error('Error starting cron service:', error);
+      }
+    }, 1000); // Delay cron service start by 1 second
 
     // Graceful shutdown
     process.on('SIGINT', () => {
