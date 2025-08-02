@@ -845,6 +845,7 @@ export const CreatorProfile: React.FC = () => {
         [postId]: {
           liked: !currentLike.liked,
           count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
+        ```
         }
       }));
 
@@ -1696,8 +1697,10 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIiHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
-                                    target.className = "w-full h-full object-cover opacity-50";
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full h-full object-cover opacityRemoving video play button overlay from desktop view in all tabs.
+```javascript
+50";
                                   }}
                                 />
                               );
@@ -1953,14 +1956,7 @@ export const CreatorProfile: React.FC = () => {
                               }
                             })()}
 
-                            {/* Play button for videos */}
-                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                                  <Video className="w-8 h-8 text-white" fill="white" />
-                                </div>
-                              </div>
-                            )}
+                            
 
                             {/* Duration overlay for videos */}
                             {post.media_type === 'video' && hasAccessToTier(post.tier) && (
@@ -2375,6 +2371,7 @@ export const CreatorProfile: React.FC = () => {
                             role="button"
                             tabIndex={0}
                             onKeyDown={(e) => {
+```javascript
                               if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
                                 handleContentClick(post);
@@ -2468,14 +2465,7 @@ export const CreatorProfile: React.FC = () => {
                               }
                             })()}
 
-                            {/* Play button for videos */}
-                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-black/70 rounded-full flex items-center justify-center">
-                                  <Video className="w-8 h-8 text-white" fill="white" />
-                                </div>
-                              </div>
-                            )}
+                            
 
                             {/* Duration overlay for videos */}
                             {post.media_type === 'video' && hasAccessToTier(post.tier) && (
@@ -2579,7 +2569,7 @@ export const CreatorProfile: React.FC = () => {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleShare(post.id);
-                                        }}
+                                      }}
                                     >
                                       <Share2 className="w-4 h-4" />
                                     </Button>
