@@ -229,7 +229,13 @@ export const VideoWatch: React.FC = () => {
               variant="ghost"
               size="sm"
               className="absolute top-4 left-4 z-10 text-white hover:bg-white/20"
-              onClick={() => navigate('/fan/feed')}
+              onClick={() => {
+                if (user?.role === 'creator') {
+                  navigate(`/creator/${user.username}`);
+                } else {
+                  navigate('/fan/feed');
+                }
+              }}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -354,7 +360,7 @@ export const VideoWatch: React.FC = () => {
                               method: 'DELETE',
                               headers: { 'Content-Type': 'application/json' }
                             });
-                            
+
                             if (response.ok) {
                               toast({
                                 title: "Success",
@@ -628,7 +634,7 @@ export const VideoWatch: React.FC = () => {
                               method: 'DELETE',
                               headers: { 'Content-Type': 'application/json' }
                             });
-                            
+
                             if (response.ok) {
                               toast({
                                 title: "Success",

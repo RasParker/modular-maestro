@@ -845,7 +845,7 @@ export const CreatorProfile: React.FC = () => {
         ...prev,
         [postId]: {
           liked: !currentLike.liked,
-          count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
+          count: currentLike.liked ? currentLike.count - 1 : currentgeneration>
         }
       }));
 
@@ -1697,7 +1697,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIiHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
@@ -1758,16 +1758,18 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <PostActions
-                                  post={post}
-                                  postLikes={postLikes}
-                                  isOwnProfile={isOwnProfile}
-                                  onLike={handleLike}
-                                  onComment={handleCommentClick}
-                                  onShare={handleShare}
-                                  onEdit={handleEditPost}
-                                  onDelete={handleDeletePost}
-                                />
+                                <div className="-ml-2">
+                                  <PostActions
+                                    post={post}
+                                    postLikes={postLikes}
+                                    isOwnProfile={isOwnProfile}
+                                    onLike={handleLike}
+                                    onComment={handleCommentClick}
+                                    onShare={handleShare}
+                                    onEdit={handleEditPost}
+                                    onDelete={handleDeletePost}
+                                  />
+                                </div>
 
                             </div>
                           </div>
@@ -1939,16 +1941,18 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <PostActions
-                                  post={post}
-                                  postLikes={postLikes}
-                                  isOwnProfile={isOwnProfile}
-                                  onLike={handleLike}
-                                  onComment={handleCommentClick}
-                                  onShare={handleShare}
-                                  onEdit={handleEditPost}
-                                  onDelete={handleDeletePost}
-                                />
+                                <div className="-ml-2">
+                                  <PostActions
+                                    post={post}
+                                    postLikes={postLikes}
+                                    isOwnProfile={isOwnProfile}
+                                    onLike={handleLike}
+                                    onComment={handleCommentClick}
+                                    onShare={handleShare}
+                                    onEdit={handleEditPost}
+                                    onDelete={handleDeletePost}
+                                  />
+                                </div>
 
                             </div>
                           </div>
@@ -2123,16 +2127,18 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <PostActions
-                                  post={post}
-                                  postLikes={postLikes}
-                                  isOwnProfile={isOwnProfile}
-                                  onLike={handleLike}
-                                  onComment={handleCommentClick}
-                                  onShare={handleShare}
-                                  onEdit={handleEditPost}
-                                  onDelete={handleDeletePost}
-                                />
+                                <div className="-ml-2">
+                                  <PostActions
+                                    post={post}
+                                    postLikes={postLikes}
+                                    isOwnProfile={isOwnProfile}
+                                    onLike={handleLike}
+                                    onComment={handleCommentClick}
+                                    onShare={handleShare}
+                                    onEdit={handleEditPost}
+                                    onDelete={handleDeletePost}
+                                  />
+                                </div>
 
                             </div>
                           </div>
@@ -2304,16 +2310,18 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <PostActions
-                                  post={post}
-                                  postLikes={postLikes}
-                                  isOwnProfile={isOwnProfile}
-                                  onLike={handleLike}
-                                  onComment={handleCommentClick}
-                                  onShare={handleShare}
-                                  onEdit={handleEditPost}
-                                  onDelete={handleDeletePost}
-                                />
+                                <div className="-ml-2">
+                                  <PostActions
+                                    post={post}
+                                    postLikes={postLikes}
+                                    isOwnProfile={isOwnProfile}
+                                    onLike={handleLike}
+                                    onComment={handleCommentClick}
+                                    onShare={handleShare}
+                                    onEdit={handleEditPost}
+                                    onDelete={handleDeletePost}
+                                  />
+                                </div>
 
                             </div>
                           </div>
