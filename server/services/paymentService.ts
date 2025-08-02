@@ -313,12 +313,14 @@ export class PaymentService {
       ]
     };
 
+    const callbackUrl = `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/payment/callback`;
+
     return this.initializePayment({
       email,
       amount,
       currency: 'GHS',
       reference,
-      callback_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment/callback`,
+      callback_url: callbackUrl,
       metadata,
       channels: ['card', 'bank', 'ussd', 'mobile_money']
     });

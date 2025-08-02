@@ -38,9 +38,9 @@ const PaymentCallback: React.FC = () => {
           setStatus('success');
           setMessage(data.message || 'Payment successful! Your subscription is now active.');
 
-          // Redirect to fan dashboard after 2 seconds
+          // Redirect to fan dashboard after a short delay
           setTimeout(() => {
-            navigate('/fan/dashboard', { replace: true });
+            window.location.href = `${window.location.origin}/fan/dashboard`;
           }, 2000);
         } else {
           setStatus('failed');
