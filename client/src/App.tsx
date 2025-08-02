@@ -43,8 +43,8 @@ import { ReviewContent } from '@/pages/admin/ReviewContent';
 import { Reports } from '@/pages/admin/Reports';
 import AdminAnalytics from '@/pages/admin/AdminAnalytics';
 
-// Payment components
-import { PaymentCallback } from '@/components/payment/PaymentCallback';
+// Payment pages  
+import PaymentCallback from '@/pages/PaymentCallback';
 
 const queryClient = new QueryClient();
 
