@@ -230,7 +230,10 @@ export const VideoWatch: React.FC = () => {
               size="sm"
               className="absolute top-4 left-4 z-10 text-white hover:bg-white/20"
               onClick={() => {
-                if (user?.role === 'creator') {
+                // Check if we came from a creator profile by looking at the post's creator
+                if (post && post.creator_username) {
+                  navigate(`/creator/${post.creator_username}`);
+                } else if (user?.role === 'creator') {
                   navigate(`/creator/${user.username}`);
                 } else {
                   navigate('/fan/feed');
@@ -532,7 +535,16 @@ export const VideoWatch: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 className="mb-4 text-muted-foreground hover:text-foreground"
-                onClick={() => navigate('/fan/feed')}
+                onClick={() => {
+                  // Check if we came from a creator profile by looking at the post's creator
+                  if (post && post.creator_username) {
+                    navigate(`/creator/${post.creator_username}`);
+                  } else if (user?.role === 'creator') {
+                    navigate(`/creator/${user.username}`);
+                  } else {
+                    navigate('/fan/feed');
+                  }
+                }}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Feed
