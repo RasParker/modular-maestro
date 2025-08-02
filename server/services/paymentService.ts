@@ -80,11 +80,26 @@ export interface MobileMoneyRequest {
 
 export class PaymentService {
   private baseURL = 'https://api.paystack.co';
-  private secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_placeholder';
-  private publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder';
+  private secretKey: string;
+  private publicKey: string;
 
   // Development mode flag - Only use development mode in actual development
   private isDevelopment = process.env.NODE_ENV !== 'production';
+
+  constructor() {
+    // In development mode, use fallback values for testing
+    if (this.isDevelopment) {
+      this.secretKey = process.env.PAYSTACK_SECRET_KEY || 'sk_test_development_key';
+      this.publicKey = process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_development_key';
+    } else {
+      // In production, require environment variables
+      if (!process.env.PAYSTACK_SECRET_KEY || !process.env.PAYSTACK_PUBLIC_KEY) {
+        throw new Error('Missing required Paystack credentials. Please provide PAYSTACK_SECRET_KEY and PAYSTACK_PUBLIC_KEY environment variables.');
+      }
+      this.secretKey = process.env.PAYSTACK_SECRET_KEY;
+      this.publicKey = process.env.PAYSTACK_PUBLIC_KEY;
+    }
+  }
 
   // Store metadata for development mode
   private devMetadataStore: Map<string, any> = new Map();
