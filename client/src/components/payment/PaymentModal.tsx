@@ -181,8 +181,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+        <DialogHeader className="text-center">
+          <DialogTitle className="flex items-center justify-center gap-2">
             <Lock className="h-5 w-5" />
             Subscribe to {creatorName}
           </DialogTitle>
@@ -280,7 +280,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
           <Button
             onClick={handlePayment}
             disabled={isLoading || (paymentMethod === 'mobile_money' && (!phoneNumber || !isValidPhoneNumber(phoneNumber)))}
-            className="w-full"
+            className="w-full py-6 text-lg font-semibold"
             size="lg"
           >
             {isLoading ? (
@@ -290,7 +290,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
               </>
             ) : (
               <>
-                Pay GHS {tier.price}
+                Pay GHS {tier.price}/month
               </>
             )}
           </Button>
