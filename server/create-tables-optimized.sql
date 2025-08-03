@@ -170,8 +170,8 @@ CREATE TABLE IF NOT EXISTS payouts (
 );
 
 -- Create indexes for better performance
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_posts_creator_id ON posts(creator_id);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_subscriptions_fan_creator ON subscriptions(fan_id, creator_id);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, read);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_activity_feeds_user_id ON activity_feeds(user_id);
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_earnings_creator_id ON earnings(creator_id);
+CREATE INDEX IF NOT EXISTS idx_posts_creator_id ON posts(creator_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_fan_creator ON subscriptions(fan_id, creator_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, read);
+CREATE INDEX IF NOT EXISTS idx_activity_feeds_user_id ON activity_feeds(user_id);
+CREATE INDEX IF NOT EXISTS idx_earnings_creator_id ON earnings(creator_id);
