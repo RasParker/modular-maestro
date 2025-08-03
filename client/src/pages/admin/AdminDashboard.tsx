@@ -42,6 +42,12 @@ export const AdminDashboard: React.FC = () => {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  // Fetch system health data
+  const { data: systemHealth, isLoading: systemHealthLoading } = useQuery({
+    queryKey: ['/api/admin/system-health'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
   // Use real data or fallback to show loading state
   const stats = platformStats || {
     totalUsers: 0,
@@ -343,27 +349,41 @@ export const AdminDashboard: React.FC = () => {
                 <CardTitle className="text-lg">System Health</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Server Performance</span>
-                    <span>98%</span>
-                  </div>
-                  <Progress value={98} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Content Delivery</span>
-                    <span>95%</span>
-                  </div>
-                  <Progress value={95} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Payment Processing</span>
-                    <span>99%</span>
-                  </div>
-                  <Progress value={99} className="h-2" />
-                </div>
+                {systemHealthLoading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between text-sm mb-2">
+                        <div className="h-4 w-24 bg-muted animate-pulse rounded"></div>
+                        <div className="h-4 w-8 bg-muted animate-pulse rounded"></div>
+                      </div>
+                      <div className="h-2 w-full bg-muted animate-pulse rounded"></div>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Server Performance</span>
+                        <span>{systemHealth?.server_performance || 0}%</span>
+                      </div>
+                      <Progress value={systemHealth?.server_performance || 0} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Database Health</span>
+                        <span>{systemHealth?.database_health || 0}%</span>
+                      </div>
+                      <Progress value={systemHealth?.database_health || 0} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>API Response Time</span>
+                        <span>{systemHealth?.api_response_time || 0}ms</span>
+                      </div>
+                      <Progress value={Math.min((1000 - (systemHealth?.api_response_time || 1000)) / 10, 100)} className="h-2" />
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 

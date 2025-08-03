@@ -84,17 +84,17 @@ export const ReviewContent: React.FC = () => {
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center justify-center sm:justify-start gap-2">
             <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             Review Content
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">
             Review and moderate user-submitted content
           </p>
         </div>
 
         <Card className="bg-gradient-card border-border/50">
-          <CardHeader>
+          <CardHeader className="text-center sm:text-left">
             <CardTitle className="text-base sm:text-xl">Pending Content Review ({content.length})</CardTitle>
             <CardDescription className="text-sm">Content awaiting moderation approval</CardDescription>
           </CardHeader>

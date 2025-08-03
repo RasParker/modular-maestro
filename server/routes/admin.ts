@@ -72,4 +72,18 @@ router.get('/top-creators', async (req, res) => {
   }
 });
 
+// Get system health metrics
+router.get('/system-health', async (req, res) => {
+  try {
+    const systemHealth = await storage.getSystemHealth();
+    res.json(systemHealth);
+  } catch (error: any) {
+    console.error('Error fetching system health:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch system health'
+    });
+  }
+});
+
 export default router;

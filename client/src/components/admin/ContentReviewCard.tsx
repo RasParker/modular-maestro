@@ -34,7 +34,7 @@ export const ContentReviewCard: React.FC<ContentReviewCardProps> = ({
   return (
     <div className="p-4 sm:p-6 rounded-lg border border-border/50 bg-muted/10">
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <div className="flex-shrink-0 self-start">
+        <div className="flex-shrink-0 self-center lg:self-start">
           <img 
             src={item.thumbnail} 
             alt={item.title}
@@ -43,11 +43,11 @@ export const ContentReviewCard: React.FC<ContentReviewCardProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 text-center sm:text-left">
               <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 break-words">
                 {item.title}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center sm:justify-start gap-3">
                 <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
                   <AvatarImage src={item.creator.avatar} alt={item.creator.username} />
                   <AvatarFallback>{item.creator.display_name.charAt(0)}</AvatarFallback>
@@ -58,7 +58,7 @@ export const ContentReviewCard: React.FC<ContentReviewCardProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
               <Badge variant="outline" className="text-xs capitalize">
                 {item.type}
               </Badge>
@@ -73,7 +73,7 @@ export const ContentReviewCard: React.FC<ContentReviewCardProps> = ({
           </div>
           
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground text-center sm:text-left">
               Submitted: {new Date(item.submitted).toLocaleString()}
             </div>
             <div className="flex gap-2">
