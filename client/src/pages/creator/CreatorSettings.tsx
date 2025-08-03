@@ -56,6 +56,11 @@ export const CreatorSettings: React.FC = () => {
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [autoPostEnabled, setAutoPostEnabled] = useState(false);
   const [watermarkEnabled, setWatermarkEnabled] = useState(true);
+  const [socialLinks, setSocialLinks] = useState({
+    twitter: '',
+    instagram: '',
+    website: ''
+  });
 
   // Privacy settings state
   const [profileDiscoverable, setProfileDiscoverable] = useState(true);
@@ -95,6 +100,7 @@ export const CreatorSettings: React.FC = () => {
           setActivityStatusVisible(userData.activity_status_visible ?? false);
           setAutoPostEnabled(userData.auto_post_enabled ?? false);
           setWatermarkEnabled(userData.watermark_enabled ?? true);
+          setSocialLinks(userData.social_links || { twitter: '', instagram: '', website: '' });
         }
       } catch (error) {
         console.error('Error loading user settings:', error);
@@ -565,6 +571,7 @@ export const CreatorSettings: React.FC = () => {
           bio: bio.trim() || null,
           profilePhotoUrl: profilePhotoUrl || null,
           coverPhotoUrl: coverPhotoUrl || null,
+          socialLinks: socialLinks,
         }),
       });
 
@@ -854,6 +861,40 @@ export const CreatorSettings: React.FC = () => {
                         placeholder="Tell your audience about yourself..."
                         rows={3}
                       />
+                    </div>
+
+                    {/* Social Media Links */}
+                    <div className="space-y-4">
+                      <Label>Social Media Links</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="twitter">Twitter/X</Label>
+                          <Input 
+                            id="twitter" 
+                            value={socialLinks.twitter}
+                            onChange={(e) => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))}
+                            placeholder="https://twitter.com/yourusername"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="instagram">Instagram</Label>
+                          <Input 
+                            id="instagram" 
+                            value={socialLinks.instagram}
+                            onChange={(e) => setSocialLinks(prev => ({ ...prev, instagram: e.target.value }))}
+                            placeholder="https://instagram.com/yourusername"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <Label htmlFor="website">Website</Label>
+                          <Input 
+                            id="website" 
+                            value={socialLinks.website}
+                            onChange={(e) => setSocialLinks(prev => ({ ...prev, website: e.target.value }))}
+                            placeholder="https://yourwebsite.com"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex gap-2">

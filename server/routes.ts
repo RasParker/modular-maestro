@@ -1705,7 +1705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: 'Not authenticated' });
       }
 
-      const { displayName, bio, profilePhotoUrl, coverPhotoUrl } = req.body;
+      const { displayName, bio, profilePhotoUrl, coverPhotoUrl, socialLinks } = req.body;
 
       const updateData: any = { updated_at: new Date() };
 
@@ -1713,6 +1713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (bio !== undefined) updateData.bio = bio;
       if (profilePhotoUrl !== undefined) updateData.avatar = profilePhotoUrl;
       if (coverPhotoUrl !== undefined) updateData.cover_image = coverPhotoUrl;
+      if (socialLinks !== undefined) updateData.social_links = socialLinks;
 
       const updatedUser = await db.update(users)
         .set(updateData)
@@ -1741,10 +1742,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userData = await db
         .select({
           comments_enabled: users.comments_enabled,
+          auto_post_enabled: users.auto_post_enabled,
+          watermark_enabled: users.watermark_enabled,
           profile_discoverable: users.profile_discoverable,
           activity_status_visible: users.activity_status_visible,
           is_online: users.is_online,
           last_seen: users.last_seen,
+          social_links: users.social_links,
         })
         .from(users)
         .where(eq(users.id, userId))
@@ -1768,14 +1772,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const userId = req.session.userId;
-      const { comments_enabled } = req.body;
+      const { comments_enabled, auto_post_enabled, watermark_enabled } = req.body;
+
+      const updateData: any = { updated_at: new Date() };
+      if (comments_enabled !== undefined) updateData.comments_enabled = comments_enabled;
+      if (auto_post_enabled !== undefined) updateData.auto_post_enabled = auto_post_enabled;
+      if (watermark_enabled !== undefined) updateData.watermark_enabled = watermark_enabled;
 
       await db
         .update(users)
-        .set({ 
-          comments_enabled: comments_enabled,
-          updated_at: new Date()
-        })
+        .set(updateData)
         .where(eq(users.id, userId));
 
       res.json({ success: true });
