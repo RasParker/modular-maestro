@@ -2,6 +2,7 @@
 import express from 'express';
 import { cronService } from '../services/cronService';
 import { payoutService } from '../services/payoutService';
+import { storage } from '../storage';
 
 const router = express.Router();
 
@@ -38,6 +39,35 @@ router.get('/payout-dashboard', async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to fetch payout dashboard data'
+    });
+  }
+});
+
+// Get platform statistics for admin dashboard
+router.get('/platform-stats', async (req, res) => {
+  try {
+    const stats = await storage.getPlatformStats();
+    res.json(stats);
+  } catch (error: any) {
+    console.error('Error fetching platform stats:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch platform statistics'
+    });
+  }
+});
+
+// Get top performing creators
+router.get('/top-creators', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 5;
+    const topCreators = await storage.getTopCreators(limit);
+    res.json(topCreators);
+  } catch (error: any) {
+    console.error('Error fetching top creators:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch top creators'
     });
   }
 });

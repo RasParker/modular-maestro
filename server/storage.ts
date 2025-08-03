@@ -134,6 +134,14 @@ export interface IStorage {
   // Creator goals methods
   getCreatorGoals(creatorId: number): Promise<any>;
   saveCreatorGoals(creatorId: number, goals: any): Promise<void>;
+
+  // Creator payout methods
+  getCreatorPayoutStats(creatorId: number): Promise<any>;
+  getAllPayoutStats(): Promise<any>;
+  
+  // Platform analytics methods
+  getPlatformStats(): Promise<any>;
+  getTopCreators(limit?: number): Promise<any[]>;
 }
 
 // Database Storage Implementation
@@ -833,6 +841,78 @@ export class DatabaseStorage implements IStorage {
       pending_count: pendingCount,
       total_creators: await db.select().from(users).where(eq(users.role, 'creator')).then(r => r.length)
     };
+  }
+
+  async getPlatformStats(): Promise<any> {
+    try {
+      // Get user counts
+      const totalUsers = await db.select({ count: sql<number>`count(*)` }).from(users);
+      const totalCreators = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'creator'));
+      const totalFans = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'fan'));
+
+      // Get subscription counts
+      const activeSubscriptions = await db.select({ count: sql<number>`count(*)` }).from(subscriptions).where(eq(subscriptions.status, 'active'));
+      
+      // Calculate total revenue from completed payment transactions
+      const revenueResult = await db.select({ 
+        total: sql<string>`COALESCE(SUM(amount), 0)` 
+      }).from(payment_transactions).where(eq(payment_transactions.status, 'completed'));
+      
+      const totalRevenue = parseFloat(revenueResult[0]?.total || '0');
+      const platformFees = totalRevenue * 0.15; // 15% commission
+
+      // Get content moderation counts
+      const pendingReports = await db.select({ count: sql<number>`count(*)` }).from(reports).where(eq(reports.status, 'pending'));
+      const approvedReports = await db.select({ count: sql<number>`count(*)` }).from(reports).where(eq(reports.status, 'resolved'));
+      const rejectedReports = await db.select({ count: sql<number>`count(*)` }).from(reports).where(eq(reports.status, 'dismissed'));
+
+      return {
+        totalUsers: totalUsers[0]?.count || 0,
+        totalCreators: totalCreators[0]?.count || 0,
+        totalFans: totalFans[0]?.count || 0,
+        monthlyRevenue: totalRevenue,
+        platformFees: platformFees,
+        activeSubscriptions: activeSubscriptions[0]?.count || 0,
+        contentModeration: {
+          pending: pendingReports[0]?.count || 0,
+          approved: approvedReports[0]?.count || 0,
+          rejected: rejectedReports[0]?.count || 0
+        }
+      };
+    } catch (error) {
+      console.error('Error getting platform stats:', error);
+      throw error;
+    }
+  }
+
+  async getTopCreators(limit: number = 5): Promise<any[]> {
+    try {
+      const topCreators = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          display_name: users.display_name,
+          total_subscribers: users.total_subscribers,
+          total_earnings: users.total_earnings,
+          verified: users.verified
+        })
+        .from(users)
+        .where(eq(users.role, 'creator'))
+        .orderBy(desc(users.total_earnings))
+        .limit(limit);
+
+      return topCreators.map(creator => ({
+        id: creator.id.toString(),
+        username: creator.username,
+        display_name: creator.display_name || creator.username,
+        subscribers: creator.total_subscribers,
+        monthly_revenue: parseFloat(creator.total_earnings || '0'),
+        status: creator.verified ? 'verified' : 'pending'
+      }));
+    } catch (error) {
+      console.error('Error getting top creators:', error);
+      return [];
+    }
   }
 
   async getPlatformSettings(): Promise<any> {

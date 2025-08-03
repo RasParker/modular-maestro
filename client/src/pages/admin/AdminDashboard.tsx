@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationTester } from '@/components/admin/NotificationTester';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Shield, 
   Users, 
@@ -20,80 +21,40 @@ import {
   Flag
 } from 'lucide-react';
 
-// Mock admin data
-const PLATFORM_STATS = {
-  totalUsers: 125000,
-  totalCreators: 8500,
-  totalFans: 116500,
-  monthlyRevenue: 285000,
-  platformFees: 42750, // 15% commission
-  activeSubscriptions: 45000,
-  contentModeration: {
-    pending: 23,
-    approved: 1240,
-    rejected: 45
-  }
-};
-
-const RECENT_REPORTS = [
-  {
-    id: '1',
-    type: 'content',
-    reason: 'Inappropriate content',
-    reported_by: 'user123',
-    target: 'artisticmia',
-    status: 'pending',
-    created_at: '2 hours ago'
-  },
-  {
-    id: '2',
-    type: 'user',
-    reason: 'Spam behavior',
-    reported_by: 'fan456',
-    target: 'spamuser',
-    status: 'under_review',
-    created_at: '4 hours ago'
-  },
-  {
-    id: '3',
-    type: 'payment',
-    reason: 'Chargeback dispute',
-    reported_by: 'system',
-    target: 'transaction_789',
-    status: 'resolved',
-    created_at: '1 day ago'
-  }
-];
-
-const TOP_CREATORS = [
-  {
-    id: '1',
-    username: 'artisticmia',
-    display_name: 'Artistic Mia',
-    subscribers: 2840,
-    monthly_revenue: 12500,
-    status: 'verified'
-  },
-  {
-    id: '2',
-    username: 'fitnessking',
-    display_name: 'Fitness King',
-    subscribers: 5120,
-    monthly_revenue: 18900,
-    status: 'verified'
-  },
-  {
-    id: '3',
-    username: 'musicmaker',
-    display_name: 'Music Maker',
-    subscribers: 1890,
-    monthly_revenue: 7200,
-    status: 'pending'
-  }
-];
-
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
+
+  // Fetch platform statistics
+  const { data: platformStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/admin/platform-stats'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Fetch top creators
+  const { data: topCreators, isLoading: creatorsLoading } = useQuery({
+    queryKey: ['/api/admin/top-creators'],
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  // Fetch recent reports
+  const { data: recentReports, isLoading: reportsLoading } = useQuery({
+    queryKey: ['/api/reports'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Use real data or fallback to show loading state
+  const stats = platformStats || {
+    totalUsers: 0,
+    totalCreators: 0,
+    totalFans: 0,
+    monthlyRevenue: 0,
+    platformFees: 0,
+    activeSubscriptions: 0,
+    contentModeration: { pending: 0, approved: 0, rejected: 0 }
+  };
+
+  const creators = Array.isArray(topCreators) ? topCreators : [];
+  const reports = Array.isArray(recentReports) ? recentReports.slice(0, 3) : [];
 
   return (
     <EdgeToEdgeContainer>
@@ -125,8 +86,12 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                    <p className="text-2xl font-bold text-foreground">{PLATFORM_STATS.totalUsers.toLocaleString()}</p>
-                    <p className="text-xs text-success">+8.5% this month</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-20 bg-muted animate-pulse rounded"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-foreground">{stats.totalUsers.toLocaleString()}</p>
+                    )}
+                    <p className="text-xs text-success">Real-time data</p>
                   </div>
                   <Users className="h-8 w-8 text-primary" />
                 </div>
@@ -138,8 +103,12 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Platform Revenue</p>
-                    <p className="text-2xl font-bold text-foreground">GHS {PLATFORM_STATS.platformFees.toLocaleString()}</p>
-                    <p className="text-xs text-success">+15% vs last month</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-foreground">GHS {stats.platformFees.toLocaleString()}</p>
+                    )}
+                    <p className="text-xs text-success">15% commission</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-accent" />
                 </div>
@@ -151,8 +120,12 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Active Creators</p>
-                    <p className="text-2xl font-bold text-foreground">{PLATFORM_STATS.totalCreators.toLocaleString()}</p>
-                    <p className="text-xs text-success">+12% growth</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-16 bg-muted animate-pulse rounded"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-foreground">{stats.totalCreators.toLocaleString()}</p>
+                    )}
+                    <p className="text-xs text-success">Live count</p>
                   </div>
                   <Crown className="h-8 w-8 text-accent" />
                 </div>
@@ -164,7 +137,11 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Pending Reports</p>
-                    <p className="text-2xl font-bold text-foreground">{PLATFORM_STATS.contentModeration.pending}</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-12 bg-muted animate-pulse rounded"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-foreground">{stats.contentModeration.pending}</p>
+                    )}
                     <p className="text-xs text-warning">Needs attention</p>
                   </div>
                   <AlertTriangle className="h-8 w-8 text-warning" />
@@ -177,36 +154,36 @@ export const AdminDashboard: React.FC = () => {
           <div className="lg:col-span-3 space-y-6">
             {/* Quick Actions */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle>Admin Actions</CardTitle>
                 <CardDescription>Manage platform operations</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Button size="lg" className="h-20 flex-col gap-2" asChild>
+                  <Button size="lg" className="h-20 flex-col gap-3 px-4" asChild>
                     <Link to="/admin/users">
                       <Users className="w-6 h-6" />
                       Manage Users
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
+                  <Button variant="outline" size="lg" className="h-20 flex-col gap-3 px-4" asChild>
                     <Link to="/admin/content">
                       <FileText className="w-6 h-6" />
                       Review Content
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
+                  <Button variant="outline" size="lg" className="h-20 flex-col gap-3 px-4 relative" asChild>
                     <Link to="/admin/reports">
                       <Flag className="w-6 h-6" />
                       Reports
-                      {PLATFORM_STATS.contentModeration.pending > 0 && (
-                        <Badge variant="destructive" className="ml-2">
-                          {PLATFORM_STATS.contentModeration.pending}
+                      {stats.contentModeration.pending > 0 && (
+                        <Badge variant="destructive" className="absolute -top-2 -right-2 px-2 py-1 text-xs">
+                          {stats.contentModeration.pending}
                         </Badge>
                       )}
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="h-20 flex-col gap-2" asChild>
+                  <Button variant="outline" size="lg" className="h-20 flex-col gap-3 px-4" asChild>
                     <Link to="/admin/analytics">
                       <BarChart3 className="w-6 h-6" />
                       Analytics
@@ -218,22 +195,34 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Content Moderation Overview */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle>Content Moderation</CardTitle>
                 <CardDescription>Review status and pending items</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="text-center p-4 rounded-lg border border-border/50">
-                    <p className="text-2xl font-bold text-warning">{PLATFORM_STATS.contentModeration.pending}</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-8 bg-muted animate-pulse rounded mx-auto mb-2"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-warning">{stats.contentModeration.pending}</p>
+                    )}
                     <p className="text-sm text-muted-foreground">Pending Review</p>
                   </div>
                   <div className="text-center p-4 rounded-lg border border-border/50">
-                    <p className="text-2xl font-bold text-success">{PLATFORM_STATS.contentModeration.approved}</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-8 bg-muted animate-pulse rounded mx-auto mb-2"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-success">{stats.contentModeration.approved}</p>
+                    )}
                     <p className="text-sm text-muted-foreground">Approved</p>
                   </div>
                   <div className="text-center p-4 rounded-lg border border-border/50">
-                    <p className="text-2xl font-bold text-destructive">{PLATFORM_STATS.contentModeration.rejected}</p>
+                    {statsLoading ? (
+                      <div className="h-8 w-8 bg-muted animate-pulse rounded mx-auto mb-2"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-destructive">{stats.contentModeration.rejected}</p>
+                    )}
                     <p className="text-sm text-muted-foreground">Rejected</p>
                   </div>
                 </div>
@@ -245,33 +234,55 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Top Creators */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle>Top Performing Creators</CardTitle>
                 <CardDescription>Highest earning creators this month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {TOP_CREATORS.map((creator, index) => (
-                  <div key={creator.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold">
-                        {index + 1}
+                {creatorsLoading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-muted animate-pulse rounded-full"></div>
+                        <div>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded mb-1"></div>
+                          <div className="h-3 w-16 bg-muted animate-pulse rounded"></div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{creator.display_name}</p>
-                        <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">GHS {creator.monthly_revenue.toLocaleString()}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">{creator.subscribers} subscribers</p>
-                        <Badge variant={creator.status === 'verified' ? 'default' : 'outline'}>
-                          {creator.status}
-                        </Badge>
+                      <div className="text-right">
+                        <div className="h-4 w-20 bg-muted animate-pulse rounded mb-1"></div>
+                        <div className="h-3 w-16 bg-muted animate-pulse rounded"></div>
                       </div>
                     </div>
+                  ))
+                ) : creators.length > 0 ? (
+                  creators.map((creator, index) => (
+                    <div key={creator.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium">{creator.display_name}</p>
+                          <p className="text-sm text-muted-foreground">@{creator.username}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">GHS {creator.monthly_revenue.toLocaleString()}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-muted-foreground">{creator.subscribers} subscribers</p>
+                          <Badge variant={creator.status === 'verified' ? 'default' : 'outline'}>
+                            {creator.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No creator data available yet
                   </div>
-                ))}
+                )}
               </CardContent>
             </Card>
           </div>
@@ -280,27 +291,46 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6">
             {/* Recent Reports */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle className="text-lg">Recent Reports</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {RECENT_REPORTS.map((report) => (
-                  <div key={report.id} className="p-3 rounded-lg border border-border/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge variant={
-                        report.status === 'pending' ? 'destructive' :
-                        report.status === 'under_review' ? 'secondary' : 'default'
-                      }>
-                        {report.status.replace('_', ' ')}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{report.created_at}</span>
+                {reportsLoading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="p-3 rounded-lg border border-border/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="h-4 w-16 bg-muted animate-pulse rounded"></div>
+                        <div className="h-3 w-12 bg-muted animate-pulse rounded"></div>
+                      </div>
+                      <div className="h-4 w-full bg-muted animate-pulse rounded mb-1"></div>
+                      <div className="h-3 w-20 bg-muted animate-pulse rounded"></div>
                     </div>
-                    <p className="text-sm font-medium">{report.reason}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Target: {report.target}
-                    </p>
+                  ))
+                ) : reports.length > 0 ? (
+                  reports.map((report: any) => (
+                    <div key={report.id} className="p-3 rounded-lg border border-border/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant={
+                          report.status === 'pending' ? 'destructive' :
+                          report.status === 'under_review' ? 'secondary' : 'default'
+                        }>
+                          {report.status.replace('_', ' ')}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium">{report.reason}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Target: {report.target_name || report.target_id}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No recent reports
                   </div>
-                ))}
+                )}
                 <Button variant="outline" size="sm" className="w-full" asChild>
                   <Link to="/admin/reports">View All Reports</Link>
                 </Button>
@@ -309,7 +339,7 @@ export const AdminDashboard: React.FC = () => {
 
             {/* System Health */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle className="text-lg">System Health</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -339,7 +369,7 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Platform Settings */}
             <Card className="bg-gradient-card border-border/50">
-              <CardHeader>
+              <CardHeader className="text-center sm:text-left">
                 <CardTitle className="text-lg">Platform Settings</CardTitle>
               </CardHeader>
               <CardContent>

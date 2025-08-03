@@ -108,7 +108,7 @@ export const NotificationTester: React.FC = () => {
       <CardContent className="space-y-6">
         {/* Single Notification Test */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Send Custom Notification</h3>
+          <h3 className="text-lg font-semibold text-center sm:text-left">Send Custom Notification</h3>
           
           <div className="space-y-2">
             <Label htmlFor="notification-type">Notification Type</Label>
@@ -161,7 +161,7 @@ export const NotificationTester: React.FC = () => {
         {/* Bulk Test */}
         <div className="border-t pt-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Send Bulk Test Notifications</h3>
+            <h3 className="text-lg font-semibold text-center sm:text-left">Send Bulk Test Notifications</h3>
             <p className="text-sm text-muted-foreground">
               This will send multiple pre-defined test notifications to demonstrate different notification types.
             </p>
@@ -180,7 +180,7 @@ export const NotificationTester: React.FC = () => {
 
         {/* Instructions */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold mb-2">Instructions</h3>
+          <h3 className="text-lg font-semibold mb-2 text-center sm:text-left">Instructions</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Notifications will be sent in real-time via WebSocket</li>
             <li>• Browser push notifications will appear if permission is granted</li>
