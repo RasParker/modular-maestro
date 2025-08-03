@@ -55,7 +55,7 @@ export interface IStorage {
   deleteUser(id: number): Promise<boolean>;
 
   // Post methods
-  getPosts(): Promise<Post[]>>;
+  getPosts(): Promise<Post[]>;
   getPost(id: number): Promise<Post | undefined>;
   createPost(post: InsertPost): Promise<Post>;
   updatePost(id: number, updates: Partial<Post>): Promise<Post | undefined>;
@@ -426,7 +426,7 @@ export class DatabaseStorage implements IStorage {
 
       const [newTier] = await db
         .insert(subscription_tiers)
-        .values(tier)
+        .values([tier])
         .returning();
       console.log('Subscription tier created successfully:', newTier);
       return newTier;
@@ -455,7 +455,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: subscriptions.id,
         status: subscriptions.status,
-        current_period_end: subscriptions.ended_at,
+        current_period_end: subscriptions.ends_at,
         created_at: subscriptions.created_at,
         auto_renew: subscriptions.auto_renew,
         creator: {
@@ -545,7 +545,7 @@ export class DatabaseStorage implements IStorage {
         status: subscriptions.status,
         auto_renew: subscriptions.auto_renew,
         started_at: subscriptions.started_at,
-        ended_at: subscriptions.ended_at,
+        ended_at: subscriptions.ends_at,
         next_billing_date: subscriptions.next_billing_date,
         created_at: subscriptions.created_at,
         updated_at: subscriptions.updated_at,
@@ -580,7 +580,7 @@ export class DatabaseStorage implements IStorage {
           id: subscriptions.id,
           status: subscriptions.status,
           created_at: subscriptions.created_at,
-          current_period_end: subscriptions.ended_at,
+          current_period_end: subscriptions.ends_at,
           auto_renew: subscriptions.auto_renew,
           fan_id: subscriptions.fan_id,
           tier_id: subscriptions.tier_id,

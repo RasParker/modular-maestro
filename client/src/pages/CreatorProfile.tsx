@@ -12,6 +12,7 @@ import { PostActions } from '@/components/creator/PostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
+import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { useAuth } from '@/contexts/AuthContext';
 import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp, User } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
