@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
-export const MinimalNavbar: React.FC = () => {
+export const MinimalNavbar: React.FC = React.memo(() => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -367,4 +367,4 @@ export const MinimalNavbar: React.FC = () => {
       </div>
     </nav>
   );
-};
+});

@@ -55,7 +55,11 @@ function App() {
           <NotificationProvider>
             <Router>
               <AppLayout>
-                <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                <Suspense fallback={
+                  <div className="flex items-center justify-center min-h-screen">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                }>
                   <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />

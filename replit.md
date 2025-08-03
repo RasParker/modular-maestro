@@ -28,6 +28,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Performance Optimization Updates
+- **Date**: August 3, 2025
+- **API Optimization**: Reduced notification polling from 10 seconds to 60 seconds and disabled when user is not logged in
+- **Authentication**: Removed artificial 300ms delay in authentication verification for immediate response
+- **React Query**: Optimized default settings with disabled refetch on window focus/mount/reconnect and better caching
+- **Component Optimization**: Added React.memo to NotificationBell, MinimalNavbar, and AppLayout to prevent unnecessary re-renders
+- **Loading States**: Improved Suspense fallback with proper spinner instead of plain text
+- **TypeScript**: Fixed all TypeScript errors in notification components for better performance
+- **Custom Hooks**: Added useDebounce and useIntersectionObserver hooks for future performance optimizations
+
 ### Migration to Replit Environment
 - **Date**: August 3, 2025
 - **Migration**: Successfully migrated project from Replit Agent to standard Replit environment

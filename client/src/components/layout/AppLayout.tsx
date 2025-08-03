@@ -9,7 +9,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+export const AppLayout: React.FC<AppLayoutProps> = React.memo(({ children }) => {
   const location = useLocation();
   const { user } = useAuth();
   const isMobile = useIsMobile();
@@ -38,4 +38,4 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {isMobile && user && <BottomNavigation />}
     </div>
   );
-};
+});

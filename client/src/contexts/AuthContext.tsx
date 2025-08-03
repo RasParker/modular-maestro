@@ -81,10 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('xclusive_user');
         setUser(null);
       } finally {
-        // Set loading to false with a small delay to improve perceived performance
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 300);
+        // Set loading to false immediately for better performance
+        setIsLoading(false);
       }
     };
 

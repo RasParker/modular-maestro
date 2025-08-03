@@ -9,7 +9,8 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNotificationWebSocket } from '@/contexts/NotificationContext';
+import { useNotificationWebSocket, NotificationWebSocket } from '@/contexts/NotificationContext';
+import { WebSocketNotification } from '@/services/NotificationWebSocket';
 
 interface Notification {
   id: number;
@@ -31,7 +32,7 @@ interface Notification {
   created_at: string;
 }
 
-export const NotificationBell: React.FC = () => {
+export const NotificationBell: React.FC = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasNewNotification, setHasNewNotification] = useState(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
@@ -52,7 +53,8 @@ export const NotificationBell: React.FC = () => {
       console.log('Fetched notifications:', data);
       return Array.isArray(data) ? data : [];
     },
-    refetchInterval: 10000, // Poll more frequently for testing
+    refetchInterval: user?.id ? 60000 : false, // Poll only if user is logged in, less frequently
+    enabled: !!user?.id, // Only fetch if user is logged in
   });
 
   // Fetch unread count
@@ -65,7 +67,8 @@ export const NotificationBell: React.FC = () => {
       console.log('Fetched unread count:', data);
       return data;
     },
-    refetchInterval: 10000, // Poll more frequently for testing
+    refetchInterval: user?.id ? 60000 : false, // Poll only if user is logged in, less frequently
+    enabled: !!user?.id, // Only fetch if user is logged in
   });
 
   // Mark notification as read
@@ -126,12 +129,10 @@ export const NotificationBell: React.FC = () => {
 
       // Show browser push notification if permission granted
       if (Notification.permission === 'granted' && document.hidden) {
-        // Ensure body is a string - if message is an object, extract the content or convert to string
+        // Ensure body is a string - convert message to string safely
         const body = typeof notification.message === 'string' 
           ? notification.message 
-          : typeof notification.message === 'object' && notification.message?.content
-            ? notification.message.content
-            : String(notification.message || '');
+          : String(notification.message || '');
             
         new Notification(notification.title, {
           body: body,
@@ -145,12 +146,10 @@ export const NotificationBell: React.FC = () => {
 
       // Show toast notification if user is on the page
       if (!document.hidden) {
-        // Ensure description is a string - if message is an object, extract the content or convert to string
+        // Ensure description is a string - convert message to string safely
         const description = typeof notification.message === 'string' 
           ? notification.message 
-          : typeof notification.message === 'object' && notification.message?.content
-            ? notification.message.content
-            : String(notification.message || '');
+          : String(notification.message || '');
             
         toast({
           title: notification.title,
@@ -160,7 +159,7 @@ export const NotificationBell: React.FC = () => {
       }
     };
 
-    wsRef.current = createConnection(handleNewNotification);
+    wsRef.current = createConnection(handleNewNotification, () => {});
 
     return () => {
       if (wsRef.current) {
@@ -354,7 +353,7 @@ export const NotificationBell: React.FC = () => {
       )}
     </div>
   );
-};
+});
 
 interface NotificationContentProps {
   notification: Notification;
