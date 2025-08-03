@@ -297,12 +297,12 @@ export const Messages: React.FC = () => {
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="mb-6">
-            <Button variant="outline" asChild className="mb-4">
-              <Link to="/creator/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
+            <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
+            <Link to="/creator/dashboard">
+              <ArrowLeft className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+            </Link>
+          </Button>
             <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
               <MessageSquare className="w-8 h-8 text-primary" />
               Messages

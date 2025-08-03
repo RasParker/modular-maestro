@@ -118,7 +118,7 @@ export const ManageUsers: React.FC = () => {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="mb-6 sm:mb-8 text-center sm:text-left">
+        <div className="mb-6 sm:mb-8 text-left">
           <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
             <Link to="/admin/dashboard">
               <ArrowLeft className="w-4 h-4 sm:mr-2" />

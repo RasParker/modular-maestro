@@ -595,10 +595,10 @@ export const CreatorSettings: React.FC = () => {
     <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <Button variant="outline" asChild className="mb-4">
+            <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
               <Link to="/creator/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
               </Link>
             </Button>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -732,7 +732,7 @@ export const CreatorSettings: React.FC = () => {
                             <p>Square image recommended. Max file size: 5MB</p>
                           </div>
                         </div>
-                        
+
                         {/* Remove Photo Buttons */}
                         {(coverPhotoUrl || profilePhotoUrl) && (
                           <div className="flex flex-col sm:flex-row gap-2">
@@ -745,7 +745,7 @@ export const CreatorSettings: React.FC = () => {
                                     // Remove from localStorage
                                     localStorage.removeItem('coverPhotoUrl');
                                     setCoverPhotoUrl(null);
-                                    
+
                                     // Sync to database
                                     await fetch('/api/users/sync-profile', {
                                       method: 'POST',
@@ -754,12 +754,12 @@ export const CreatorSettings: React.FC = () => {
                                         coverPhotoUrl: null,
                                       }),
                                     });
-                                    
+
                                     // Trigger reactivity
                                     window.dispatchEvent(new CustomEvent('localStorageChange', {
                                       detail: { keys: ['coverPhotoUrl'] }
                                     }));
-                                    
+
                                     toast({
                                       title: "Cover photo removed",
                                       description: "Your cover photo has been removed successfully.",
@@ -778,7 +778,7 @@ export const CreatorSettings: React.FC = () => {
                                 Remove Cover Photo
                               </Button>
                             )}
-                            
+
                             {profilePhotoUrl && (
                               <Button
                                 variant="outline"
@@ -788,7 +788,7 @@ export const CreatorSettings: React.FC = () => {
                                     // Remove from localStorage
                                     localStorage.removeItem('profilePhotoUrl');
                                     setProfilePhotoUrl(null);
-                                    
+
                                     // Sync to database
                                     await fetch('/api/users/sync-profile', {
                                       method: 'POST',
@@ -797,15 +797,15 @@ export const CreatorSettings: React.FC = () => {
                                         profilePhotoUrl: null,
                                       }),
                                     });
-                                    
+
                                     // Update user context
                                     updateUser({ avatar: undefined } as any);
-                                    
+
                                     // Trigger reactivity
                                     window.dispatchEvent(new CustomEvent('localStorageChange', {
                                       detail: { keys: ['profilePhotoUrl'] }
                                     }));
-                                    
+
                                     toast({
                                       title: "Profile photo removed",
                                       description: "Your profile photo has been removed successfully.",
@@ -862,7 +862,7 @@ export const CreatorSettings: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="content" className="space-y-6">
-              
+
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Content Settings</CardTitle>
@@ -933,7 +933,7 @@ export const CreatorSettings: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="goals" className="space-y-6">
-              
+
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Monthly Goals</CardTitle>
@@ -985,7 +985,8 @@ export const CreatorSettings: React.FC = () => {
                           id="postsGoal"
                           type="number"
                           value={monthlyGoals.postsGoal}
-                          onChange={(e) => setMonthlyGoals(prev => ({ 
+                          onChange```text
+=(e) => setMonthlyGoals(prev => ({ 
                             ...prev, 
                             postsGoal: parseInt(e.target.value) || 0 
                           }))}
@@ -1024,7 +1025,7 @@ export const CreatorSettings: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="payouts" className="space-y-6">
-              
+
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle>Payout Settings</CardTitle>
@@ -1156,11 +1157,11 @@ export const CreatorSettings: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              
+
 </TabsContent>
 
             <TabsContent value="security" className="space-y-6">
-              
+
                 <Card className="bg-gradient-card border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">

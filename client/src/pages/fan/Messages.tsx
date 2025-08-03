@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -81,7 +80,7 @@ export const Messages: React.FC = () => {
     if (!user?.id) return;
 
     console.log('Initializing WebSocket connection for Messages');
-    
+
     try {
       const wsService = createConnection(
         (notification) => {
@@ -89,7 +88,7 @@ export const Messages: React.FC = () => {
         },
         (messageData) => {
           console.log('Messages: Received real-time message:', messageData);
-          
+
           if (messageData.type === 'new_message_realtime') {
             setMessages(prev => {
               const currentConversationId = selectedConversation?.id;
@@ -133,7 +132,7 @@ export const Messages: React.FC = () => {
       } else {
         setRefreshingConversations(true);
       }
-      
+
       const response = await fetch('/api/conversations', {
         credentials: 'include'
       });
@@ -141,7 +140,7 @@ export const Messages: React.FC = () => {
         const data = await response.json();
         console.log('Fetched conversations:', data);
         setConversations(data);
-        
+
         // Check if there's a specific conversation to auto-select from chat initiation
         const autoSelectId = sessionStorage.getItem('autoSelectConversationId');
         if (autoSelectId) {
@@ -237,7 +236,7 @@ export const Messages: React.FC = () => {
     onSuccess: async (data) => {
       console.log('Message sent successfully:', data);
       const messageContent = newMessage.trim();
-      
+
       // Add the message immediately to the UI for better UX
       if (selectedConversation && user) {
         const newMsg = {
@@ -330,10 +329,10 @@ export const Messages: React.FC = () => {
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="mb-6">
-            <Button variant="outline" asChild className="mb-4">
+            <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
               <Link to="/fan/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
               </Link>
             </Button>
             <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">

@@ -9,7 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, Shield, Mail, Users, Save } from 'lucide-react';
+import { Settings, Shield, Mail, Users, Save, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const AdminSettings: React.FC = () => {
   const { toast } = useToast();
@@ -138,6 +139,12 @@ export const AdminSettings: React.FC = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
+              <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
+                <Link to="/admin/dashboard">
+                  <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Back to Dashboard</span>
+                </Link>
+              </Button>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Admin Settings</h1>
               <p className="text-muted-foreground text-sm sm:text-base">
                 Manage platform-wide settings and configurations

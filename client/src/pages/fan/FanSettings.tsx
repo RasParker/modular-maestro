@@ -374,10 +374,10 @@ export const FanSettings: React.FC = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Button variant="outline" asChild className="mb-4">
+          <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
             <Link to="/fan/dashboard">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </Link>
           </Button>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
