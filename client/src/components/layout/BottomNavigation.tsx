@@ -119,9 +119,9 @@ export const BottomNavigation: React.FC = () => {
           },
           { 
             label: 'Admin', 
-            href: '/admin/dashboard', 
+            href: '/admin/settings', 
             icon: Shield,
-            active: location.pathname.startsWith('/admin')
+            active: location.pathname === '/admin/settings'
           }
         ];
 

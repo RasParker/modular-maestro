@@ -985,8 +985,7 @@ export const CreatorSettings: React.FC = () => {
                           id="postsGoal"
                           type="number"
                           value={monthlyGoals.postsGoal}
-                          onChange```text
-=(e) => setMonthlyGoals(prev => ({ 
+                          onChange={(e) => setMonthlyGoals(prev => ({ 
                             ...prev, 
                             postsGoal: parseInt(e.target.value) || 0 
                           }))}
