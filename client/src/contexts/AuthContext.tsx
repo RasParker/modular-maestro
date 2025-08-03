@@ -52,7 +52,7 @@ const MOCK_USERS: User[] = [
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Check for stored user session and verify with server
@@ -60,28 +60,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const storedUser = localStorage.getItem('xclusive_user');
         if (storedUser) {
-          // Verify session with server
-          const response = await fetch('/api/auth/verify', {
+          // Set user immediately from localStorage for faster initial render
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          
+          // Verify session with server in background
+          fetch('/api/auth/verify', {
             credentials: 'include'
-          });
-
-          if (response.ok) {
-            const data = await response.json();
+          }).then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Session invalid');
+            }
+          }).then(data => {
             setUser(data.user);
-          } else {
+          }).catch(() => {
             // Session expired or invalid, clear local storage
             console.log('Session expired, clearing local storage');
             localStorage.removeItem('xclusive_user');
             setUser(null);
-          }
+          });
+        } else {
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Session verification failed:', error);
         // Clear local storage on error
         localStorage.removeItem('xclusive_user');
         setUser(null);
-      } finally {
-        // Set loading to false immediately for better performance
         setIsLoading(false);
       }
     };
