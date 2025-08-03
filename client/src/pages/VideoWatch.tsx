@@ -458,20 +458,17 @@ export const VideoWatch: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 px-4">
                           <Avatar className="h-9 w-9 flex-shrink-0">
-                            <AvatarImage 
-                              src={video.creator?.avatar ? (video.creator.avatar.startsWith('/uploads/') ? video.creator.avatar : `/uploads/${video.creator.avatar}`) : undefined} 
-                              alt={video.creator?.username || 'Creator'} 
-                            />
-                            <AvatarFallback>{(video.creator?.display_name || video.creator?.username || 'C').charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-light text-foreground line-clamp-2 mb-1 leading-tight">
                               {video.title || video.content}
                             </h4>
                             <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                              <span className="truncate">{video.creator?.display_name || video.creator?.username || 'Unknown Creator'}</span>
+                              <span className="truncate mr-2">{video.creator_display_name || video.creator_username}</span>
                               <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                 <Eye className="w-3 h-3" />
                                 <span>{Math.floor(Math.random() * 500) + 100}K</span>
@@ -728,18 +725,15 @@ export const VideoWatch: React.FC = () => {
 
                         <div className="flex gap-3">
                           <Avatar className="h-9 w-9 flex-shrink-0">
-                            <AvatarImage 
-                              src={video.creator?.avatar ? (video.creator.avatar.startsWith('/uploads/') ? video.creator.avatar : `/uploads/${video.creator.avatar}`) : undefined} 
-                              alt={video.creator?.username || 'Creator'} 
-                            />
-                            <AvatarFallback className="text-sm">{(video.creator?.display_name || video.creator?.username || 'C').charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarImage src={video.creator_avatar || video.avatar} alt={video.creator_username || video.username} />
+                            <AvatarFallback className="text-sm">{(video.creator_display_name || video.creator_username || video.display_name || video.username || 'U').charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <h3 className="text-foreground line-clamp-2 mb-1" style={{ fontSize: '14px', fontWeight: 500 }}>
                               {video.title || video.content}
                             </h3>
                             <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
-                              <span className="truncate">{video.creator?.display_name || video.creator?.username}</span>
+                              <span className="truncate mr-2">{video.creator_display_name || video.creator_username}</span>
                               <div className="flex items-center gap-1 flex-shrink-0 text-right">
                                 <Eye className="w-3 h-3" />
                                 <span>{Math.floor(Math.random() * 500) + 100}K</span>

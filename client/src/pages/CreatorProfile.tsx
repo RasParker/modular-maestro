@@ -14,7 +14,7 @@ import { PaymentModal } from '@/components/payment/PaymentModal';
 import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
 import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp, User, Camera } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp, User } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -1234,20 +1234,61 @@ export const CreatorProfile: React.FC = () => {
             </div>
           )}
 
-          {/* Cover Photo Upload Button - Only show for own profile */}
-          {isOwnProfile && (
+          {/* Cover Photo Upload Button - Only show for own profile and when no cover photo */}
+          {isOwnProfile && !creator.cover && (
             <div className="absolute top-4 right-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
-                title="Add cover photo"
-                asChild
-              >
-                <Link to="/creator/settings?tab=profile">
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-10 w-10 p-0 bg-background/80 backdrop-blur-sm border-2 border-border hover:bg-background/90 transition-colors"
+                  title="Add cover photo"
+                  onClick={() => document.getElementById('header-cover-upload')?.click()}
+                >
                   <Plus className="w-4 h-4" />
-                </Link>
-              </Button>
+                </Button>
+                <input
+                  id="header-cover-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const formData = new FormData();
+                        formData.append('coverPhoto', file);
+
+                        const response = await fetch('/api/upload/cover-photo', {
+                          method: 'POST',
+                          body: formData,
+                        });
+
+                        if (!response.ok) throw new Error('Upload failed');
+
+                        const result = await response.json();
+
+                        // Update localStorage and trigger re-render
+                        localStorage.setItem('coverPhotoUrl', result.url);
+                        window.dispatchEvent(new CustomEvent('localStorageChange', {
+                          detail: { keys: ['coverPhotoUrl'] }
+                        }));
+
+                        toast({
+                          title: "Cover photo updated",
+                          description: "Your cover photo has been updated successfully.",
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Upload failed",
+                          description: "Failed to upload cover photo. Please try again.",
+                          variant: "destructive",
+                        });
+                      }
+                    }
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -1261,19 +1302,6 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-
-              {/* Profile Photo Upload Button - Only show for own profile */}
-              {isOwnProfile && (
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full border-2 border-background flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
-                  <Link to="/creator/settings?tab=profile" className="flex items-center justify-center w-full h-full">
-                    {creator.avatar ? (
-                      <Camera className="w-4 h-4 text-primary-foreground" />
-                    ) : (
-                      <Plus className="w-4 h-4 text-primary-foreground" />
-                    )}
-                  </Link>
-                </div>
-              )}
 
               {/* Online status dot overlay */}
               {creator.activity_status_visible && creator.is_online && (
