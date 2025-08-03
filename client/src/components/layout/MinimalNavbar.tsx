@@ -208,6 +208,7 @@ export const MinimalNavbar: React.FC = () => {
 
           {/* User Menu - Desktop */}
           <div className="hidden md:flex items-center space-x-3">
+            <ThemeToggle />
             {user && <NotificationBell />}
             {user && (
               <DropdownMenu>

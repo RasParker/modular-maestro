@@ -480,13 +480,10 @@ export const CreatePost: React.FC = () => {
                       <FormItem>
                         <FormLabel>Schedule Time</FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <Input
-                              type="time"
-                              {...field}
-                            />
-                            <Clock className="absolute right-3 top-3 h-4 w-4 opacity-50" />
-                          </div>
+                          <Input
+                            type="time"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
