@@ -396,11 +396,12 @@ export const EditPost: React.FC = () => {
         <div className="mb-8">
           <Button 
             variant="outline" 
-            className="mb-4"
+            size="sm"
+            className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4"
             onClick={handleBackClick}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            <ArrowLeft className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Back to Dashboard</span>
           </Button>
           <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
           <p className="text-muted-foreground">

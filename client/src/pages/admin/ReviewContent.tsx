@@ -78,10 +78,10 @@ export const ReviewContent: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-6 sm:mb-8">
-          <Button variant="outline" asChild className="mb-4">
+          <Button variant="outline" size="sm" asChild className="mb-4 w-10 h-10 p-0 sm:w-auto sm:h-auto sm:p-2 sm:px-4">
             <Link to="/admin/dashboard">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </Link>
           </Button>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center justify-center sm:justify-start gap-2">
