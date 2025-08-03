@@ -403,8 +403,8 @@ export const EditPost: React.FC = () => {
             <ArrowLeft className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Back to Dashboard</span>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Edit Post</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Update your post content and settings
           </p>
         </div>

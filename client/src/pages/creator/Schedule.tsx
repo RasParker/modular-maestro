@@ -251,10 +251,10 @@ export const Schedule: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-primary" />
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground">Content Schedule</h1>
+                  <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Content Schedule</h1>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Manage your scheduled and draft content
                 </p>
               </div>

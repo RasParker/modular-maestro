@@ -300,8 +300,8 @@ export const CreatePost: React.FC = () => {
               <span className="hidden sm:inline">Back to Dashboard</span>
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Create New Post</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Create New Post</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Share exclusive content with your subscribers
           </p>
         </div>

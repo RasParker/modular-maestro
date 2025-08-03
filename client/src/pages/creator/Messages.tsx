@@ -303,11 +303,11 @@ export const Messages: React.FC = () => {
               <span className="hidden sm:inline">Back to Dashboard</span>
             </Link>
           </Button>
-            <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-              <MessageSquare className="w-8 h-8 text-primary" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               Messages
             </h1>
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Connect with your subscribers
             </p>
           </div>
@@ -492,7 +492,7 @@ export const Messages: React.FC = () => {
                       <ArrowLeft className="w-4 h-4" />
                     </Link>
                   </Button>
-                  <h1 className="text-xl font-bold text-foreground">Messages</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground">Messages</h1>
                 </div>
               </div>
               <div className="relative">

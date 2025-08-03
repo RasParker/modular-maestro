@@ -248,7 +248,7 @@ export const ManageContent: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Content Manager</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Manage and organize your content
               </p>
             </div>
