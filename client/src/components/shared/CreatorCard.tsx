@@ -36,10 +36,8 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
                 {(creator.display_name || creator.username).charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            {/* Online status dot - will be rendered by OnlineStatusIndicator if needed */}
-            <div className="absolute -bottom-0.5 -right-0.5">
-              <OnlineStatusIndicator userId={parseInt(creator.id)} dotOnly={true} size="xs" />
-            </div>
+            {/* Online status dot - positioned absolutely on avatar border */}
+            <OnlineStatusIndicator userId={parseInt(creator.id)} dotOnly={true} size="xs" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">

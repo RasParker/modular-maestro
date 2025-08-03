@@ -1305,7 +1305,7 @@ export const CreatorProfile: React.FC = () => {
 
               {/* Online status dot overlay */}
               {creator.activity_status_visible && creator.is_online && (
-                <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-lg"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-lg z-30" style={{ transform: 'translate(50%, 50%)' }}></div>
               )}</div>
 
             {/* Desktop Layout - Action buttons on the right */}
