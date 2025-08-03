@@ -218,9 +218,9 @@ export const VideoWatch: React.FC = () => {
   const fullMediaUrl = mediaUrl?.startsWith('http') ? mediaUrl : `/uploads/${mediaUrl}`;
 
   return (
-    <div className={`min-h-screen bg-background overflow-x-hidden ${isImmersive ? 'is-immersive' : ''}`}>
+    <div className={`min-h-screen bg-background ${isImmersive ? 'is-immersive' : ''}`}>
       {/* Mobile Layout */}
-      <div className="md:hidden overflow-x-hidden">
+      <div className="md:hidden">
         {/* Video Player Wrapper - YouTube style for mobile */}
         <div className="video-player-wrapper relative bg-black w-full">
           {/* Back Button */}
@@ -525,9 +525,9 @@ export const VideoWatch: React.FC = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex min-h-screen bg-background justify-center overflow-x-hidden">
-        <div className="w-full max-w-8xl px-6 overflow-x-hidden">
-          <div className="flex gap-6 py-6 justify-center overflow-x-hidden">
+      <div className="hidden md:flex min-h-screen bg-background justify-center">
+        <div className="w-full max-w-8xl px-6">
+          <div className="flex gap-6 py-6 justify-center">
             {/* Main Content */}
             <div className="flex-1 max-w-6xl">
               {/* Back Button */}
@@ -687,7 +687,7 @@ export const VideoWatch: React.FC = () => {
             </div>
 
             {/* Sidebar - Next Videos */}
-            <div className="w-70 min-w-0 flex-shrink-0 space-y-0">
+            <div className="w-70 space-y-0">
               <h3 className="text-lg font-semibold mb-4 px-2">Up next</h3>
               <div className="space-y-0 border border-border rounded-lg overflow-hidden">
                 {nextVideos.map((video, index) => {
