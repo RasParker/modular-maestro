@@ -1619,10 +1619,11 @@ export const CreatorProfile: React.FC = () => {
             {getFilteredPosts().length > 0 ? (
               <>
                 {/* Mobile: Edge-to-edge borderless layout like fan feed */}
-                <div className="md:hidden">
-                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                <div className="md:hidden overflow-x-hidden">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container overflow-x-hidden" style={{
                     scrollbarWidth: 'none',
-                    msOverflowStyle: 'none'
+                    msOverflowStyle: 'none',
+                    maxWidth: '100vw'
                   }}>
                     {getFilteredPosts().map((post) => (
                       <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
@@ -1696,7 +1697,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnZnPg==';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
@@ -1840,11 +1841,11 @@ export const CreatorProfile: React.FC = () => {
                 </div>
 
                 {/* Desktop: YouTube-style 16:9 card layout */}
-                <div className="hidden md:block">
-                  <div className="max-w-4xl mx-auto space-y-6">
+                <div className="hidden md:block overflow-x-hidden">
+                  <div className="max-w-4xl mx-auto space-y-6 overflow-x-hidden">
                     {getFilteredPosts().map((post) => (
-                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
-                        <CardContent className="p-4">
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden max-w-full">
+                        <CardContent className="p-4 overflow-x-hidden">
                           {/* Media Content - 16:9 aspect ratio */}
                           <div 
                             className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
@@ -2110,10 +2111,11 @@ export const CreatorProfile: React.FC = () => {
             {getFilteredPosts().length > 0 ? (
               <>
                 {/* Mobile: Edge-to-edge borderless layout like fan feed */}
-                <div className="md:hidden">
-                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                <div className="md:hidden overflow-x-hidden">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container overflow-x-hidden" style={{
                     scrollbarWidth: 'none',
-                    msOverflowStyle: 'none'
+                    msOverflowStyle: 'none',
+                    maxWidth: '100vw'
                   }}>
                     {getFilteredPosts().map((post) => (
                       <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
@@ -2331,11 +2333,11 @@ export const CreatorProfile: React.FC = () => {
                 </div>
 
                 {/* Desktop: YouTube-style 16:9 card layout */}
-                <div className="hidden md:block">
-                  <div className="max-w-4xl mx-auto space-y-6">
+                <div className="hidden md:block overflow-x-hidden">
+                  <div className="max-w-4xl mx-auto space-y-6 overflow-x-hidden">
                     {getFilteredPosts().map((post) => (
-                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
-                        <CardContent className="p-4">
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden max-w-full">
+                        <CardContent className="p-4 overflow-x-hidden">
                           {/* Media Content - 16:9 aspect ratio */}
                           <div 
                             className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
@@ -2353,7 +2355,7 @@ export const CreatorProfile: React.FC = () => {
                               const hasAccess = hasAccessToTier(post.tier);
 
                               if (!hasAccess) {
-                                return (
+                                return(
                                   <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
                                     <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
                                     <div className="text-center z-10 p-4">

@@ -453,11 +453,13 @@
 
     .video-watch-main {
       max-width: 1440px;
+      overflow-x: hidden;
     }
 
     .video-watch-sidebar {
       width: 280px;
       min-width: 280px;
+      max-width: 280px;
       flex-shrink: 0;
     }
   }
@@ -465,11 +467,30 @@
   /* Prevent horizontal overflow globally */
   * {
     box-sizing: border-box;
+    max-width: 100%;
   }
 
   body, html {
     overflow-x: hidden;
     max-width: 100vw;
+  }
+
+  /* Fix for creator profile and feed cards */
+  .creator-profile-container,
+  .feed-container,
+  .video-watch-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Ensure all card containers don't overflow */
+  .card-container,
+  .post-card,
+  .content-card {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Custom width utility */
