@@ -373,7 +373,7 @@ export const AdminDashboard: React.FC = () => {
                 <CardTitle className="text-lg">Platform Settings</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground mb-4 text-center sm:text-left">
                   Configure platform-wide settings and policies
                 </p>
                 <Button variant="outline" size="sm" className="w-full" asChild>

@@ -162,7 +162,7 @@ export const NotificationTester: React.FC = () => {
         <div className="border-t pt-6">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-center sm:text-left">Send Bulk Test Notifications</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-center sm:text-left">
               This will send multiple pre-defined test notifications to demonstrate different notification types.
             </p>
             
