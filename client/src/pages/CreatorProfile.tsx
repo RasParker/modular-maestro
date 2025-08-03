@@ -1700,8 +1700,6 @@ export const CreatorProfile: React.FC = () => {
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
-                              ```text
-
                               );
                             } else {
                               return (
@@ -2570,8 +2568,8 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </div>
@@ -2588,7 +2586,7 @@ export const CreatorProfile: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-            )}
+              )}
               </div>
             </TabsContent>
           </Tabs>

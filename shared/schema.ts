@@ -81,7 +81,7 @@ export const subscription_tiers = pgTable("subscription_tiers", {
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("GHS"),
-  benefits: json("benefits").$type<string[]>().notNull().default([]),
+  benefits: text("benefits").array().notNull().default(["Basic access"]),
   is_active: boolean("is_active").notNull().default(true),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
