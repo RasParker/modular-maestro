@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 interface OnlineStatusIndicatorProps {
   userId: number;
   showLastSeen?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   dotOnly?: boolean;
   isOwnProfile?: boolean;
 }
@@ -63,8 +63,10 @@ export const OnlineStatusIndicator: React.FC<OnlineStatusIndicatorProps> = ({
   const getSizeClasses = () => {
     // Use same sizes for both dotOnly and text indicators
     switch (size) {
-      case 'sm':
+      case 'xs':
         return 'w-2 h-2';
+      case 'sm':
+        return 'w-2.5 h-2.5';
       case 'md':
         return 'w-3 h-3';
       case 'lg':

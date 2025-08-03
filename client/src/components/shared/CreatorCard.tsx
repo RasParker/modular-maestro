@@ -38,7 +38,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
             </Avatar>
             {/* Online status dot - will be rendered by OnlineStatusIndicator if needed */}
             <div className="absolute -bottom-0.5 -right-0.5">
-              <OnlineStatusIndicator userId={parseInt(creator.id)} dotOnly={true} size="sm" />
+              <OnlineStatusIndicator userId={parseInt(creator.id)} dotOnly={true} size="xs" />
             </div>
           </div>
           <div className="flex-1 min-w-0">

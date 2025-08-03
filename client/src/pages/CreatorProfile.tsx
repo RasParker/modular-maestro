@@ -1298,20 +1298,15 @@ export const CreatorProfile: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-3">
             <div className="relative">
-              <Avatar className={`w-24 h-24 border-4 transition-colors ${
-                creator.activity_status_visible && creator.is_online 
-                  ? 'border-green-500' 
-                  : 'border-background'
-              }`}>
+              <Avatar className="w-24 h-24 border-4 border-background">
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
               {/* Online status dot overlay */}
               {creator.activity_status_visible && creator.is_online && (
-                <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-3 border-background shadow-lg animate-pulse"></div>
-              )}
-            </div>
+                <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-lg"></div>
+              )}</div>
 
             {/* Desktop Layout - Action buttons on the right */}
             <div className="hidden md:flex w-full items-end justify-between">
@@ -1325,10 +1320,9 @@ export const CreatorProfile: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
-                </div>
+<div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">@{creator.username}</p>
+              </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Users className="w-4 h-4" />
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
@@ -1706,6 +1700,8 @@ export const CreatorProfile: React.FC = () => {
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
+                              ```text
+
                               );
                             } else {
                               return (
@@ -2574,8 +2570,8 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
