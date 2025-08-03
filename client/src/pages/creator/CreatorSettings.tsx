@@ -88,6 +88,9 @@ export const CreatorSettings: React.FC = () => {
   });
   const [isPayoutSettingsLoading, setIsPayoutSettingsLoading] = useState(false);
 
+  // New state for subscription tiers
+  const [tiers, setTiers] = useState([]);
+
   // Load user settings, payout settings and monthly goals on component mount
   useEffect(() => {
     const loadUserSettings = async () => {
@@ -146,9 +149,17 @@ export const CreatorSettings: React.FC = () => {
       }
     };
 
-    loadUserSettings();
-    loadPayoutSettings();
-    loadMonthlyGoals();
+    const loadSubscriptionTiers = async () => {
+      try {
+        const response = await fetch(`/api/creators/${req.session?.userId || 2}/tiers`);
+        if (response.ok) {
+          const tiersData = await response.json();
+          setTiers(tiersData);
+        }
+      } catch (error) {
+        console.error('Error loading subscription tiers:', error);
+      }
+    };
   }, []);
 
   const handleSavePayoutSettings = async () => {
@@ -969,7 +980,7 @@ export const CreatorSettings: React.FC = () => {
                         <SelectContent>
                           <SelectItem value="free">Free</SelectItem>
                           <SelectItem value="basic">Basic Support</SelectItem>
-                          <SelectItem value="premium">Premium Content</SelectItem>
+                          <SelectItem value="premium">PremiumContent</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
