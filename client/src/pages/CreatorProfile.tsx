@@ -13,14 +13,14 @@ import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp, User } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { BioDisplay } from '@/lib/text-utils';
-import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
+
 
 // Add CSS for feed cards to match Fan feed page
 const feedCardStyles = `
@@ -1297,26 +1297,18 @@ export const CreatorProfile: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="max-w-4xl mx-auto flex items-end gap-3">
             <div className="relative">
-              <Avatar className="w-24 h-24 border-4 border-background">
+              <Avatar className={`w-24 h-24 border-4 transition-colors ${
+                creator.activity_status_visible && creator.is_online 
+                  ? 'border-green-500' 
+                  : 'border-background'
+              }`}>
                 <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
-              {/* Profile Photo Upload Button - Only show for own profile and when no avatar */}
-              {isOwnProfile && !creator.avatar && (
-                <div className="absolute -bottom-1 -right-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 w-6 p-0 bg-primary rounded-full border-2 border-background hover:bg-primary/90 transition-colors"
-                    title="Add profile photo"
-                    asChild
-                  >
-                    <Link to="/creator/settings?tab=profile">
-                      <Plus className="w-3 h-3 text-primary-foreground" />
-                    </Link>
-                  </Button>
-                </div>
+              {/* Online status dot overlay */}
+              {creator.activity_status_visible && creator.is_online && (
+                <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-3 border-background shadow-lg animate-pulse"></div>
               )}
             </div>
 
@@ -1356,7 +1348,6 @@ export const CreatorProfile: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
@@ -1412,6 +1403,20 @@ export const CreatorProfile: React.FC = () => {
                 <Plus className="w-4 h-4" />
               </Link>
             </Button>
+            {/* Profile Photo Upload Button - Modern placement */}
+            {!creator.avatar && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 w-10 p-0"
+                title="Add profile photo"
+                asChild
+              >
+                <Link to="/creator/settings?tab=profile">
+                  <User className="w-4 h-4" />
+                </Link>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-2 mt-4">

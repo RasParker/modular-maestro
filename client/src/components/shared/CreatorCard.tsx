@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users } from 'lucide-react';
 import { BioDisplay } from '@/lib/text-utils';
+import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 
 interface CreatorCardProps {
   creator: {
@@ -25,15 +26,21 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
     <Card className="bg-gradient-card border-border/50 hover:border-primary/50 transition-all duration-300">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <Avatar className="w-12 h-12">
-            <AvatarImage 
-              src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} 
-              alt={creator.username} 
-            />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {(creator.display_name || creator.username).charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="w-12 h-12">
+              <AvatarImage 
+                src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} 
+                alt={creator.username} 
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                {(creator.display_name || creator.username).charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {/* Online status dot - will be rendered by OnlineStatusIndicator if needed */}
+            <div className="absolute -bottom-0.5 -right-0.5">
+              <OnlineStatusIndicator userId={parseInt(creator.id)} dotOnly={true} size="sm" />
+            </div>
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm truncate">
