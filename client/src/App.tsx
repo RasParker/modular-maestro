@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -8,44 +9,43 @@ import { NotificationProvider } from '@/contexts/NotificationContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { AppLayout } from '@/components/layout/AppLayout';
 
-import { Login } from '@/pages/Login';
-import { Signup } from '@/pages/Signup';
-import { Explore } from '@/pages/Explore';
-import { CreatorProfile } from '@/pages/CreatorProfile';
-import { VideoWatch } from '@/pages/VideoWatch';
-import { FeedPage } from '@/pages/fan/FeedPage';
-import { FanDashboard } from '@/pages/fan/FanDashboard';
-import { CreatorDashboard } from '@/pages/creator/CreatorDashboard';
-import { CreatePost } from '@/pages/creator/CreatePost';
-import { Analytics } from '@/pages/creator/Analytics';
-import { Subscribers } from '@/pages/creator/Subscribers';
-import { CreatorSettings } from '@/pages/creator/CreatorSettings';
-import { EditPost } from '@/pages/creator/EditPost';
-import { ManageTiers } from '@/pages/creator/ManageTiers';
-import { ManageContent } from '@/pages/creator/ManageContent';
-import { Earnings } from '@/pages/creator/Earnings';
-import { Messages as CreatorMessages } from '@/pages/creator/Messages';
+// Lazy load pages for better performance
+const Login = React.lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })));
+const Signup = React.lazy(() => import('@/pages/Signup').then(m => ({ default: m.Signup })));
+const Explore = React.lazy(() => import('@/pages/Explore').then(m => ({ default: m.Explore })));
+const CreatorProfile = React.lazy(() => import('@/pages/CreatorProfile').then(m => ({ default: m.CreatorProfile })));
+const VideoWatch = React.lazy(() => import('@/pages/VideoWatch').then(m => ({ default: m.VideoWatch })));
+const FeedPage = React.lazy(() => import('@/pages/fan/FeedPage').then(m => ({ default: m.FeedPage })));
+const FanDashboard = React.lazy(() => import('@/pages/fan/FanDashboard').then(m => ({ default: m.FanDashboard })));
+const CreatorDashboard = React.lazy(() => import('@/pages/creator/CreatorDashboard').then(m => ({ default: m.CreatorDashboard })));
+const CreatePost = React.lazy(() => import('@/pages/creator/CreatePost').then(m => ({ default: m.CreatePost })));
+const Analytics = React.lazy(() => import('@/pages/creator/Analytics').then(m => ({ default: m.Analytics })));
+const Subscribers = React.lazy(() => import('@/pages/creator/Subscribers').then(m => ({ default: m.Subscribers })));
+const CreatorSettings = React.lazy(() => import('@/pages/creator/CreatorSettings').then(m => ({ default: m.CreatorSettings })));
+const EditPost = React.lazy(() => import('@/pages/creator/EditPost').then(m => ({ default: m.EditPost })));
+const ManageTiers = React.lazy(() => import('@/pages/creator/ManageTiers').then(m => ({ default: m.ManageTiers })));
+const ManageContent = React.lazy(() => import('@/pages/creator/ManageContent').then(m => ({ default: m.ManageContent })));
+const Earnings = React.lazy(() => import('@/pages/creator/Earnings').then(m => ({ default: m.Earnings })));
+const CreatorMessages = React.lazy(() => import('@/pages/creator/Messages').then(m => ({ default: m.Messages })));
 
 // Fan pages
-import { ManageSubscriptions } from '@/pages/fan/ManageSubscriptions';
-import { Messages } from '@/pages/fan/Messages';
-import { PaymentMethod } from '@/pages/fan/PaymentMethod';
-import { FanSettings } from '@/pages/fan/FanSettings';
-import { Notifications } from '@/pages/fan/Notifications';
+const ManageSubscriptions = React.lazy(() => import('@/pages/fan/ManageSubscriptions').then(m => ({ default: m.ManageSubscriptions })));
+const Messages = React.lazy(() => import('@/pages/fan/Messages').then(m => ({ default: m.Messages })));
+const PaymentMethod = React.lazy(() => import('@/pages/fan/PaymentMethod').then(m => ({ default: m.PaymentMethod })));
+const FanSettings = React.lazy(() => import('@/pages/fan/FanSettings').then(m => ({ default: m.FanSettings })));
+const Notifications = React.lazy(() => import('@/pages/fan/Notifications').then(m => ({ default: m.Notifications })));
 
 // Admin pages
-import { AdminDashboard } from '@/pages/admin/AdminDashboard';
-import { AdminSettings } from '@/pages/admin/AdminSettings';
-import { AdminRedirect } from '@/pages/admin/AdminRedirect';
-import { ManageUsers } from '@/pages/admin/ManageUsers';
-import { ReviewContent } from '@/pages/admin/ReviewContent';
-import { Reports } from '@/pages/admin/Reports';
-import AdminAnalytics from '@/pages/admin/AdminAnalytics';
+const AdminDashboard = React.lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminSettings = React.lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
+const AdminRedirect = React.lazy(() => import('@/pages/admin/AdminRedirect').then(m => ({ default: m.AdminRedirect })));
+const ManageUsers = React.lazy(() => import('@/pages/admin/ManageUsers').then(m => ({ default: m.ManageUsers })));
+const ReviewContent = React.lazy(() => import('@/pages/admin/ReviewContent').then(m => ({ default: m.ReviewContent })));
+const Reports = React.lazy(() => import('@/pages/admin/Reports').then(m => ({ default: m.Reports })));
+const AdminAnalytics = React.lazy(() => import('@/pages/admin/AdminAnalytics'));
 
-// Payment pages  
-import PaymentCallback from '@/pages/PaymentCallback';
-
-const queryClient = new QueryClient();
+// Payment pages
+const PaymentCallback = React.lazy(() => import('@/pages/PaymentCallback'));
 
 function App() {
   return (
@@ -55,7 +55,8 @@ function App() {
           <NotificationProvider>
             <Router>
               <AppLayout>
-              <Routes>
+                <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                  <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -112,10 +113,11 @@ function App() {
 
               {/* Catch-all route for undefined paths */}
               <Route path="*" element={<Navigate to="/login" replace />} />
-              </Routes>
-            </AppLayout>
-          </Router>
-          <Toaster />
+                  </Routes>
+                </Suspense>
+              </AppLayout>
+            </Router>
+            <Toaster />
           </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>

@@ -57,9 +57,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Check for stored user session and verify with server
     const verifySession = async () => {
-      const storedUser = localStorage.getItem('xclusive_user');
-      if (storedUser) {
-        try {
+      try {
+        const storedUser = localStorage.getItem('xclusive_user');
+        if (storedUser) {
           // Verify session with server
           const response = await fetch('/api/auth/verify', {
             credentials: 'include'
@@ -74,14 +74,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.removeItem('xclusive_user');
             setUser(null);
           }
-        } catch (error) {
-          console.error('Session verification failed:', error);
-          // Clear local storage on error
-          localStorage.removeItem('xclusive_user');
-          setUser(null);
         }
+      } catch (error) {
+        console.error('Session verification failed:', error);
+        // Clear local storage on error
+        localStorage.removeItem('xclusive_user');
+        setUser(null);
+      } finally {
+        // Set loading to false with a small delay to improve perceived performance
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 300);
       }
-      setIsLoading(false);
     };
 
     verifySession();
