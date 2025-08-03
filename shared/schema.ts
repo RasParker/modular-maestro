@@ -24,6 +24,8 @@ export const users = pgTable("users", {
   total_earnings: decimal("total_earnings", { precision: 10, scale: 2 }).notNull().default("0.00"),
   commission_rate: decimal("commission_rate", { precision: 5, scale: 2 }).notNull().default("0.15"), // 15% platform fee
   comments_enabled: boolean("comments_enabled").notNull().default(true), // Allow comments on posts
+  auto_post_enabled: boolean("auto_post_enabled").notNull().default(false), // Auto-post to social media
+  watermark_enabled: boolean("watermark_enabled").notNull().default(true), // Add watermark to images
   profile_discoverable: boolean("profile_discoverable").notNull().default(true), // Allow profile to appear in search results
   activity_status_visible: boolean("activity_status_visible").notNull().default(false), // Show when user is online
   is_online: boolean("is_online").notNull().default(false), // Current online status

@@ -54,6 +54,8 @@ export const CreatorSettings: React.FC = () => {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('creator4@example.com');
   const [commentsEnabled, setCommentsEnabled] = useState(true);
+  const [autoPostEnabled, setAutoPostEnabled] = useState(false);
+  const [watermarkEnabled, setWatermarkEnabled] = useState(true);
 
   // Privacy settings state
   const [profileDiscoverable, setProfileDiscoverable] = useState(true);
@@ -91,6 +93,8 @@ export const CreatorSettings: React.FC = () => {
           setCommentsEnabled(userData.comments_enabled ?? true);
           setProfileDiscoverable(userData.profile_discoverable ?? true);
           setActivityStatusVisible(userData.activity_status_visible ?? false);
+          setAutoPostEnabled(userData.auto_post_enabled ?? false);
+          setWatermarkEnabled(userData.watermark_enabled ?? true);
         }
       } catch (error) {
         console.error('Error loading user settings:', error);
@@ -218,6 +222,8 @@ export const CreatorSettings: React.FC = () => {
         },
         body: JSON.stringify({
           comments_enabled: commentsEnabled,
+          auto_post_enabled: autoPostEnabled,
+          watermark_enabled: watermarkEnabled,
         }),
       });
 
@@ -878,7 +884,11 @@ export const CreatorSettings: React.FC = () => {
                           Automatically share new posts on your connected social accounts
                         </p>
                       </div>
-                      <Switch id="autoPost" />
+                      <Switch 
+                        id="autoPost" 
+                        checked={autoPostEnabled}
+                        onCheckedChange={setAutoPostEnabled}
+                      />
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -888,7 +898,11 @@ export const CreatorSettings: React.FC = () => {
                           Protect your content with your username watermark
                         </p>
                       </div>
-                      <Switch id="watermark" defaultChecked />
+                      <Switch 
+                        id="watermark" 
+                        checked={watermarkEnabled}
+                        onCheckedChange={setWatermarkEnabled}
+                      />
                     </div>
 
                     <div className="flex items-center justify-between">

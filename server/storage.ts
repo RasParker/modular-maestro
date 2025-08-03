@@ -143,11 +143,14 @@ export interface IStorage {
   getPlatformStats(): Promise<any>;
   getTopCreators(limit?: number): Promise<any[]>;
   getSystemHealth(): Promise<any>;
+
+  getUserSettings(userId: number): Promise<any>;
 }
 
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
   private inMemoryGoals = new Map<string, any>();
+  db: any;
 
   constructor() {
     // Initialize with your specified goals for creator 1
@@ -157,6 +160,7 @@ export class DatabaseStorage implements IStorage {
       postsGoal: 15,
       updated_at: new Date()
     });
+    this.db = db;
   }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -1204,6 +1208,43 @@ export class DatabaseStorage implements IStorage {
         api_response_time: 1000,
         last_updated: new Date()
       };
+    }
+  }
+
+  async getUserSettings(userId: number) {
+    try {
+      const [user] = await this.db.select({
+        comments_enabled: users.comments_enabled,
+        auto_post_enabled: users.auto_post_enabled,
+        watermark_enabled: users.watermark_enabled,
+        profile_discoverable: users.profile_discoverable,
+        activity_status_visible: users.activity_status_visible,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+      return user;
+    } catch (error) {
+      console.error('Error fetching user settings:', error);
+      throw error;
+    }
+  }
+
+  async updateUserProfile(userId: number, profileData: { display_name?: string; bio?: string; avatar?: string; cover_image?: string }) {
+    try {
+      const updates: Partial<User> = { ...profileData, updated_at: new Date() };
+      
+      const [updatedUser] = await this.db
+        .update(users)
+        .set(updates)
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
     }
   }
 }
