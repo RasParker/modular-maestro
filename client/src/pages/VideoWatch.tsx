@@ -107,9 +107,9 @@ export const VideoWatch: React.FC = () => {
             .slice(0, 5)
             .map((post: any) => ({
               ...post,
-              creator_display_name: post.username || 'Unknown Creator',
-              creator_username: post.username || 'unknown',
-              creator_avatar: post.avatar || null
+              creator_display_name: post.creator?.display_name || post.creator?.username || post.username || 'Unknown Creator',
+              creator_username: post.creator?.username || post.username || 'unknown',
+              creator_avatar: post.creator?.avatar || post.avatar || null
             }));
           setNextVideos(filtered);
         }
