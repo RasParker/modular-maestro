@@ -306,7 +306,10 @@ export const VideoWatch: React.FC = () => {
                 <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                   <span className="truncate mr-2">{post.creator_display_name || post.creator_username}</span>
                   <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                    <span>{Math.floor(Math.random() * 1000) + 100}K views</span>
+                    <div className="flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      <span>{Math.floor(Math.random() * 1000) + 100}K</span>
+                    </div>
                     <span>•</span>
                     <span>{getTimeAgo(post.created_at)}</span>
                   </div>
@@ -588,7 +591,10 @@ export const VideoWatch: React.FC = () => {
                   <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
                     <span className="truncate mr-2">{post.creator_display_name || post.creator_username}</span>
                     <div className="flex items-center gap-1 flex-shrink-0 text-right">
-                      <span>876K views</span>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        <span>876K</span>
+                      </div>
                       <span>•</span>
                       <span>{getTimeAgo(post.created_at)}</span>
                     </div>
