@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -55,7 +54,7 @@ const ReplyInput: React.FC<{
           <AvatarImage src={userAvatar} alt={currentUserName} />
           <AvatarFallback className="text-xs">{currentUserName?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
-        <div className="flex-1 flex gap-1">
+        <div className="flex-1 flex gap-3">
           <Textarea
             placeholder={`Reply to ${username}...`}
             value={replyText}
@@ -74,17 +73,18 @@ const ReplyInput: React.FC<{
           <div className="flex flex-col gap-1">
             <Button
               size="sm"
+              variant="ghost"
               onClick={handleSubmit}
               disabled={!replyText.trim()}
-              className="h-8 w-7 p-0"
+              className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/10"
             >
-              <Send className="w-3 h-3" />
+              <Send className="w-4 h-4" />
             </Button>
             <Button
               size="sm"
               variant="ghost"
               onClick={onCancel}
-              className="h-8 w-7 p-0 text-muted-foreground"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
             >
               ✕
             </Button>
@@ -142,7 +142,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
   React.useEffect(() => {
     fetchComments();
-    
+
     // Check if comments are enabled for this creator
     const checkCommentsEnabled = async () => {
       if (creatorId) {
@@ -341,7 +341,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             {/* Comment Actions - Instagram style */}
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span>{getTimeAgo(comment.createdAt)}</span>
-              
+
               {comment.likes > 0 && (
                 <span className="font-medium">{comment.likes} {comment.likes === 1 ? 'like' : 'likes'}</span>
               )}
@@ -505,7 +505,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               <AvatarImage src={user?.avatar} alt={user?.username} />
               <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div className="flex-1 flex gap-1">
+            <div className="flex-1 flex gap-3">
               <Textarea
                 placeholder="Add a comment..."
                 value={newComment}
@@ -528,7 +528,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
                 size="sm"
-                className="h-[40px] px-3"
+                variant="ghost"
+                className="h-[40px] px-3 text-primary hover:text-primary/80 hover:bg-primary/10"
               >
                 <Send className="w-4 h-4" />
               </Button>
@@ -548,7 +549,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             <AvatarImage src={user?.avatar} alt={user?.username} />
             <AvatarFallback className="text-xs">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="flex-1 flex gap-1">
+          <div className="flex-1 flex gap-3">
             <Textarea
               placeholder="Add a comment..."
               value={newComment}
