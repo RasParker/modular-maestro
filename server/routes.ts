@@ -380,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       query += ` ORDER BY posts.created_at DESC`;
 
-      const result = await db.query(query, params);
+      const result = await pool.query(query, params);
 
       console.log(`Found ${result.rows.length} posts`);
 
