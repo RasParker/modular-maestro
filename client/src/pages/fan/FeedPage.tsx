@@ -311,9 +311,9 @@ export const FeedPage: React.FC = () => {
             return {
               id: post.id.toString(),
               creator: {
-                username: post.creator_username || 'Unknown',
-                display_name: post.creator_display_name || post.creator_username || 'Unknown',
-                avatar: post.creator_avatar || '',
+                username: post.creator?.username || post.username || 'Unknown',
+                display_name: post.creator?.display_name || post.display_name || post.creator?.username || post.username || 'Unknown',
+                avatar: post.creator?.avatar || post.avatar || '',
                 id: post.creator_id
               },
               content: post.content || post.title || '',
