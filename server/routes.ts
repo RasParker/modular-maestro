@@ -290,7 +290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add caching headers for user profiles
       res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -309,7 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add caching headers for user profiles
       res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -343,165 +343,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Post routes
   // Get all posts for feed and creator content
+  // Get all posts endpoint
   app.get("/api/posts", async (req, res) => {
     try {
-      // Get query parameters to determine what posts to fetch
       const { status, creatorId } = req.query;
 
       console.log('Fetching posts with params:', { status, creatorId });
 
-      // Use a simpler approach with separate query building
-      let allPosts;
+      let query = `
+        SELECT 
+          posts.*,
+          users.username,
+          users.avatar,
+          users.display_name,
+          json_build_object(
+            'id', users.id,
+            'username', users.username,
+            'display_name', users.display_name,
+            'avatar', users.avatar
+          ) as creator
+        FROM posts 
+        LEFT JOIN users ON posts.creator_id = users.id
+        WHERE 1=1
+      `;
+      const params: any[] = [];
 
-      if (creatorId) {
-        const creatorIdNum = parseInt(creatorId as string);
-        if (!status || status === 'published') {
-          // Creator posts, published only
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .where(and(
-            eq(posts.creator_id, creatorIdNum),
-            eq(posts.status, 'published')
-          ))
-          .orderBy(desc(posts.created_at));
-        } else if (status === 'all') {
-          // Creator posts, all statuses
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .where(eq(posts.creator_id, creatorIdNum))
-          .orderBy(desc(posts.created_at));
-        } else {
-          // Creator posts with specific status
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .where(and(
-            eq(posts.creator_id, creatorIdNum),
-            eq(posts.status, status as string)
-          ))
-          .orderBy(desc(posts.created_at));
-        }
-      } else {
-        if (!status || status === 'published') {
-          // Public feed, published only
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .where(eq(posts.status, 'published'))
-          .orderBy(desc(posts.created_at));
-        } else if (status === 'all') {
-          // All posts, all statuses
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .orderBy(desc(posts.created_at));
-        } else {
-          // Public feed with specific status
-          allPosts = await db.select({
-            id: posts.id,
-            creator_id: posts.creator_id,
-            title: posts.title,
-            content: posts.content,
-            media_type: posts.media_type,
-            media_urls: posts.media_urls,
-            tier: posts.tier,
-            status: posts.status,
-            created_at: posts.created_at,
-            likes_count: posts.likes_count,
-            comments_count: posts.comments_count,
-            creator_username: users.username,
-            creator_display_name: users.display_name,
-            creator_avatar: users.avatar
-          })
-          .from(posts)
-          .leftJoin(users, eq(posts.creator_id, users.id))
-          .where(eq(posts.status, status as string))
-          .orderBy(desc(posts.created_at));
-        }
+      if (status) {
+        query += ` AND posts.status = $${params.length + 1}`;
+        params.push(status);
       }
 
-      console.log(`Found ${allPosts.length} posts`);
-      res.json(allPosts);
+      if (creatorId) {
+        query += ` AND posts.creator_id = $${params.length + 1}`;
+        params.push(parseInt(creatorId as string));
+      }
+
+      query += ` ORDER BY posts.created_at DESC`;
+
+      const result = await db.query(query, params);
+
+      console.log(`Found ${result.rows.length} posts`);
+
+      res.json(result.rows);
     } catch (error) {
       console.error('Error fetching posts:', error);
-      res.status(500).json({ error: 'Failed to fetch posts' });
+      res.status(500).json({ error: "Failed to fetch posts" });
     }
   });
 
@@ -3272,9 +3158,6 @@ function formatTimeAgo(date: Date): string {
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
-
-  // Checking subscription for access control
-
   if (diffInHours < 24) {
     return diffInHours + " hour" + (diffInHours === 1 ? '' : 's') + " ago";
   }
