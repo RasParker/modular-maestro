@@ -3,17 +3,17 @@ import { QueryClient } from '@tanstack/react-query';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes - longer cache for better performance
-      gcTime: 15 * 60 * 1000, // 15 minutes - longer memory retention
+      retry: 2,
+      staleTime: 10 * 60 * 1000, // 10 minutes - aggressive caching for speed
+      gcTime: 30 * 60 * 1000, // 30 minutes - keep data in memory longer
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
-      refetchOnMount: false, // Use cached data when available
-      refetchOnReconnect: false, // Prevent unnecessary refetches on reconnect
+      refetchOnMount: 'always', // Always check for fresh data on mount
+      refetchOnReconnect: true, // Refetch when connection restored
       refetchInterval: false, // Disable automatic refetching
       networkMode: 'online', // Only fetch when online
     },
     mutations: {
-      retry: 1,
+      retry: 2,
       networkMode: 'online',
     },
   },
