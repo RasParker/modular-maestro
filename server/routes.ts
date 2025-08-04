@@ -536,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
-      console.log('Creating post with data:', { creator_id, title, content, media_type, tier, status });
+      console.log('Creating post with data:', { creator_id, title, content, media_type, media_urls, tier, status });
 
       // Validate required fields
       if (!creator_id) {
@@ -556,7 +556,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: title || 'Untitled Post',
         content: content || '',
         media_type: media_type || 'text',
-        media_urls: media_urls || [],
+        media_urls: Array.isArray(media_urls) ? media_urls : (media_urls ? [media_urls] : []),
         tier,
         status: status || 'published',
         created_at: new Date(),

@@ -40,7 +40,7 @@ export const posts = pgTable('posts', {
   title: text('title').notNull(),
   content: text('content'),
   media_type: text('media_type').notNull().default('text'),
-  media_urls: json("media_urls").$type<string[]>().notNull().default([]),
+  media_urls: text("media_urls").array().notNull().default([]),
   tier: text('tier').notNull().default('public'),
   status: text('status').notNull().default('published'), // published, draft, scheduled
   scheduled_for: timestamp('scheduled_for'), // when to publish scheduled posts
