@@ -12,11 +12,11 @@ console.log('Using PostgreSQL database');
 
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  max: 5, // Reduced pool size for faster startup
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000, // Reduced to 5 seconds for faster feedback
-  statement_timeout: 15000, // Reduced to 15 seconds
-  query_timeout: 15000, // Reduced to 15 seconds
+  max: 10, // Increased pool size for better performance
+  idleTimeoutMillis: 60000,
+  connectionTimeoutMillis: 15000, // Increased for Replit environment
+  statement_timeout: 30000, // Increased for complex operations
+  query_timeout: 30000, // Increased for complex queries
   allowExitOnIdle: true, // Allow pool to exit when idle
 });
 

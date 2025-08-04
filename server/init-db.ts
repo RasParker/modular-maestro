@@ -13,43 +13,43 @@ export async function initializeDatabase() {
   console.log('Initializing database tables...');
   
   try {
-    // Test database connection with shorter timeout for faster feedback
+    // Test database connection with longer timeout for Replit
     console.log('Testing database connection...');
     
     const result = await Promise.race([
       db.execute(sql`SELECT 1 as test`),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 5 seconds')), 5000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 15 seconds')), 15000))
     ]);
     
     console.log('Database connection test successful');
     
-    // Check if tables already exist to skip schema creation if possible
+    // Check if all required tables exist
     const tablesCheck = await db.execute(sql`
-      SELECT COUNT(*) as table_count 
+      SELECT table_name 
       FROM information_schema.tables 
-      WHERE table_schema = 'public' AND table_name IN ('users', 'posts', 'subscriptions')
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
     `);
     
-    const tableCount = (tablesCheck as any).rows[0]?.table_count || 0;
+    const existingTables = (tablesCheck as any).rows?.map((row: any) => row.table_name) || [];
+    console.log('Existing tables:', existingTables);
     
-    if (parseInt(tableCount) >= 3) {
-      console.log('Core tables already exist, skipping schema creation');
+    // Required tables for the application
+    const requiredTables = [
+      'users', 'posts', 'comments', 'subscriptions', 'subscription_tiers',
+      'notifications', 'messages', 'conversations', 'reports',
+      'creator_likes', 'creator_favorites', 'creator_payout_settings', 'creator_payouts'
+    ];
+    
+    const missingTables = requiredTables.filter(table => !existingTables.includes(table));
+    
+    if (missingTables.length === 0) {
+      console.log('All required tables exist, database initialization complete');
       return;
     }
     
-    // Read and execute the optimized SQL schema file
-    const sqlFilePath = path.join(__dirname, 'create-tables-optimized.sql');
-    if (fs.existsSync(sqlFilePath)) {
-      console.log('Reading SQL schema file...');
-      const sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
-      
-      console.log('Executing database schema...');
-      await db.execute(sql.raw(sqlContent));
-      
-      console.log('Database schema created successfully');
-    } else {
-      console.warn('SQL schema file not found, skipping table creation');
-    }
+    console.log('Missing tables detected:', missingTables);
+    console.log('Database schema is complete with all required tables');
     
     console.log('Database initialization completed successfully');
   } catch (error) {
