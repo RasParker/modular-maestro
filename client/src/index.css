@@ -161,7 +161,7 @@
 
     /* Accent - Gold for premium features */
     --accent: 45 90% 60%;
-    --accent-foreground: 240 20% 10%;
+    --accent-foreground: 0 0% 0%;
 
     /* Destructive */
     --destructive: 0 84.2% 60.2%;
@@ -219,7 +219,7 @@
 
     /* Accent - Gold for premium features */
     --accent: 45 90% 60%;
-    --accent-foreground: 240 20% 10%;
+    --accent-foreground: 0 0% 0%;
 
     /* Destructive */
     --destructive: 0 70% 60%;
@@ -490,7 +490,7 @@
     .youtube-grid-card .rounded-md {
       border-radius: 0 !important;
     }
-    
+
     .feed-card .rounded-lg,
     .feed-card .rounded-md {
       border-radius: 0 !important;
@@ -500,7 +500,7 @@
     .aspect-video {
       border-radius: 0 !important;
     }
-    
+
     .aspect-video .rounded,
     .aspect-video .rounded-lg,
     .aspect-video .rounded-md {
