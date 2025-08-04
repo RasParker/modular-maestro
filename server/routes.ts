@@ -288,6 +288,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Add caching headers for user profiles
+      res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
+      
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -304,6 +307,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Add caching headers for user profiles
+      res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
+      
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {

@@ -57,7 +57,7 @@ function App() {
               <AppLayout>
                 <Suspense fallback={
                   <div className="flex items-center justify-center min-h-[200px]">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                   </div>
                 }>
                   <Routes>

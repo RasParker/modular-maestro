@@ -50,10 +50,9 @@ export const NotificationBell: React.FC = React.memo(() => {
       const response = await fetch('/api/notifications?limit=5');
       if (!response.ok) throw new Error('Failed to fetch notifications');
       const data = await response.json();
-      console.log('Fetched notifications:', data);
       return Array.isArray(data) ? data : [];
     },
-    refetchInterval: user?.id ? 60000 : false, // Poll only if user is logged in, less frequently
+    refetchInterval: user?.id ? 120000 : false, // Poll every 2 minutes when logged in
     enabled: !!user?.id, // Only fetch if user is logged in
   });
 
@@ -64,10 +63,9 @@ export const NotificationBell: React.FC = React.memo(() => {
       const response = await fetch('/api/notifications/unread-count');
       if (!response.ok) throw new Error('Failed to fetch unread count');
       const data = await response.json();
-      console.log('Fetched unread count:', data);
       return data;
     },
-    refetchInterval: user?.id ? 60000 : false, // Poll only if user is logged in, less frequently
+    refetchInterval: user?.id ? 120000 : false, // Poll every 2 minutes when logged in
     enabled: !!user?.id, // Only fetch if user is logged in
   });
 

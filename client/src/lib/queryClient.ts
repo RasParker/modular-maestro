@@ -4,11 +4,12 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 2 * 60 * 1000, // 2 minutes - reduced for more fresh data
-      gcTime: 5 * 60 * 1000, // 5 minutes - reduced memory usage
+      staleTime: 5 * 60 * 1000, // 5 minutes - longer cache for better performance
+      gcTime: 15 * 60 * 1000, // 15 minutes - longer memory retention
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
       refetchOnMount: false, // Use cached data when available
       refetchOnReconnect: false, // Prevent unnecessary refetches on reconnect
+      refetchInterval: false, // Disable automatic refetching
       networkMode: 'online', // Only fetch when online
     },
     mutations: {
