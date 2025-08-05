@@ -545,18 +545,37 @@ export class DatabaseStorage implements IStorage {
 
   async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<any> {
     try {
-      const query = `
-        SELECT s.*, u.username as creator_username, t.name as tier_name, t.price as tier_price
-        FROM subscriptions s
-        JOIN users u ON s.creator_id = u.id
-        JOIN subscription_tiers t ON s.tier_id = t.id
-        WHERE s.fan_id = $1 AND s.creator_id = $2 AND s.status = 'active'
-        ORDER BY s.created_at DESC
-        LIMIT 1
-      `;
+      const result = await db
+        .select({
+          id: subscriptions.id,
+          fan_id: subscriptions.fan_id,
+          creator_id: subscriptions.creator_id,
+          tier_id: subscriptions.tier_id,
+          status: subscriptions.status,
+          auto_renew: subscriptions.auto_renew,
+          started_at: subscriptions.started_at,
+          ends_at: subscriptions.ends_at,
+          next_billing_date: subscriptions.next_billing_date,
+          created_at: subscriptions.created_at,
+          updated_at: subscriptions.updated_at,
+          creator_username: users.username,
+          tier_name: subscription_tiers.name,
+          tier_price: subscription_tiers.price
+        })
+        .from(subscriptions)
+        .innerJoin(users, eq(subscriptions.creator_id, users.id))
+        .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
+        .where(
+          and(
+            eq(subscriptions.fan_id, fanId),
+            eq(subscriptions.creator_id, creatorId),
+            eq(subscriptions.status, 'active')
+          )
+        )
+        .orderBy(desc(subscriptions.created_at))
+        .limit(1);
 
-      const result = await this.db.query(query, [fanId, creatorId]);
-      return result.rows[0] || null;
+      return result[0] || null;
     } catch (error) {
       console.error('Error getting user subscription to creator:', error);
       throw error;

@@ -28,8 +28,19 @@ const PaymentCallback: React.FC = () => {
       }
 
       try {
-        // For development, we'll simulate a successful payment since we're in dev mode
-        if (paymentStatus === 'success') {
+        // Always verify payment with backend regardless of status
+        console.log('Verifying payment with backend...');
+        const response = await fetch(`/api/payments/verify/${reference}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        console.log('Payment verification result:', result);
+
+        if (result.success && result.data.status === 'success') {
           setStatus('success');
           setMessage('Payment successful! Your subscription is now active.');
 
@@ -49,39 +60,8 @@ const PaymentCallback: React.FC = () => {
             }
           }, 3000);
         } else {
-          // Try to verify with backend
-          const response = await fetch(`/api/payments/verify/${reference}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          const result = await response.json();
-
-          if (result.success && result.data.status === 'success') {
-            setStatus('success');
-            setMessage('Payment successful! Your subscription is now active.');
-
-            toast({
-              title: "Payment Successful",
-              description: "Your subscription has been activated successfully!",
-            });
-
-            // Redirect after 3 seconds
-            setTimeout(() => {
-              const lastProfile = sessionStorage.getItem('lastCreatorProfile');
-              if (lastProfile) {
-                sessionStorage.removeItem('lastCreatorProfile');
-                navigate(lastProfile);
-              } else {
-                navigate('/fan/dashboard');
-              }
-            }, 3000);
-          } else {
-            setStatus('failed');
-            setMessage(result.message || 'Payment verification failed');
-          }
+          setStatus('failed');
+          setMessage(result.message || 'Payment verification failed');
         }
       } catch (error) {
         console.error('Payment verification error:', error);
