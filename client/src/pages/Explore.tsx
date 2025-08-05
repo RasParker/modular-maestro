@@ -25,9 +25,9 @@ const CREATORS = [
     subscribers: 2840,
     verified: true,
     tiers: [
-      { name: 'Supporter', price: 5 },
-      { name: 'Fan', price: 15 },
-      { name: 'Superfan', price: 25 }
+      { id: 'mock_1_1', name: 'Supporter', price: 5, description: 'Basic support tier', benefits: ['Access to exclusive posts', 'Monthly updates'] },
+      { id: 'mock_1_2', name: 'Fan', price: 15, description: 'Fan tier with more benefits', benefits: ['Everything in Supporter', 'Direct messages', 'Weekly updates'] },
+      { id: 'mock_1_3', name: 'Superfan', price: 25, description: 'Ultimate fan experience', benefits: ['Everything in Fan', 'Video calls', 'Custom content'] }
     ]
   },
   {
@@ -41,8 +41,8 @@ const CREATORS = [
     subscribers: 5120,
     verified: true,
     tiers: [
-      { name: 'Basic', price: 10 },
-      { name: 'Premium', price: 20 }
+      { id: 'mock_2_1', name: 'Basic', price: 10, description: 'Basic fitness plan', benefits: ['Weekly workout videos', 'Nutrition tips'] },
+      { id: 'mock_2_2', name: 'Premium', price: 20, description: 'Premium fitness experience', benefits: ['Everything in Basic', 'Personal training sessions', 'Custom meal plans'] }
     ]
   },
   {
@@ -56,8 +56,8 @@ const CREATORS = [
     subscribers: 1890,
     verified: false,
     tiers: [
-      { name: 'Listener', price: 8 },
-      { name: 'Producer', price: 18 }
+      { id: 'mock_3_1', name: 'Listener', price: 8, description: 'Music lover tier', benefits: ['Early access to new tracks', 'Behind the scenes content'] },
+      { id: 'mock_3_2', name: 'Producer', price: 18, description: 'Producer collaboration tier', benefits: ['Everything in Listener', 'Beat making tutorials', 'Collaboration opportunities'] }
     ]
   },
   {
@@ -71,9 +71,9 @@ const CREATORS = [
     subscribers: 3250,
     verified: true,
     tiers: [
-      { name: 'Follower', price: 7 },
-      { name: 'Student', price: 12 },
-      { name: 'Pro', price: 25 }
+      { id: 'mock_4_1', name: 'Follower', price: 7, description: 'Tech enthusiast tier', benefits: ['Weekly tech news', 'Product reviews'] },
+      { id: 'mock_4_2', name: 'Student', price: 12, description: 'Learning focused tier', benefits: ['Everything in Follower', 'Programming tutorials', 'Code reviews'] },
+      { id: 'mock_4_3', name: 'Pro', price: 25, description: 'Professional development tier', benefits: ['Everything in Student', 'One-on-one mentoring', 'Career guidance'] }
     ]
   },
   {
@@ -87,8 +87,8 @@ const CREATORS = [
     subscribers: 2150,
     verified: true,
     tiers: [
-      { name: 'Foodie', price: 9 },
-      { name: 'Chef', price: 19 }
+      { id: 'mock_5_1', name: 'Foodie', price: 9, description: 'Food lover tier', benefits: ['Weekly recipes', 'Cooking tips'] },
+      { id: 'mock_5_2', name: 'Chef', price: 19, description: 'Professional cooking tier', benefits: ['Everything in Foodie', 'Live cooking sessions', 'Professional techniques'] }
     ]
   },
   {
@@ -102,8 +102,8 @@ const CREATORS = [
     subscribers: 1820,
     verified: false,
     tiers: [
-      { name: 'Trendy', price: 12 },
-      { name: 'Stylish', price: 22 }
+      { id: 'mock_6_1', name: 'Trendy', price: 12, description: 'Fashion forward tier', benefits: ['Style guides', 'Trend reports'] },
+      { id: 'mock_6_2', name: 'Stylish', price: 22, description: 'Personal styling tier', benefits: ['Everything in Trendy', 'Personal styling sessions', 'Wardrobe consultations'] }
     ]
   }
 ];
@@ -221,7 +221,7 @@ export const Explore: React.FC = () => {
         }
       }
 
-      // Open tier selection modal to show all options
+      // Always open tier selection modal for consistent experience
       setSelectedCreator(creator);
       setTierSelectionModalOpen(true);
     } catch (error) {
@@ -428,17 +428,11 @@ export const Explore: React.FC = () => {
 
       {/* Tier Selection Modal */}
       {selectedCreator && (
-        <Dialog open={tierSelectionModalOpen} onOpenChange={() => {}}>
+        <Dialog open={tierSelectionModalOpen} onOpenChange={setTierSelectionModalOpen}>
           <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
             <DialogHeader className="flex-shrink-0 pb-4">
-              <DialogTitle className="text-xl font-bold flex items-center justify-between">
+              <DialogTitle className="text-xl font-bold">
                 Choose Your Subscription
-                <button
-                  onClick={() => setTierSelectionModalOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ✕
-                </button>
               </DialogTitle>
               <p className="text-sm text-muted-foreground">
                 Select a tier to unlock exclusive content from {selectedCreator.display_name}
