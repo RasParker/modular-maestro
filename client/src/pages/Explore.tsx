@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
 import { PaymentModal } from '@/components/payment/PaymentModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Search, Users, Star, Filter, Heart, MessageSquare, Share2, Image, Video } from 'lucide-react';
@@ -114,9 +115,10 @@ export const Explore: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [tierSelectionModalOpen, setTierSelectionModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<any>(null);
-  const [selectedCreatorName, setSelectedCreatorName] = useState('');
+  const [selectedCreator, setSelectedCreator] = useState<any>(null);
   
   const [realCreators, setRealCreators] = useState<any[]>([]);
   const [allCreators, setAllCreators] = useState<any[]>([]);
@@ -189,22 +191,12 @@ export const Explore: React.FC = () => {
     }
 
     try {
-      // Find the creator and tier
+      // Find the creator
       const creator = allCreators.find(c => c.display_name === creatorName);
       if (!creator) {
         toast({
           title: "Error",
           description: "Creator not found.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const tier = creator.tiers.find(t => t.price === price);
-      if (!tier) {
-        toast({
-          title: "Error",
-          description: "Subscription tier not found.",
           variant: "destructive"
         });
         return;
@@ -223,10 +215,9 @@ export const Explore: React.FC = () => {
         }
       }
 
-      // Open payment modal
-      setSelectedTier(tier);
-      setSelectedCreatorName(creatorName);
-      setPaymentModalOpen(true);
+      // Open tier selection modal to show all options
+      setSelectedCreator(creator);
+      setTierSelectionModalOpen(true);
     } catch (error) {
       console.error('Subscription check error:', error);
       toast({
@@ -235,6 +226,12 @@ export const Explore: React.FC = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleTierSelected = (tier: any) => {
+    setSelectedTier(tier);
+    setTierSelectionModalOpen(false);
+    setPaymentModalOpen(true);
   };
 
   
@@ -423,13 +420,52 @@ export const Explore: React.FC = () => {
 
       </EdgeToEdgeContainer>
 
+      {/* Tier Selection Modal */}
+      {selectedCreator && (
+        <Dialog open={tierSelectionModalOpen} onOpenChange={setTierSelectionModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Choose a subscription tier</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Select a tier to subscribe to {selectedCreator.display_name}
+              </p>
+            </DialogHeader>
+            <div className="space-y-3">
+              {selectedCreator.tiers.map((tier: any) => (
+                <div
+                  key={tier.id}
+                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-colors"
+                  onClick={() => handleTierSelected(tier)}
+                >
+                  <div>
+                    <h4 className="font-medium">{tier.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Access to exclusive content and perks
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-accent">
+                      GHS {tier.price}/month
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* Payment Modal */}
-      {selectedTier && (
+      {selectedTier && selectedCreator && (
         <PaymentModal
           isOpen={paymentModalOpen}
-          onClose={() => setPaymentModalOpen(false)}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setSelectedTier(null);
+            setSelectedCreator(null);
+          }}
           tier={selectedTier}
-          creatorName={selectedCreatorName}
+          creatorName={selectedCreator.display_name}
         />
       )}
     </EdgeToEdgeContainer>
