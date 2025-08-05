@@ -35,7 +35,7 @@ export const ManageSubscriptions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('active');
-  const [paymentHistory, setPaymentHistory] = useState([]); // Placeholder for payment history data
+
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -137,9 +137,9 @@ export const ManageSubscriptions: React.FC = () => {
     .filter(sub => sub.status === 'active')
     .reduce((sum, sub) => sum + parseFloat(sub.tier.price.toString()), 0);
 
-    const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
-    const expiredSubscriptions = subscriptions.filter(sub => sub.status === 'expired');
-    const cancelledSubscriptions = subscriptions.filter(sub => sub.status === 'cancelled');
+  // Calculate derived data
+  const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
+  const subscriptionHistory = subscriptions.filter(sub => sub.status !== 'active'); // All non-active subscriptions (cancelled, expired, etc.)
 
 
   return (
@@ -217,7 +217,7 @@ export const ManageSubscriptions: React.FC = () => {
               <TabsTrigger value="history">
                 Payment History
                 <span className="ml-2 text-xs opacity-70">
-                  {paymentHistory.length}
+                  {subscriptionHistory.length}
                 </span>
               </TabsTrigger>
             </TabsList>
@@ -226,7 +226,7 @@ export const ManageSubscriptions: React.FC = () => {
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-semibold">
-                  Your Subscriptions ({loading ? '...' : subscriptions.length})
+                  Active Subscriptions ({loading ? '...' : activeSubscriptions.length})
                 </h2>
               </div>
 
@@ -238,7 +238,7 @@ export const ManageSubscriptions: React.FC = () => {
                 <div className="text-center py-8 text-muted-foreground">
                   <p>Error loading subscriptions: {error}</p>
                 </div>
-              ) : subscriptions.length === 0 ? (
+              ) : activeSubscriptions.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <p>No active subscriptions yet.</p>
                   <Button variant="premium" className="mt-4" asChild>
@@ -246,7 +246,7 @@ export const ManageSubscriptions: React.FC = () => {
                   </Button>
                 </div>
               ) : (
-                subscriptions.map((subscription) => {
+                activeSubscriptions.map((subscription) => {
                   // Transform the subscription data to match SubscriptionCard expectations
                   const transformedSubscription = {
                     id: subscription.id.toString(),
@@ -278,10 +278,85 @@ export const ManageSubscriptions: React.FC = () => {
           )}
 
           {activeTab === 'history' && (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Payment history will be displayed here.</p>
-              {/* Implement payment history component/logic here */}
-            </div>
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Payment History ({loading ? '...' : subscriptionHistory.length})
+                </h2>
+              </div>
+
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : error ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Error loading payment history: {error}</p>
+                </div>
+              ) : subscriptionHistory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No payment history yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {subscriptionHistory.map((subscription) => (
+                    <Card key={subscription.id} className="bg-gradient-card border-border/50">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden flex-shrink-0">
+                              {subscription.creator.avatar ? (
+                                <img 
+                                  src={subscription.creator.avatar} 
+                                  alt={subscription.creator.display_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                                  <span className="text-foreground font-medium text-sm sm:text-base">
+                                    {subscription.creator.display_name?.charAt(0) || subscription.creator.username.charAt(0)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-foreground text-sm sm:text-base">
+                                {subscription.creator.display_name || subscription.creator.username}
+                              </h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground">
+                                @{subscription.creator.username}
+                              </p>
+                              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                                {subscription.tier.name} • GHS {subscription.tier.price}/month
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  subscription.status === 'cancelled' 
+                                    ? 'bg-destructive/10 text-destructive' 
+                                    : subscription.status === 'expired' 
+                                    ? 'bg-orange-500/10 text-orange-500'
+                                    : 'bg-muted text-muted-foreground'
+                                }`}>
+                                  {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="text-right">
+                            <div className="text-xs sm:text-sm text-muted-foreground">
+                              <p>Subscribed: {new Date(subscription.created_at).toLocaleDateString()}</p>
+                              <p>Ended: {new Date(subscription.current_period_end).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </Tabs>
         </div>
