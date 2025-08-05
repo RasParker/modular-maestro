@@ -540,36 +540,60 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<any> {
-    const result = await this.db.query(`
-      SELECT s.*, st.name as tier_name, st.price as tier_price
-      FROM subscriptions s
-      LEFT JOIN subscription_tiers st ON s.tier_id = st.id
-      WHERE s.fan_id = $1 AND s.creator_id = $2 AND s.status = 'active' AND (s.ended_at IS NULL OR s.ended_at > NOW())
-      ORDER BY s.created_at DESC
-      LIMIT 1
-    `, [fanId, creatorId]);
+    try {
+      const result = await db
+        .select({
+          id: subscriptions.id,
+          fan_id: subscriptions.fan_id,
+          creator_id: subscriptions.creator_id,
+          tier_id: subscriptions.tier_id,
+          status: subscriptions.status,
+          auto_renew: subscriptions.auto_renew,
+          started_at: subscriptions.started_at,
+          ended_at: subscriptions.ends_at,
+          next_billing_date: subscriptions.next_billing_date,
+          created_at: subscriptions.created_at,
+          updated_at: subscriptions.updated_at,
+          tier_name: subscription_tiers.name,
+          tier_price: subscription_tiers.price,
+        })
+        .from(subscriptions)
+        .leftJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
+        .where(
+          and(
+            eq(subscriptions.fan_id, fanId),
+            eq(subscriptions.creator_id, creatorId),
+            eq(subscriptions.status, 'active')
+          )
+        )
+        .orderBy(desc(subscriptions.created_at))
+        .limit(1);
 
-    const subscription = result.rows[0];
+      const subscription = result[0];
 
-    if (!subscription) {
+      if (!subscription) {
+        return undefined;
+      }
+
+      return {
+        id: subscription.id,
+        fan_id: subscription.fan_id,
+        creator_id: subscription.creator_id,
+        tier_id: subscription.tier_id,
+        status: subscription.status,
+        auto_renew: subscription.auto_renew,
+        started_at: subscription.started_at,
+        ended_at: subscription.ended_at,
+        next_billing_date: subscription.next_billing_date,
+        created_at: subscription.created_at,
+        updated_at: subscription.updated_at,
+        tier_name: subscription.tier_name,
+        tier_price: subscription.tier_price,
+      };
+    } catch (error) {
+      console.error('Error getting user subscription to creator:', error);
       return undefined;
     }
-
-    return {
-      id: subscription.id,
-      fan_id: subscription.fan_id,
-      creator_id: subscription.creator_id,
-      tier_id: subscription.tier_id,
-      status: subscription.status,
-      auto_renew: subscription.auto_renew,
-      started_at: subscription.started_at,
-      ended_at: subscription.ended_at,
-      next_billing_date: subscription.next_billing_date,
-      created_at: subscription.created_at,
-      updated_at: subscription.updated_at,
-      tier_name: subscription.tier_name,
-      tier_price: subscription.tier_price,
-    };
   }
 
   async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
@@ -583,15 +607,35 @@ export class DatabaseStorage implements IStorage {
 
   async getCreatorSubscribers(creatorId: number): Promise<any[]> {
     try {
-      const result = await this.db.query(`
-        SELECT s.*, u.username, u.email, u.display_name, u.avatar
-        FROM subscriptions s
-        JOIN users u ON s.fan_id = u.id
-        WHERE s.creator_id = $1 AND s.status = 'active'
-        ORDER BY s.created_at DESC
-      `, [creatorId]);
+      const result = await db
+        .select({
+          id: subscriptions.id,
+          fan_id: subscriptions.fan_id,
+          creator_id: subscriptions.creator_id,
+          tier_id: subscriptions.tier_id,
+          status: subscriptions.status,
+          auto_renew: subscriptions.auto_renew,
+          started_at: subscriptions.started_at,
+          ended_at: subscriptions.ends_at,
+          next_billing_date: subscriptions.next_billing_date,
+          created_at: subscriptions.created_at,
+          updated_at: subscriptions.updated_at,
+          username: users.username,
+          email: users.email,
+          display_name: users.display_name,
+          avatar: users.avatar
+        })
+        .from(subscriptions)
+        .innerJoin(users, eq(subscriptions.fan_id, users.id))
+        .where(
+          and(
+            eq(subscriptions.creator_id, creatorId),
+            eq(subscriptions.status, 'active')
+          )
+        )
+        .orderBy(desc(subscriptions.created_at));
 
-      return result.rows.map(row => ({
+      return result.map(row => ({
         id: row.id,
         fan_id: row.fan_id,
         creator_id: row.creator_id,
@@ -612,7 +656,6 @@ export class DatabaseStorage implements IStorage {
       }));
     } catch (error) {
       console.error('Error in getCreatorSubscribers:', error);
-      // Return empty array instead of trying fallback that also fails
       return [];
     }
   }
