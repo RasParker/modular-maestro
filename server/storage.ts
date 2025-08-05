@@ -540,32 +540,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<any> {
-    const [subscription] = await db
-      .select({
-        id: subscriptions.id,
-        fan_id: subscriptions.fan_id,
-        creator_id: subscriptions.creator_id,
-        tier_id: subscriptions.tier_id,
-        status: subscriptions.status,
-        auto_renew: subscriptions.auto_renew,
-        started_at: subscriptions.started_at,
-        ended_at: subscriptions.ends_at,
-        next_billing_date: subscriptions.next_billing_date,
-        created_at: subscriptions.created_at,
-        updated_at: subscriptions.updated_at,
-        tier_name: subscription_tiers.name
-      })
-      .from(subscriptions)
-      .leftJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
-      .where(
-        and(
-          eq(subscriptions.fan_id, fanId),
-          eq(subscriptions.creator_id, creatorId),
-          eq(subscriptions.status, 'active')
-        )
-      );
+    const result = await this.db.query(`
+      SELECT s.*, st.name as tier_name, st.price as tier_price
+      FROM subscriptions s
+      LEFT JOIN subscription_tiers st ON s.tier_id = st.id
+      WHERE s.fan_id = $1 AND s.creator_id = $2 AND s.status = 'active' AND (s.ended_at IS NULL OR s.ended_at > NOW())
+      ORDER BY s.created_at DESC
+      LIMIT 1
+    `, [fanId, creatorId]);
 
-    return subscription || undefined;
+    const subscription = result.rows[0];
+
+    if (!subscription) {
+      return undefined;
+    }
+
+    return {
+      id: subscription.id,
+      fan_id: subscription.fan_id,
+      creator_id: subscription.creator_id,
+      tier_id: subscription.tier_id,
+      status: subscription.status,
+      auto_renew: subscription.auto_renew,
+      started_at: subscription.started_at,
+      ended_at: subscription.ended_at,
+      next_billing_date: subscription.next_billing_date,
+      created_at: subscription.created_at,
+      updated_at: subscription.updated_at,
+      tier_name: subscription.tier_name,
+      tier_price: subscription.tier_price,
+    };
   }
 
   async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
@@ -579,32 +583,33 @@ export class DatabaseStorage implements IStorage {
 
   async getCreatorSubscribers(creatorId: number): Promise<any[]> {
     try {
-      const subscribers = await db
-        .select({
-          id: subscriptions.id,
-          status: subscriptions.status,
-          created_at: subscriptions.created_at,
-          current_period_end: subscriptions.ends_at,
-          auto_renew: subscriptions.auto_renew,
-          fan_id: subscriptions.fan_id,
-          tier_id: subscriptions.tier_id,
-          username: users.username,
-          email: users.email,
-          avatar: users.avatar,
-          display_name: users.display_name,
-          tier_name: subscription_tiers.name,
-          tier_price: subscription_tiers.price
-        })
-        .from(subscriptions)
-        .innerJoin(users, eq(subscriptions.fan_id, users.id))
-        .innerJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
-        .where(and(
-          eq(subscriptions.creator_id, creatorId),
-          eq(subscriptions.status, 'active')
-        ))
-        .orderBy(desc(subscriptions.created_at));
+      const result = await this.db.query(`
+        SELECT s.*, u.username, u.email, u.display_name, u.avatar
+        FROM subscriptions s
+        JOIN users u ON s.fan_id = u.id
+        WHERE s.creator_id = $1 AND s.status = 'active'
+        ORDER BY s.created_at DESC
+      `, [creatorId]);
 
-      return subscribers;
+      return result.rows.map(row => ({
+        id: row.id,
+        fan_id: row.fan_id,
+        creator_id: row.creator_id,
+        tier_id: row.tier_id,
+        status: row.status,
+        auto_renew: row.auto_renew,
+        started_at: row.started_at,
+        ended_at: row.ended_at,
+        next_billing_date: row.next_billing_date,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        fan: {
+          username: row.username,
+          email: row.email,
+          display_name: row.display_name,
+          avatar: row.avatar
+        }
+      }));
     } catch (error) {
       console.error('Error in getCreatorSubscribers:', error);
       // Return empty array instead of trying fallback that also fails
@@ -1234,13 +1239,13 @@ export class DatabaseStorage implements IStorage {
   async updateUserProfile(userId: number, profileData: { display_name?: string; bio?: string; avatar?: string; cover_image?: string }) {
     try {
       const updates: Partial<User> = { ...profileData, updated_at: new Date() };
-      
+
       const [updatedUser] = await this.db
         .update(users)
         .set(updates)
         .where(eq(users.id, userId))
         .returning();
-      
+
       return updatedUser;
     } catch (error) {
       console.error('Error updating user profile:', error);

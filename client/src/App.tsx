@@ -46,6 +46,8 @@ const AdminAnalytics = React.lazy(() => import('@/pages/admin/AdminAnalytics'));
 
 // Payment pages
 const PaymentCallback = React.lazy(() => import('@/pages/PaymentCallback'));
+const PaymentTest = React.lazy(() => import('@/pages/PaymentTest'));
+const NotFound = React.lazy(() => import('@/pages/NotFound'));
 
 function App() {
   return (
@@ -85,7 +87,8 @@ function App() {
 
               {/* Payment Routes */}
               <Route path="/payment-callback" element={<PaymentCallback />} />
-          <Route path="/payment/callback" element={<PaymentCallback />} />
+              <Route path="/payment-test" element={<PaymentTest />} />
+
 
               {/* Creator Routes */}
               <Route path="/creator/dashboard" element={<ProtectedRoute allowedRoles={['creator']}><CreatorDashboard /></ProtectedRoute>} />
@@ -116,7 +119,7 @@ function App() {
               <Route path="/video/:id" element={<VideoWatch />} />
 
               {/* Catch-all route for undefined paths */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
               </AppLayout>

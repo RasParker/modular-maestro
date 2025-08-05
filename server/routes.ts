@@ -16,6 +16,7 @@ import { db, pool } from './db';
 import { users, posts, comments, post_likes, comment_likes, subscriptions, subscription_tiers, reports, creator_likes, creator_favorites, users as usersTable, posts as postsTable, subscriptions as subscriptionsTable, subscription_tiers as tiersTable, comments as commentsTable, conversations as conversationsTable, messages as messagesTable } from '../shared/schema';
 import { eq, desc, and, gte, lte, count, sum, sql, inArray, asc, like, or, isNull, gt, lt } from 'drizzle-orm';
 import paymentRoutes from './routes/payment';
+import paymentTestRoutes from './routes/payment-test';
 import payoutRoutes from './routes/payouts';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from "./middleware/auth";
@@ -1932,6 +1933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Payment routes
   app.use('/api/payments', paymentRoutes);
+  app.use('/api/payment-test', paymentTestRoutes);
   app.use('/api/payouts', payoutRoutes);
   app.use('/api/admin', adminRoutes);
 
