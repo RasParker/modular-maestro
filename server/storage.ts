@@ -1,8 +1,8 @@
-import { 
-  users, 
-  posts, 
-  comments, 
-  post_likes, 
+import {
+  users,
+  posts,
+  comments,
+  post_likes,
   comment_likes,
   subscription_tiers,
   subscriptions,
@@ -14,7 +14,7 @@ import {
   notifications,
   notification_preferences,
   reports,
-  type User, 
+  type User,
   type InsertUser,
   type Post,
   type InsertPost,
@@ -151,6 +151,7 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   private inMemoryGoals = new Map<string, any>();
   db: any;
+  pool: any; // Added pool property
 
   constructor() {
     // Initialize with your specified goals for creator 1
@@ -161,6 +162,9 @@ export class DatabaseStorage implements IStorage {
       updated_at: new Date()
     });
     this.db = db;
+    // Assuming 'pool' is available from your db configuration or setup
+    // If 'pool' is not directly available, you might need to import or initialize it differently
+    this.pool = db; // Placeholder: Replace with your actual DB pool if different from 'db' instance
   }
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -494,7 +498,7 @@ export class DatabaseStorage implements IStorage {
     // Update creator's subscriber count
     await db
       .update(users)
-      .set({ 
+      .set({
         total_subscribers: sql`${users.total_subscribers} + 1`,
         updated_at: new Date()
       })
@@ -515,7 +519,7 @@ export class DatabaseStorage implements IStorage {
   async cancelSubscription(id: number): Promise<boolean> {
     const [subscription] = await db
       .update(subscriptions)
-      .set({ 
+      .set({
         status: 'cancelled',
         auto_renew: false,
         updated_at: new Date()
@@ -527,7 +531,7 @@ export class DatabaseStorage implements IStorage {
       // Update creator's subscriber count
       await db
         .update(users)
-        .set({ 
+        .set({
           total_subscribers: sql`${users.total_subscribers} - 1`,
           updated_at: new Date()
         })
@@ -541,58 +545,21 @@ export class DatabaseStorage implements IStorage {
 
   async getUserSubscriptionToCreator(fanId: number, creatorId: number): Promise<any> {
     try {
-      const result = await db
-        .select({
-          id: subscriptions.id,
-          fan_id: subscriptions.fan_id,
-          creator_id: subscriptions.creator_id,
-          tier_id: subscriptions.tier_id,
-          status: subscriptions.status,
-          auto_renew: subscriptions.auto_renew,
-          started_at: subscriptions.started_at,
-          ended_at: subscriptions.ends_at,
-          next_billing_date: subscriptions.next_billing_date,
-          created_at: subscriptions.created_at,
-          updated_at: subscriptions.updated_at,
-          tier_name: subscription_tiers.name,
-          tier_price: subscription_tiers.price,
-        })
-        .from(subscriptions)
-        .leftJoin(subscription_tiers, eq(subscriptions.tier_id, subscription_tiers.id))
-        .where(
-          and(
-            eq(subscriptions.fan_id, fanId),
-            eq(subscriptions.creator_id, creatorId),
-            eq(subscriptions.status, 'active')
-          )
-        )
-        .orderBy(desc(subscriptions.created_at))
-        .limit(1);
+      const query = `
+        SELECT s.*, u.username as creator_username, t.name as tier_name, t.price as tier_price
+        FROM subscriptions s
+        JOIN users u ON s.creator_id = u.id
+        JOIN subscription_tiers t ON s.tier_id = t.id
+        WHERE s.fan_id = $1 AND s.creator_id = $2 AND s.status = 'active'
+        ORDER BY s.created_at DESC
+        LIMIT 1
+      `;
 
-      const subscription = result[0];
-
-      if (!subscription) {
-        return undefined;
-      }
-
-      return {
-        id: subscription.id,
-        fan_id: subscription.fan_id,
-        creator_id: subscription.creator_id,
-        tier_id: subscription.tier_id,
-        status: subscription.status,
-        auto_renew: subscription.auto_renew,
-        started_at: subscription.started_at,
-        ended_at: subscription.ended_at,
-        next_billing_date: subscription.next_billing_date,
-        created_at: subscription.created_at,
-        updated_at: subscription.updated_at,
-        tier_name: subscription.tier_name,
-        tier_price: subscription.tier_price,
-      };
+      const result = await this.pool.query(query, [fanId, creatorId]);
+      return result.rows[0] || null;
     } catch (error) {
       console.error('Error getting user subscription to creator:', error);
-      return undefined;
+      throw error;
     }
   }
 
@@ -913,8 +880,8 @@ export class DatabaseStorage implements IStorage {
       const activeSubscriptions = await db.select({ count: sql<number>`count(*)` }).from(subscriptions).where(eq(subscriptions.status, 'active'));
 
       // Calculate total revenue from completed payment transactions
-      const revenueResult = await db.select({ 
-        total: sql<string>`COALESCE(SUM(amount), 0)` 
+      const revenueResult = await db.select({
+        total: sql<string>`COALESCE(SUM(amount), 0)`
       }).from(payment_transactions).where(eq(payment_transactions.status, 'completed'));
 
       const totalRevenue = parseFloat(revenueResult[0]?.total || '0');
@@ -1019,7 +986,7 @@ export class DatabaseStorage implements IStorage {
       await db.execute(sql`
         INSERT INTO platform_settings (key, value, updated_at)
         VALUES ('commission_rate', ${settings.commission_rate.toString()}, NOW())
-        ON CONFLICT (key) DO UPDATE SET 
+        ON CONFLICT (key) DO UPDATE SET
           value = EXCLUDED.value,
           updated_at = EXCLUDED.updated_at
       `);
@@ -1088,7 +1055,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateReportStatus(reportId: number, status: string, adminNotes?: string, resolvedBy?: number): Promise<Report | undefined> {
     try {
-      const updates: Partial<Report> = { 
+      const updates: Partial<Report> = {
         status,
         updated_at: new Date()
       };

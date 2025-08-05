@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EdgeToEdgeContainer } from '@/components/layout/EdgeToEdgeContainer';
+import { PaymentModal } from '@/components/payment/PaymentModal';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Search, Users, Star, Filter, Heart, MessageSquare, Share2, Image, Video } from 'lucide-react';
@@ -113,6 +114,9 @@ export const Explore: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<any>(null);
+  const [selectedCreatorName, setSelectedCreatorName] = useState('');
   
   const [realCreators, setRealCreators] = useState<any[]>([]);
   const [allCreators, setAllCreators] = useState<any[]>([]);
@@ -206,47 +210,28 @@ export const Explore: React.FC = () => {
         return;
       }
 
-      // Check if user already has active subscription to this creator
-      const subscriptionCheckResponse = await fetch(`/api/subscriptions/user/${user.id}/creator/${parseInt(creator.id.replace('real_', ''))}`);
-      if (subscriptionCheckResponse.ok) {
-        toast({
-          title: "Already subscribed",
-          description: `You already have an active subscription to ${creatorName}.`,
-          variant: "destructive"
-        });
-        return;
+      // Check if user already has active subscription to this creator (only for real creators)
+      if (creator.id.startsWith('real_')) {
+        const subscriptionCheckResponse = await fetch(`/api/subscriptions/user/${user.id}/creator/${parseInt(creator.id.replace('real_', ''))}`);
+        if (subscriptionCheckResponse.ok) {
+          toast({
+            title: "Already subscribed",
+            description: `You already have an active subscription to ${creatorName}.`,
+            variant: "destructive"
+          });
+          return;
+        }
       }
 
-      // Initialize payment process
-      const response = await fetch('/api/payments/initialize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fan_id: user.id,
-          tier_id: tier.id,
-          payment_method: 'card'
-        })
-      });
-
-      const paymentData = await response.json();
-
-      if (paymentData.success) {
-        // Redirect to payment gateway
-        window.location.href = paymentData.data.authorization_url;
-      } else {
-        toast({
-          title: "Payment initialization failed",
-          description: paymentData.message || "Failed to initialize payment. Please try again.",
-          variant: "destructive"
-        });
-      }
+      // Open payment modal
+      setSelectedTier(tier);
+      setSelectedCreatorName(creatorName);
+      setPaymentModalOpen(true);
     } catch (error) {
-      console.error('Payment initialization error:', error);
+      console.error('Subscription check error:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize payment. Please try again.",
+        description: "Failed to check subscription status. Please try again.",
         variant: "destructive"
       });
     }
@@ -437,6 +422,16 @@ export const Explore: React.FC = () => {
         )}
 
       </EdgeToEdgeContainer>
+
+      {/* Payment Modal */}
+      {selectedTier && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          tier={selectedTier}
+          creatorName={selectedCreatorName}
+        />
+      )}
     </EdgeToEdgeContainer>
   );
 };

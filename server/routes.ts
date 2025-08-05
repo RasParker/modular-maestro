@@ -1755,7 +1755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           activity_status_visible: activity_status_visible !== undefined ? activity_status_visible : undefined,
           updated_at: new Date()
         })
-        .where(eq(usersTable.id, userId));
+        .where(eq(users.id, userId));
 
       res.json({ success: true });
     } catch (error) {
