@@ -20,35 +20,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Mock users for demo
-const MOCK_USERS: User[] = [
-  {
-    id: '1',
-    email: 'admin@xclusive.com',
-    username: 'admin',
-    role: 'admin',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: '2',
-    email: 'creator@example.com',
-    username: 'amazingcreator',
-    role: 'creator',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=150&h=150&fit=crop&crop=face',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: '3',
-    email: 'fan@example.com',
-    username: 'loyalfan',
-    role: 'fan',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-];
+
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -75,9 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }).then(data => {
             setUser(data.user);
-          }).catch(() => {
+          }).catch((error) => {
             // Session expired or invalid, clear local storage
-            console.log('Session expired, clearing local storage');
+            console.log('Session expired, clearing local storage', error);
             localStorage.removeItem('xclusive_user');
             setUser(null);
           });
@@ -97,32 +69,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: 'Login failed' }));
         throw new Error(errorData.error || 'Login failed');
       }
 
       const data = await response.json();
 
-      // Store user and token
+      // Store user data
       localStorage.setItem('xclusive_user', JSON.stringify(data.user));
-      localStorage.setItem('xclusive_token', data.token);
+      if (data.token) {
+        localStorage.setItem('xclusive_token', data.token);
+      }
 
       setUser(data.user);
-      setIsLoading(false);
     } catch (error) {
       console.error('Login error:', error);
-      setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 

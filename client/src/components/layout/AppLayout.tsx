@@ -11,7 +11,6 @@ interface AppLayoutProps {
 
 export const AppLayout: React.FC<AppLayoutProps> = React.memo(({ children }) => {
   const location = useLocation();
-  const { user } = useAuth();
   const isMobile = useIsMobile();
 
   // Don't show navigation on auth pages
@@ -23,6 +22,9 @@ export const AppLayout: React.FC<AppLayoutProps> = React.memo(({ children }) => 
   if (isAuthPage) {
     return <div className="min-h-screen">{children}</div>;
   }
+
+  // Get user only when not on auth pages to avoid context issues
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
