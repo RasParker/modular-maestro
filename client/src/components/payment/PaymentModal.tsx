@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,7 @@ interface PaymentModalProps {
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tier, creatorName }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'mobile_money'>('card');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [mobileProvider, setMobileProvider] = useState<'mtn' | 'vod' | 'tgo' | 'airtel'>('mtn');
@@ -82,9 +84,19 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
       console.log('Payment initialization response:', data);
 
       if (data.success) {
-        console.log('Redirecting to Paystack:', data.data.authorization_url);
-        // Redirect to Paystack payment page
-        window.location.href = data.data.authorization_url;
+        console.log('Payment authorization URL:', data.data.authorization_url);
+        
+        // Check if this is a relative URL (development mode) or external URL (production)
+        if (data.data.authorization_url.startsWith('/')) {
+          // Development mode - use React Router navigation
+          console.log('Development mode: navigating to callback');
+          onClose(); // Close the modal first
+          navigate(data.data.authorization_url);
+        } else {
+          // Production mode - redirect to external Paystack URL
+          console.log('Production mode: redirecting to Paystack');
+          window.location.href = data.data.authorization_url;
+        }
       } else {
         throw new Error(data.message || 'Payment initialization failed');
       }

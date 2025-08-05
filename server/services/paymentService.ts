@@ -328,7 +328,7 @@ export class PaymentService {
     };
 
     // Use current environment's callback URL
-    const baseUrl = process.env.REPL_SLUG && process.env.REPL_OWNER 
+    const baseUrl = process.env.REPL_SLUG && process.env.REPL_OWNER
       ? `https://${process.env.REPL_SLUG}-${process.env.REPL_OWNER}.replit.app`
       : 'http://localhost:5000';
     const callbackUrl = `${baseUrl}/payment/callback`;
