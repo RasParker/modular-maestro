@@ -555,7 +555,7 @@ export class DatabaseStorage implements IStorage {
         LIMIT 1
       `;
 
-      const result = await this.pool.query(query, [fanId, creatorId]);
+      const result = await this.db.query(query, [fanId, creatorId]);
       return result.rows[0] || null;
     } catch (error) {
       console.error('Error getting user subscription to creator:', error);

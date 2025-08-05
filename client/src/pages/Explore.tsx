@@ -148,7 +148,10 @@ export const Explore: React.FC = () => {
                 tiers = tiersData.map((tier: any) => ({
                   id: tier.id,
                   name: tier.name,
-                  price: parseFloat(tier.price)
+                  price: tier.price, // Keep as string to preserve decimal precision
+                  description: tier.description || '',
+                  benefits: tier.benefits || [],
+                  creator_id: tier.creator_id
                 }));
               }
             } catch (error) {
@@ -434,49 +437,55 @@ export const Explore: React.FC = () => {
               {selectedCreator.tiers.map((tier: any) => (
                 <div
                   key={tier.id}
-                  className="p-4 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-colors hover:bg-muted/30"
+                  className="p-5 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-all duration-200 hover:bg-muted/30 hover:shadow-md"
                   onClick={() => handleTierSelected(tier)}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{tier.name}</h4>
-                      <div className="font-bold text-accent text-lg mt-1">
-                        GHS {tier.price}/month
+                  <div className="space-y-4">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-lg font-bold text-foreground">{tier.name}</h4>
+                        <div className="font-bold text-accent text-xl mt-1">
+                          GHS {parseFloat(tier.price).toFixed(2)}/month
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-muted-foreground">Monthly billing</div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {tier.description && (
-                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-                      {tier.description}
-                    </p>
-                  )}
+                    
+                    {/* Description */}
+                    {tier.description && (
+                      <div className="border-l-3 border-accent/30 pl-4">
+                        <p className="text-sm text-foreground leading-relaxed">
+                          {tier.description}
+                        </p>
+                      </div>
+                    )}
 
-                  {tier.benefits && tier.benefits.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        What's included:
-                      </p>
-                      <div className="space-y-1">
-                        {tier.benefits.slice(0, 3).map((benefit: string, index: number) => (
-                          <div key={index} className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 bg-accent rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
-                          </div>
-                        ))}
-                        {tier.benefits.length > 3 && (
-                          <div className="text-xs text-muted-foreground mt-2">
-                            +{tier.benefits.length - 3} more benefits
-                          </div>
-                        )}
+                    {/* Benefits */}
+                    {tier.benefits && tier.benefits.length > 0 && (
+                      <div className="space-y-3">
+                        <h5 className="text-sm font-semibold text-foreground">
+                          What's included:
+                        </h5>
+                        <div className="space-y-2">
+                          {tier.benefits.map((benefit: string, index: number) => (
+                            <div key={index} className="flex items-start gap-3">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                              <span className="text-sm text-foreground">{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* CTA */}
+                    <div className="pt-3 border-t border-border/50">
+                      <div className="w-full bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2 px-4 rounded-md text-center transition-colors">
+                        Choose {tier.name}
                       </div>
                     </div>
-                  )}
-
-                  <div className="mt-4 pt-3 border-t border-border/30">
-                    <button className="w-full text-sm font-medium text-accent hover:text-accent/80 transition-colors">
-                      Select {tier.name} → GHS {tier.price}/month
-                    </button>
                   </div>
                 </div>
               ))}
