@@ -588,7 +588,7 @@ export const FanSettings: React.FC = () => {
                         checked={preferences.emailNotifications}
                         onCheckedChange={async (checked) => {
                           setPreferences(prev => ({ ...prev, emailNotifications: checked }));
-                          
+
                           try {
                             const response = await fetch('/api/user/notification-preferences', {
                               method: 'POST',
@@ -633,7 +633,7 @@ export const FanSettings: React.FC = () => {
                         checked={preferences.pushNotifications}
                         onCheckedChange={async (checked) => {
                           setPreferences(prev => ({ ...prev, pushNotifications: checked }));
-                          
+
                           try {
                             const response = await fetch('/api/user/notification-preferences', {
                               method: 'POST',
@@ -823,7 +823,7 @@ export const FanSettings: React.FC = () => {
                         <p className="text-xs text-muted-foreground">Premium Tier • GHS 9.99/month</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">Active</Badge>
+                        <Badge variant="success" className="text-xs">Active</Badge>
                         <Button variant="outline" size="sm">Manage</Button>
                       </div>
                     </div>
@@ -833,7 +833,7 @@ export const FanSettings: React.FC = () => {
                         <p className="text-xs text-muted-foreground">Basic Tier • GHS 4.99/month</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">Active</Badge>
+                        <Badge variant="success" className="text-xs">Active</Badge>
                         <Button variant="outline" size="sm">Manage</Button>
                       </div>
                     </div>
@@ -863,7 +863,7 @@ export const FanSettings: React.FC = () => {
                         onChange={async (e) => {
                           const newValue = e.target.value;
                           setPrivacySettings(prev => ({ ...prev, profileVisibility: newValue }));
-                          
+
                           try {
                             const response = await fetch('/api/user/privacy-settings', {
                               method: 'POST',
@@ -928,7 +928,7 @@ export const FanSettings: React.FC = () => {
                         onChange={async (e) => {
                           const newValue = e.target.value;
                           setPrivacySettings(prev => ({ ...prev, allowDirectMessages: newValue }));
-                          
+
                           try {
                             const response = await fetch('/api/user/privacy-settings', {
                               method: 'POST',

@@ -331,15 +331,15 @@ export const ManageSubscriptions: React.FC = () => {
                                 {subscription.tier.name} • GHS {subscription.tier.price}/month
                               </p>
                               <div className="flex items-center gap-2 mt-2">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                  subscription.status === 'cancelled' 
-                                    ? 'bg-destructive/10 text-destructive' 
-                                    : subscription.status === 'expired' 
-                                    ? 'bg-orange-500/10 text-orange-500'
-                                    : 'bg-muted text-muted-foreground'
-                                }`}>
+                                <Badge variant={
+                                  subscription.status === 'cancelled' || subscription.status === 'expired'
+                                    ? 'danger' 
+                                    : subscription.status === 'active'
+                                    ? 'success'
+                                    : 'secondary'
+                                } className="text-xs">
                                   {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                                </span>
+                                </Badge>
                               </div>
                             </div>
                           </div>

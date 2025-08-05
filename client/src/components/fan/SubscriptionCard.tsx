@@ -56,7 +56,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   <Badge variant="outline" className="text-xs">{subscription.creator.category}</Badge>
                   <Badge variant="outline" className="text-xs">{subscription.tier}</Badge>
-                  <Badge variant={subscription.status === 'active' ? 'default' : subscription.status === 'paused' ? 'destructive' : 'secondary'} className="text-xs">
+                  <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'paused' ? 'danger' : 'secondary'} className="text-xs">
                     {subscription.status}
                   </Badge>
                 </div>
@@ -79,7 +79,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           <div className="flex flex-row items-center justify-between gap-3 mt-4 pt-4 border-t border-border/50">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Auto-renew:</span>
-              <Badge variant={subscription.auto_renew ? 'default' : 'destructive'} className="text-xs">
+              <Badge variant={subscription.auto_renew ? 'success' : 'danger'} className="text-xs">
                 {subscription.auto_renew ? 'Enabled' : 'Disabled'}
               </Badge>
             </div>
