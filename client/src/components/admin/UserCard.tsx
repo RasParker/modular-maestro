@@ -39,7 +39,7 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onSuspendUser }) => {
             <Badge variant="outline" className="text-xs capitalize">
               {user.role}
             </Badge>
-            <Badge variant={user.status === 'active' ? 'success' : 'destructive'} className={`text-xs ${user.status === 'active' ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-100 dark:border-green-700' : ''}`}>
+            <Badge variant={user.status === 'active' ? 'success' : 'destructive'} className="text-xs">
               {user.status}
             </Badge>
           </div>
