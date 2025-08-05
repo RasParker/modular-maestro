@@ -132,7 +132,10 @@ export const Explore: React.FC = () => {
           console.log('Fetched real creators:', creators);
 
           // Transform real creators to match the expected format
-          const transformedCreators = await Promise.all(creators.map(async (creator: any) => {
+          // Filter out suspended users first
+          const activeCreators = creators.filter((creator: any) => creator.status === 'active');
+          
+          const transformedCreators = await Promise.all(activeCreators.map(async (creator: any) => {
             // Check localStorage for profile customizations for this specific creator
             const profilePhotoUrl = localStorage.getItem('profilePhotoUrl');
             const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
