@@ -441,69 +441,75 @@ export const Explore: React.FC = () => {
             
             <div className="flex-1 overflow-y-auto pr-2 -mr-2">
               <div className="space-y-3">
-                {selectedCreator.tiers.map((tier: any) => (
-                  <div
-                    key={tier.id}
-                    className="p-4 border border-border rounded-xl hover:border-accent/60 cursor-pointer transition-all duration-200 hover:bg-accent/5 hover:shadow-sm group"
-                    onClick={() => handleTierSelected(tier)}
-                  >
-                    <div className="space-y-3">
-                      {/* Tier Header */}
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-bold text-foreground group-hover:text-accent transition-colors">
-                            {tier.name}
-                          </h4>
-                          <div className="font-bold text-accent text-lg mt-0.5">
-                            GHS {parseFloat(tier.price).toFixed(2)}
-                            <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
+                {selectedCreator.tiers && selectedCreator.tiers.length > 0 ? (
+                  selectedCreator.tiers.map((tier: any) => (
+                    <div
+                      key={tier.id}
+                      className="p-4 border border-border rounded-xl hover:border-accent/60 cursor-pointer transition-all duration-200 hover:bg-accent/5 hover:shadow-sm group"
+                      onClick={() => handleTierSelected(tier)}
+                    >
+                      <div className="space-y-3">
+                        {/* Tier Header */}
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-bold text-foreground group-hover:text-accent transition-colors">
+                              {tier.name}
+                            </h4>
+                            <div className="font-bold text-accent text-lg mt-0.5">
+                              GHS {typeof tier.price === 'string' ? parseFloat(tier.price).toFixed(2) : tier.price.toFixed(2)}
+                              <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
+                            Monthly
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                          Monthly
-                        </div>
-                      </div>
-                      
-                      {/* Description */}
-                      {tier.description && (
-                        <div className="bg-muted/30 p-3 rounded-lg">
-                          <p className="text-sm text-foreground leading-relaxed">
-                            {tier.description}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Benefits */}
-                      {tier.benefits && tier.benefits.length > 0 && (
-                        <div className="space-y-2">
-                          <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                            What's included:
-                          </h5>
-                          <div className="space-y-1.5">
-                            {tier.benefits.slice(0, 3).map((benefit: string, index: number) => (
-                              <div key={index} className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                                <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
-                              </div>
-                            ))}
-                            {tier.benefits.length > 3 && (
-                              <div className="text-xs text-muted-foreground pl-3.5">
-                                +{tier.benefits.length - 3} more benefits
-                              </div>
-                            )}
+                        
+                        {/* Description */}
+                        {tier.description && (
+                          <div className="bg-muted/30 p-3 rounded-lg">
+                            <p className="text-sm text-foreground leading-relaxed">
+                              {tier.description}
+                            </p>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Action Button */}
-                      <div className="pt-2">
-                        <div className="w-full bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground text-primary font-medium py-2.5 px-4 rounded-lg text-center transition-all duration-200 text-sm">
-                          Select {tier.name} →
+                        {/* Benefits */}
+                        {tier.benefits && tier.benefits.length > 0 && (
+                          <div className="space-y-2">
+                            <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                              What's included:
+                            </h5>
+                            <div className="space-y-1.5">
+                              {tier.benefits.slice(0, 3).map((benefit: string, index: number) => (
+                                <div key={index} className="flex items-start gap-2">
+                                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                                  <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
+                                </div>
+                              ))}
+                              {tier.benefits.length > 3 && (
+                                <div className="text-xs text-muted-foreground pl-3.5">
+                                  +{tier.benefits.length - 3} more benefits
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Button */}
+                        <div className="pt-2">
+                          <div className="w-full bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground text-primary font-medium py-2.5 px-4 rounded-lg text-center transition-all duration-200 text-sm">
+                            Select {tier.name} →
+                          </div>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No subscription tiers available</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
             
