@@ -206,40 +206,47 @@ export const Explore: React.FC = () => {
         return;
       }
 
-      // Create subscription directly
-      const response = await fetch('/api/subscriptions', {
+      // Check if user already has active subscription to this creator
+      const subscriptionCheckResponse = await fetch(`/api/subscriptions/user/${user.id}/creator/${parseInt(creator.id.replace('real_', ''))}`);
+      if (subscriptionCheckResponse.ok) {
+        toast({
+          title: "Already subscribed",
+          description: `You already have an active subscription to ${creatorName}.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Initialize payment process
+      const response = await fetch('/api/payments/initialize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           fan_id: user.id,
-          creator_id: parseInt(creator.id.replace('real_', '')),
           tier_id: tier.id,
-          status: 'active',
-          auto_renew: true,
-          started_at: new Date().toISOString(),
-          next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          payment_method: 'card'
         })
       });
 
-      if (response.ok) {
-        toast({
-          title: "Successfully subscribed!",
-          description: `You're now subscribed to ${creatorName}'s ${tier.name} tier.`,
-        });
+      const paymentData = await response.json();
+
+      if (paymentData.success) {
+        // Redirect to payment gateway
+        window.location.href = paymentData.data.authorization_url;
       } else {
-        const errorData = await response.json();
         toast({
-          title: "Subscription failed",
-          description: errorData.error || "Failed to create subscription. Please try again.",
+          title: "Payment initialization failed",
+          description: paymentData.message || "Failed to initialize payment. Please try again.",
           variant: "destructive"
         });
       }
     } catch (error) {
+      console.error('Payment initialization error:', error);
       toast({
         title: "Error",
-        description: "Failed to create subscription. Please try again.",
+        description: "Failed to initialize payment. Please try again.",
         variant: "destructive"
       });
     }
