@@ -544,7 +544,7 @@ export const CreatorProfile: React.FC = () => {
   const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
@@ -910,8 +910,8 @@ export const CreatorProfile: React.FC = () => {
       setTimeout(() => {
         // Invalidate conversations query to refresh the list
         queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
-        // Navigate to messages page
-        window.location.href = '/fan/messages';
+        // Navigate to messages page using React Router
+        navigate('/fan/messages');
       }, 500);
     },
     onError: (error) => {
@@ -926,7 +926,7 @@ export const CreatorProfile: React.FC = () => {
   const handleChatClick = async () => {
     if (!user) {
       // Redirect to login if not authenticated
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
