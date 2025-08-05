@@ -426,69 +426,86 @@ export const Explore: React.FC = () => {
       {/* Tier Selection Modal */}
       {selectedCreator && (
         <Dialog open={tierSelectionModalOpen} onOpenChange={setTierSelectionModalOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Choose a subscription tier</DialogTitle>
+          <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
+            <DialogHeader className="flex-shrink-0 pb-4">
+              <DialogTitle className="text-xl font-bold">Choose Your Subscription</DialogTitle>
               <p className="text-sm text-muted-foreground">
-                Select a tier to subscribe to {selectedCreator.display_name}
+                Select a tier to unlock exclusive content from {selectedCreator.display_name}
               </p>
             </DialogHeader>
-            <div className="space-y-4">
-              {selectedCreator.tiers.map((tier: any) => (
-                <div
-                  key={tier.id}
-                  className="p-5 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-all duration-200 hover:bg-muted/30 hover:shadow-md"
-                  onClick={() => handleTierSelected(tier)}
-                >
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-lg font-bold text-foreground">{tier.name}</h4>
-                        <div className="font-bold text-accent text-xl mt-1">
-                          GHS {parseFloat(tier.price).toFixed(2)}/month
+            
+            <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+              <div className="space-y-3">
+                {selectedCreator.tiers.map((tier: any) => (
+                  <div
+                    key={tier.id}
+                    className="p-4 border border-border rounded-xl hover:border-accent/60 cursor-pointer transition-all duration-200 hover:bg-accent/5 hover:shadow-sm group"
+                    onClick={() => handleTierSelected(tier)}
+                  >
+                    <div className="space-y-3">
+                      {/* Tier Header */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-foreground group-hover:text-accent transition-colors">
+                            {tier.name}
+                          </h4>
+                          <div className="font-bold text-accent text-lg mt-0.5">
+                            GHS {parseFloat(tier.price).toFixed(2)}
+                            <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
+                          Monthly
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm text-muted-foreground">Monthly billing</div>
-                      </div>
-                    </div>
-                    
-                    {/* Description */}
-                    {tier.description && (
-                      <div className="border-l-3 border-accent/30 pl-4">
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {tier.description}
-                        </p>
-                      </div>
-                    )}
+                      
+                      {/* Description */}
+                      {tier.description && (
+                        <div className="bg-muted/30 p-3 rounded-lg">
+                          <p className="text-sm text-foreground leading-relaxed">
+                            {tier.description}
+                          </p>
+                        </div>
+                      )}
 
-                    {/* Benefits */}
-                    {tier.benefits && tier.benefits.length > 0 && (
-                      <div className="space-y-3">
-                        <h5 className="text-sm font-semibold text-foreground">
-                          What's included:
-                        </h5>
+                      {/* Benefits */}
+                      {tier.benefits && tier.benefits.length > 0 && (
                         <div className="space-y-2">
-                          {tier.benefits.map((benefit: string, index: number) => (
-                            <div key={index} className="flex items-start gap-3">
-                              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-sm text-foreground">{benefit}</span>
-                            </div>
-                          ))}
+                          <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            What's included:
+                          </h5>
+                          <div className="space-y-1.5">
+                            {tier.benefits.slice(0, 3).map((benefit: string, index: number) => (
+                              <div key={index} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                                <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
+                              </div>
+                            ))}
+                            {tier.benefits.length > 3 && (
+                              <div className="text-xs text-muted-foreground pl-3.5">
+                                +{tier.benefits.length - 3} more benefits
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* CTA */}
-                    <div className="pt-3 border-t border-border/50">
-                      <div className="w-full bg-accent/10 hover:bg-accent/20 text-accent font-medium py-2 px-4 rounded-md text-center transition-colors">
-                        Choose {tier.name}
+                      {/* Action Button */}
+                      <div className="pt-2">
+                        <div className="w-full bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground text-primary font-medium py-2.5 px-4 rounded-lg text-center transition-all duration-200 text-sm">
+                          Select {tier.name} →
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex-shrink-0 pt-4 border-t border-border/50">
+              <p className="text-xs text-center text-muted-foreground">
+                Cancel anytime • Secure payments via Paystack
+              </p>
             </div>
           </DialogContent>
         </Dialog>
