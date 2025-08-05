@@ -48,7 +48,7 @@ export const ManageUsers: React.FC = () => {
         username: user.username,
         email: user.email,
         role: user.role,
-        status: 'active', // Default to active since we don't have status in the DB yet
+        status: user.status || 'active', // Use status from DB or default to active
         joined: new Date(user.created_at).toISOString().split('T')[0],
         subscribers: user.total_subscribers || 0,
         revenue: parseFloat(user.total_earnings || '0'),
@@ -73,7 +73,19 @@ export const ManageUsers: React.FC = () => {
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    return matchesSearch && matchesRole && matchesStatus;
+    
+    // Apply tab filtering
+    let matchesTab = true;
+    if (activeTab === 'creators') {
+      matchesTab = user.role === 'creator';
+    } else if (activeTab === 'fans') {
+      matchesTab = user.role === 'fan';
+    } else if (activeTab === 'banned') {
+      matchesTab = user.status === 'suspended';
+    }
+    // 'all' tab shows all users, so no additional filtering needed
+    
+    return matchesSearch && matchesRole && matchesStatus && matchesTab;
   });
 
   const handleSuspendUser = async (userId: string) => {
@@ -185,25 +197,25 @@ export const ManageUsers: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Tab Navigation */}
             <TabsList className="mb-6 mx-auto sm:mx-0">
-              <TabsTrigger value="all">
+              <TabsTrigger value="all" onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}>
                 All Users
                 <span className="ml-2 text-xs opacity-70">
                   {users.length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="creators">
+              <TabsTrigger value="creators" onClick={() => { setRoleFilter('creator'); setStatusFilter('all'); }}>
                 Creators
                 <span className="ml-2 text-xs opacity-70">
                   {getCreators().length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="fans">
+              <TabsTrigger value="fans" onClick={() => { setRoleFilter('fan'); setStatusFilter('all'); }}>
                 Fans
                 <span className="ml-2 text-xs opacity-70">
                   {getFans().length}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="banned">
+              <TabsTrigger value="banned" onClick={() => { setRoleFilter('all'); setStatusFilter('suspended'); }}>
                 Banned
                 <span className="ml-2 text-xs opacity-70">
                   {getBannedUsers().length}
@@ -216,21 +228,71 @@ export const ManageUsers: React.FC = () => {
                 <LoadingSpinner />
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
-                    <UserCard
-                      key={user.id}
-                      user={user}
-                      onSuspendUser={handleSuspendUser}
-                    />
-                  ))
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    No users found matching your criteria.
-                  </p>
-                )}
-              </div>
+              <>
+                <TabsContent value="all" className="space-y-4">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <UserCard
+                        key={user.id}
+                        user={user}
+                        onSuspendUser={handleSuspendUser}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      No users found matching your criteria.
+                    </p>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="creators" className="space-y-4">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <UserCard
+                        key={user.id}
+                        user={user}
+                        onSuspendUser={handleSuspendUser}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      No creators found matching your criteria.
+                    </p>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="fans" className="space-y-4">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <UserCard
+                        key={user.id}
+                        user={user}
+                        onSuspendUser={handleSuspendUser}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      No fans found matching your criteria.
+                    </p>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="banned" className="space-y-4">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <UserCard
+                        key={user.id}
+                        user={user}
+                        onSuspendUser={handleSuspendUser}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      No suspended users found.
+                    </p>
+                  )}
+                </TabsContent>
+              </>
             )}
             </Tabs>
           </CardContent>
