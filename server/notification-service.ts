@@ -67,14 +67,18 @@ export class NotificationService {
 
   static async notifyNewMessage(recipientId: number, senderId: number, messagePreview: string): Promise<void> {
     const sender = await storage.getUser(senderId);
-    if (!sender) return;
+    const recipient = await storage.getUser(recipientId);
+    if (!sender || !recipient) return;
+
+    // Determine the correct action URL based on recipient's role
+    const actionUrl = recipient.role === 'creator' ? '/creator/messages' : '/fan/messages';
 
     await this.createNotification({
       user_id: recipientId,
       type: 'new_message',
       title: 'New Message',
       message: `${sender.display_name || sender.username}: ${messagePreview.substring(0, 50)}${messagePreview.length > 50 ? '...' : ''}`,
-      action_url: '/fan/messages',
+      action_url: actionUrl,
       actor_id: senderId,
       entity_type: 'message',
       metadata: {}

@@ -1138,8 +1138,12 @@ export class DatabaseStorage implements IStorage {
   // Notification methods
   async getNotifications(userId: number, limit: number = 20): Promise<Notification[]> {
     try {
-      // Return empty array for now due to schema issues
-      return [];
+      return await db
+        .select()
+        .from(notifications)
+        .where(eq(notifications.user_id, userId))
+        .orderBy(desc(notifications.created_at))
+        .limit(limit);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       return [];
@@ -1148,8 +1152,11 @@ export class DatabaseStorage implements IStorage {
 
   async getUnreadNotificationCount(userId: number): Promise<number> {
     try {
-      // Return 0 for now due to schema issues
-      return 0;
+      const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(notifications)
+        .where(and(eq(notifications.user_id, userId), eq(notifications.read, false)));
+      return result[0]?.count || 0;
     } catch (error) {
       console.error('Error getting unread notification count:', error);
       return 0;
@@ -1157,12 +1164,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
-    throw new Error('Notifications feature not yet fully implemented');
+    try {
+      const [newNotification] = await db
+        .insert(notifications)
+        .values(notification)
+        .returning();
+      return newNotification;
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw new Error('Failed to create notification');
+    }
   }
 
   async markNotificationAsRead(notificationId: number): Promise<boolean> {
     try {
-      return false;
+      const result = await db
+        .update(notifications)
+        .set({ read: true })
+        .where(eq(notifications.id, notificationId));
+      return (result.rowCount || 0) > 0;
     } catch (error) {
       console.error('Error marking notification as read:', error);
       return false;
@@ -1171,7 +1191,11 @@ export class DatabaseStorage implements IStorage {
 
   async markAllNotificationsAsRead(userId: number): Promise<boolean> {
     try {
-      return false;
+      const result = await db
+        .update(notifications)
+        .set({ read: true })
+        .where(and(eq(notifications.user_id, userId), eq(notifications.read, false)));
+      return (result.rowCount || 0) > 0;
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       return false;
