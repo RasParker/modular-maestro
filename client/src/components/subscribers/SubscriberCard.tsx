@@ -13,6 +13,7 @@ interface Subscriber {
   status: string;
   avatar?: string;
   created_at?: string;
+  display_name?: string; // Added display_name to the interface
 }
 
 interface SubscriberCardProps {
@@ -63,7 +64,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => onMessage(subscriber.username || 'Unknown User')}
+          onClick={() => onMessage(subscriber.username || subscriber.display_name || 'Unknown User')}
           className="w-full"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
@@ -106,7 +107,7 @@ export const SubscriberCard: React.FC<SubscriberCardProps> = ({ subscriber, onMe
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onMessage(subscriber.username || 'Unknown User')}
+            onClick={() => onMessage(subscriber.username || subscriber.display_name || 'Unknown User')}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Send Message

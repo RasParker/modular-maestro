@@ -1246,7 +1246,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       const recent = req.query.recent === 'true';
 
-      let subscribers = await storage.getCreatorSubscribers(creatorId);
+      console.log('Fetching subscribers for creator:', creatorId);
+
+      // Get subscribers with user information
+      const subscribersQuery = await db
+        .select({
+          id: subscriptionsTable.id,
+          fan_id: subscriptionsTable.fan_id,
+          creator_id: subscriptionsTable.creator_id,
+          tier_id: subscriptionsTable.tier_id,
+          status: subscriptionsTable.status,
+          created_at: subscriptionsTable.created_at,
+          next_billing_date: subscriptionsTable.next_billing_date,
+          auto_renew: subscriptionsTable.auto_renew,
+          // User information
+          username: usersTable.username,
+          email: usersTable.email,
+          avatar: usersTable.avatar,
+          display_name: usersTable.display_name,
+          // Tier information
+          tier_name: tiersTable.name,
+          tier_price: tiersTable.price
+        })
+        .from(subscriptionsTable)
+        .innerJoin(usersTable, eq(subscriptionsTable.fan_id, usersTable.id))
+        .leftJoin(tiersTable, eq(subscriptionsTable.tier_id, tiersTable.id))
+        .where(and(
+          eq(subscriptionsTable.creator_id, creatorId),
+          eq(subscriptionsTable.status, 'active')
+        ))
+        .orderBy(desc(subscriptionsTable.created_at));
+
+      let subscribers = subscribersQuery.map(sub => ({
+        ...sub,
+        joined: new Date(sub.created_at).toLocaleDateString(),
+        tier: sub.tier_name || 'Basic'
+      }));
+
+      console.log('Found subscribers:', subscribers.length, subscribers);
 
       if (recent) {
         // Sort by created_at descending for recent subscribers
