@@ -430,23 +430,53 @@ export const Explore: React.FC = () => {
                 Select a tier to subscribe to {selectedCreator.display_name}
               </p>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {selectedCreator.tiers.map((tier: any) => (
                 <div
                   key={tier.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-colors"
+                  className="p-4 border border-border rounded-lg hover:border-accent/50 cursor-pointer transition-colors hover:bg-muted/30"
                   onClick={() => handleTierSelected(tier)}
                 >
-                  <div>
-                    <h4 className="font-medium">{tier.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Access to exclusive content and perks
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-accent">
-                      GHS {tier.price}/month
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-foreground">{tier.name}</h4>
+                      <div className="font-bold text-accent text-lg mt-1">
+                        GHS {tier.price}/month
+                      </div>
                     </div>
+                  </div>
+                  
+                  {tier.description && (
+                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                      {tier.description}
+                    </p>
+                  )}
+
+                  {tier.benefits && tier.benefits.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        What's included:
+                      </p>
+                      <div className="space-y-1">
+                        {tier.benefits.slice(0, 3).map((benefit: string, index: number) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <div className="w-1.5 h-1.5 bg-accent rounded-full mt-2 flex-shrink-0" />
+                            <span className="text-sm text-foreground leading-relaxed">{benefit}</span>
+                          </div>
+                        ))}
+                        {tier.benefits.length > 3 && (
+                          <div className="text-xs text-muted-foreground mt-2">
+                            +{tier.benefits.length - 3} more benefits
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-3 border-t border-border/30">
+                    <button className="w-full text-sm font-medium text-accent hover:text-accent/80 transition-colors">
+                      Select {tier.name} → GHS {tier.price}/month
+                    </button>
                   </div>
                 </div>
               ))}
