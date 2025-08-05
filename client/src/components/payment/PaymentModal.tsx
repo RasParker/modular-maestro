@@ -191,12 +191,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tie
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <DialogTitle className="flex items-center justify-center gap-2">
             <Lock className="h-5 w-5" />
             Subscribe to {creatorName}
+            <button
+              onClick={onClose}
+              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ✕
+            </button>
           </DialogTitle>
           <DialogDescription className="text-center">
             You're subscribing to the {tier.name} tier

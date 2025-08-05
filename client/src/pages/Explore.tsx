@@ -425,10 +425,18 @@ export const Explore: React.FC = () => {
 
       {/* Tier Selection Modal */}
       {selectedCreator && (
-        <Dialog open={tierSelectionModalOpen} onOpenChange={setTierSelectionModalOpen}>
+        <Dialog open={tierSelectionModalOpen} onOpenChange={() => {}}>
           <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
             <DialogHeader className="flex-shrink-0 pb-4">
-              <DialogTitle className="text-xl font-bold">Choose Your Subscription</DialogTitle>
+              <DialogTitle className="text-xl font-bold flex items-center justify-between">
+                Choose Your Subscription
+                <button
+                  onClick={() => setTierSelectionModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ✕
+                </button>
+              </DialogTitle>
               <p className="text-sm text-muted-foreground">
                 Select a tier to unlock exclusive content from {selectedCreator.display_name}
               </p>
