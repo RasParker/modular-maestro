@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,13 +39,13 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onSuspendUser }) => {
             <Badge variant="outline" className="text-xs capitalize">
               {user.role}
             </Badge>
-            <Badge variant={user.status === 'active' ? 'outline' : 'destructive'} className={`text-xs ${user.status === 'active' ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-100 dark:border-green-700' : ''}`}>
+            <Badge variant={user.status === 'active' ? 'success' : 'destructive'} className={`text-xs ${user.status === 'active' ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-100 dark:border-green-700' : ''}`}>
               {user.status}
             </Badge>
           </div>
         </div>
       </div>
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <div className="text-left sm:text-right">
           <p className="text-sm font-medium">
