@@ -119,10 +119,10 @@ export const Subscribers: React.FC = () => {
   });
 
   const handleMessage = (username: string) => {
-    // Find the subscriber by username to get their ID
+    // Find the subscriber by username to get their fan_id (user ID)
     const subscriber = subscribers.find(s => s.username === username);
     if (subscriber) {
-      createConversationMutation.mutate(subscriber.id);
+      createConversationMutation.mutate(subscriber.fan_id);
     } else {
       toast({
         title: "Error",
