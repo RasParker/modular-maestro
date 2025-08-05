@@ -2212,7 +2212,7 @@ app.get('/api/conversations', async (req, res) => {
 
     console.log('Fetching conversations for user:', userId);
 
-    // Get conversations where current user is participant1 (fan)
+    // Get conversations where current user is participant1 (fan) and exclude self-conversations
     const fanConversations = await db
       .select({
         id: conversationsTable.id,
@@ -2226,10 +2226,13 @@ app.get('/api/conversations', async (req, res) => {
       })
       .from(conversationsTable)
       .leftJoin(usersTable, eq(conversationsTable.participant_2_id, usersTable.id))
-      .where(eq(conversationsTable.participant_1_id, userId))
+      .where(and(
+        eq(conversationsTable.participant_1_id, userId),
+        sql`${conversationsTable.participant_1_id} != ${conversationsTable.participant_2_id}`
+      ))
       .orderBy(desc(conversationsTable.updated_at));
 
-    // Get conversations where current user is participant2 (creator)
+    // Get conversations where current user is participant2 (creator) and exclude self-conversations
     const creatorConversations = await db
       .select({
         id: conversationsTable.id,
@@ -2243,7 +2246,10 @@ app.get('/api/conversations', async (req, res) => {
       })
       .from(conversationsTable)
       .leftJoin(usersTable, eq(conversationsTable.participant_1_id, usersTable.id))
-      .where(eq(conversationsTable.participant_2_id, userId))
+      .where(and(
+        eq(conversationsTable.participant_2_id, userId),
+        sql`${conversationsTable.participant_1_id} != ${conversationsTable.participant_2_id}`
+      ))
       .orderBy(desc(conversationsTable.updated_at));
 
     // Get last message for each conversation
@@ -2277,36 +2283,42 @@ app.get('/api/conversations', async (req, res) => {
 
     // Add fan conversations (where current user is the fan)
     fanConversations.forEach(conv => {
-      allConversations.push({
-        id: conv.id,
-        other_participant_id: conv.other_participant_id,
-        creator: {
-          username: conv.creator_username,
-          display_name: conv.creator_display_name,
-          avatar: conv.creator_avatar,
-        },
-        last_message: lastMessages.get(conv.id) || 'No messages yet',
-        timestamp: conv.updated_at,
-        unread: false,
-        unread_count: 0,
-      });
+      // Double-check to prevent self-conversations
+      if (conv.other_participant_id !== userId) {
+        allConversations.push({
+          id: conv.id,
+          other_participant_id: conv.other_participant_id,
+          creator: {
+            username: conv.creator_username,
+            display_name: conv.creator_display_name,
+            avatar: conv.creator_avatar,
+          },
+          last_message: lastMessages.get(conv.id) || 'No messages yet',
+          timestamp: conv.updated_at,
+          unread: false,
+          unread_count: 0,
+        });
+      }
     });
 
     // Add creator conversations (where current user is the creator)
     creatorConversations.forEach(conv => {
-      allConversations.push({
-        id: conv.id,
-        other_participant_id: conv.other_participant_id,
-        creator: {
-          username: conv.fan_username,
-          display_name: conv.fan_display_name,
-          avatar: conv.fan_avatar,
-        },
-        last_message: lastMessages.get(conv.id) || 'No messages yet',
-        timestamp: conv.updated_at,
-        unread: false,
-        unread_count: 0,
-      });
+      // Double-check to prevent self-conversations
+      if (conv.other_participant_id !== userId) {
+        allConversations.push({
+          id: conv.id,
+          other_participant_id: conv.other_participant_id,
+          creator: {
+            username: conv.fan_username,
+            display_name: conv.fan_display_name,
+            avatar: conv.fan_avatar,
+          },
+          last_message: lastMessages.get(conv.id) || 'No messages yet',
+          timestamp: conv.updated_at,
+          unread: false,
+          unread_count: 0,
+        });
+      }
     });
 
     // Sort by timestamp
@@ -2479,6 +2491,11 @@ app.post('/api/conversations', async (req, res) => {
 
     if (!currentUserId) {
       return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Prevent self-conversations
+    if (currentUserId === otherUserId) {
+      return res.status(400).json({ error: 'Cannot create conversation with yourself' });
     }
 
     console.log('Creating conversation between:', currentUserId, 'and', otherUserId);
