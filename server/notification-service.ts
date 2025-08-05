@@ -61,7 +61,7 @@ export class NotificationService {
       entity_type: 'subscription',
       metadata: {
         tier_name: tierName || 'unknown'
-      }
+      } as any
     });
   }
 
@@ -101,7 +101,7 @@ export class NotificationService {
       metadata: {
         post_title: postTitle,
         comment_content: commentContent.substring(0, 100)
-      }
+      } as any
     });
   }
 
@@ -128,7 +128,7 @@ export class NotificationService {
         entity_id: commentId,
         metadata: {
           post_title: postTitle
-        }
+        } as any
       });
 
       console.log('Comment like notification created successfully');
@@ -154,7 +154,7 @@ export class NotificationService {
         entity_id: postId,
         metadata: {
           post_title: postTitle
-        }
+        } as any
       });
     }
   }
@@ -170,7 +170,7 @@ export class NotificationService {
       metadata: {
         amount,
         tier_name: tierName
-      }
+      } as any
     });
   }
 
@@ -185,7 +185,7 @@ export class NotificationService {
       metadata: {
         amount,
         tier_name: tierName
-      }
+      } as any
     });
   }
 
@@ -199,7 +199,7 @@ export class NotificationService {
       entity_type: 'payment',
       metadata: {
         amount
-      }
+      } as any
     });
   }
 
@@ -226,7 +226,7 @@ export class NotificationService {
         entity_id: postId,
         metadata: {
           post_title: postTitle
-        }
+        } as any
       });
 
       console.log('Like notification created successfully');

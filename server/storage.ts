@@ -1214,7 +1214,12 @@ export class DatabaseStorage implements IStorage {
   // Notification preferences methods
   async getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined> {
     try {
-      return undefined;
+      const [prefs] = await db
+        .select()
+        .from(notification_preferences)
+        .where(eq(notification_preferences.user_id, userId))
+        .limit(1);
+      return prefs;
     } catch (error) {
       console.error('Error fetching notification preferences:', error);
       return undefined;
@@ -1222,7 +1227,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences> {
-    throw new Error('Notification preferences feature not yet implemented');
+    const [prefs] = await db
+      .insert(notification_preferences)
+      .values(preferences)
+      .returning();
+    return prefs;
   }
 
   async updateNotificationPreferences(userId: number, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined> {
