@@ -318,84 +318,84 @@ export const VideoWatch: React.FC = () => {
             </div>
 
             {/* Action Buttons Row */}
-            <div className="flex items-center justify-between mb-6 px-2">
-              <div className="flex items-center gap-6">
+            <div className="flex items-center justify-between mb-6 px-2 overflow-hidden">
+              <div className="flex items-center gap-4 flex-1 min-w-0">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`flex items-center gap-2 h-auto py-2 px-3 ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                  className={`flex items-center gap-1 h-auto py-2 px-2 ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
                   onClick={handleLike}
                 >
-                  <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
+                  <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
                   <span className="text-sm">{post.likes_count || 0}</span>
                 </Button>
 
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground">
-                  <MessageSquare className="w-5 h-5" />
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground">
+                  <MessageSquare className="w-4 h-4" />
                   <span className="text-sm">{post.comments_count || 0}</span>
                 </Button>
 
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" onClick={handleShare}>
-                  <Share2 className="w-5 h-5" />
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" onClick={handleShare}>
+                  <Share2 className="w-4 h-4" />
                   <span className="text-sm">Share</span>
                 </Button>
-
-                {/* Creator Edit/Delete Actions */}
-                {user && post.creator_id === user.id && (
-                  <>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
-                      onClick={() => navigate(`/creator/edit-post/${post.id}`)}
-                    >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/>
-                      </svg>
-                      <span className="text-sm">Edit</span>
-                    </Button>
-
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
-                      onClick={async () => {
-                        if (window.confirm('Are you sure you want to delete this post?')) {
-                          try {
-                            const response = await fetch(`/api/posts/${post.id}`, {
-                              method: 'DELETE',
-                              headers: { 'Content-Type': 'application/json' }
-                            });
-
-                            if (response.ok) {
-                              toast({
-                                title: "Success",
-                                description: "Post deleted successfully"
-                              });
-                              navigate('/creator/dashboard');
-                            } else {
-                              throw new Error('Failed to delete post');
-                            }
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: "Failed to delete post",
-                              variant: "destructive"
-                            });
-                          }
-                        }
-                      }}
-                    >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14Z"/>
-                        <line x1="10" x2="10" y1="11" y2="17"/>
-                        <line x1="14" x2="14" y1="11" y2="17"/>
-                      </svg>
-                      <span className="text-sm">Delete</span>
-                    </Button>
-                  </>
-                )}
               </div>
+
+              {/* Creator Edit/Delete Actions */}
+              {user && post.creator_id === user.id && (
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
+                    onClick={() => navigate(`/creator/edit-post/${post.id}`)}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/>
+                    </svg>
+                    <span className="text-xs">Edit</span>
+                  </Button>
+
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
+                    onClick={async () => {
+                      if (window.confirm('Are you sure you want to delete this post?')) {
+                        try {
+                          const response = await fetch(`/api/posts/${post.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                          });
+
+                          if (response.ok) {
+                            toast({
+                              title: "Success",
+                              description: "Post deleted successfully"
+                            });
+                            navigate('/creator/dashboard');
+                          } else {
+                            throw new Error('Failed to delete post');
+                          }
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to delete post",
+                            variant: "destructive"
+                          });
+                        }
+                      }
+                    }}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 0 0 1-2-2V6h14Z"/>
+                      <line x1="10" x2="10" y1="11" y2="17"/>
+                      <line x1="14" x2="14" y1="11" y2="17"/>
+                    </svg>
+                    <span className="text-xs">Delete</span>
+                  </Button>
+                </div>
+              )}
             </div>
 
 
@@ -603,8 +603,8 @@ export const VideoWatch: React.FC = () => {
               </div>
 
               {/* Action Buttons Row */}
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-                <div className="flex items-center gap-6">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border overflow-hidden">
+                <div className="flex items-center gap-6 flex-1 min-w-0">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -628,7 +628,7 @@ export const VideoWatch: React.FC = () => {
 
                 {/* Creator Edit/Delete Actions - Desktop */}
                 {user && post.creator_id === user.id && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -673,7 +673,7 @@ export const VideoWatch: React.FC = () => {
                       }}
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14Z"/>
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 0 0 1-2-2V6h14Z"/>
                         <line x1="10" x2="10" y1="11" y2="17"/>
                         <line x1="14" x2="14" y1="11" y2="17"/>
                       </svg>

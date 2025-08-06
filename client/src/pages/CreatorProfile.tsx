@@ -409,14 +409,14 @@ export const CreatorProfile: React.FC = () => {
               subscription.status === 'active' && 
               subscription.creator_id === creator.id) {
             setUserSubscription(subscription);
-            console.log(`✓ User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
+            console.log('✓ User ${user.id} has active subscription to creator ${creator.id}:', subscription);
           } else {
             setUserSubscription(null);
-            console.log(`✗ User ${user.id} has no active subscription to creator ${creator.id}`);
+            console.log('✗ User ${user.id} has no active subscription to creator ${creator.id}');
           }
         } else {
           setUserSubscription(null);
-          console.log(`✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})`);
+          console.log('✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})');
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -1696,7 +1696,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnZnPg==';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
@@ -2002,7 +2002,7 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 px-2">
+                                <div className="flex items-center justify-between mt-2">
                                   <div className="flex items-center gap-6">
                                     <Button
                                       variant="ghost"
