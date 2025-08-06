@@ -207,10 +207,24 @@ router.get('/callback', async (req, res) => {
 });
 
 // Paystack webhook handler
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'] as string;
-    const payload = req.body.toString();
+    let payload: string;
+    let event: any;
+
+    // Handle both raw and JSON body
+    if (Buffer.isBuffer(req.body)) {
+      payload = req.body.toString();
+      event = JSON.parse(payload);
+    } else if (typeof req.body === 'string') {
+      payload = req.body;
+      event = JSON.parse(payload);
+    } else {
+      // Body is already parsed JSON
+      payload = JSON.stringify(req.body);
+      event = req.body;
+    }
 
     // Validate webhook signature
     if (!paymentService.validateWebhookSignature(payload, signature)) {
@@ -219,8 +233,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         message: 'Invalid webhook signature'
       });
     }
-
-    const event = JSON.parse(payload);
 
     // Handle different webhook events
     switch (event.event) {

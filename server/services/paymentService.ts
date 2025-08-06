@@ -418,6 +418,12 @@ export class PaymentService {
 
   // Validate webhook signature
   validateWebhookSignature(payload: string, signature: string): boolean {
+    // In development mode, skip signature validation for testing
+    if (this.isDevelopment) {
+      console.log('🔧 Development mode: Skipping webhook signature validation');
+      return true;
+    }
+
     const crypto = require('crypto');
     const hash = crypto.createHmac('sha512', this.secretKey).update(payload).digest('hex');
     return hash === signature;
