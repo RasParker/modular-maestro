@@ -318,7 +318,7 @@ export const VideoWatch: React.FC = () => {
             </div>
 
             {/* Action Buttons Row */}
-            <div className="flex items-center justify-between mb-6 px-2 overflow-hidden">
+            <div className="flex items-center justify-between mb-6 pl-0 pr-2 overflow-hidden">
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 <Button
                   variant="ghost"
@@ -337,7 +337,7 @@ export const VideoWatch: React.FC = () => {
 
                 <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" onClick={handleShare}>
                   <Share2 className="w-4 h-4" />
-                  <span className="text-sm">Share</span>
+                  <span className="text-sm font-normal">Share</span>
                 </Button>
               </div>
 
@@ -622,7 +622,7 @@ export const VideoWatch: React.FC = () => {
 
                   <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" onClick={handleShare}>
                     <Share2 className="w-5 h-5" />
-                    <span className="text-sm">Share</span>
+                    <span className="text-sm font-normal">Share</span>
                   </Button>
                 </div>
 
