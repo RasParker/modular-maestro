@@ -1757,12 +1757,12 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 overflow-hidden">
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
                                   <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-1 h-auto py-2 pl-0 pr-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2001,12 +2001,12 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 overflow-hidden">
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
                                   <div className="flex items-center gap-6 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-2 h-auto py-2 pl-0 pr-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2248,12 +2248,12 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 overflow-hidden">
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
                                   <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-1 h-auto py-2 pl-0 pr-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2492,12 +2492,12 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 overflow-hidden">
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
                                   <div className="flex items-center gap-6 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-2 h-auto py-2 pl-0 pr-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
