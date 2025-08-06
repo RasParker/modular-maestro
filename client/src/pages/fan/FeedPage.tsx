@@ -751,7 +751,7 @@ export const FeedPage: React.FC = () => {
 
                   {/* Bottom section - VideoWatch Up Next style */}
                   <div className="p-3">
-                    <div className="flex gap-3">
+                    <div className="flex items-start gap-3">
                       <Avatar className="h-9 w-9 flex-shrink-0">
                         <AvatarImage 
                           src={post.creator.avatar ? (post.creator.avatar.startsWith('/uploads/') ? post.creator.avatar : `/uploads/${post.creator.avatar}`) : undefined} 
@@ -772,8 +772,6 @@ export const FeedPage: React.FC = () => {
                             <span>{getTimeAgo(post.posted)}</span>
                           </div>
                         </div>
-                        
-                        
                       </div>
                     </div>
 
