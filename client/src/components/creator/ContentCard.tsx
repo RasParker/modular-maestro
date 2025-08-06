@@ -97,12 +97,12 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
   return (
     <Card className="bg-gradient-card border-border/50 hover:border-primary/20 transition-all duration-200">
-      <CardContent className="p-4">
-        <div className="flex gap-4">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex gap-3 sm:gap-4">
           {/* Media Preview - Left side */}
           <div className="flex-shrink-0">
             <div 
-              className="w-40 h-24 overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
+              className="w-24 h-16 sm:w-40 sm:h-24 overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewContent && onViewContent({
@@ -154,14 +154,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
 
               
 
-              {/* Duration overlay for videos - Only show for Published content */}
-              {type === 'Video' && status === 'Published' && (
-                <div className="absolute bottom-1 right-1">
-                  <div className="px-1 py-0.5 bg-black/80 rounded text-white text-xs font-medium">
-                    {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
-                  </div>
-                </div>
-              )}
+              
             </div>
           </div>
 
@@ -251,27 +244,27 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
 
             {/* Stats and Actions */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
               {/* Stats */}
               {status === 'Published' && (
-                <div className="flex items-center gap-4 text-muted-foreground min-w-0 flex-1">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground">
-                    <Eye className="w-5 h-5" />
-                    <span className="text-sm">{views}</span>
+                <div className="flex items-center gap-2 sm:gap-4 text-muted-foreground min-w-0 flex-1">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-sm">{views}</span>
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground">
-                    <Heart className="w-5 h-5" />
-                    <span className="text-sm">{likes}</span>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-sm">{likes}</span>
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground">
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="text-sm">{comments}</span>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
+                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-sm">{comments}</span>
                   </Button>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -279,10 +272,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                     e.stopPropagation();
                     onEdit(id);
                   }}
-                  className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground hover:text-foreground"
                 >
-                  <Edit3 className="w-4 h-4" />
-                  <span className="text-sm">Edit</span>
+                  <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">Edit</span>
                 </Button>
 
                 <Button
@@ -292,10 +285,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                     e.stopPropagation();
                     onDelete(id);
                   }}
-                  className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
+                  className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-red-500 hover:text-red-600"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="text-sm">Delete</span>
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">Delete</span>
                 </Button>
               </div>
             </div>

@@ -291,7 +291,7 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="published" className="space-y-4">
             {publishedContent.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 {publishedContent.map((item) => (
                   <ContentCard
                     key={item.id}
@@ -305,11 +305,11 @@ export const ManageContent: React.FC = () => {
               </div>
             ) : (
               <Card className="bg-gradient-card border-border/50">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">No published content</h3>
-                  <p className="text-muted-foreground text-center mb-4">Publish your first post to get started</p>
-                  <Button asChild>
+                <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+                  <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium text-foreground mb-2 text-center">No published content</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground text-center mb-4 max-w-sm">Publish your first post to get started</p>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link to="/creator/upload">Create Content</Link>
                   </Button>
                 </CardContent>
@@ -319,7 +319,7 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="scheduled" className="space-y-4">
             {scheduledContent.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 {scheduledContent.map((item) => (
                   <ContentCard
                     key={item.id}
@@ -333,11 +333,11 @@ export const ManageContent: React.FC = () => {
               </div>
             ) : (
               <Card className="bg-gradient-card border-border/50">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">No scheduled content</h3>
-                  <p className="text-muted-foreground text-center mb-4">Schedule posts to publish them automatically</p>
-                  <Button asChild>
+                <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+                  <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium text-foreground mb-2 text-center">No scheduled content</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground text-center mb-4 max-w-sm">Schedule posts to publish them automatically</p>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link to="/creator/upload">Create Content</Link>
                   </Button>
                 </CardContent>
@@ -347,7 +347,7 @@ export const ManageContent: React.FC = () => {
 
           <TabsContent value="drafts" className="space-y-4">
             {draftContent.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 {draftContent.map((item) => (
                   <ContentCard
                     key={item.id}
@@ -361,11 +361,11 @@ export const ManageContent: React.FC = () => {
               </div>
             ) : (
               <Card className="bg-gradient-card border-border/50">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">No draft content</h3>
-                  <p className="text-muted-foreground text-center mb-4">Save drafts to work on them later</p>
-                  <Button asChild>
+                <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+                  <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium text-foreground mb-2 text-center">No draft content</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground text-center mb-4 max-w-sm">Save drafts to work on them later</p>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link to="/creator/upload">Create Content</Link>
                   </Button>
                 </CardContent>
