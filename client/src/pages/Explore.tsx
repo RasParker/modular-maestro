@@ -136,18 +136,13 @@ export const Explore: React.FC = () => {
           const activeCreators = creators.filter((creator: any) => creator.status === 'active');
           
           const transformedCreators = await Promise.all(activeCreators.map(async (creator: any) => {
-            // Check localStorage for profile customizations for this specific creator
-            const profilePhotoUrl = localStorage.getItem('profilePhotoUrl');
-            const coverPhotoUrl = localStorage.getItem('coverPhotoUrl');
-            const displayName = localStorage.getItem('displayName');
-            const bio = localStorage.getItem('bio');
-
             // Fetch subscription tiers from API
             let tiers = [];
             try {
               const tiersResponse = await fetch(`/api/creators/${creator.id}/tiers`);
               if (tiersResponse.ok) {
                 const tiersData = await tiersResponse.json();
+                console.log(`Fetched tiers for creator ${creator.id} (${creator.username}):`, tiersData);
                 tiers = tiersData.map((tier: any) => ({
                   id: tier.id,
                   name: tier.name,
@@ -156,6 +151,7 @@ export const Explore: React.FC = () => {
                   benefits: tier.benefits || [],
                   creator_id: tier.creator_id
                 }));
+                console.log(`Transformed tiers for creator ${creator.id}:`, tiers);
               }
             } catch (error) {
               console.error("Error fetching subscription tiers:", error);
@@ -165,10 +161,10 @@ export const Explore: React.FC = () => {
             return {
               id: `real_${creator.id}`,
               username: creator.username,
-              display_name: displayName || creator.display_name || creator.username,
-              avatar: profilePhotoUrl || creator.avatar || null,
-              cover: coverPhotoUrl || creator.cover_image || null,
-              bio: bio || creator.bio || 'Creator profile - join for exclusive content!',
+              display_name: creator.display_name || creator.username,
+              avatar: creator.avatar || null,
+              cover: creator.cover_image || null,
+              bio: creator.bio || 'Creator profile - join for exclusive content!',
               category: 'General',
               subscribers: creator.total_subscribers || 0,
               verified: creator.verified || false,
@@ -199,6 +195,10 @@ export const Explore: React.FC = () => {
     try {
       // Find the creator
       const creator = allCreators.find(c => c.display_name === creatorName);
+      console.log(`Looking for creator with display_name: "${creatorName}"`);
+      console.log(`Found creator:`, creator);
+      console.log(`Creator tiers:`, creator?.tiers);
+      
       if (!creator) {
         toast({
           title: "Error",
@@ -222,6 +222,7 @@ export const Explore: React.FC = () => {
       }
 
       // Always open tier selection modal for consistent experience
+      console.log(`Setting selectedCreator:`, creator);
       setSelectedCreator(creator);
       setTierSelectionModalOpen(true);
     } catch (error) {
@@ -441,6 +442,11 @@ export const Explore: React.FC = () => {
             
             <div className="flex-1 overflow-y-auto pr-2 -mr-2">
               <div className="space-y-3">
+                {(() => {
+                  console.log('Tier Selection Modal - selectedCreator:', selectedCreator);
+                  console.log('Tier Selection Modal - selectedCreator.tiers:', selectedCreator.tiers);
+                  return null;
+                })()}
                 {selectedCreator.tiers && selectedCreator.tiers.length > 0 ? (
                   selectedCreator.tiers.map((tier: any) => {
                     // Handle benefits properly - they might be a JSON string
