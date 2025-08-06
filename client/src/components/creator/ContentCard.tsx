@@ -244,27 +244,29 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             </div>
 
             {/* Stats and Actions */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <div className="flex items-center justify-between gap-2">
               {/* Stats */}
-              {status === 'Published' && (
-                <div className="flex items-center gap-2 sm:gap-4 text-muted-foreground min-w-0 flex-1">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
-                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-xs sm:text-sm">{views}</span>
+              {status === 'Published' ? (
+                <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground min-w-0 flex-1">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-1 px-1 sm:px-2 text-muted-foreground">
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs">{views}</span>
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-xs sm:text-sm">{likes}</span>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-1 px-1 sm:px-2 text-muted-foreground">
+                    <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs">{likes}</span>
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground">
-                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-xs sm:text-sm">{comments}</span>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 h-auto py-1 px-1 sm:px-2 text-muted-foreground">
+                    <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs">{comments}</span>
                   </Button>
                 </div>
+              ) : (
+                <div className="flex-1"></div>
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -272,7 +274,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                     e.stopPropagation();
                     onEdit(id);
                   }}
-                  className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-1 h-auto py-1 px-1 sm:px-2 text-muted-foreground hover:text-foreground"
                 >
                   <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-xs sm:text-sm">Edit</span>
@@ -285,7 +287,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                     e.stopPropagation();
                     onDelete(id);
                   }}
-                  className="flex items-center gap-1 sm:gap-2 h-auto py-1 px-2 sm:py-2 sm:px-3 text-red-500 hover:text-red-600"
+                  className="flex items-center gap-1 h-auto py-1 px-1 sm:px-2 text-red-500 hover:text-red-600"
                 >
                   <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-xs sm:text-sm">Delete</span>
