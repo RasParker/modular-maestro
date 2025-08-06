@@ -134,6 +134,46 @@ export const ManageSubscriptions: React.FC = () => {
     }
   };
 
+  const handleToggleAutoRenew = async (subscriptionId: string, autoRenew: boolean) => {
+    const numericId = parseInt(subscriptionId);
+    
+    try {
+      const response = await fetch(`/api/subscriptions/${numericId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          auto_renew: autoRenew
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update auto-renew setting');
+      }
+
+      // Update local state only after successful API call
+      setSubscriptions(subscriptions.map(sub => 
+        sub.id === numericId 
+          ? { ...sub, auto_renew: autoRenew }
+          : sub
+      ));
+
+      toast({
+        title: autoRenew ? "Auto-renew enabled" : "Auto-renew disabled",
+        description: autoRenew 
+          ? "Your subscription will automatically renew." 
+          : "Your subscription will not automatically renew.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update auto-renew setting. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const totalMonthlySpend = subscriptions
     .filter(sub => sub.status === 'active')
     .reduce((sum, sub) => sum + parseFloat(sub.tier.price.toString()), 0);
@@ -271,6 +311,7 @@ export const ManageSubscriptions: React.FC = () => {
                       subscription={transformedSubscription}
                       onPauseResume={(id) => handlePauseResume(parseInt(id))}
                       onCancel={(id) => handleCancel(parseInt(id))}
+                      onToggleAutoRenew={handleToggleAutoRenew}
                     />
                   );
                 })

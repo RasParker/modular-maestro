@@ -423,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { creator_id, title, content, media_type, media_urls, tier, status, scheduled_for } = req.body;
 
-      console.log('Creating post with data:', { creator_id, title, content, media_type, media_urls, tier, status });
+      console.log('Creating post with data:', { creator_id, content, media_type, media_urls, tier, status });
 
       // Validate required fields
       if (!creator_id) {
@@ -927,7 +927,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tier_id: parseInt(req.body.tier_id),
         started_at: req.body.started_at ? new Date(req.body.started_at) : new Date(),
         next_billing_date: req.body.next_billing_date ? new Date(req.body.next_billing_date) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        ends_at: req.body.ends_at ? new Date(req.body.ends_at) : null
+        ends_at: req.body.ends_at ? new Date(req.body.ends_at) : null,
+        auto_renew: req.body.auto_renew !== undefined ? req.body.auto_renew : true // Default to true
       };
 
       // Remove undefined values and handle null properly
@@ -993,17 +994,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/subscriptions/:subscriptionId", async (req, res) => {
+  // Update subscription status (pause/resume) or auto-renew setting
+  app.put("/api/subscriptions/:id", async (req, res) => {
     try {
-      const subscriptionId = parseInt(req.params.subscriptionId);
-      const subscription = await storage.updateSubscription(subscriptionId, req.body);
+      const subscriptionId = parseInt(req.params.id);
+      const { status, auto_renew } = req.body;
 
-      if (!subscription) {
-        return res.status(404).json({ error: "Subscription not found" });
+      if (!status && auto_renew === undefined) {
+        return res.status(400).json({ error: "Status or auto_renew is required" });
       }
 
-      res.json(subscription);
+      const updateData: any = {};
+      if (status) updateData.status = status;
+      if (auto_renew !== undefined) updateData.auto_renew = auto_renew;
+
+      await db
+        .update(subscriptionsTable)
+        .set(updateData)
+        .where(eq(subscriptionsTable.id, subscriptionId));
+
+      res.json({ success: true, message: "Subscription updated successfully" });
     } catch (error) {
+      console.error('Error updating subscription:', error);
       res.status(500).json({ error: "Failed to update subscription" });
     }
   });

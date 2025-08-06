@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Pause, Play, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Subscription {
   id: string;
@@ -26,12 +28,14 @@ interface SubscriptionCardProps {
   subscription: Subscription;
   onPauseResume: (id: string) => void;
   onCancel: (id: string) => void;
+  onToggleAutoRenew?: (id: string, autoRenew: boolean) => void;
 }
 
 export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   subscription,
   onPauseResume,
-  onCancel
+  onCancel,
+  onToggleAutoRenew
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -78,10 +82,15 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
 
           <div className="flex flex-row items-center justify-between gap-3 mt-4 pt-4 border-t border-border/50">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Auto-renew:</span>
-              <Badge variant={subscription.auto_renew ? 'success' : 'danger'} className="text-xs">
-                {subscription.auto_renew ? 'Enabled' : 'Disabled'}
-              </Badge>
+              <Label htmlFor={`auto-renew-${subscription.id}`} className="text-sm text-muted-foreground">
+                Auto-renew
+              </Label>
+              <Switch
+                id={`auto-renew-${subscription.id}`}
+                checked={subscription.auto_renew}
+                onCheckedChange={(checked) => onToggleAutoRenew?.(subscription.id, checked)}
+                disabled={subscription.status !== 'active'}
+              />
             </div>
 
             <div className="flex gap-2">
@@ -169,11 +178,16 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                   <span className="text-sm text-muted-foreground">Joined</span>
                   <span className="text-sm font-medium">{new Date(subscription.joined).toLocaleDateString()}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Auto-renew</span>
-                  <Badge variant={subscription.auto_renew ? 'default' : 'destructive'} className="text-xs">
-                    {subscription.auto_renew ? 'Enabled' : 'Disabled'}
-                  </Badge>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor={`auto-renew-${subscription.id}`} className="text-xs sm:text-sm text-muted-foreground">
+                    Auto-renew
+                  </Label>
+                  <Switch
+                    id={`auto-renew-${subscription.id}`}
+                    checked={subscription.auto_renew}
+                    onCheckedChange={(checked) => onToggleAutoRenew?.(subscription.id, checked)}
+                    disabled={subscription.status !== 'active'}
+                  />
                 </div>
               </div>
 
