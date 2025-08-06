@@ -2002,7 +2002,7 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center justify-between mt-2 px-2">
                                   <div className="flex items-center gap-6">
                                     <Button
                                       variant="ghost"
