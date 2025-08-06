@@ -1762,7 +1762,7 @@ export const CreatorProfile: React.FC = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-1 h-auto py-2 pl-0 pr-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2006,7 +2006,7 @@ export const CreatorProfile: React.FC = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-2 h-auto py-2 pl-0 pr-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2253,7 +2253,7 @@ export const CreatorProfile: React.FC = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-1 h-auto py-2 pl-0 pr-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
@@ -2497,7 +2497,7 @@ export const CreatorProfile: React.FC = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-2 h-auto py-2 pl-0 pr-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
