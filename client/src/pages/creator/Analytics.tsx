@@ -178,7 +178,7 @@ export const Analytics: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Monthly Earnings</p>
-                  <p className="text-2xl font-bold text-foreground">${analytics.monthlyEarnings}</p>
+                  <p className="text-2xl font-bold text-foreground">GHS {parseFloat(analytics.monthlyEarnings || 0).toFixed(2)}</p>
                   <p className="text-xs text-success">+{analytics.growthRate}% vs last month</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-success" />

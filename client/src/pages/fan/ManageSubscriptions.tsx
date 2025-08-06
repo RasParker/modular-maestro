@@ -434,8 +434,9 @@ export const ManageSubscriptions: React.FC = () => {
                               </p>
                               <div className="flex items-center gap-2 mt-2">
                                 <Badge variant={
+                                  subscription.status === 'active' ? 'success' :
                                   subscription.status === 'cancelled' || subscription.status === 'expired'
-                                    ? 'danger' 
+                                    ? 'destructive'r' 
                                     : subscription.status === 'active'
                                     ? 'success'
                                     : 'secondary'

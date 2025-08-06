@@ -183,7 +183,7 @@ export const FanDashboard: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monthly Spending</p>
                       <p className="text-2xl font-bold text-foreground">
-                        GHS {subscriptions.filter(sub => sub.status === 'active').reduce((sum, sub) => sum + sub.tier.price, 0)}
+                        GHS {parseFloat(subscriptions.filter(sub => sub.status === 'active').reduce((sum, sub) => sum + sub.tier.price, 0).toFixed(2))}
                       </p>
                     </div>
                     <CreditCard className="h-8 w-8 text-accent" />
@@ -262,8 +262,11 @@ export const FanDashboard: React.FC = () => {
                                 </p>
                               </div>
                               <div className="flex flex-col sm:flex-row items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {subscription.status}
+                                <Badge variant={
+                                  subscription.status === 'active' ? 'success' : 
+                                  subscription.status === 'paused' ? 'secondary' : 'destructive'
+                                } className="text-xs">
+                                  {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                                 </Badge>
                                 <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
                                   <Link to={`/creator/${subscription.creator.username}`}>
