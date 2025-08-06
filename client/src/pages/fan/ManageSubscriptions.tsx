@@ -436,9 +436,7 @@ export const ManageSubscriptions: React.FC = () => {
                                 <Badge variant={
                                   subscription.status === 'active' ? 'success' :
                                   subscription.status === 'cancelled' || subscription.status === 'expired'
-                                    ? 'destructive'r' 
-                                    : subscription.status === 'active'
-                                    ? 'success'
+                                    ? 'destructive' 
                                     : 'secondary'
                                 } className="text-xs">
                                   {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}

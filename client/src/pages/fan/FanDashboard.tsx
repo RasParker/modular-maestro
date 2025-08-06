@@ -106,6 +106,22 @@ export const FanDashboard: React.FC = () => {
     fetchNewContentCount();
   }, [user]);
 
+  const fetchNewContentCount = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(`/api/fan/${user.id}/new-content-count`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch new content count');
+      }
+      const data = await response.json();
+      setNewContentCount(data.count || 0);
+    } catch (err) {
+      console.error('Error fetching new content count:', err);
+      setNewContentCount(0);
+    }
+  };
+
   useEffect(() => {
     if (user?.id) {
       const interval = setInterval(() => {
@@ -183,7 +199,7 @@ export const FanDashboard: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Monthly Spending</p>
                       <p className="text-2xl font-bold text-foreground">
-                        GHS {parseFloat(subscriptions.filter(sub => sub.status === 'active').reduce((sum, sub) => sum + sub.tier.price, 0).toFixed(2))}
+                        GHS {subscriptions.filter(sub => sub.status === 'active').reduce((sum, sub) => sum + parseFloat(sub.tier.price), 0).toFixed(2)}
                       </p>
                     </div>
                     <CreditCard className="h-8 w-8 text-accent" />
