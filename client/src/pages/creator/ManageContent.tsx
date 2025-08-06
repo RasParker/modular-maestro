@@ -62,7 +62,7 @@ export const ManageContent: React.FC = () => {
 
       try {
         setLoading(true);
-        const response = await fetch(`/api/posts?status=all&creatorId=${user.id}`);
+        const response = await fetch(`/api/creator/${user.id}/content`);
         if (response.ok) {
           const allPosts = await response.json();
 
