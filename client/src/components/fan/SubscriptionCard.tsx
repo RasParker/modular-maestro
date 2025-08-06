@@ -60,7 +60,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   <Badge variant="outline" className="text-xs">{subscription.creator.category}</Badge>
                   <Badge variant="outline" className="text-xs">{subscription.tier}</Badge>
-                  <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'paused' ? 'danger' : 'secondary'} className="text-xs">
+                  <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'paused' ? 'destructive' : 'secondary'} className="text-xs">
                     {subscription.status}
                   </Badge>
                 </div>

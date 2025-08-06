@@ -180,7 +180,8 @@ export const ManageSubscriptions: React.FC = () => {
 
   // Calculate derived data
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
-  const subscriptionHistory = subscriptions.filter(sub => sub.status !== 'active'); // All non-active subscriptions (cancelled, expired, etc.)
+  const inactiveSubscriptions = subscriptions.filter(sub => sub.status === 'paused');
+  const subscriptionHistory = subscriptions.filter(sub => !['active', 'paused'].includes(sub.status)); // Cancelled, expired, etc.
 
 
   return (
@@ -255,6 +256,12 @@ export const ManageSubscriptions: React.FC = () => {
                   {activeSubscriptions.length}
                 </span>
               </TabsTrigger>
+              <TabsTrigger value="inactive">
+                Inactive Subscriptions
+                <span className="ml-2 text-xs opacity-70">
+                  {inactiveSubscriptions.length}
+                </span>
+              </TabsTrigger>
               <TabsTrigger value="history">
                 Payment History
                 <span className="ml-2 text-xs opacity-70">
@@ -288,6 +295,59 @@ export const ManageSubscriptions: React.FC = () => {
                 </div>
               ) : (
                 activeSubscriptions.map((subscription) => {
+                  // Transform the subscription data to match SubscriptionCard expectations
+                  const transformedSubscription = {
+                    id: subscription.id.toString(),
+                    creator: {
+                      username: subscription.creator.username,
+                      display_name: subscription.creator.display_name || subscription.creator.username,
+                      avatar: subscription.creator.avatar || '',
+                      category: 'General' // Default category since it's not in our API data
+                    },
+                    tier: subscription.tier.name,
+                    price: parseFloat(subscription.tier.price.toString()),
+                    status: subscription.status as 'active' | 'paused',
+                    next_billing: new Date(subscription.current_period_end).toLocaleDateString(),
+                    joined: new Date(subscription.created_at).toLocaleDateString(),
+                    auto_renew: subscription.auto_renew
+                  };
+
+                  return (
+                    <SubscriptionCard
+                      key={subscription.id}
+                      subscription={transformedSubscription}
+                      onPauseResume={(id) => handlePauseResume(parseInt(id))}
+                      onCancel={(id) => handleCancel(parseInt(id))}
+                      onToggleAutoRenew={handleToggleAutoRenew}
+                    />
+                  );
+                })
+              )}
+            </>
+          )}
+
+          {activeTab === 'inactive' && (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Inactive Subscriptions ({loading ? '...' : inactiveSubscriptions.length})
+                </h2>
+              </div>
+
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : error ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Error loading subscriptions: {error}</p>
+                </div>
+              ) : inactiveSubscriptions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No inactive subscriptions.</p>
+                </div>
+              ) : (
+                inactiveSubscriptions.map((subscription) => {
                   // Transform the subscription data to match SubscriptionCard expectations
                   const transformedSubscription = {
                     id: subscription.id.toString(),
