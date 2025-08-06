@@ -1757,18 +1757,19 @@ export const CreatorProfile: React.FC = () => {
                                 </div>
 
                                 {/* Action Buttons Row - VideoWatch Style */}
-                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                {/* Action Buttons Row - Aligned with Avatar */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden">
                                   <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? "text-red-500" : "text-muted-foreground"}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleLike(post.id);
                                       }}
                                     >
-                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? "fill-current" : ""}`} />
                                       <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
                                     </Button>
 
@@ -1830,7 +1831,6 @@ export const CreatorProfile: React.FC = () => {
                                   )}
                                 </div>
 
-                            </div>
                           </div>
                         </div>
                       </div>
