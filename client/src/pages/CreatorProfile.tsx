@@ -62,23 +62,23 @@ const MOCK_CREATORS = {
     subscribers: 2840,
     verified: true,
     tiers: [
-      {
+      { 
         id: '1',
-        name: 'Supporter',
+        name: 'Supporter', 
         price: 5,
         description: 'Access to basic content and community posts',
         features: ['Weekly art posts', 'Community access', 'Behind-the-scenes content']
       },
-      {
+      { 
         id: '2',
-        name: 'Fan',
+        name: 'Fan', 
         price: 15,
         description: 'Everything in Supporter plus exclusive tutorials',
         features: ['Everything in Supporter', 'Monthly tutorials', 'Process videos', 'High-res downloads']
       },
-      {
+      { 
         id: '3',
-        name: 'Superfan',
+        name: 'Superfan', 
         price: 25,
         description: 'Ultimate access with personal interaction',
         features: ['Everything in Fan', 'Direct messaging', '1-on-1 feedback', 'Custom artwork requests']
@@ -116,7 +116,7 @@ const MOCK_CREATORS = {
         mediaType: 'video',
         tier: 'Superfan',
         createdAt: '2024-02-18T15:20:00',
-        thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44443?w=400&h=300&fit=crop',
+        thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
         likes: 18,
         comments: [
           {
@@ -269,7 +269,7 @@ export const CreatorProfile: React.FC = () => {
           const parsedTiers = JSON.parse(savedTiers);
           if (Array.isArray(parsedTiers)) {
             // Check if these are mock tiers and clear them
-            const isMockData = parsedTiers.some(tier =>
+            const isMockData = parsedTiers.some(tier => 
               tier.name === 'Supporter' || tier.name === 'Fan' || tier.name === 'Superfan'
             );
 
@@ -404,8 +404,8 @@ export const CreatorProfile: React.FC = () => {
           console.log('Subscription API response:', subscription);
 
           // Only set subscription if it exists, is active, and is for this creator
-          if (subscription &&
-              subscription.status === 'active' &&
+          if (subscription && 
+              subscription.status === 'active' && 
               subscription.creator_id === creator.id) {
             setUserSubscription(subscription);
             console.log('✓ User ${user.id} has active subscription to creator ${creator.id}:', subscription);
@@ -682,7 +682,7 @@ export const CreatorProfile: React.FC = () => {
 
     // If user has no active subscription to this creator, no access to premium content
     if (!userSubscription || userSubscription.status !== 'active') {
-      console.log('Access denied: No active subscription', {
+      console.log('Access denied: No active subscription', { 
         userSubscription: userSubscription,
         hasSubscription: !!userSubscription,
         subscriptionStatus: userSubscription?.status
@@ -692,9 +692,9 @@ export const CreatorProfile: React.FC = () => {
 
     // Verify subscription is to this specific creator
     if (userSubscription.creator_id !== creator?.id) {
-      console.log('Access denied: Subscription not for this creator', {
-        subscriptionCreatorId: userSubscription.creator_id,
-        currentCreatorId: creator?.id
+      console.log('Access denied: Subscription not for this creator', { 
+        subscriptionCreatorId: userSubscription.creator_id, 
+        currentCreatorId: creator?.id 
       });
       return false;
     }
@@ -714,10 +714,10 @@ export const CreatorProfile: React.FC = () => {
     const postTierLevel = tierHierarchy[postTier.toLowerCase()] || 1; // Default to tier 1 for premium content
 
     const hasAccess = userTierLevel >= postTierLevel;
-    console.log('Tier access check:', {
-      postTier,
-      userTierLevel,
-      postTierLevel,
+    console.log('Tier access check:', { 
+      postTier, 
+      userTierLevel, 
+      postTierLevel, 
       userTierName: userSubscription.tier_name,
       hasAccess,
       creatorId: creator?.id,
@@ -869,8 +869,8 @@ export const CreatorProfile: React.FC = () => {
   };
 
   const handleCommentCountChange = (postId: string | number, newCount: number) => {
-    setUserPosts(prev => prev.map(post =>
-      post.id.toString() === postId.toString()
+    setUserPosts(prev => prev.map(post => 
+      post.id.toString() === postId.toString() 
         ? { ...post, comments_count: newCount }
         : post
     ));
@@ -1128,8 +1128,8 @@ export const CreatorProfile: React.FC = () => {
 
       if (response.ok) {
         const updatedPost = await response.json();
-        setUserPosts(prev => prev.map(post =>
-          post.id === editingPost.id
+        setUserPosts(prev => prev.map(post => 
+          post.id === editingPost.id 
             ? { ...post, title: editCaption, content: editCaption }
             : post
         ));
@@ -1222,8 +1222,8 @@ export const CreatorProfile: React.FC = () => {
       <div className="relative">
         <div className="h-48 md:h-64 overflow-hidden relative">
           {creator.cover ? (
-            <img
-              src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`}
+            <img 
+              src={creator.cover.startsWith('/uploads/') ? creator.cover : `/uploads/${creator.cover}`} 
               alt={creator.display_name}
               className="w-full h-full object-cover"
             />
@@ -1319,7 +1319,7 @@ export const CreatorProfile: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-              <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">@{creator.username}</p>
               </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -1361,7 +1361,7 @@ export const CreatorProfile: React.FC = () => {
 
               return (
                 <div>
-                  <BioDisplay
+                  <BioDisplay 
                     bio={bioText}
                     context="profile"
                     className="text-muted-foreground leading-tight text-sm line-clamp-2"
@@ -1375,9 +1375,9 @@ export const CreatorProfile: React.FC = () => {
         {/* Action Buttons - Both Desktop and Mobile */}
         {isOwnProfile ? (
           <div className="flex items-center gap-2 mt-4">
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Edit Profile"
               asChild
@@ -1386,9 +1386,9 @@ export const CreatorProfile: React.FC = () => {
                 <Settings className="w-4 h-4" />
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Create Post"
               asChild
@@ -1414,9 +1414,9 @@ export const CreatorProfile: React.FC = () => {
           </div>
         ) : (
           <div className="flex items-center gap-2 mt-4">
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Start conversation"
               onClick={handleChatClick}
@@ -1424,9 +1424,9 @@ export const CreatorProfile: React.FC = () => {
             >
               <MessageSquare className="w-4 h-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Like creator"
               disabled={likingCreator || isOwnProfile || !user || user.role !== 'fan'}
@@ -1434,9 +1434,9 @@ export const CreatorProfile: React.FC = () => {
             >
               <Heart className={`w-4 h-4 ${isCreatorLiked ? 'fill-red-500 text-red-500' : ''}`} />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Add to favorites"
               disabled={favoritingCreator || isOwnProfile || !user || user.role !== 'fan'}
@@ -1444,9 +1444,9 @@ export const CreatorProfile: React.FC = () => {
             >
               <Star className={`w-4 h-4 ${isCreatorFavorited ? 'fill-yellow-500 text-yellow-500' : ''}`} />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               className="h-10 w-10 p-0"
               title="Share profile"
               onClick={() => {
@@ -1469,7 +1469,7 @@ export const CreatorProfile: React.FC = () => {
           <div className="bg-gradient-card border border-border/50 rounded-lg shadow-sm overflow-hidden">
             {!isSubscriptionTiersExpanded ? (
               /* Compact View */
-              <div
+              <div 
                 className="p-4 md:p-6 cursor-pointer hover:bg-muted/30 transition-colors"
                 onClick={() => setIsSubscriptionTiersExpanded(true)}
               >
@@ -1495,8 +1495,8 @@ export const CreatorProfile: React.FC = () => {
                   </div>
                   <div className="flex-shrink-0">
                     {isOwnProfile ? (
-                      <Button
-                        size="sm"
+                      <Button 
+                        size="sm" 
                         variant="outline"
                         className="px-3 py-2 text-sm font-medium rounded-full md:px-6 md:py-3"
                         onClick={(e) => {
@@ -1507,8 +1507,8 @@ export const CreatorProfile: React.FC = () => {
                         MANAGE
                       </Button>
                     ) : (
-                      <Button
-                        size="sm"
+                      <Button 
+                        size="sm" 
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 text-sm font-medium rounded-full md:px-6 md:py-3"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1526,7 +1526,7 @@ export const CreatorProfile: React.FC = () => {
               <div className="p-4 md:p-6">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
                   <h3 className="text-base md:text-lg font-semibold">SUBSCRIPTION TIERS</h3>
-                  <button
+                  <button 
                     onClick={() => setIsSubscriptionTiersExpanded(false)}
                     className="p-1 hover:bg-muted/50 rounded-full transition-colors"
                   >
@@ -1536,8 +1536,8 @@ export const CreatorProfile: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-3">
                   {creator.tiers.map((tier: any, index: number) => (
-                    <div
-                      key={tier.id}
+                    <div 
+                      key={tier.id} 
                       className={`flex flex-col p-4 md:p-5 border border-border/30 rounded-lg hover:border-accent/50 transition-colors ${!isOwnProfile ? 'cursor-pointer hover:shadow-md' : ''}`}
                       onClick={!isOwnProfile ? (e) => {
                         e.stopPropagation();
@@ -1575,9 +1575,9 @@ export const CreatorProfile: React.FC = () => {
 
                 {isOwnProfile && (
                   <div className="mt-4 pt-4 border-t border-border/20">
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
                       className="w-full md:w-auto text-sm"
                       asChild
                     >
@@ -1625,7 +1625,7 @@ export const CreatorProfile: React.FC = () => {
                   }}>
                     {getFilteredPosts().map((post) => (
                       <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
-                        <div
+                        <div 
                           className="relative w-full aspect-video bg-black cursor-pointer"
                           onClick={() => handleContentClick(post)}
                           role="button"
@@ -1651,13 +1651,13 @@ export const CreatorProfile: React.FC = () => {
                                       </svg>
                                     </div>
                                     <p className="text-xs text-muted-foreground mb-2">
-                                      {post.tier === 'supporter' ? 'Supporter' :
-                                       post.tier === 'fan' ? 'Fan' :
-                                       post.tier === 'premium' ? 'Premium' :
+                                      {post.tier === 'supporter' ? 'Supporter' : 
+                                       post.tier === 'fan' ? 'Fan' : 
+                                       post.tier === 'premium' ? 'Premium' : 
                                        post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
                                     </p>
-                                    <Button
-                                      size="sm"
+                                    <Button 
+                                      size="sm" 
                                       className="bg-accent hover:bg-accent/90 text-black text-xs px-2 py-1"
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -1682,14 +1682,14 @@ export const CreatorProfile: React.FC = () => {
                               const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
 
                               return post.media_type === 'video' ? (
-                                <video
+                                <video 
                                   src={fullUrl}
                                   className="w-full h-full object-cover"
                                   muted
                                   preload="metadata"
                                 />
                               ) : (
-                                <img
+                                <img 
                                   src={fullUrl}
                                   alt={post.title}
                                   className="w-full h-full object-cover"
@@ -1702,7 +1702,7 @@ export const CreatorProfile: React.FC = () => {
                               );
                             } else {
                               return (
-                                <img
+                                <img 
                                   src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
                                        post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
                                        post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
@@ -1772,9 +1772,9 @@ export const CreatorProfile: React.FC = () => {
                                     <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
                                   </Button>
 
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
                                     className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1785,10 +1785,10 @@ export const CreatorProfile: React.FC = () => {
                                     <span className="text-sm">{post.comments_count || 0}</span>
                                   </Button>
 
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleShare(post.id);
@@ -1831,16 +1831,6 @@ export const CreatorProfile: React.FC = () => {
                               </div>
                             </div>
                           </div>
-
-                          {/* Comments Section - Mobile */}
-                          {showComments[post.id] && (
-                            <div className="mt-4 pt-3 border-t border-border/20">
-                              <CommentSection
-                                postId={post.id}
-                                onCommentCountChange={handleCommentCountChange}
-                              />
-                            </div>
-                          )}
                         </div>
                       </div>
                     ))}
@@ -1854,7 +1844,7 @@ export const CreatorProfile: React.FC = () => {
                       <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
                         <CardContent className="p-4">
                           {/* Media Content - 16:9 aspect ratio */}
-                          <div
+                          <div 
                             className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
                             onClick={() => handleContentClick(post)}
                             role="button"
@@ -1880,16 +1870,16 @@ export const CreatorProfile: React.FC = () => {
                                         </svg>
                                       </div>
                                       <h3 className="text-base font-medium text-foreground mb-2">
-                                        {post.tier === 'supporter' ? 'Supporter' :
-                                         post.tier === 'fan' ? 'Fan' :
-                                         post.tier === 'premium' ? 'Premium' :
+                                        {post.tier === 'supporter' ? 'Supporter' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
                                          post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
                                       </h3>
                                       <p className="text-sm text-muted-foreground mb-3">
                                         Subscribe to unlock
                                       </p>
-                                      <Button
-                                        size="sm"
+                                      <Button 
+                                        size="sm" 
                                         className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -1914,7 +1904,7 @@ export const CreatorProfile: React.FC = () => {
                                 const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
 
                                 return post.media_type === 'video' ? (
-                                  <video
+                                  <video 
                                     src={fullUrl}
                                     className="w-full h-full object-cover"
                                     muted
@@ -1931,7 +1921,7 @@ export const CreatorProfile: React.FC = () => {
                                     }}
                                   />
                                 ) : (
-                                  <img
+                                  <img 
                                     src={fullUrl}
                                     alt={post.title}
                                     className="w-full h-full object-cover"
@@ -1944,7 +1934,7 @@ export const CreatorProfile: React.FC = () => {
                                 );
                               } else {
                                 return (
-                                  <img
+                                  <img 
                                     src={`https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
                                     alt={`${creator.display_name}'s post`}
                                     className="w-full h-full object-cover"
@@ -1966,7 +1956,7 @@ export const CreatorProfile: React.FC = () => {
                             {/* Tier badge */}
                             <div className="absolute top-4 left-4">
                               <Badge variant={getTierColor(post.tier)} className="text-sm">
-                                {post.tier === 'public' ? 'Free' :
+                                {post.tier === 'public' ? 'Free' : 
                                  post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
                                  post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
                                  post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
@@ -2025,9 +2015,9 @@ export const CreatorProfile: React.FC = () => {
                                       <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
                                     </Button>
 
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
                                       className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -2038,10 +2028,10 @@ export const CreatorProfile: React.FC = () => {
                                       <span className="text-sm">{post.comments_count || 0}</span>
                                     </Button>
 
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleShare(post.id);
@@ -2085,17 +2075,983 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+                </>
+              ) : (
+                <Card className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="text-center py-4">
+                      <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No posts in this category</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {activeTab === 'all' 
+                          ? (isOwnProfile ? 'Start creating content to build your audience.' : `${creator.display_name} hasn't posted any content yet.`)
+                          : activeTab === 'public'
+                          ? (isOwnProfile ? 'No public posts yet. Create some free content to attract new fans.' : `${creator.display_name} hasn't posted any public content yet.`)
+                          : (isOwnProfile ? 'No subscription content yet. Create premium posts for your subscribers.' : `${creator.display_name} hasn't posted any subscription content yet.`)
+                        }
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+            )}
+              </div>
+            </TabsContent>
 
-                          {/* Comments Section - Desktop */}
-                          {showComments[post.id] && (
-                            <div className="mt-6 pt-4 border-t border-border/20">
-                              <CommentSection
-                                postId={post.id}
-                                initialComments={[]}
-                                onCommentCountChange={(count) => handleCommentCountChange(post.id, count)}
-                              />
+            <TabsContent value="subscription" className="space-y-6">
+              {/* Subscription Posts Content */}
+              <div>
+            {getFilteredPosts().length > 0 ? (
+              <>
+                {/* Mobile: Edge-to-edge borderless layout like fan feed */}
+                <div className="md:hidden">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}>
+                    {getFilteredPosts().map((post) => (
+                      <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
+                        <div 
+                          className="relative w-full aspect-video bg-black cursor-pointer"
+                          onClick={() => handleContentClick(post)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleContentClick(post);
+                            }
+                          }}
+                        >
+                          {(() => {
+                            const hasAccess = hasAccessToTier(post.tier);
+
+                            if (!hasAccess) {
+                              return (
+                                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                  <div className="text-center z-10 p-4">
+                                    <div className="mb-3">
+                                      <svg className="w-8 h-8 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-2">
+                                      {post.tier === 'supporter' ? 'Supporter' : 
+                                       post.tier === 'fan' ? 'Fan' : 
+                                       post.tier === 'premium' ? 'Premium' : 
+                                       post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                    </p>
+                                    <Button 
+                                      size="sm" 
+                                      className="bg-accent hover:bg-accent/90 text-black text-xs px-2 py-1"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!user) {
+                                          window.location.href = `/login?redirect=/creator/${username}`;
+                                        } else {
+                                          document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }}
+                                    >
+                                      {!user ? 'Login' : 'Subscribe'}
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                            const mediaUrl = mediaUrls[0];
+
+                            if (mediaUrl) {
+                              const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                              return post.media_type === 'video' ? (
+                                <video 
+                                  src={fullUrl}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  preload="metadata"
+                                />
+                              ) : (
+                                <img 
+                                  src={fullUrl}
+                                  alt={post.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full h-full object-cover opacity-50";
+                                  }}
+                                />
+                              );
+                            } else {
+                              return (
+                                <img 
+                                  src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
+                                       post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
+                                       post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
+                                       `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                  alt={`${creator.display_name}'s post`}
+                                  className="w-full h-full object-cover"
+                                />
+                              );
+                            }
+                          })()}
+
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
                             </div>
                           )}
+
+                          {/* Duration overlay for videos */}
+                          {post.media_type === 'video' && (
+                            <div className="absolute bottom-2 right-2">
+                              <div className="px-1 py-0.5 bg-black/60 rounded text-white text-xs">
+                                {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom section - VideoWatch Up Next style */}
+                        <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: YouTube-style 16:9 card layout */}
+                <div className="hidden md:block">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {getFilteredPosts().map((post) => (
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          {/* Media Content - 16:9 aspect ratio */}
+                          <div 
+                            className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
+                            onClick={() => handleContentClick(post)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleContentClick(post);
+                              }
+                            }}
+                          >
+                            {(() => {
+                              const hasAccess = hasAccessToTier(post.tier);
+
+                              if (!hasAccess) {
+                                return (
+                                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                    <div className="text-center z-10 p-4">
+                                      <div className="mb-3">
+                                        <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-foreground mb-2">
+                                        {post.tier === 'supporter' ? 'Supporter' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                      </h3>
+                                      <p className="text-sm text-muted-foreground mb-3">
+                                        Subscribe to unlock
+                                      </p>
+                                      <Button 
+                                        size="sm" 
+                                        className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (!user) {
+                                            window.location.href = `/login?redirect=/creator/${username}`;
+                                          } else {
+                                            document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                          }
+                                        }}
+                                      >
+                                        {!user ? 'Login' : 'Subscribe'}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                              const mediaUrl = mediaUrls[0];
+
+                              if (mediaUrl) {
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                                return post.media_type === 'video' ? (
+                                  <video 
+                                    src={fullUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                          <div class="text-white text-sm">Video unavailable</div>
+                                        </div>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <img 
+                                    src={fullUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full h-full object-cover opacity-50";
+                                    }}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <img 
+                                    src={`https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                    alt={`${creator.display_name}'s post`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                );
+                              }
+                            })()}
+
+
+                            {/* Duration overlay for videos */}
+                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
+                              <div className="absolute bottom-4 right-4">
+                                <div className="px-2 py-1 bg-black/80 rounded text-white text-sm font-medium">
+                                  {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tier badge */}
+                            <div className="absolute top-4 left-4">
+                              <Badge variant={getTierColor(post.tier)} className="text-sm">
+                                {post.tier === 'public' ? 'Free' : 
+                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                                 post.tier}
+                              </Badge>
+                            </div>
+
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-6 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-5 h-5" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-5 h-5" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+                </>
+              ) : (
+                <Card className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="text-center py-4">
+                      <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No subscription posts yet</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {isOwnProfile ? 'Create premium posts to engage your subscribers.' : `${creator.display_name} hasn't posted any subscription content yet.`}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="public" className="space-y-6">
+              {/* Public Posts Content */}
+              <div>
+            {getFilteredPosts().length > 0 ? (
+              <>
+                {/* Mobile: Edge-to-edge borderless layout like fan feed */}
+                <div className="md:hidden">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}>
+                    {getFilteredPosts().map((post) => (
+                      <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
+                        <div 
+                          className="relative w-full aspect-video bg-black cursor-pointer"
+                          onClick={() => handleContentClick(post)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleContentClick(post);
+                            }
+                          }}
+                        >
+                          {(() => {
+                            const hasAccess = hasAccessToTier(post.tier);
+
+                            if (!hasAccess) {
+                              return (
+                                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                  <div className="text-center z-10 p-4">
+                                    <div className="mb-3">
+                                      <svg className="w-8 h-8 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-2">
+                                      {post.tier === 'supporter' ? 'Supporter' : 
+                                       post.tier === 'fan' ? 'Fan' : 
+                                       post.tier === 'premium' ? 'Premium' : 
+                                       post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                    </p>
+                                    <Button 
+                                      size="sm" 
+                                      className="bg-accent hover:bg-accent/90 text-black text-xs px-2 py-1"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!user) {
+                                          window.location.href = `/login?redirect=/creator/${username}`;
+                                        } else {
+                                          document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }}
+                                    >
+                                      {!user ? 'Login' : 'Subscribe'}
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                            const mediaUrl = mediaUrls[0];
+
+                            if (mediaUrl) {
+                              const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                              return post.media_type === 'video' ? (
+                                <video 
+                                  src={fullUrl}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  preload="metadata"
+                                />
+                              ) : (
+                                <img 
+                                  src={fullUrl}
+                                  alt={post.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full h-full object-cover opacity-50";
+                                  }}
+                                />
+                              );
+                            } else {
+                              return (
+                                <img 
+                                  src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
+                                       post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
+                                       post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
+                                       `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                  alt={`${creator.display_name}'s post`}
+                                  className="w-full h-full object-cover"
+                                />
+                              );
+                            }
+                          })()}
+
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Duration overlay for videos */}
+                          {post.media_type === 'video' && (
+                            <div className="absolute bottom-2 right-2">
+                              <div className="px-1 py-0.5 bg-black/60 rounded text-white text-xs">
+                                {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom section - VideoWatch Up Next style */}
+                        <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: YouTube-style 16:9 card layout */}
+                <div className="hidden md:block">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {getFilteredPosts().map((post) => (
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          {/* Media Content - 16:9 aspect ratio */}
+                          <div 
+                            className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
+                            onClick={() => handleContentClick(post)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleContentClick(post);
+                              }
+                            }}
+                          >
+                            {(() => {
+                              const hasAccess = hasAccessToTier(post.tier);
+
+                              if (!hasAccess) {
+                                return (
+                                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                    <div className="text-center z-10 p-4">
+                                      <div className="mb-3">
+                                        <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-foreground mb-2">
+                                        {post.tier === 'supporter' ? 'Supporter' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                      </h3>
+                                      <p className="text-sm text-muted-foreground mb-3">
+                                        Subscribe to unlock
+                                      </p>
+                                      <Button 
+                                        size="sm" 
+                                        className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (!user) {
+                                            window.location.href = `/login?redirect=/creator/${username}`;
+                                          } else {
+                                            document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                          }
+                                        }}
+                                      >
+                                        {!user ? 'Login' : 'Subscribe'}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                              const mediaUrl = mediaUrls[0];
+
+                              if (mediaUrl) {
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                                return post.media_type === 'video' ? (
+                                  <video 
+                                    src={fullUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                          <div class="text-white text-sm">Video unavailable</div>
+                                        </div>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <img 
+                                    src={fullUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full h-full object-cover opacity-50";
+                                    }}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <img 
+                                    src={`https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                    alt={`${creator.display_name}'s post`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                );
+                              }
+                            })()}
+
+
+                            {/* Duration overlay for videos */}
+                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
+                              <div className="absolute bottom-4 right-4">
+                                <div className="px-2 py-1 bg-black/80 rounded text-white text-sm font-medium">
+                                  {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tier badge */}
+                            <div className="absolute top-4 left-4">
+                              <Badge variant={getTierColor(post.tier)} className="text-sm">
+                                {post.tier === 'public' ? 'Free' : 
+                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                                 post.tier}
+                              </Badge>
+                            </div>
+
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-6 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-5 h-5" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-5 h-5" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
                         </CardContent>
                       </Card>
                     ))}
@@ -2145,23 +3101,23 @@ export const CreatorProfile: React.FC = () => {
                 {selectedContent.mediaPreview ? (
                   <div className="relative w-full h-full">
                     {/* Blurred background layer */}
-                    <div
+                    <div 
                       className="absolute inset-0 bg-cover bg-center filter blur-sm scale-110"
                       style={{ backgroundImage: `url(${selectedContent.mediaPreview})` }}
                     />
                     {/* Main media content - Square container */}
                     <div className="relative z-10 w-full h-full">
                       {selectedContent.type === 'Video' ? (
-                        <video
-                          src={selectedContent.mediaPreview}
+                        <video 
+                          src={selectedContent.mediaPreview} 
                           className="w-full h-full object-contain"
                           controls
                           autoPlay
                           muted
                         />
                       ) : (
-                        <img
-                          src={selectedContent.mediaPreview}
+                        <img 
+                          src={selectedContent.mediaPreview} 
                           alt={selectedContent.caption}
                           className="w-full h-full object-contain"
                         />
