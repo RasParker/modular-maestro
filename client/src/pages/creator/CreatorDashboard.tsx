@@ -380,15 +380,11 @@ export const CreatorDashboard: React.FC = () => {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-sm truncate">{content.content || content.title || 'Untitled Post'}</h4>
-                                  <div className="flex items-center gap-2 mt-1">
+                                  <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{content.content || content.title || 'Untitled Post'}</h4>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <Badge variant="outline" className="text-xs">{content.tier}</Badge>
-                                    <span className="text-xs text-muted-foreground">
-                                      {content.scheduled_for 
-                                        ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                                        : 'Scheduled'
-                                      }
-                                    </span>
+                                    <span>•</span>
+                                    <span>{new Date(content.created_at).toLocaleDateString()}</span>
                                   </div>
                                   <div className="flex items-center gap-4 mt-2">
                                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -480,15 +476,11 @@ export const CreatorDashboard: React.FC = () => {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm truncate">{content.content || content.title || 'Untitled Post'}</h4>
-                              <div className="flex items-center gap-2 mt-1">
+                              <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{content.content || content.title || 'Untitled Post'}</h4>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Badge variant="outline" className="text-xs">{content.tier}</Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {content.scheduled_for 
-                                    ? new Date(content.scheduled_for).toLocaleDateString() + ' at ' + new Date(content.scheduled_for).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                                    : 'Scheduled'
-                                  }
-                                </span>
+                                <span>•</span>
+                                <span>{new Date(content.created_at).toLocaleDateString()}</span>
                               </div>
                               <div className="flex items-center gap-4 mt-2">
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -564,7 +556,8 @@ export const CreatorDashboard: React.FC = () => {
                                 return post.media_type === 'video' ? (
                                   <video
                                     src={mediaUrl}
-                                    className="w-16 h-16 object-cover rounded-lg"
+                                    className="w-20 h-11 object-cover rounded-lg"
+                                    style={{ aspectRatio: '16/9' }}
                                     muted
                                     preload="metadata"
                                     onError={(e) => {
@@ -573,7 +566,7 @@ export const CreatorDashboard: React.FC = () => {
                                       target.style.display = 'none';
                                       const parent = target.parentElement;
                                       if (parent) {
-                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                        parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
                                       }
                                     }}
                                   />
@@ -581,21 +574,22 @@ export const CreatorDashboard: React.FC = () => {
                                   <img
                                     src={mediaUrl}
                                     alt={post.title || 'Post'}
-                                    className="w-16 h-16 object-cover rounded-lg"
+                                    className="w-20 h-11 object-cover rounded-lg"
+                                    style={{ aspectRatio: '16/9' }}
                                     onError={(e) => {
                                       // Hide image and show fallback icon
                                       const target = e.target as HTMLImageElement;
                                       target.style.display = 'none';
                                       const parent = target.parentElement;
                                       if (parent) {
-                                        parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                        parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path></svg></div>`;
                                       }
                                     }}
                                   />
                                 );
                               })()
                             ) : (
-                              <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                              <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
                                 {post.media_type === 'image' ? (
                                   <Image className="w-6 h-6 text-muted-foreground" />
                                 ) : post.media_type === 'video' ? (
@@ -607,10 +601,11 @@ export const CreatorDashboard: React.FC = () => {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm line-clamp-2 break-words">{post.caption || post.title || 'Untitled Post'}</h4>
-                            <div className="flex items-center gap-2 mt-1">
+                            <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                              <span className="text-xs text-muted-foreground truncate">
+                              <span>•</span>
+                              <span className="truncate">
                                 {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
                               </span>
                             </div>
@@ -648,7 +643,8 @@ export const CreatorDashboard: React.FC = () => {
                                   return post.media_type === 'video' ? (
                                     <video
                                       src={mediaUrl}
-                                      className="w-16 h-16 object-cover rounded-lg"
+                                      className="w-20 h-11 object-cover rounded-lg"
+                                      style={{ aspectRatio: '16/9' }}
                                       muted
                                       preload="metadata"
                                       onError={(e) => {
@@ -657,7 +653,7 @@ export const CreatorDashboard: React.FC = () => {
                                         target.style.display = 'none';
                                         const parent = target.parentElement;
                                         if (parent) {
-                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
                                         }
                                       }}
                                     />
@@ -665,21 +661,22 @@ export const CreatorDashboard: React.FC = () => {
                                     <img
                                       src={mediaUrl}
                                       alt={post.title || 'Post'}
-                                      className="w-16 h-16 object-cover rounded-lg"
+                                      className="w-20 h-11 object-cover rounded-lg"
+                                      style={{ aspectRatio: '16/9' }}
                                       onError={(e) => {
                                         // Hide image and show fallback icon
                                         const target = e.target as HTMLImageElement;
                                         target.style.display = 'none';
                                         const parent = target.parentElement;
                                         if (parent) {
-                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path></svg></div>`;
                                         }
                                       }}
                                     />
                                   );
                                 })()
                               ) : (
-                                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
                                   {post.media_type === 'image' ? (
                                     <Image className="w-6 h-6 text-muted-foreground" />
                                   ) : post.media_type === 'video' ? (
@@ -691,10 +688,11 @@ export const CreatorDashboard: React.FC = () => {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm line-clamp-2 break-words">{post.caption || post.title || 'Untitled Post'}</h4>
-                              <div className="flex items-center gap-2 mt-1">
+                              <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                                <span className="text-xs text-muted-foreground truncate">
+                                <span>•</span>
+                                <span className="truncate">
                                   {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
                                 </span>
                               </div>
