@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Heart, MessageSquare, Share2, ArrowLeft, Maximize2, X, Eye, ChevronDown, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +23,41 @@ export const VideoWatch: React.FC = () => {
   const [liked, setLiked] = useState(false);
   const [showCommentsSheet, setShowCommentsSheet] = useState(false);
   const [nextVideos, setNextVideos] = useState<any[]>([]);
+  
+  // Draggable bottom sheet state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [currentTranslateY, setCurrentTranslateY] = useState(0);
+
+  // Drag handlers for bottom sheet
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setDragStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - dragStartY;
+    
+    // Only allow dragging down (positive deltaY)
+    if (deltaY > 0) {
+      setCurrentTranslateY(deltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    
+    // If dragged down more than 100px, close the sheet
+    if (currentTranslateY > 100) {
+      setShowCommentsSheet(false);
+    }
+    
+    // Reset transform
+    setCurrentTranslateY(0);
+  };
 
   const getTimeAgo = (dateString: string) => {
     // Handle CURRENT_TIMESTAMP literal string
@@ -491,28 +526,33 @@ export const VideoWatch: React.FC = () => {
         </div>
 
         {/* Comments Bottom Sheet - Mobile Only */}
-        <Drawer 
-          open={showCommentsSheet} 
-          onOpenChange={setShowCommentsSheet}
-          snapPoints={[0.9, 0.5]}
-          activeSnapPoint={0.9}
-        >
-          <DrawerContent 
-            className="h-[90vh] p-0 border-t-0 bg-background flex flex-col focus:outline-none"
-            style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
+        <Sheet open={showCommentsSheet} onOpenChange={setShowCommentsSheet}>
+          <SheetContent
+            side="bottom"
+            className="h-[85vh] p-0 border-t-4 border-border/30 rounded-t-xl bg-background flex flex-col"
+            style={{
+              transform: `translateY(${currentTranslateY}px)`,
+              transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+            }}
           >
             {/* Custom Drag Handle - YouTube Style */}
-            <div className="flex items-center justify-center py-2 bg-background border-b border-border/10 rounded-t-2xl">
-              <div className="w-10 h-1 bg-muted-foreground/40 rounded-full hover:bg-muted-foreground/60 transition-colors cursor-grab active:cursor-grabbing"></div>
+            <div 
+              className="flex items-center justify-center py-3 bg-background border-b border-border/10 rounded-t-xl cursor-grab active:cursor-grabbing"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              data-testid="drag-handle-comments"
+            >
+              <div className="w-12 h-1 bg-muted-foreground/40 rounded-full hover:bg-muted-foreground/60 transition-colors"></div>
             </div>
 
-            <DrawerHeader className="px-4 py-2 border-b border-border/20 bg-background shrink-0">
-              <DrawerTitle className="text-lg font-semibold text-foreground text-center mb-3">
+            <SheetHeader className="px-4 py-3 border-b border-border/20 bg-background shrink-0">
+              <SheetTitle className="text-lg font-semibold text-foreground text-center">
                 Comments
-              </DrawerTitle>
+              </SheetTitle>
 
               {/* Sort Options */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mt-3">
                 <Button variant="default" size="sm" className="rounded-full">
                   Top
                 </Button>
@@ -520,7 +560,7 @@ export const VideoWatch: React.FC = () => {
                   Newest
                 </Button>
               </div>
-            </DrawerHeader>
+            </SheetHeader>
 
             <div className="flex-1 overflow-hidden">
               <CommentSection
@@ -530,8 +570,8 @@ export const VideoWatch: React.FC = () => {
                 isBottomSheet={true}
               />
             </div>
-          </DrawerContent>
-        </Drawer>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Desktop Layout */}
