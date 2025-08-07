@@ -12,15 +12,16 @@ import { PostActions } from '@/components/creator/PostActions';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { PaymentModal } from '@/components/payment/PaymentModal';
 import { TierDetailsModal } from '@/components/subscription/TierDetailsModal';
+import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
 import { useAuth } from '@/contexts/AuthContext';
-import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Star, Users, DollarSign, Check, Settings, Eye, MessageSquare, Heart, Share2, Share, Image, Video, FileText, Edit, Trash2, ArrowLeft, Plus, ChevronDown, ChevronUp, User } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { BioDisplay } from '@/lib/text-utils';
-import { OnlineStatusIndicator } from '@/components/OnlineStatusIndicator';
+
 
 // Add CSS for feed cards to match Fan feed page
 const feedCardStyles = `
@@ -294,8 +295,7 @@ export const CreatorProfile: React.FC = () => {
 
     // Listen for localStorage changes (cross-tab)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || 
-          e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
+      if (e.key === 'profilePhotoUrl' || e.key === 'coverPhotoUrl' || e.key === 'displayName' || e.key === 'bio' || e.key === 'subscriptionTiers') {
         updateProfileData();
 
         // Also trigger a re-fetch of creator data to update the UI
@@ -408,14 +408,14 @@ export const CreatorProfile: React.FC = () => {
               subscription.status === 'active' && 
               subscription.creator_id === creator.id) {
             setUserSubscription(subscription);
-            console.log(`✓ User ${user.id} has active subscription to creator ${creator.id}:`, subscription);
+            console.log('✓ User ${user.id} has active subscription to creator ${creator.id}:', subscription);
           } else {
             setUserSubscription(null);
-            console.log(`✗ User ${user.id} has no active subscription to creator ${creator.id}`);
+            console.log('✗ User ${user.id} has no active subscription to creator ${creator.id}');
           }
         } else {
           setUserSubscription(null);
-          console.log(`✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})`);
+          console.log('✗ No subscription found for user ${user.id} to creator ${creator.id} (${response.status})');
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -543,7 +543,7 @@ export const CreatorProfile: React.FC = () => {
   const handleSubscribe = async (tierId: string) => {
     if (!user) {
       // Redirect to login with return path
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
@@ -844,8 +844,7 @@ export const CreatorProfile: React.FC = () => {
       setPostLikes(prev => ({
         ...prev,
         [postId]: {
-          liked: !currentLike.liked,
-          count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
+          liked: !currentLike.liked,          count: currentLike.liked ? currentLike.count - 1 : currentLike.count + 1
         }
       }));
 
@@ -910,8 +909,8 @@ export const CreatorProfile: React.FC = () => {
       setTimeout(() => {
         // Invalidate conversations query to refresh the list
         queryClient.invalidateQueries({ queryKey: ['/api/conversations'] });
-        // Navigate to messages page
-        window.location.href = '/fan/messages';
+        // Navigate to messages page using React Router
+        navigate('/fan/messages');
       }, 500);
     },
     onError: (error) => {
@@ -926,7 +925,7 @@ export const CreatorProfile: React.FC = () => {
   const handleChatClick = async () => {
     if (!user) {
       // Redirect to login if not authenticated
-      window.location.href = `/login?redirect=/creator/${username}`;
+      navigate(`/login?redirect=/creator/${username}`);
       return;
     }
 
@@ -1303,23 +1302,10 @@ export const CreatorProfile: React.FC = () => {
                 <AvatarFallback className="text-2xl">{(creator?.display_name || creator?.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
-              {/* Profile Photo Upload Button - Only show for own profile and when no avatar */}
-              {isOwnProfile && !creator.avatar && (
-                <div className="absolute -bottom-1 -right-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 w-6 p-0 bg-primary rounded-full border-2 border-background hover:bg-primary/90 transition-colors"
-                    title="Add profile photo"
-                    asChild
-                  >
-                    <Link to="/creator/settings?tab=profile">
-                      <Plus className="w-3 h-3 text-primary-foreground" />
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </div>
+              {/* Online status dot overlay */}
+              {creator.activity_status_visible && creator.is_online && (
+                <div className="absolute w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-lg z-30" style={{ bottom: '3px', right: '3px' }}></div>
+              )}</div>
 
             {/* Desktop Layout - Action buttons on the right */}
             <div className="hidden md:flex w-full items-end justify-between">
@@ -1333,10 +1319,9 @@ export const CreatorProfile: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                  <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
-                </div>
+<div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">@{creator.username}</p>
+              </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Users className="w-4 h-4" />
                   {(creator?.total_subscribers || 0).toLocaleString()} subscribers
@@ -1357,7 +1342,6 @@ export const CreatorProfile: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">@{creator.username}</p>
-                <OnlineStatusIndicator userId={creator.id} showLastSeen={true} size="md" />
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                 <Users className="w-4 h-4" />
@@ -1413,6 +1397,20 @@ export const CreatorProfile: React.FC = () => {
                 <Plus className="w-4 h-4" />
               </Link>
             </Button>
+            {/* Profile Photo Upload Button - Modern placement */}
+            {!creator.avatar && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 w-10 p-0"
+                title="Add profile photo"
+                asChild
+              >
+                <Link to="/creator/settings?tab=profile">
+                  <User className="w-4 h-4" />
+                </Link>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-2 mt-4">
@@ -1697,7 +1695,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIiHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIiB4bWxuczPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
@@ -1748,98 +1746,89 @@ export const CreatorProfile: React.FC = () => {
                                 {post.content || post.title || 'Untitled Post'}
                               </h4>
 
-                                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                  <span className="truncate">{creator.display_name}</span>
-                                  <div className="flex items-center gap-1 flex-shrink-0">
-                                    <Eye className="w-3 h-3" />
-                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
-                                    <span>•</span>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span className="truncate">{creator.display_name}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                  <span>•</span>
                                   <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
-                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons Row - Aligned with Avatar */}
+                              <div className="flex items-center justify-between mt-2 overflow-hidden">
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? "text-red-500" : "text-muted-foreground"}`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleLike(post.id);
+                                    }}
+                                  >
+                                    <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? "fill-current" : ""}`} />
+                                    <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                  </Button>
+
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCommentClick(post.id);
+                                    }}
+                                  >
+                                    <MessageSquare className="w-4 h-4" />
+                                    <span className="text-sm">{post.comments_count || 0}</span>
+                                  </Button>
+
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleShare(post.id);
+                                    }}
+                                  >
+                                    <Share2 className="w-4 h-4" />
+                                    <span className="text-sm">Share</span>
+                                  </Button>
                                 </div>
 
-                                {/* Stats/action icons row with edit/delete buttons */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-3">
-                                    {/* Like button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleLike(post.id);
-                                        }}
-                                      >
-                                        <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-red-500 text-red-500' : ''}`} />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {postLikes[post.id]?.count || post.likes_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Comment button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCommentClick(post.id);
-                                        }}
-                                      >
-                                        <MessageSquare className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {post.comments_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Share button */}
+                                {/* Creator Edit/Delete Actions - Only for own posts */}
+                                {isOwnProfile && (
+                                  <div className="flex items-center gap-2 flex-shrink-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-6 w-6 p-0 text-muted-foreground hover:text-green-500"
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleShare(post.id);
+                                        handleEditPost(post.id);
                                       }}
                                     >
-                                      <Share2 className="w-4 h-4" />
+                                      <Edit className="w-4 h-4" />
+                                      <span className="text-sm">Edit</span>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeletePost(post.id);
+                                      }}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      <span className="text-sm">Delete</span>
                                     </Button>
                                   </div>
-
-                                  {/* Action buttons for own posts - bottom row right side */}
-                                  {isOwnProfile && (
-                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleEditPost(post.id);
-                                        }}
-                                      >
-                                        <Edit className="w-3 h-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleDeletePost(post.id);
-                                        }}
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
-
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1938,7 +1927,7 @@ export const CreatorProfile: React.FC = () => {
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
-                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                       target.className = "w-full h-full object-cover opacity-50";
                                     }}
                                   />
@@ -2010,83 +1999,75 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Stats/action icons row with edit/delete buttons */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-3">
-                                    {/* Like button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleLike(post.id);
-                                        }}
-                                      >
-                                        <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-red-500 text-red-500' : ''}`} />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {postLikes[post.id]?.count || post.likes_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Comment button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCommentClick(post.id);
-                                        }}
-                                      >
-                                        <MessageSquare className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {post.comments_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Share button */}
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-6 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-6 w-6 p-0 text-muted-foreground hover:text-green-500"
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-5 h-5" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleShare(post.id);
                                       }}
                                     >
-                                      <Share2 className="w-4 h-4" />
+                                      <Share2 className="w-5 h-5" />
+                                      <span className="text-sm">Share</span>
                                     </Button>
                                   </div>
 
-                                  {/* Action buttons for own posts - bottom row right side */}
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
                                   {isOwnProfile && (
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex items-center gap-3 flex-shrink-0">
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleEditPost(post.id);
                                         }}
                                       >
-                                        <Edit className="w-3 h-3" />
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
                                       </Button>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleDeletePost(post.id);
                                         }}
                                       >
-                                        <Trash2 className="w-3 h-3" />
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
                                       </Button>
                                     </div>
                                   )}
@@ -2204,7 +2185,7 @@ export const CreatorProfile: React.FC = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                     target.className = "w-full h-full object-cover opacity-50";
                                   }}
                                 />
@@ -2265,83 +2246,75 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Stats/action icons row with edit/delete buttons */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-3">
-                                    {/* Like button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleLike(post.id);
-                                        }}
-                                      >
-                                        <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-red-500 text-red-500' : ''}`} />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {postLikes[post.id]?.count || post.likes_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Comment button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCommentClick(post.id);
-                                        }}
-                                      >
-                                        <MessageSquare className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {post.comments_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Share button */}
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-6 w-6 p-0 text-muted-foreground hover:text-green-500"
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleShare(post.id);
                                       }}
                                     >
                                       <Share2 className="w-4 h-4" />
+                                      <span className="text-sm">Share</span>
                                     </Button>
                                   </div>
 
-                                  {/* Action buttons for own posts - bottom row right side */}
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
                                   {isOwnProfile && (
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleEditPost(post.id);
                                         }}
                                       >
-                                        <Edit className="w-3 h-3" />
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
                                       </Button>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleDeletePost(post.id);
                                         }}
                                       >
-                                        <Trash2 className="w-3 h-3" />
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
                                       </Button>
                                     </div>
                                   )}
@@ -2445,7 +2418,7 @@ export const CreatorProfile: React.FC = () => {
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
-                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy92MDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
                                       target.className = "w-full h-full object-cover opacity-50";
                                     }}
                                   />
@@ -2517,83 +2490,75 @@ export const CreatorProfile: React.FC = () => {
                                   </div>
                                 </div>
 
-                                {/* Stats/action icons row with edit/delete buttons */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-3">
-                                    {/* Like button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleLike(post.id);
-                                        }}
-                                      >
-                                        <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-red-500 text-red-500' : ''}`} />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {postLikes[post.id]?.count || post.likes_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Comment button */}
-                                    <div className="flex items-center gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleCommentClick(post.id);
-                                        }}
-                                      >
-                                        <MessageSquare className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        {post.comments_count || 0}
-                                      </span>
-                                    </div>
-
-                                    {/* Share button */}
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-6 flex-1 min-w-0">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-6 w-6 p-0 text-muted-foreground hover:text-green-500"
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-5 h-5" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         handleShare(post.id);
-                                        }}
+                                      }}
                                     >
-                                      <Share2 className="w-4 h-4" />
+                                      <Share2 className="w-5 h-5" />
+                                      <span className="text-sm">Share</span>
                                     </Button>
                                   </div>
 
-                                  {/* Action buttons for own posts - bottom row right side */}
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
                                   {isOwnProfile && (
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex items-center gap-3 flex-shrink-0">
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-blue-500"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleEditPost(post.id);
                                         }}
                                       >
-                                        <Edit className="w-3 h-3" />
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
                                       </Button>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           handleDeletePost(post.id);
                                         }}
                                       >
-                                        <Trash2 className="w-3 h-3" />
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
                                       </Button>
                                     </div>
                                   )}
@@ -2612,6 +2577,492 @@ export const CreatorProfile: React.FC = () => {
                   <CardContent className="p-6">
                     <div className="text-center py-4">
                       <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No subscription posts yet</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {isOwnProfile ? 'Create premium posts to engage your subscribers.' : `${creator.display_name} hasn't posted any subscription content yet.`}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="public" className="space-y-6">
+              {/* Public Posts Content */}
+              <div>
+            {getFilteredPosts().length > 0 ? (
+              <>
+                {/* Mobile: Edge-to-edge borderless layout like fan feed */}
+                <div className="md:hidden">
+                  <div className="w-full bg-background space-y-0 scrollbar-hide mobile-feed-container" style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}>
+                    {getFilteredPosts().map((post) => (
+                      <div key={post.id} className="w-full bg-background border-b border-border/20 overflow-hidden">
+                        <div 
+                          className="relative w-full aspect-video bg-black cursor-pointer"
+                          onClick={() => handleContentClick(post)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleContentClick(post);
+                            }
+                          }}
+                        >
+                          {(() => {
+                            const hasAccess = hasAccessToTier(post.tier);
+
+                            if (!hasAccess) {
+                              return (
+                                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                  <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                  <div className="text-center z-10 p-4">
+                                    <div className="mb-3">
+                                      <svg className="w-8 h-8 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-2">
+                                      {post.tier === 'supporter' ? 'Supporter' : 
+                                       post.tier === 'fan' ? 'Fan' : 
+                                       post.tier === 'premium' ? 'Premium' : 
+                                       post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                    </p>
+                                    <Button 
+                                      size="sm" 
+                                      className="bg-accent hover:bg-accent/90 text-black text-xs px-2 py-1"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!user) {
+                                          window.location.href = `/login?redirect=/creator/${username}`;
+                                        } else {
+                                          document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                      }}
+                                    >
+                                      {!user ? 'Login' : 'Subscribe'}
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                            const mediaUrl = mediaUrls[0];
+
+                            if (mediaUrl) {
+                              const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                              return post.media_type === 'video' ? (
+                                <video 
+                                  src={fullUrl}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  preload="metadata"
+                                />
+                              ) : (
+                                <img 
+                                  src={fullUrl}
+                                  alt={post.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                    target.className = "w-full h-full object-cover opacity-50";
+                                  }}
+                                />
+                              );
+                            } else {
+                              return (
+                                <img 
+                                  src={post.id === '1' ? 'https://placehold.co/640x360/E63946/FFFFFF?text=Creator+Post+1' :
+                                       post.id === '2' ? 'https://placehold.co/640x360/457B9D/FFFFFF?text=Creator+Post+2' :
+                                       post.id === '3' ? 'https://placehold.co/640x360/1D3557/FFFFFF?text=Creator+Post+3' :
+                                       `https://placehold.co/640x360/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                  alt={`${creator.display_name}'s post`}
+                                  className="w-full h-full object-cover"
+                                />
+                              );
+                            }
+                          })()}
+
+                          {/* Content type overlay - only show for non-video media */}
+                          {post.media_type !== 'video' && (
+                            <div className="absolute top-2 left-2">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                {getMediaOverlayIcon(post.media_type)}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Duration overlay for videos */}
+                          {post.media_type === 'video' && (
+                            <div className="absolute bottom-2 right-2">
+                              <div className="px-1 py-0.5 bg-black/60 rounded text-white text-xs">
+                                {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom section - VideoWatch Up Next style */}
+                        <div className="p-3">
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-1 h-auto py-2 px-2 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-4 h-4 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-4 h-4" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-1 h-auto py-2 px-2 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: YouTube-style 16:9 card layout */}
+                <div className="hidden md:block">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {getFilteredPosts().map((post) => (
+                      <Card key={post.id} className="bg-gradient-card border-border/50 overflow-hidden">
+                        <CardContent className="p-4">
+                          {/* Media Content - 16:9 aspect ratio */}
+                          <div 
+                            className="relative aspect-video bg-black cursor-pointer rounded-lg overflow-hidden mb-4"
+                            onClick={() => handleContentClick(post)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleContentClick(post);
+                              }
+                            }}
+                          >
+                            {(() => {
+                              const hasAccess = hasAccessToTier(post.tier);
+
+                              if (!hasAccess) {
+                                return (
+                                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+                                    <div className="text-center z-10 p-4">
+                                      <div className="mb-3">
+                                        <svg className="w-12 h-12 mx-auto text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-foreground mb-2">
+                                        {post.tier === 'supporter' ? 'Supporter' : 
+                                         post.tier === 'fan' ? 'Fan' : 
+                                         post.tier === 'premium' ? 'Premium' : 
+                                         post.tier === 'superfan' ? 'Superfan' : 'Premium'} Content
+                                      </h3>
+                                      <p className="text-sm text-muted-foreground mb-3">
+                                        Subscribe to unlock
+                                      </p>
+                                      <Button 
+                                        size="sm" 
+                                        className="bg-accent hover:bg-accent/90 text-black text-sm px-4"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (!user) {
+                                            window.location.href = `/login?redirect=/creator/${username}`;
+                                          } else {
+                                            document.getElementById('subscription-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                                          }
+                                        }}
+                                      >
+                                        {!user ? 'Login' : 'Subscribe'}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              const mediaUrls = Array.isArray(post.media_urls) ? post.media_urls : [post.media_urls];
+                              const mediaUrl = mediaUrls[0];
+
+                              if (mediaUrl) {
+                                const fullUrl = mediaUrl.startsWith('/uploads/') ? mediaUrl : `/uploads/${mediaUrl}`;
+
+                                return post.media_type === 'video' ? (
+                                  <video 
+                                    src={fullUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLVideoElement;
+                                      target.style.display = 'none';
+                                      const parent = target.parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                                          <div class="text-white text-sm">Video unavailable</div>
+                                        </div>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <img 
+                                    src={fullUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzVMMTI1IDEwMEgxMTJWMTI1SDg4VjEwMEg3NUwxMDAgNzVaIiBmaWxsPSIjOWNhM2FmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjEyIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+Cjwvc3ZnPg==';
+                                      target.className = "w-full h-full object-cover opacity-50";
+                                    }}
+                                  />
+                                );
+                              } else {
+                                return (
+                                  <img 
+                                    src={`https://placehold.co/1280x720/6366F1/FFFFFF?text=Creator+Post+${post.id}`}
+                                    alt={`${creator.display_name}'s post`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                );
+                              }
+                            })()}
+
+
+                            {/* Duration overlay for videos */}
+                            {post.media_type === 'video' && hasAccessToTier(post.tier) && (
+                              <div className="absolute bottom-4 right-4">
+                                <div className="px-2 py-1 bg-black/80 rounded text-white text-sm font-medium">
+                                  {Math.floor(Math.random() * 10) + 1}:{Math.floor(Math.random() * 60).toString().padStart(2, '0')}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tier badge */}
+                            <div className="absolute top-4 left-4">
+                              <Badge variant={getTierColor(post.tier)} className="text-sm">
+                                {post.tier === 'public' ? 'Free' : 
+                                 post.tier.toLowerCase() === 'starter pump' ? 'Starter Pump' :
+                                 post.tier.toLowerCase() === 'power gains' ? 'Power Gains' :
+                                 post.tier.toLowerCase() === 'elite beast mode' ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('starter') ? 'Starter Pump' :
+                                 post.tier.toLowerCase().includes('power') ? 'Power Gains' :
+                                 post.tier.toLowerCase().includes('elite') ? 'Elite Beast Mode' :
+                                 post.tier.toLowerCase().includes('beast') ? 'Elite Beast Mode' :
+                                 post.tier}
+                              </Badge>
+                            </div>
+
+                            {/* Content type overlay - only show for non-video media */}
+                            {post.media_type !== 'video' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm">
+                                  {getMediaOverlayIcon(post.media_type)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Creator Info and Content - Fan Feed Single View Style */}
+                          <div className="flex gap-3">
+                            <Avatar className="h-9 w-9 flex-shrink-0">
+                              <AvatarImage src={creator.avatar ? (creator.avatar.startsWith('/uploads/') ? creator.avatar : `/uploads/${creator.avatar}`) : undefined} alt={creator.username} />
+                              <AvatarFallback className="text-sm">{(creator?.display_name || creator?.username || 'U').charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-foreground line-clamp-2 mb-1">
+                                {post.content || post.title || 'Untitled Post'}
+                              </h4>
+
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span className="truncate">{creator.display_name}</span>
+                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{Math.floor(Math.random() * 2000) + 100}</span>
+                                    <span>•</span>
+                                  <span>{getTimeAgo(post.created_at || post.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Row - VideoWatch Style */}
+                                <div className="flex items-center justify-between mt-2 overflow-hidden -ml-3">
+                                  <div className="flex items-center gap-6 flex-1 min-w-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`flex items-center gap-2 h-auto py-2 px-3 ${postLikes[post.id]?.liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLike(post.id);
+                                      }}
+                                    >
+                                      <Heart className={`w-5 h-5 ${postLikes[post.id]?.liked ? 'fill-current' : ''}`} />
+                                      <span className="text-sm">{postLikes[post.id]?.count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentClick(post.id);
+                                      }}
+                                    >
+                                      <MessageSquare className="w-5 h-5" />
+                                      <span className="text-sm">{post.comments_count || 0}</span>
+                                    </Button>
+
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground" 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleShare(post.id);
+                                      }}
+                                    >
+                                      <Share2 className="w-5 h-5" />
+                                      <span className="text-sm">Share</span>
+                                    </Button>
+                                  </div>
+
+                                  {/* Creator Edit/Delete Actions - Only for own posts */}
+                                  {isOwnProfile && (
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post.id);
+                                        }}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="text-sm">Edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex items-center gap-2 h-auto py-2 px-3 text-red-500 hover:text-red-600"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeletePost(post.id);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        <span className="text-sm">Delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+                </>
+              ) : (
+                <Card className="bg-gradient-card border-border/50">
+                  <CardContent className="p-6">
+                    <div className="text-center py-4">
+                      <Eye className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">No public posts yet</h3>
                       <p className="text-muted-foreground text-sm">
                         {isOwnProfile ? 'Create some free content to attract new fans.' : `${creator.display_name} hasn't posted any public content yet.`}
@@ -2619,7 +3070,7 @@ export const CreatorProfile: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-            )}
+              )}
               </div>
             </TabsContent>
           </Tabs>

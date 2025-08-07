@@ -23,8 +23,8 @@ interface Comment {
 
 interface CommentSectionProps {
   postId: string;
-  initialComments: Comment[];
-  onCommentCountChange: (count: number) => void;
+  initialComments?: Comment[];
+  onCommentCountChange: (postId: string | number, count: number) => void;
   creatorId?: string;
   isBottomSheet?: boolean;
 }
@@ -104,7 +104,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [comments, setComments] = useState<Comment[]>(initialComments || []);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [showReplies, setShowReplies] = useState<Record<string, boolean>>({});
@@ -133,7 +133,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           replies: comment.replies || []
         }));
         setComments(formattedComments);
-        onCommentCountChange(formattedComments.length);
+        onCommentCountChange(postId, formattedComments.length);
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
@@ -205,7 +205,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         setComments(prev => [comment, ...prev]);
         setNewComment('');
         // Update comment count by calling the callback with the new count
-        onCommentCountChange(comments.length + 1);
+        onCommentCountChange(postId, comments.length + 1);
 
         toast({
           title: "Comment added",
@@ -222,36 +222,61 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     }
   };
 
-  const handleAddReply = (parentId: string, replyContent: string) => {
+  const handleAddReply = async (parentId: string, replyContent: string) => {
     if (!replyContent.trim()) return;
 
-    const reply: Comment = {
-      id: Date.now().toString(),
-      user: {
-        id: user?.id || '1',
-        username: user?.username || 'current_user',
-        avatar: user?.avatar
-      },
-      content: replyContent,
-      likes: 0,
-      liked: false,
-      createdAt: new Date().toISOString(),
-      replies: []
-    };
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: replyContent,
+          user_id: user?.id || 1,
+          parent_id: parentId
+        })
+      });
 
-    setComments(prev => prev.map(comment => 
-      comment.id === parentId 
-        ? { ...comment, replies: [reply, ...comment.replies] }
-        : comment
-    ));
+      if (response.ok) {
+        const replyData = await response.json();
+        const reply: Comment = {
+          id: replyData.id.toString(),
+          user: {
+            id: replyData.user?.id.toString() || user?.id?.toString() || '1',
+            username: replyData.user?.username || user?.username || 'current_user',
+            avatar: replyData.user?.avatar || user?.avatar
+          },
+          content: replyData.content,
+          likes: 0,
+          liked: false,
+          createdAt: replyData.created_at,
+          replies: []
+        };
 
-    setReplyingTo(null);
-    onCommentCountChange(comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
+        setComments(prev => prev.map(comment => 
+          comment.id === parentId 
+            ? { ...comment, replies: [reply, ...comment.replies] }
+            : comment
+        ));
 
-    toast({
-      title: "Reply added",
-      description: "Your reply has been posted successfully.",
-    });
+        setReplyingTo(null);
+        onCommentCountChange(postId, comments.reduce((total, comment) => total + 1 + comment.replies.length, 0) + 1);
+
+        toast({
+          title: "Reply added",
+          description: "Your reply has been posted successfully.",
+        });
+      } else {
+        throw new Error('Failed to post reply');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post reply. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleLikeComment = (commentId: string, isReply: boolean = false, parentId?: string) => {

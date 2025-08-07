@@ -1832,6 +1832,14 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Mobile Comments Section */}
+                        {showComments[post.id] && (
+                          <CommentSection
+                            postId={post.id}
+                            onCommentCountChange={handleCommentCountChange}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -2075,6 +2083,16 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
+
+                          {/* Desktop Comments Section */}
+                          {showComments[post.id] && (
+                            <div className="mt-4 pt-4 border-t border-border/20">
+                              <CommentSection
+                                postId={post.id}
+                                onCommentCountChange={handleCommentCountChange}
+                              />
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
@@ -2323,6 +2341,14 @@ export const CreatorProfile: React.FC = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Mobile Comments Section */}
+                        {showComments[post.id] && (
+                          <CommentSection
+                            postId={post.id}
+                            onCommentCountChange={handleCommentCountChange}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -2575,6 +2601,16 @@ export const CreatorProfile: React.FC = () => {
               ) : (
                 <Card className="bg-gradient-card border-border/50">
                   <CardContent className="p-6">
+
+                          {/* Desktop Comments Section */}
+                          {showComments[post.id] && (
+                            <div className="mt-4 pt-4 border-t border-border/20">
+                              <CommentSection
+                                postId={post.id}
+                                onCommentCountChange={handleCommentCountChange}
+                              />
+                            </div>
+                          )}
                     <div className="text-center py-4">
                       <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">No subscription posts yet</h3>
@@ -2808,6 +2844,14 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
+
+                        {/* Mobile Comments Section */}
+                        {showComments[post.id] && (
+                          <CommentSection
+                            postId={post.id}
+                            onCommentCountChange={handleCommentCountChange}
+                          />
+                        )}
                         </div>
                       </div>
                     ))}
@@ -3060,6 +3104,16 @@ export const CreatorProfile: React.FC = () => {
                 </>
               ) : (
                 <Card className="bg-gradient-card border-border/50">
+
+                          {/* Desktop Comments Section */}
+                          {showComments[post.id] && (
+                            <div className="mt-4 pt-4 border-t border-border/20">
+                              <CommentSection
+                                postId={post.id}
+                                onCommentCountChange={handleCommentCountChange}
+                              />
+                            </div>
+                          )}
                   <CardContent className="p-6">
                     <div className="text-center py-4">
                       <Eye className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
