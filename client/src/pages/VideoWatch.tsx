@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { CommentSection } from '@/components/fan/CommentSection';
 import { Heart, MessageSquare, Share2, ArrowLeft, Maximize2, X, Eye, ChevronDown, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -491,21 +491,28 @@ export const VideoWatch: React.FC = () => {
         </div>
 
         {/* Comments Bottom Sheet - Mobile Only */}
-        <Sheet open={showCommentsSheet} onOpenChange={setShowCommentsSheet}>
-          <SheetContent
-            side="bottom"
-            className="h-[85vh] p-0 border-t-4 border-border/30 rounded-t-xl bg-background flex flex-col"
+        <Drawer 
+          open={showCommentsSheet} 
+          onOpenChange={setShowCommentsSheet}
+          snapPoints={[0.9, 0.5]}
+          activeSnapPoint={0.9}
+        >
+          <DrawerContent 
+            className="h-[90vh] p-0 border-t-0 bg-background flex flex-col focus:outline-none"
+            style={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
           >
-            <SheetHeader className="px-4 py-3 border-b border-border/20 bg-background shrink-0">
-              <div className="flex items-center justify-center">
-                <div className="w-12 h-1 bg-muted-foreground/30 rounded-full mb-2"></div>
-              </div>
-              <SheetTitle className="text-lg font-semibold text-foreground text-center">
+            {/* Custom Drag Handle - YouTube Style */}
+            <div className="flex items-center justify-center py-2 bg-background border-b border-border/10 rounded-t-2xl">
+              <div className="w-10 h-1 bg-muted-foreground/40 rounded-full hover:bg-muted-foreground/60 transition-colors cursor-grab active:cursor-grabbing"></div>
+            </div>
+
+            <DrawerHeader className="px-4 py-2 border-b border-border/20 bg-background shrink-0">
+              <DrawerTitle className="text-lg font-semibold text-foreground text-center mb-3">
                 Comments
-              </SheetTitle>
+              </DrawerTitle>
 
               {/* Sort Options */}
-              <div className="flex items-center gap-3 mt-3">
+              <div className="flex items-center gap-3">
                 <Button variant="default" size="sm" className="rounded-full">
                   Top
                 </Button>
@@ -513,18 +520,18 @@ export const VideoWatch: React.FC = () => {
                   Newest
                 </Button>
               </div>
-            </SheetHeader>
+            </DrawerHeader>
 
             <div className="flex-1 overflow-hidden">
               <CommentSection
-                postId={post.id.toString()}
+                postId={post?.id?.toString() || ''}
                 initialComments={[]}
                 onCommentCountChange={(count) => setPost((prev: any) => ({ ...prev, comments_count: count }))}
                 isBottomSheet={true}
               />
             </div>
-          </SheetContent>
-        </Sheet>
+          </DrawerContent>
+        </Drawer>
       </div>
 
       {/* Desktop Layout */}
