@@ -102,7 +102,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           {/* Media Preview - Left side */}
           <div className="flex-shrink-0">
             <div 
-              className="w-24 h-16 sm:w-40 sm:h-24 overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
+              className="w-32 h-18 sm:w-48 sm:h-27 overflow-hidden rounded-lg cursor-pointer hover:opacity-95 transition-opacity bg-black"
+              style={{ aspectRatio: '16/9' }}
               onClick={(e) => {
                 e.stopPropagation();
                 onViewContent && onViewContent({
@@ -162,46 +163,9 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           <div className="flex-1 min-w-0 space-y-2">
             {/* Title/Caption */}
             <div className="flex-1 min-w-0">
-              {(() => {
-                const { truncated, needsExpansion } = truncateText(caption, 80);
-                return (
-                  <h3 className="text-sm font-medium text-foreground leading-tight break-words overflow-hidden md:line-clamp-2 line-clamp-1">
-                    {expandedCaption ? caption : (
-                      <>
-                        {truncated}
-                        {needsExpansion && !expandedCaption && (
-                          <>
-                            <span className="hidden sm:inline">... </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedCaption(true);
-                              }}
-                              className="text-primary hover:text-primary/80 font-medium hidden sm:inline"
-                            >
-                              more
-                            </button>
-                          </>
-                        )}
-                      </>
-                    )}
-                    {expandedCaption && needsExpansion && (
-                      <>
-                        {' '}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedCaption(false);
-                          }}
-                          className="text-primary hover:text-primary/80 font-medium hidden sm:inline"
-                        >
-                          less
-                        </button>
-                      </>
-                    )}
-                  </h3>
-                );
-              })()}
+              <h3 className="text-sm font-medium text-foreground leading-tight truncate overflow-hidden whitespace-nowrap">
+                {caption}
+              </h3>
             </div>
 
             {/* Meta information */}
