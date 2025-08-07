@@ -1831,6 +1831,16 @@ export const CreatorProfile: React.FC = () => {
                               </div>
                             </div>
                           </div>
+
+                          {/* Comments Section - Mobile */}
+                          {showComments[post.id] && (
+                            <div className="mt-4 pt-3 border-t border-border/20">
+                              <CommentSection 
+                                postId={post.id} 
+                                onCommentCountChange={handleCommentCountChange}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -2075,6 +2085,16 @@ export const CreatorProfile: React.FC = () => {
 
                             </div>
                           </div>
+
+                          {/* Comments Section - Desktop */}
+                          {showComments[post.id] && (
+                            <div className="mt-6 pt-4 border-t border-border/20">
+                              <CommentSection 
+                                postId={post.id} 
+                                onCommentCountChange={handleCommentCountChange}
+                              />
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
