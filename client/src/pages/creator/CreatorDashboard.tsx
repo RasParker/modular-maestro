@@ -11,7 +11,7 @@ import { QuickActionsGrid } from '@/components/creator/QuickActionsGrid';
 import { ContentScheduleCard } from '@/components/creator/ContentScheduleCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { 
+import {
   BarChart3,
   TrendingUp,
   Users,
@@ -89,15 +89,15 @@ export const CreatorDashboard: React.FC = () => {
 
 
         // Filter for scheduled content - check for both status and scheduled_for date
-        const scheduled = posts.filter((post: any) => 
-          post.status === 'scheduled' || 
+        const scheduled = posts.filter((post: any) =>
+          post.status === 'scheduled' ||
           (post.scheduled_for && new Date(post.scheduled_for) > new Date())
         );
         console.log('Filtered scheduled content:', scheduled);
         setScheduledContent(scheduled);
 
         // Filter for published posts only for Recent Posts section
-        const publishedPosts = posts.filter((post: any) => 
+        const publishedPosts = posts.filter((post: any) =>
           post.status === 'published'
         );
         setUserPosts(publishedPosts);
@@ -161,7 +161,7 @@ export const CreatorDashboard: React.FC = () => {
       console.log('Updating monthly goals with:', goalsData);
       setMonthlyGoals({
         subscriberGoal: goalsData.subscriberGoal || 30,
-        revenueGoal: goalsData.revenueGoal || 1000, 
+        revenueGoal: goalsData.revenueGoal || 1000,
         postsGoal: goalsData.postsGoal || 15,
         currentSubscribers: analytics.subscribers || 0,
         currentRevenue: analytics.monthlyEarnings || 0,
@@ -284,8 +284,8 @@ export const CreatorDashboard: React.FC = () => {
                           <p className="text-xs text-muted-foreground">GHS {tier.revenue.toLocaleString()}/month</p>
                         </div>
                       </div>
-                      <Progress 
-                        value={analytics.subscribers > 0 ? (tier.subscribers / analytics.subscribers) * 100 : 0} 
+                      <Progress
+                        value={analytics.subscribers > 0 ? (tier.subscribers / analytics.subscribers) * 100 : 0}
                         className="h-2"
                       />
                     </div>
@@ -330,14 +330,15 @@ export const CreatorDashboard: React.FC = () => {
                                   {content.media_urls && content.media_urls.length > 0 ? (
                                     (() => {
                                       // Construct full URL - add /uploads/ prefix if not present
-                                      const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
-                                        ? content.media_urls[0] 
+                                      const mediaUrl = content.media_urls[0].startsWith('/uploads/')
+                                        ? content.media_urls[0]
                                         : `/uploads/${content.media_urls[0]}`;
 
                                       return content.media_type === 'video' ? (
                                         <video
                                           src={mediaUrl}
-                                          className="w-16 h-16 object-cover rounded-lg"
+                                          className="w-20 h-11 object-cover rounded-lg"
+                                          style={{ aspectRatio: '16/9' }}
                                           muted
                                           preload="metadata"
                                           onError={(e) => {
@@ -346,7 +347,7 @@ export const CreatorDashboard: React.FC = () => {
                                             target.style.display = 'none';
                                             const parent = target.parentElement;
                                             if (parent) {
-                                              parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                              parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
                                             }
                                           }}
                                         />
@@ -354,21 +355,22 @@ export const CreatorDashboard: React.FC = () => {
                                         <img
                                           src={mediaUrl}
                                           alt={content.title || 'Scheduled Post'}
-                                          className="w-16 h-16 object-cover rounded-lg"
+                                          className="w-20 h-11 object-cover rounded-lg"
+                                          style={{ aspectRatio: '16/9' }}
                                           onError={(e) => {
                                             // Hide image and show fallback icon
                                             const target = e.target as HTMLImageElement;
                                             target.style.display = 'none';
                                             const parent = target.parentElement;
                                             if (parent) {
-                                              parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                              parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
                                             }
                                           }}
                                         />
                                       );
                                     })()
                                   ) : (
-                                    <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
                                       {content.media_type === 'image' ? (
                                         <Image className="w-6 h-6 text-muted-foreground" />
                                       ) : content.media_type === 'video' ? (
@@ -394,9 +396,9 @@ export const CreatorDashboard: React.FC = () => {
                                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                       <Calendar className="w-3 h-3" />
                                       <span>
-                                        {content.scheduled_for 
-                                          ? new Date(content.scheduled_for) > new Date() 
-                                            ? 'Future' 
+                                        {content.scheduled_for
+                                          ? new Date(content.scheduled_for) > new Date()
+                                            ? 'Future'
                                             : 'Ready'
                                           : 'Not Set'
                                         }
@@ -420,20 +422,21 @@ export const CreatorDashboard: React.FC = () => {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {scheduledContent.slice(0, 2).map((content) => (
+                        {scheduledContent.map((content) => (
                           <div key={content.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
                             <div className="flex-shrink-0">
                               {content.media_urls && content.media_urls.length > 0 ? (
                                 (() => {
                                   // Construct full URL - add /uploads/ prefix if not present
-                                  const mediaUrl = content.media_urls[0].startsWith('/uploads/') 
-                                    ? content.media_urls[0] 
+                                  const mediaUrl = content.media_urls[0].startsWith('/uploads/')
+                                    ? content.media_urls[0]
                                     : `/uploads/${content.media_urls[0]}`;
 
                                   return content.media_type === 'video' ? (
                                     <video
                                       src={mediaUrl}
-                                      className="w-16 h-16 object-cover rounded-lg"
+                                      className="w-20 h-11 object-cover rounded-lg"
+                                      style={{ aspectRatio: '16/9' }}
                                       muted
                                       preload="metadata"
                                       onError={(e) => {
@@ -442,7 +445,7 @@ export const CreatorDashboard: React.FC = () => {
                                         target.style.display = 'none';
                                         const parent = target.parentElement;
                                         if (parent) {
-                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
                                         }
                                       }}
                                     />
@@ -450,21 +453,22 @@ export const CreatorDashboard: React.FC = () => {
                                     <img
                                       src={mediaUrl}
                                       alt={content.title || 'Scheduled Post'}
-                                      className="w-16 h-16 object-cover rounded-lg"
+                                      className="w-20 h-11 object-cover rounded-lg"
+                                      style={{ aspectRatio: '16/9' }}
                                       onError={(e) => {
                                         // Hide image and show fallback icon
                                         const target = e.target as HTMLImageElement;
                                         target.style.display = 'none';
                                         const parent = target.parentElement;
                                         if (parent) {
-                                          parent.innerHTML = `<div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
                                         }
                                       }}
                                     />
                                   );
                                 })()
                               ) : (
-                                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center">
+                                <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
                                   {content.media_type === 'image' ? (
                                     <Image className="w-6 h-6 text-muted-foreground" />
                                   ) : content.media_type === 'video' ? (
@@ -490,9 +494,9 @@ export const CreatorDashboard: React.FC = () => {
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                   <Calendar className="w-3 h-3" />
                                   <span>
-                                    {content.scheduled_for 
-                                      ? new Date(content.scheduled_for) > new Date() 
-                                        ? 'Future' 
+                                    {content.scheduled_for
+                                      ? new Date(content.scheduled_for) > new Date()
+                                        ? 'Future'
                                         : 'Ready'
                                       : 'Not Set'
                                     }
@@ -544,87 +548,87 @@ export const CreatorDashboard: React.FC = () => {
                       <ScrollArea className="h-[200px] w-full scrollbar-hide">
                         <div className="space-y-4 pr-4">
                           {userPosts.map((post) => (
-                        <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
-                          <div className="flex-shrink-0">
-                            {post.media_urls && post.media_urls.length > 0 ? (
-                              (() => {
-                                // Construct full URL - add /uploads/ prefix if not present
-                                const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
-                                  ? post.media_urls[0] 
-                                  : `/uploads/${post.media_urls[0]}`;
+                            <div key={post.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                              <div className="flex-shrink-0">
+                                {post.media_urls && post.media_urls.length > 0 ? (
+                                  (() => {
+                                    // Construct full URL - add /uploads/ prefix if not present
+                                    const mediaUrl = post.media_urls[0].startsWith('/uploads/')
+                                      ? post.media_urls[0]
+                                      : `/uploads/${post.media_urls[0]}`;
 
-                                return post.media_type === 'video' ? (
-                                  <video
-                                    src={mediaUrl}
-                                    className="w-20 h-11 object-cover rounded-lg"
-                                    style={{ aspectRatio: '16/9' }}
-                                    muted
-                                    preload="metadata"
-                                    onError={(e) => {
-                                      // Hide video and show fallback icon
-                                      const target = e.target as HTMLVideoElement;
-                                      target.style.display = 'none';
-                                      const parent = target.parentElement;
-                                      if (parent) {
-                                        parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
-                                      }
-                                    }}
-                                  />
+                                    return post.media_type === 'video' ? (
+                                      <video
+                                        src={mediaUrl}
+                                        className="w-20 h-11 object-cover rounded-lg"
+                                        style={{ aspectRatio: '16/9' }}
+                                        muted
+                                        preload="metadata"
+                                        onError={(e) => {
+                                          // Hide video and show fallback icon
+                                          const target = e.target as HTMLVideoElement;
+                                          target.style.display = 'none';
+                                          const parent = target.parentElement;
+                                          if (parent) {
+                                            parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div>`;
+                                          }
+                                        }}
+                                      />
+                                    ) : (
+                                      <img
+                                        src={mediaUrl}
+                                        alt={post.title || 'Post'}
+                                        className="w-20 h-11 object-cover rounded-lg"
+                                        style={{ aspectRatio: '16/9' }}
+                                        onError={(e) => {
+                                          // Hide image and show fallback icon
+                                          const target = e.target as HTMLImageElement;
+                                          target.style.display = 'none';
+                                          const parent = target.parentElement;
+                                          if (parent) {
+                                            parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                                          }
+                                        }}
+                                      />
+                                    );
+                                  })()
                                 ) : (
-                                  <img
-                                    src={mediaUrl}
-                                    alt={post.title || 'Post'}
-                                    className="w-20 h-11 object-cover rounded-lg"
-                                    style={{ aspectRatio: '16/9' }}
-                                    onError={(e) => {
-                                      // Hide image and show fallback icon
-                                      const target = e.target as HTMLImageElement;
-                                      target.style.display = 'none';
-                                      const parent = target.parentElement;
-                                      if (parent) {
-                                        parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path></svg></div>`;
-                                      }
-                                    }}
-                                  />
-                                );
-                              })()
-                            ) : (
-                              <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
-                                {post.media_type === 'image' ? (
-                                  <Image className="w-6 h-6 text-muted-foreground" />
-                                ) : post.media_type === 'video' ? (
-                                  <Video className="w-6 h-6 text-muted-foreground" />
-                                ) : (
-                                  <FileText className="w-6 h-6 text-muted-foreground" />
+                                  <div className="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
+                                    {post.media_type === 'image' ? (
+                                      <Image className="w-6 h-6 text-muted-foreground" />
+                                    ) : post.media_type === 'video' ? (
+                                      <Video className="w-6 h-6 text-muted-foreground" />
+                                    ) : (
+                                      <FileText className="w-6 h-6 text-muted-foreground" />
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Badge variant="outline" className="text-xs">{post.tier}</Badge>
-                              <span>•</span>
-                              <span className="truncate">
-                                {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
-                              </span>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <Badge variant="outline" className="text-xs">{post.tier}</Badge>
+                                  <span>•</span>
+                                  <span className="truncate">
+                                    {post.date || new Date(post.created_at || Date.now()).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-4 mt-2">
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <Eye className="w-3 h-3" />
+                                    <span>{post.views || post.views_count || 0}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <Heart className="w-3 h-3" />
+                                    <span>{post.likes || post.likes_count || 0}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <MessageSquare className="w-3 h-3" />
+                                    <span>{post.comments || post.comments_count || 0}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-4 mt-2">
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Eye className="w-3 h-3" />
-                                <span>{post.views || post.views_count || 0}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Heart className="w-3 h-3" />
-                                <span>{post.likes || post.likes_count || 0}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <MessageSquare className="w-3 h-3" />
-                                <span>{post.comments || post.comments_count || 0}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
                           ))}
                         </div>
                       </ScrollArea>
@@ -636,8 +640,8 @@ export const CreatorDashboard: React.FC = () => {
                               {post.media_urls && post.media_urls.length > 0 ? (
                                 (() => {
                                   // Construct full URL - add /uploads/ prefix if not present
-                                  const mediaUrl = post.media_urls[0].startsWith('/uploads/') 
-                                    ? post.media_urls[0] 
+                                  const mediaUrl = post.media_urls[0].startsWith('/uploads/')
+                                    ? post.media_urls[0]
                                     : `/uploads/${post.media_urls[0]}`;
 
                                   return post.media_type === 'video' ? (
@@ -669,7 +673,7 @@ export const CreatorDashboard: React.FC = () => {
                                         target.style.display = 'none';
                                         const parent = target.parentElement;
                                         if (parent) {
-                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path></svg></div>`;
+                                          parent.innerHTML = `<div class="w-20 h-11 bg-gradient-to-br from-accent/20 to-accent/10 rounded-lg flex items-center justify-center" style="aspect-ratio: 16/9;"><svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
                                         }
                                       }}
                                     />
@@ -743,9 +747,9 @@ export const CreatorDashboard: React.FC = () => {
                     {recentSubscribers.map((subscriber) => (
                       <div key={subscriber.id} className="flex items-center gap-3">
                         <Avatar className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
-                          <AvatarImage 
-                            src={subscriber.fan?.avatar || subscriber.avatar} 
-                            alt={subscriber.fan?.username || subscriber.username} 
+                          <AvatarImage
+                            src={subscriber.fan?.avatar || subscriber.avatar}
+                            alt={subscriber.fan?.username || subscriber.username}
                           />
                           <AvatarFallback className="text-xs">
                             {(subscriber.fan?.username || subscriber.username)?.charAt(0)?.toUpperCase()}
@@ -760,7 +764,7 @@ export const CreatorDashboard: React.FC = () => {
                               {subscriber.tier_name || subscriber.tier || 'Subscriber'}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
-                              {subscriber.created_at 
+                              {subscriber.created_at
                                 ? new Date(subscriber.created_at).toLocaleDateString() === new Date().toLocaleDateString()
                                   ? 'Today'
                                   : new Date(subscriber.created_at).toLocaleDateString()
