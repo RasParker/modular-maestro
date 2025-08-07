@@ -605,7 +605,7 @@ export const CreatorDashboard: React.FC = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
+                                <h4 className="font-medium text-sm mb-1 line-clamp-1 overflow-hidden text-ellipsis">{post.caption || post.title || 'Untitled Post'}</h4>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                   <Badge variant="outline" className="text-xs">{post.tier}</Badge>
                                   <span>•</span>
@@ -692,7 +692,7 @@ export const CreatorDashboard: React.FC = () => {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm mb-1 truncate overflow-hidden whitespace-nowrap">{post.caption || post.title || 'Untitled Post'}</h4>
+                              <h4 className="font-medium text-sm mb-1 line-clamp-1 overflow-hidden text-ellipsis">{post.caption || post.title || 'Untitled Post'}</h4>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Badge variant="outline" className="text-xs">{post.tier}</Badge>
                                 <span>•</span>
